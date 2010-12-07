@@ -1,0 +1,43 @@
+﻿<#@ template debug="false" #>
+<#@ output extension=".Generated.cs" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq.Expressions" #>
+using System;
+using System.Linq.Expressions;
+
+namespace ExpressionToCodeLib {
+  interface IExpressionTypeDispatch {
+<#
+	foreach(ExpressionType v in Enum.GetValues(typeof(ExpressionType))) {
+#>
+		void Dispatch<#=v.ToString()#>(Expression e);
+<#
+	}
+#>
+  }
+
+    internal static class ExpressionTypeDispatch {
+		public static void ExpressionDispatch(this IExpressionTypeDispatch dispatcher, Expression e) {
+			try{
+				switch(e.NodeType) {
+<#
+	foreach(ExpressionType v in Enum.GetValues(typeof(ExpressionType))) {
+#>
+					case ExpressionType.<#=v.ToString()#>: dispatcher.Dispatch<#=v.ToString()#>(e); return;
+<#
+	}
+#>
+					default: throw new ArgumentOutOfRangeException("Impossible enum value:"+(int)e.NodeType);
+				}
+			} catch(NotImplementedException nie) {
+				throw new ArgumentOutOfRangeException("Could not dispatch expr with nodetype "+e.NodeType+" and type " +e.GetType().Name,nie);
+			}
+		}
+	}
+}
+ 
+<#+
+  // Insert any template procedures here
+  void foo(){}
+#>
