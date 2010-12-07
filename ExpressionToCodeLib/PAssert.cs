@@ -11,7 +11,7 @@ namespace ExpressionToCodeLib {
 		}
 		public static void That(Expression<Func<bool>> assertion, string msg = null) {
 			if (!assertion.Compile()())
-				throw new PAssertFailedException((msg ?? "PAssert.That failed for:") + "\n" + ExpressionToCode.AnnotatedToCode(assertion.Body));
+				throw new PAssertFailedException((msg ?? "PAssert.That failed for:") + "\n\n" + ExpressionToCode.AnnotatedToCode(assertion.Body));
 		}
 	}
 }
