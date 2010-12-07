@@ -29,16 +29,16 @@ namespace ExpressionToCodeLib {
 		public static string AnnotatedToCode(Expression expr) {
 			var splitLine = ExpressionToStringWithValues(expr);
 
-			List<string> lines = new List<string>();
-			lines.Add(splitLine.Line);
+			StringBuilder exprWithStalkedValues = new StringBuilder();
+			exprWithStalkedValues.AppendLine(splitLine.Line);
 			for (int nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
 				char[] stalkLine = new string(' ', splitLine.Nodes[nodeI].Location).ToCharArray();
 				for (int prevI = 0; prevI < nodeI; prevI++)
 					stalkLine[splitLine.Nodes[prevI].Location] = '|';
-				lines.Add((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
+				exprWithStalkedValues.AppendLine((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
 			}
 
-			return string.Join("\n", lines.ToArray());
+			return exprWithStalkedValues.ToString();
 		}
 
 
