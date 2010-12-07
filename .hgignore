@@ -1,0 +1,3 @@
+glob:*.suo
+glob:bin/
+glob:obj/
