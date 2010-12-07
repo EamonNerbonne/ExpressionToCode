@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib {
-	public class ExprTextPart {
+	class ExprTextPart {
 		public readonly string Text;
 		public readonly Expression OptionalValue;
 		ExprTextPart(string text, Expression val) {

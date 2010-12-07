@@ -7,21 +7,16 @@ using System.Linq.Expressions;
 using System.Text;
 
 namespace ExpressionToCodeLib {
-	static class ObjectToCode {
-		static string EscapeChar(char c) {
-			if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) { //this is a little too rigorous; but easier to read 
-				if (c == '\r') return "\\r";
-				else if (c == '\t') return "\\t";
-				else if (c == '\n') return "\\n";
-				else return "\\x" + Convert.ToString((int)c, 16);
-			} else if (c == '\\') return "\\\\";
-			else return c.ToString();
-		}
-		static string EscapeStringChars(string str) {
-			StringBuilder sb = new StringBuilder(str.Length);
-			foreach (char c in str)
-				sb.Append(EscapeChar(c));
-			return sb.ToString();
+	public static class ObjectToCode {
+		public static string ComplexObjectToPseudoCode(object val) {
+			string retval = PlainObjectToCode(val);
+			if (retval != null) return retval;
+			else if (val is IEnumerable)
+				return FormatEnumerable((IEnumerable)val);
+			else if (val is Expression)
+				return ExpressionToCode.ToCode((Expression)val);
+			else
+				return val.ToString();
 		}
 
 		public static string PlainObjectToCode(object val) {
@@ -55,7 +50,24 @@ namespace ExpressionToCodeLib {
 				return null;
 		}
 
-		private static string DoubleToCode(double p) {
+		static string EscapeChar(char c) {
+			if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) { //this is a little too rigorous; but easier to read 
+				if (c == '\r') return "\\r";
+				else if (c == '\t') return "\\t";
+				else if (c == '\n') return "\\n";
+				else return "\\x" + Convert.ToString((int)c, 16);
+			} else if (c == '\\') return "\\\\";
+			else return c.ToString();
+		}
+
+		static string EscapeStringChars(string str) {
+			StringBuilder sb = new StringBuilder(str.Length);
+			foreach (char c in str)
+				sb.Append(EscapeChar(c));
+			return sb.ToString();
+		}
+
+		static string DoubleToCode(double p) {
 			if (double.IsNaN(p))
 				return "double.NaN";
 			else if (double.IsNegativeInfinity(p))
@@ -68,7 +80,7 @@ namespace ExpressionToCodeLib {
 				return p.ToString("0.0########################");
 		}
 
-		private static string FloatToCode(float p) {
+		static string FloatToCode(float p) {
 			if (float.IsNaN(p))
 				return "float.NaN";
 			else if (float.IsNegativeInfinity(p))
@@ -80,7 +92,6 @@ namespace ExpressionToCodeLib {
 			else
 				return p.ToString("0.0########")+"f";
 		}
-
 
 		static string FormatEnumerable(IEnumerable list) {
 			return "{" + string.Join(", ", ExtractFirst10((IEnumerable)list).ToArray()) + "}";
@@ -96,18 +107,6 @@ namespace ExpressionToCodeLib {
 				} else
 					yield return ComplexObjectToPseudoCode(item);
 			}
-		}
-
-		public static string ComplexObjectToPseudoCode(object val) {
-			string retval = PlainObjectToCode(val);
-			if (retval != null) return retval;
-			else if (val is IEnumerable)
-				return FormatEnumerable((IEnumerable)val);
-			else if (val is Expression)
-				return ExpressionToCode.ToCode((Expression)val);
-			else
-				return val.ToString();
-
 		}
 	}
 }
