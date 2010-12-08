@@ -27,5 +27,26 @@ namespace ExpressionToCodeLib {
 			else
 				throw new ArgumentOutOfRangeException("e", "Expression represents a member access for member" + mi.Name + " of membertype " + mi.MemberType + " that is unsupported");
 		}
+
+		public static bool HasBuiltinConversion(Type from, Type to) {
+			return false
+			|| from == typeof(sbyte) && (to == typeof(short) || to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			|| from == typeof(byte) && (to == typeof(short) || to == typeof(ushort) || to == typeof(int) || to == typeof(uint) || to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			|| from == typeof(short) && (to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			|| from == typeof(ushort) && (to == typeof(int) || to == typeof(uint) || to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			|| from == typeof(int) && (to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			|| from == typeof(uint) && (to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			|| from == typeof(long) && (to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			|| from == typeof(char) && (to == typeof(ushort) || to == typeof(int) || to == typeof(uint) || to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			|| from == typeof(float) && (to == typeof(double))
+			|| from == typeof(ulong) && (to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			;
+		}
+
+		public static bool CanImplicitlyCast(Type from, Type to) {
+			return to.IsAssignableFrom(from) || HasBuiltinConversion(from, to);
+
+			//TODO: extend with op_Implicit support.
+		}
 	}
 }
