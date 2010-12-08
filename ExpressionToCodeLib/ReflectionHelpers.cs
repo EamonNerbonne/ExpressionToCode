@@ -47,6 +47,11 @@ namespace ExpressionToCodeLib {
 			return to.IsAssignableFrom(from) || HasBuiltinConversion(from, to);
 
 			//TODO: extend with op_Implicit support.
+			//Use this to test if a conversion is required.
+			//That means expressions checking if a child is a conversion, 
+			//and if so checking if the conversion can be implicit,
+			//and if so checking if the code compiles without conversion
+			//if it does NOT compile, and IS implicit, then we can omit it since the compiler will add it.
 		}
 	}
 }
