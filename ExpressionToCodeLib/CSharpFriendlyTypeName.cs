@@ -27,9 +27,12 @@ namespace ExpressionToCodeLib {
 		}
 		static string GenericTypeName(Type type) {
 			if (!type.IsGenericType) return null;
-			string basename = type.GetGenericTypeDefinition().Name;
+			Type typedef = type.GetGenericTypeDefinition();
+			if (typedef == typeof(Nullable<>))
+				return Get(type.GetGenericArguments().Single()) + "?";
+			string defname = typedef.Name;
 			string argsString = string.Join(", ", type.GetGenericArguments().Select(Get).ToArray());
-			return basename.Substring(0, basename.IndexOf('`')) + "<" + argsString + ">";
+			return defname.Substring(0, defname.IndexOf('`')) + "<" + argsString + ">";
 		}
 		static string ArrayTypeName(Type type) {
 			if (!type.IsArray) return null;
