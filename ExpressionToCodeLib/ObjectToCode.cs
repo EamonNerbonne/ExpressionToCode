@@ -18,10 +18,13 @@ namespace ExpressionToCodeLib {
 			else
 				return val.ToString();
 		}
-
 		public static string PlainObjectToCode(object val) {
+			return PlainObjectToCode(val, val == null ? null : val.GetType());
+		}
+
+		public static string PlainObjectToCode(object val, Type type) {
 			if (val == null)
-				return "null";
+				return type == null ? "null" : "default(" + CSharpFriendlyTypeName.Get(type) + ")";
 			else if (val is string) {
 				bool useLiteralSyntax = ((string)val).Any(c => c < 32 || c == '\\') && ((string)val).All(c => c != '\n' && c != '\r' && c != '\t');
 				if (useLiteralSyntax)
@@ -87,10 +90,10 @@ namespace ExpressionToCodeLib {
 				return "float.NegativeInfinity";
 			else if (float.IsPositiveInfinity(p))
 				return "float.PositiveInfinity";
-			else if (Math.Abs(p) >= (1<<24))
-				return p.ToString("0.0########e0")+"f";
+			else if (Math.Abs(p) >= (1 << 24))
+				return p.ToString("0.0########e0") + "f";
 			else
-				return p.ToString("0.0########")+"f";
+				return p.ToString("0.0########") + "f";
 		}
 
 		static string FormatEnumerable(IEnumerable list) {

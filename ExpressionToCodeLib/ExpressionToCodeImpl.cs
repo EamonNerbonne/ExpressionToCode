@@ -120,7 +120,7 @@ namespace ExpressionToCodeLib {
 
 
 		public void DispatchConstant(Expression e) {
-			string codeRepresentation = ObjectToCode.PlainObjectToCode(((ConstantExpression)e).Value);
+			string codeRepresentation = ObjectToCode.PlainObjectToCode(((ConstantExpression)e).Value, e.Type);
 			if (codeRepresentation == null)
 				throw new NotImplementedException();
 			else
@@ -196,7 +196,7 @@ namespace ExpressionToCodeLib {
 			NewArrayExpression nae = (NewArrayExpression)e;
 			Type arrayElemType = nae.Type.GetElementType();
 			bool implicitTypeOK = nae.Expressions.Any() && nae.Expressions.All(expr => expr.Type == arrayElemType);
-			Sink("new" + (implicitTypeOK ? "" :" "+ CSharpFriendlyTypeName.Get(arrayElemType)) + "[] ", nae);
+			Sink("new" + (implicitTypeOK ? "" : " " + CSharpFriendlyTypeName.Get(arrayElemType)) + "[] ", nae);
 			ArgListDispatch(nae.Expressions, open: "{ ", close: " }");
 		}
 
