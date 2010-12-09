@@ -25,12 +25,12 @@ namespace ExpressionToCodeLib {
 			else if (mi is EventInfo)
 				return ((EventInfo)mi).GetAddMethod(true).IsStatic;
 			else
-				throw new ArgumentOutOfRangeException("e", "Expression represents a member access for member" + mi.Name + " of membertype " + mi.MemberType + " that is unsupported");
+				throw new ArgumentOutOfRangeException("mi", "Expression represents a member access for member" + mi.Name + " of membertype " + mi.MemberType + " that is unsupported");
 		}
 
 		public static bool HasBuiltinConversion(Type from, Type to) {
-			return false
-			|| from == typeof(sbyte) && (to == typeof(short) || to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+			return 
+			from == typeof(sbyte) && (to == typeof(short) || to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
 			|| from == typeof(byte) && (to == typeof(short) || to == typeof(ushort) || to == typeof(int) || to == typeof(uint) || to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
 			|| from == typeof(short) && (to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
 			|| from == typeof(ushort) && (to == typeof(int) || to == typeof(uint) || to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))

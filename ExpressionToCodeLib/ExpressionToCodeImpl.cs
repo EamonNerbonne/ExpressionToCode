@@ -7,9 +7,8 @@ using System.Runtime.CompilerServices;
 namespace ExpressionToCodeLib {
 	class ExpressionToCodeImpl : IExpressionTypeDispatch {
 		#region General Helpers
-		Action<ExprTextPart> sink;
+		readonly Action<ExprTextPart> sink;
 		internal ExpressionToCodeImpl(Action<ExprTextPart> sink) { this.sink = sink; }
-		void Sink(ExprTextPart etp) { sink(etp); }
 		void Sink(string text) { sink(ExprTextPart.TextOnly(text)); }
 		void Sink(string text, Expression value) { sink(ExprTextPart.TextAndExpr(text, value)); }
 

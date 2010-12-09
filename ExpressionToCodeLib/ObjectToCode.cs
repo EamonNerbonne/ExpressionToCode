@@ -46,7 +46,7 @@ namespace ExpressionToCodeLib {
 			else if (val is bool && val.Equals(false))
 				return "false";
 			else if (val is Enum && Enum.IsDefined(val.GetType(), val))
-				return val.GetType().Name + "." + val.ToString();
+				return val.GetType().Name + "." + val;
 			else if (val.GetType().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val))
 				return "default(" + CSharpFriendlyTypeName.Get(val.GetType()) + ")";
 			else
@@ -58,7 +58,7 @@ namespace ExpressionToCodeLib {
 				if (c == '\r') return "\\r";
 				else if (c == '\t') return "\\t";
 				else if (c == '\n') return "\\n";
-				else return "\\x" + Convert.ToString((int)c, 16);
+				else return "\\x" + Convert.ToString(c, 16);
 			} else if (c == '\\') return "\\\\";
 			else return c.ToString();
 		}
@@ -97,7 +97,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		static string FormatEnumerable(IEnumerable list) {
-			return "{" + string.Join(", ", ExtractFirst10((IEnumerable)list).ToArray()) + "}";
+			return "{" + string.Join(", ", ExtractFirst10(list).ToArray()) + "}";
 		}
 
 		static IEnumerable<string> ExtractFirst10(IEnumerable list) {

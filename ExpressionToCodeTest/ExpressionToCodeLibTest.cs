@@ -65,7 +65,7 @@ namespace ExpressionToCodeTest {
 		public void EnumConstant() {
 			Assert.AreEqual(
 				@"() => new object().Equals((object)MidpointRounding.ToEven)",
-				ExpressionToCode.ToCode(() => new object().Equals((object)MidpointRounding.ToEven)));
+				ExpressionToCode.ToCode(() => new object().Equals(MidpointRounding.ToEven)));
 		}
 
 		[Test]
@@ -200,14 +200,14 @@ namespace ExpressionToCodeTest {
 		public void StaticCall() {
 			Assert.AreEqual(
 				@"() => object.Equals((object)3, (object)0)",
-				ExpressionToCode.ToCode(() => object.Equals((object)3, (object)0)));
+				ExpressionToCode.ToCode(() => Equals((object)3, (object)0)));
 		}
 
 		[Test, Ignore]
 		public void StaticCallImplicitCast() {
 			Assert.AreEqual(
 				@"() => object.Equals((object)3, (object)0)",
-				ExpressionToCode.ToCode(() => object.Equals(3, 0)));
+				ExpressionToCode.ToCode(() => Equals(3, 0)));
 		}
 
 		[Test]
