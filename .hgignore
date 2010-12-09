@@ -1,3 +1,4 @@
 glob:*.suo
 glob:bin/
 glob:obj/
+glob:_ReSharper.*
