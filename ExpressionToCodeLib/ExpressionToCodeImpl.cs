@@ -55,6 +55,15 @@ namespace ExpressionToCodeLib {
 			bool needsSpace = ExpressionPrecedence.TokenizerConfusable(ue.NodeType, ue.Operand.NodeType);
 			Sink(op + (needsSpace ? " " : ""), e);
 			NestExpression(ue.NodeType, ue.Operand);
+		}//"(" + CSharpFriendlyTypeName.Get(e.Type) + ")",
+
+		void UnaryDispatchConvert(Expression e) {
+			var ue = (UnaryExpression)e;
+			if (e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
+				Sink("(" + CSharpFriendlyTypeName.Get(e.Type) + ")");
+			else
+				Sink("(" + CSharpFriendlyTypeName.Get(e.Type) + ")", e);
+			NestExpression(ue.NodeType, ue.Operand);
 		}
 
 		void UnaryPostfixDispatch(string op, Expression e) { UnaryExpression ue = (UnaryExpression)e; NestExpression(ue.NodeType, ue.Operand); Sink(op, e); }
@@ -87,7 +96,7 @@ namespace ExpressionToCodeLib {
 		public void DispatchCall(Expression e) {
 			MethodCallExpression mce = (MethodCallExpression)e;
 			var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
-			if (optPropertyInfo != null && optPropertyInfo.Name=="Item") {
+			if (optPropertyInfo != null && optPropertyInfo.Name == "Item") {
 				NestExpression(mce.NodeType, mce.Object);
 				ArgListDispatch(mce.Arguments, mce, "[", "]");
 			} else {
@@ -220,8 +229,8 @@ namespace ExpressionToCodeLib {
 		public void DispatchArrayLength(Expression e) { NestExpression(e.NodeType, ((UnaryExpression)e).Operand); Sink(".Length", e); }
 		public void DispatchArrayIndex(Expression e) { NestExpression(e.NodeType, ((BinaryExpression)e).Left); Sink("[", e); NestExpression(null, ((BinaryExpression)e).Right); Sink("]"); }
 		public void DispatchCoalesce(Expression e) { BinaryDispatch("??", e); }
-		public void DispatchConvert(Expression e) { UnaryDispatch("(" + CSharpFriendlyTypeName.Get(e.Type) + ")", e); }
-		public void DispatchConvertChecked(Expression e) { UnaryDispatch("(" + CSharpFriendlyTypeName.Get(e.Type) + ")", e); } //TODO: get explicit and implicit conversion operators right.
+		public void DispatchConvert(Expression e) { UnaryDispatchConvert(e); }
+		public void DispatchConvertChecked(Expression e) { UnaryDispatchConvert(e); } //TODO: get explicit and implicit conversion operators right.
 		public void DispatchDivide(Expression e) { BinaryDispatch("/", e); }
 		public void DispatchEqual(Expression e) { BinaryDispatch("==", e); }
 		public void DispatchExclusiveOr(Expression e) { BinaryDispatch("^", e); }
