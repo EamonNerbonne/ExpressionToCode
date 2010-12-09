@@ -6,11 +6,17 @@ namespace ExpressionToCodeLib {
 		static bool UnaryDashSym(ExpressionType et) {
 			return et == ExpressionType.Negate
 				|| et == ExpressionType.NegateChecked
-				|| et == ExpressionType.PreDecrementAssign;
+#if DOTNET40
+				|| et == ExpressionType.PreDecrementAssign
+#endif
+				;
 		}
 		static bool UnaryPlusSym(ExpressionType et) {
 			return et == ExpressionType.UnaryPlus
-				|| et == ExpressionType.PreIncrementAssign;
+#if DOTNET40
+				|| et == ExpressionType.PreIncrementAssign
+#endif
+				;
 		}
 		public static bool TokenizerConfusable(ExpressionType a, ExpressionType b) {
 			return UnaryDashSym(a) && UnaryDashSym(b) || UnaryPlusSym(a) && UnaryPlusSym(b);
@@ -18,6 +24,7 @@ namespace ExpressionToCodeLib {
 
 		public static int Rank(ExpressionType exprType) {
 			switch (exprType) {
+#if DOTNET40
 				//brackets make no sense:
 				case ExpressionType.Block: return -1;
 				case ExpressionType.Goto: return -1;
@@ -26,10 +33,10 @@ namespace ExpressionToCodeLib {
 				case ExpressionType.Throw: return -1;
 				case ExpressionType.Try: return -1;
 				case ExpressionType.Label: return -1;
+#endif
 
 				//brackets built-in; thus unnecesary (for params only!).
 				case ExpressionType.MemberInit: return 1;
-				case ExpressionType.Index: return 1;
 				case ExpressionType.ArrayIndex: return 1;
 				case ExpressionType.Call: return 1;
 				case ExpressionType.Invoke: return 1;
@@ -44,9 +51,12 @@ namespace ExpressionToCodeLib {
 				case ExpressionType.Parameter: return 1;
 				case ExpressionType.MemberAccess: return 1;
 				case ExpressionType.ArrayLength: return 1;
+#if DOTNET40
+				case ExpressionType.Index: return 1;
 				case ExpressionType.Default: return 1;
 				case ExpressionType.PostIncrementAssign: return 1;
 				case ExpressionType.PostDecrementAssign: return 1;
+#endif
 
 				//unary prefixes
 				case ExpressionType.UnaryPlus: return 2;
@@ -55,11 +65,13 @@ namespace ExpressionToCodeLib {
 				case ExpressionType.Convert: return 2;
 				case ExpressionType.ConvertChecked: return 2;
 				case ExpressionType.Not: return 2;//bitwise OR numeric!
+#if DOTNET40
 				case ExpressionType.OnesComplement: return 2; //numeric
 				case ExpressionType.IsTrue: return 2;//maybe?
 				case ExpressionType.IsFalse: return 2;//maybe?
 				case ExpressionType.PreIncrementAssign: return 2;
 				case ExpressionType.PreDecrementAssign: return 2;
+#endif
 
 				//binary multiplicative
 				case ExpressionType.Modulo: return 3;
@@ -72,8 +84,10 @@ namespace ExpressionToCodeLib {
 				case ExpressionType.AddChecked: return 4;
 				case ExpressionType.Subtract: return 4;
 				case ExpressionType.SubtractChecked: return 4;
+#if DOTNET40
 				case ExpressionType.Decrement: return 4;//nonnative; uses ... - 1
 				case ExpressionType.Increment: return 4;//nonnative; uses ... - 1
+#endif
 
 				//binary shift
 				case ExpressionType.LeftShift: return 5;
@@ -108,6 +122,8 @@ namespace ExpressionToCodeLib {
 
 				//assignments & lamba's
 				case ExpressionType.Lambda: return 15;
+				case ExpressionType.Quote: return 15;//maybe?
+#if DOTNET40
 				case ExpressionType.Assign: return 15;
 				case ExpressionType.AddAssign: return 15;
 				case ExpressionType.AndAssign: return 15;
@@ -123,7 +139,7 @@ namespace ExpressionToCodeLib {
 				case ExpressionType.AddAssignChecked: return 15;
 				case ExpressionType.MultiplyAssignChecked: return 15;
 				case ExpressionType.SubtractAssignChecked: return 15;
-				case ExpressionType.Quote: return 15;//maybe?
+#endif
 
 				//Can't deal with these:
 				/*

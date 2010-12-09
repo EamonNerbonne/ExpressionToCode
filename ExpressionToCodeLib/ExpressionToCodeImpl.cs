@@ -67,7 +67,7 @@ namespace ExpressionToCodeLib {
 			if (le.Parameters.Count == 1)
 				NestExpression(e.NodeType, le.Parameters.Single());
 			else
-				ArgListDispatch(le.Parameters);
+				ArgListDispatch(le.Parameters.Cast<Expression>());//cast required for .NET 3.5
 			Sink(" => ");
 			NestExpression(le.NodeType, le.Body);
 		}
@@ -87,9 +87,10 @@ namespace ExpressionToCodeLib {
 		public void DispatchCall(Expression e) {
 			MethodCallExpression mce = (MethodCallExpression)e;
 			var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
-			if (optPropertyInfo != null)
-				DispatchIndex(Expression.MakeIndex(mce.Object, optPropertyInfo, mce.Arguments));
-			else {
+			if (optPropertyInfo != null && optPropertyInfo.Name=="Item") {
+				NestExpression(mce.NodeType, mce.Object);
+				ArgListDispatch(mce.Arguments, mce, "[", "]");
+			} else {
 				bool isExtensionMethod = mce.Method.IsStatic && mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any() && mce.Object == null;
 				Expression objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
 				SinkMethodName(mce, objectExpr);
@@ -105,12 +106,14 @@ namespace ExpressionToCodeLib {
 			Sink("." + mce.Method.Name, mce);
 		}
 
+#if DOTNET40
 		public void DispatchIndex(Expression e) {
 			var ie = (IndexExpression)e;
 			NestExpression(ie.NodeType, ie.Object);
 			if (ie.Indexer.Name != "Item") Sink("." + ie.Indexer.Name);//TODO: is this OK?
 			ArgListDispatch(ie.Arguments, ie, "[", "]");
 		}
+#endif
 
 		public void DispatchInvoke(Expression e) {
 			InvocationExpression ie = (InvocationExpression)e;
@@ -168,7 +171,7 @@ namespace ExpressionToCodeLib {
 				JoinDispatch(mlb.Initializers, ", ", DispatchElementInit);
 				Sink(" }");
 			} else if (mb is MemberAssignment) {
-				NestExpression(ExpressionType.Assign, ((MemberAssignment)mb).Expression, true);
+				RawChildDispatch(((MemberAssignment)mb).Expression);
 			} else
 				throw new NotImplementedException("Member binding of unknown type: " + mb.GetType());
 		}

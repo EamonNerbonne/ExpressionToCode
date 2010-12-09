@@ -2,14 +2,16 @@
 <#@ output extension=".Generated.cs" #>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System" #>
+<#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Linq.Expressions" #>
+<#@ import namespace="System.Linq" #>
 using System;
 using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib {
   interface IExpressionTypeDispatch {
 <#
-	foreach(ExpressionType v in Enum.GetValues(typeof(ExpressionType))) {
+	foreach(var v in ExpressionTypes3_5()) {
 #>
 		void Dispatch<#=v.ToString()#>(Expression e);
 <#
@@ -22,13 +24,17 @@ namespace ExpressionToCodeLib {
 			try{
 				switch(e.NodeType) {
 <#
-	foreach(ExpressionType v in Enum.GetValues(typeof(ExpressionType))) {
+	foreach(var v in ExpressionTypes3_5()) {
 #>
 					case ExpressionType.<#=v.ToString()#>: dispatcher.Dispatch<#=v.ToString()#>(e); return;
 <#
 	}
 #>
-					default: throw new ArgumentOutOfRangeException("Impossible enum value:"+(int)e.NodeType);
+					default:
+						if(Enum.IsDefined(typeof(ExpressionType),e.NodeType))
+							throw new NotImplementedException("ExpressionToCode supports .NET 3.5 expressions only");
+						else
+							throw new ArgumentOutOfRangeException("Impossible enum value:"+(int)e.NodeType);
 				}
 			} catch(NotImplementedException nie) {
 				throw new ArgumentOutOfRangeException("Could not dispatch expr with nodetype "+e.NodeType+" and type " +e.GetType().Name,nie);
@@ -38,6 +44,7 @@ namespace ExpressionToCodeLib {
 }
  
 <#+
-  // Insert any template procedures here
-  void foo(){}
+	IEnumerable<ExpressionType> ExpressionTypes3_5() {
+		return Enum.GetValues(typeof(ExpressionType)).Cast<ExpressionType>().Where(et=>et<= ExpressionType.TypeIs);
+	}
 #>

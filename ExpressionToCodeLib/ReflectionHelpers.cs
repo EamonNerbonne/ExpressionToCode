@@ -16,7 +16,7 @@ namespace ExpressionToCodeLib {
 			if (mi is FieldInfo)
 				return ((FieldInfo)mi).IsStatic;
 			else if (mi is MethodInfo)
-				return ((MethodInfo)mi).Attributes.HasFlag(MethodAttributes.Static);
+				return (((MethodInfo)mi).Attributes & MethodAttributes.Static) == MethodAttributes.Static;
 			else if (mi is PropertyInfo) {
 				PropertyInfo pi = (PropertyInfo)mi;
 				return pi.CanRead ? pi.GetGetMethod().IsStatic : pi.GetSetMethod().IsStatic;
