@@ -24,7 +24,7 @@ namespace ExpressionToCodeLib {
 
 		public static string PlainObjectToCode(object val, Type type) {
 			if (val == null)
-				return type == null || type==typeof(object) ? "null" : "default(" + CSharpFriendlyTypeName.Get(type) + ")";
+				return type == null || type == typeof(object) ? "null" : "default(" + CSharpFriendlyTypeName.Get(type) + ")";
 			else if (val is string) {
 				bool useLiteralSyntax = ((string)val).Any(c => c < 32 || c == '\\') && ((string)val).All(c => c != '\n' && c != '\r' && c != '\t');
 				if (useLiteralSyntax)
@@ -49,6 +49,8 @@ namespace ExpressionToCodeLib {
 				return val.GetType().Name + "." + val;
 			else if (val.GetType().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val))
 				return "default(" + CSharpFriendlyTypeName.Get(val.GetType()) + ")";
+			else if (val is Type)
+				return "typeof(" + CSharpFriendlyTypeName.Get((Type)val) + ")";
 			else
 				return null;
 		}
