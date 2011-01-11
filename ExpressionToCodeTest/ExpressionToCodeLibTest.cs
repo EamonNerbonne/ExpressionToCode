@@ -203,6 +203,14 @@ namespace ExpressionToCodeTest {
 				ExpressionToCode.ToCode(() => Equals((object)3, (object)0)));
 		}
 
+		[Test]
+		public void TypedConstant() {
+			Assert.AreEqual(
+				@"() => new[] { typeof(int), typeof(string) }",
+				ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string) }));
+		}
+
+
 		[Test, Ignore]
 		public void StaticCallImplicitCast() {
 			Assert.AreEqual(
@@ -226,7 +234,7 @@ namespace ExpressionToCodeTest {
 				ExpressionToCode.ToCode(() => (("a\n\\b" ?? x) + x).Length == 2 ? false : true && (1m + (decimal)-i > 0m || false)));
 		}
 
-		[Test,Ignore]
+		[Test, Ignore]
 		public void StringsImplicitCast() {
 			var i = 1;
 			var x = "X";
