@@ -53,7 +53,7 @@ namespace ExpressionToCodeLib {
 			else if (val is Type)
 				return "typeof(" + CSharpFriendlyTypeName.Get((Type)val) + ")";
 			else if (val is MethodInfo)
-				return CSharpFriendlyTypeName.Get(((MethodInfo)val).ReflectedType) + "." + ((MethodInfo)val).Name;
+				return CSharpFriendlyTypeName.Get(((MethodInfo)val).DeclaringType) + "." + ((MethodInfo)val).Name;
 			else
 				return null;
 		}
