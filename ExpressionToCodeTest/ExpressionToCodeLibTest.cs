@@ -210,6 +210,13 @@ namespace ExpressionToCodeTest {
 				ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string) }));
 		}
 
+		[Test]
+		public void MethodGroupConstant() {
+			Assert.AreEqual(
+				@"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)",
+				ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
+		}
+
 
 		[Test, Ignore]
 		public void StaticCallImplicitCast() {
