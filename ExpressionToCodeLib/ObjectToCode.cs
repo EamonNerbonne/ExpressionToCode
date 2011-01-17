@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace ExpressionToCodeLib {
@@ -51,6 +52,8 @@ namespace ExpressionToCodeLib {
 				return "default(" + CSharpFriendlyTypeName.Get(val.GetType()) + ")";
 			else if (val is Type)
 				return "typeof(" + CSharpFriendlyTypeName.Get((Type)val) + ")";
+			else if (val is MethodInfo)
+				return CSharpFriendlyTypeName.Get(((MethodInfo)val).ReflectedType) + "." + ((MethodInfo)val).Name;
 			else
 				return null;
 		}

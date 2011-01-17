@@ -213,7 +213,7 @@ namespace ExpressionToCodeTest {
 		[Test]
 		public void MethodGroupConstant() {
 			Assert.AreEqual(
-				@"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)",
+				@"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)Delegate.CreateDelegate(typeof(Predicate<int>), null, DateTime.IsLeapYear))",
 				ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
 		}
 
