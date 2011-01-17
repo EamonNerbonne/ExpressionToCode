@@ -200,7 +200,7 @@ namespace ExpressionToCodeTest {
 		public void StaticCall() {
 			Assert.AreEqual(
 				@"() => object.Equals((object)3, (object)0)",
-				ExpressionToCode.ToCode(() => Equals((object)3, (object)0)));
+				ExpressionToCode.ToCode(() => Equals(3, 0)));
 		}
 
 		[Test]
@@ -215,6 +215,10 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)Delegate.CreateDelegate(typeof(Predicate<int>), null, DateTime.IsLeapYear))",
 				ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
+			HashSet<int> set = new HashSet<int>();
+			Assert.AreEqual(
+			@"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)Delegate.CreateDelegate(typeof(Func<int, bool>), set, HashSet<int>.Add))",
+			ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
 		}
 
 
