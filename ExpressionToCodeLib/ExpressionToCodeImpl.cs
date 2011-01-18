@@ -133,7 +133,7 @@ namespace ExpressionToCodeLib {
 		public void DispatchConstant(Expression e) {
 			string codeRepresentation = ObjectToCode.PlainObjectToCode(((ConstantExpression)e).Value, e.Type);
 			if (codeRepresentation == null)
-				throw new NotImplementedException();
+				throw new ArgumentOutOfRangeException("e", "Can't print constant " + (((ConstantExpression)e).Value == null ? "<null>" : ((ConstantExpression)e).Value.ToString()) + " in expr of type " + e.Type+"\n"+e.ToString());
 			else
 				Sink(codeRepresentation);
 		}
