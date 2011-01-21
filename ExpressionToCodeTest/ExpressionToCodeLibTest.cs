@@ -125,6 +125,25 @@ namespace ExpressionToCodeTest {
 			   "() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)set.Add)"
 			   , ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
 		}
+
+
+		[Test]
+		public void MethodGroupConstant() {
+			Assert.AreEqual(
+				@"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)Delegate.CreateDelegate(typeof(Predicate<int>), null, DateTime.IsLeapYear))",
+				ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
+			HashSet<int> set = new HashSet<int>();
+			Assert.AreEqual(
+				@"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)Delegate.CreateDelegate(typeof(Func<int, bool>), set, HashSet<int>.Add))",
+				ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
+
+			Func<Func<object, object, bool>, bool> sink = f => f(null, null);
+			Assert.AreEqual(
+				@"() => sink((Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), null, object.Equals))",
+				ExpressionToCode.ToCode(() => sink(int.Equals)));
+		}
+
+
 		[Test]
 		public void MultipleCasts() {
 			Assert.AreEqual(
@@ -245,22 +264,6 @@ namespace ExpressionToCodeTest {
 				ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string) }));
 		}
 
-		[Test]
-		public void MethodGroupConstant() {
-			Assert.AreEqual(
-				@"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)Delegate.CreateDelegate(typeof(Predicate<int>), null, DateTime.IsLeapYear))",
-				ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
-			HashSet<int> set = new HashSet<int>();
-			Assert.AreEqual(
-				@"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)Delegate.CreateDelegate(typeof(Func<int, bool>), set, HashSet<int>.Add))",
-				ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
-
-			Func<Func<object, object, bool>, bool> sink = f => f(null, null);
-			Assert.AreEqual(
-				@"() => sink((Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), null, object.Equals))",
-				ExpressionToCode.ToCode(() => sink(int.Equals)));
-		}
-
 
 		[Test, Ignore]
 		public void StaticCallImplicitCast() {
@@ -284,6 +287,23 @@ namespace ExpressionToCodeTest {
 				@"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true && (1m + (decimal)-i > 0m || false)",
 				ExpressionToCode.ToCode(() => (("a\n\\b" ?? x) + x).Length == 2 ? false : true && (1m + (decimal)-i > 0m || false)));
 		}
+
+		[Test]
+		public void Strings2() {
+			var x = "X";
+			const string y = "Y";
+			Assert.AreEqual(
+				@"() => x != ""Y"" && x.Length == ""Y"".Length && ""a"".Length == 1",
+				ExpressionToCode.ToCode(() => x != y && x.Length == y.Length && "a".Length == 1));
+		}
+
+		[Test]
+		public void StringAccessor() {
+			Assert.AreEqual(
+				@"() => ""abc""[1] == 'b'",
+				ExpressionToCode.ToCode(() => "abc"[1] == 'b'));
+		}
+
 
 		[Test, Ignore]
 		public void StringsImplicitCast() {
