@@ -80,10 +80,19 @@ namespace ExpressionToCodeLib {
 			NestExpression(le.NodeType, le.Body);
 		}
 
+		static bool isThisRef(Expression e) {
+			return
+				e.NodeType == ExpressionType.Constant && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
+		}
+		static bool isClosureRef(Expression e) {
+			return
+				e.NodeType == ExpressionType.Constant && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
+		}
+
 		public void DispatchMemberAccess(Expression e) {
 			MemberExpression me = (MemberExpression)e;
 			Expression memberOfExpr = me.Expression;
-			if (memberOfExpr != null && !memberOfExpr.Type.Name.StartsWith("<>")) {
+			if (memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr)) {
 				NestExpression(e.NodeType, memberOfExpr);
 				Sink(".");
 			} else if (ReflectionHelpers.IsMemberInfoStatic(me.Member))
@@ -107,11 +116,14 @@ namespace ExpressionToCodeLib {
 		}
 
 		void SinkMethodName(MethodCallExpression mce, Expression objExpr) {
-			if (objExpr != null)
-				NestExpression(mce.NodeType, objExpr);
-			else if (mce.Method.IsStatic) //TODO: better deal with own members both static and non-static);
-				Sink(CSharpFriendlyTypeName.Get(mce.Method.ReflectedType));
-			Sink("." + mce.Method.Name, mce);
+			if (objExpr != null) {
+				if (!(isThisRef(objExpr) || isClosureRef(objExpr))) {
+					NestExpression(mce.NodeType, objExpr);
+					Sink(".");
+				}
+			} else if (mce.Method.IsStatic)
+				Sink(CSharpFriendlyTypeName.Get(mce.Method.DeclaringType) + ".");//TODO:better reference avoiding for this?
+			Sink(mce.Method.Name, mce);
 		}
 
 #if DOTNET40
@@ -131,10 +143,16 @@ namespace ExpressionToCodeLib {
 
 
 		public void DispatchConstant(Expression e) {
-			string codeRepresentation = ObjectToCode.PlainObjectToCode(((ConstantExpression)e).Value, e.Type);
-			if (codeRepresentation == null)
-				throw new ArgumentOutOfRangeException("e", "Can't print constant " + (((ConstantExpression)e).Value == null ? "<null>" : ((ConstantExpression)e).Value.ToString()) + " in expr of type " + e.Type+"\n"+e.ToString());
-			else
+			var const_Val = ((ConstantExpression)e).Value;
+			string codeRepresentation = ObjectToCode.PlainObjectToCode(const_Val, e.Type);
+			//e.Type.IsVisible
+			if (codeRepresentation == null) {
+				var typeclass = e.Type.GuessTypeClass();
+				if (typeclass == ReflectionHelpers.TypeClass.NormalType) // probably this!
+					Sink("this");//TODO:verify that all this references refer to the same object!
+				else
+					throw new ArgumentOutOfRangeException("e", "Can't print constant " + (const_Val == null ? "<null>" : const_Val.ToString()) + " in expr of type " + e.Type);
+			} else
 				Sink(codeRepresentation);
 		}
 
