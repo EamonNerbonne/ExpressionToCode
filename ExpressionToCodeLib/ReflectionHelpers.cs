@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace ExpressionToCodeLib {
 	static class ReflectionHelpers {
+
+
 		public static PropertyInfo GetPropertyIfGetter(MethodInfo mi) {
 			bool supposedGetter = mi.Name.StartsWith("get_");
 			//bool supposedSetter = mi.Name.StartsWith("set_");
@@ -29,7 +33,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		public static bool HasBuiltinConversion(Type from, Type to) {
-			return 
+			return
 			from == typeof(sbyte) && (to == typeof(short) || to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
 			|| from == typeof(byte) && (to == typeof(short) || to == typeof(ushort) || to == typeof(int) || to == typeof(uint) || to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
 			|| from == typeof(short) && (to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
@@ -53,5 +57,37 @@ namespace ExpressionToCodeLib {
 			//and if so checking if the code compiles without conversion
 			//if it does NOT compile, and IS implicit, then we can omit it since the compiler will add it.
 		}
+
+		public enum TypeClass {
+			BuiltinType,
+			AnonymousType,
+			ClosureType,
+			NormalType,
+		}
+
+		public static TypeClass GuessTypeClass(this Type type) {
+			bool compilerGenerated = type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
+			string name = type.Name;
+			bool name_StartWithLessThan = name.StartsWith("<");
+			bool isBuiltin = type.IsPrimitive;
+
+			if (name_StartWithLessThan && compilerGenerated) {
+				bool named_AnonymousType = name.Contains("AnonymousType");
+				bool named_DisplayClass = name.Contains("DisplayClass");
+				bool isGeneric = type.IsGenericType;
+				bool isNested = type.IsNested;
+
+				if (!isBuiltin && isGeneric && !isNested && named_AnonymousType)
+					return TypeClass.AnonymousType;
+				else if (!isBuiltin && !isGeneric && isNested && named_DisplayClass)
+					return TypeClass.ClosureType;//note that since genericness+nestedness don't overlap, these typeclasses aren't confusable.
+				else
+					throw new ArgumentException("Can't deal with unknown-style compiler generated class " + type.FullName);
+			} else if (!compilerGenerated && !name_StartWithLessThan) {
+				return isBuiltin ? TypeClass.BuiltinType : TypeClass.NormalType;
+			} else
+				throw new ArgumentException("Unusual type, heuristics uncertain:" + name);
+		}
+
 	}
 }
