@@ -19,11 +19,11 @@ namespace ExpressionToCodeTest {
 			Assert.That(msgLines[1], Is.EqualTo(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0"));
 			Assert.That(string.Join("\n", msgLines.Skip(1).ToArray()), Is.EqualTo(@"
 TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
-                |                   |                   |            |
-                |                   |                   |            false
-                |                   |                   00:01:00
-                |                   -1
-                00:00:00.0100000
+                 |                  |                   |            |
+                 |                  |                   |            false
+                 |                  |                   00:01:00
+                 |                  -1
+                 00:00:00.0100000
 ".Replace("\r","").Trim()));
 		}
 
