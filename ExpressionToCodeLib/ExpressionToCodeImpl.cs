@@ -216,8 +216,24 @@ namespace ExpressionToCodeLib {
 
 		public void DispatchNew(Expression e) {
 			NewExpression ne = (NewExpression)e;
-			Sink("new " + CSharpFriendlyTypeName.Get(ne.Type), ne);
-			ArgListDispatch(ne.Arguments);
+			if (ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
+				var parms = ne.Type.GetConstructors().Single().GetParameters();
+				var props = ne.Type.GetProperties();
+				if (!parms.Select(p => new { p.Name, Type = p.ParameterType }).SequenceEqual(props.Select(p => new { p.Name, Type = p.PropertyType })))
+					throw new InvalidOperationException("Constructor params for anonymous type don't match it's properties!");
+				if (!parms.Select(p => p.ParameterType).SequenceEqual(ne.Arguments.Select(argE => argE.Type)))
+					throw new InvalidOperationException("Constructor Arguments for anonymous type don't match it's type signature!");
+				Sink("new { ");
+				for (int i = 0; i < props.Length; i++) {
+					Sink(props[i].Name + " = ");
+					RawChildDispatch(ne.Arguments[i]);
+					if (i + 1 < props.Length) Sink(", ");
+				}
+				Sink(" }");
+			} else {
+				Sink("new " + CSharpFriendlyTypeName.Get(ne.Type), ne);
+				ArgListDispatch(ne.Arguments);
+			}
 			//TODO: deal with anonymous types.
 		}
 
