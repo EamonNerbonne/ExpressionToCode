@@ -204,6 +204,13 @@ namespace ExpressionToCodeTest {
 		}
 
 		[Test]
+		public void QuotedWithAnonymous() {
+			Assert.AreEqual(
+				@"() => new[] { new { X = ""a"", Y = ""b"" } }.Select(o => o.X + o.Y).Single()",
+				ExpressionToCode.ToCode(() => new[] { new { X = "a", Y = "b" } }.Select(o => o.X + o.Y).Single()));
+		}
+
+		[Test]
 		public void StaticCall() {
 			Assert.AreEqual(
 				@"() => object.Equals((object)3, (object)0)",
