@@ -1,4 +1,11 @@
-﻿using System;
+﻿// ReSharper disable RedundantNameQualifier
+// ReSharper disable ConvertToConstant.Local
+// ReSharper disable RedundantLogicalConditionalExpressionOperand
+// ReSharper disable RedundantCast
+// ReSharper disable ConstantNullCoalescingCondition
+// ReSharper disable EqualExpressionComparison
+// ReSharper disable RedundantToStringCall
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -201,6 +208,20 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => object.Equals((object)3, (object)0)",
 				ExpressionToCode.ToCode(() => Equals(3, 0)));
+		}
+
+		[Test]
+		public void ThisCall() {
+			Assert.AreEqual(
+				@"() => !Equals((object)3)",
+				ExpressionToCode.ToCode(() => !Equals(3)));
+		}
+
+		[Test]
+		public void ThisExplicit() {
+			Assert.AreEqual(
+				@"() => object.Equals(this, (object)3)",
+				ExpressionToCode.ToCode(() => object.Equals(this, 3)));
 		}
 
 		[Test]
