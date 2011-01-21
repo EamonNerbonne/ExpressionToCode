@@ -119,6 +119,13 @@ namespace ExpressionToCodeTest {
 		}
 
 		[Test]
+		public void MethodGroupToDelegate() {
+			HashSet<int> set = new HashSet<int>();
+			Assert.AreEqual(
+			   "() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)set.Add)"
+			   , ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
+		}
+		[Test]
 		public void MultipleCasts() {
 			Assert.AreEqual(
 				@"() => 1 == (int)(object)1",
