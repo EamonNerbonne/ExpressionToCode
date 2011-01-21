@@ -18,7 +18,7 @@ namespace ExpressionToCodeTest {
 				ExpressionToCode.ToCode(() => 1 + x + 2 == 4));
 		}
 
-		[Test, Ignore]
+		[Test]
 		public void AnonymousClasses() {
 			Assert.AreEqual(
 				@"() => new { X = 3, A = ""a"" } == new { X = 3, A = ""a"" }",
@@ -220,7 +220,7 @@ namespace ExpressionToCodeTest {
 				@"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)Delegate.CreateDelegate(typeof(Func<int, bool>), set, HashSet<int>.Add))",
 				ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
 
-			Func<Func<object, object, bool>, bool> sink = f => f(null,null);
+			Func<Func<object, object, bool>, bool> sink = f => f(null, null);
 			Assert.AreEqual(
 				@"() => sink((Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), null, object.Equals))",
 				ExpressionToCode.ToCode(() => sink(int.Equals)));
