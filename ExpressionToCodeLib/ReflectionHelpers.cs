@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace ExpressionToCodeLib {
 	static class ReflectionHelpers {
@@ -65,11 +66,13 @@ namespace ExpressionToCodeLib {
 			NormalType,
 		}
 
+		static readonly HashSet<Type> builtins = new HashSet<Type>(new[] { typeof(decimal), typeof(string), });
+
 		public static TypeClass GuessTypeClass(this Type type) {
 			bool compilerGenerated = type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
 			string name = type.Name;
 			bool name_StartWithLessThan = name.StartsWith("<");
-			bool isBuiltin = type.IsPrimitive;
+			bool isBuiltin = type.IsPrimitive || type.IsEnum || type == typeof(decimal) || type == typeof(string) || typeof(Type).IsAssignableFrom(type);
 
 			if (name_StartWithLessThan && compilerGenerated) {
 				bool named_AnonymousType = name.Contains("AnonymousType");
