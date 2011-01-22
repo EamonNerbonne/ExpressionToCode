@@ -119,6 +119,54 @@ namespace ExpressionToCodeTest {
 		}
 
 		[Test]
+		public void MembersBuiltin() {
+			Assert.AreEqual(
+				@"() => 1.23m.ToString()",
+				ExpressionToCode.ToCode(() => 1.23m.ToString()));
+			Assert.AreEqual(
+				@"() => AttributeTargets.All.HasFlag((Enum)AttributeTargets.Assembly)",
+				ExpressionToCode.ToCode(() => AttributeTargets.All.HasFlag((Enum)AttributeTargets.Assembly)));
+			Assert.AreEqual(
+				@"() => ""abc"".Length == 3",
+				ExpressionToCode.ToCode(() => "abc".Length == 3));
+			Assert.AreEqual(
+				@"() => 'a'.CompareTo('b') < 0",
+				ExpressionToCode.ToCode(() => 'a'.CompareTo('b') < 0));
+		}
+
+		[Test]
+		public void MembersDefault() {
+			Assert.AreEqual(
+				@"() => default(DateTime).Ticks == 0",
+				ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0));
+		}
+
+		class ClassA {
+			int x;
+			public void DoAssert() {
+				x = 37;
+				Assert.AreEqual(
+					@"() => x != C()",
+					ExpressionToCode.ToCode(() => x != C()));
+				Assert.AreEqual(
+					@"() => !object.ReferenceEquals(this, new ClassA())",
+					ExpressionToCode.ToCode(() => !ReferenceEquals(this, new ClassA())));
+				Assert.AreEqual(
+					@"() => MyEquals(this) && !MyEquals(default(ClassA))",
+					ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
+			}
+			public int C() { return x + 5; }
+
+			public bool MyEquals(ClassA other) { return other != null && x == other.x; }
+		}
+
+		[Test]
+		public void MembersThis() {
+			new ClassA().DoAssert();
+		}
+
+
+		[Test]
 		public void MethodGroupToDelegate() {
 			HashSet<int> set = new HashSet<int>();
 			Assert.AreEqual(
@@ -265,7 +313,7 @@ namespace ExpressionToCodeTest {
 		}
 
 
-		[Test, Ignore]
+		[Test]
 		public void StaticCallImplicitCast() {
 			Assert.AreEqual(
 				@"() => object.Equals((object)3, (object)0)",
