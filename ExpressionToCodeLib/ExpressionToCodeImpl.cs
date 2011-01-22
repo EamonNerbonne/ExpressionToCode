@@ -105,7 +105,7 @@ namespace ExpressionToCodeLib {
 			MethodCallExpression mce = (MethodCallExpression)e;
 
 			var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
-			if (optPropertyInfo != null && optPropertyInfo.Name == "Item") {
+			if (optPropertyInfo != null && (optPropertyInfo.Name == "Item" || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
 				NestExpression(mce.NodeType, mce.Object);
 				ArgListDispatch(mce.Arguments, mce, "[", "]");
 			} else {
