@@ -186,27 +186,27 @@ namespace ExpressionToCodeTest {
 
 
 		[Test]
-		public void MethodGroupToDelegate() {
-			HashSet<int> set = new HashSet<int>();
+		public void MethodGroupAsExtensionMethod() {
 			Assert.AreEqual(
-			   "() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)set.Add)"
-			   , ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
+			   "() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any"
+			   , ExpressionToCode.ToCode(() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any));
 		}
 
 
 		[Test]
 		public void MethodGroupConstant() {
 			Assert.AreEqual(
-				@"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)Delegate.CreateDelegate(typeof(Predicate<int>), null, DateTime.IsLeapYear))",
+				@"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)DateTime.IsLeapYear)",
 				ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
+
 			HashSet<int> set = new HashSet<int>();
 			Assert.AreEqual(
-				@"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)Delegate.CreateDelegate(typeof(Func<int, bool>), set, HashSet<int>.Add))",
+				@"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)set.Add)",
 				ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
 
 			Func<Func<object, object, bool>, bool> sink = f => f(null, null);
 			Assert.AreEqual(
-				@"() => sink((Func<object, object, bool>)Delegate.CreateDelegate(typeof(Func<object, object, bool>), null, object.Equals))",
+				@"() => sink((Func<object, object, bool>)object.Equals)",
 				ExpressionToCode.ToCode(() => sink(int.Equals)));
 		}
 
