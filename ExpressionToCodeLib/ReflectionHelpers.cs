@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 namespace ExpressionToCodeLib {
 	static class ReflectionHelpers {
-
-
 		public static PropertyInfo GetPropertyIfGetter(MethodInfo mi) {
 			bool supposedGetter = mi.Name.StartsWith("get_");
 			//bool supposedSetter = mi.Name.StartsWith("set_");
@@ -17,6 +15,7 @@ namespace ExpressionToCodeLib {
 			PropertyInfo pi = mi.DeclaringType.GetProperty(mi.Name.Substring(4), BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
 			return pi.CanRead ? pi : null;//TODO:verify.
 		}
+
 		public static bool IsMemberInfoStatic(MemberInfo mi) {
 			if (mi is FieldInfo)
 				return ((FieldInfo)mi).IsStatic;
