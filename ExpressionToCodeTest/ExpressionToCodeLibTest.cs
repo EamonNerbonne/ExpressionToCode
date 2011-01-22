@@ -173,9 +173,10 @@ namespace ExpressionToCodeTest {
 					@"() => MyEquals(this) && !MyEquals(default(ClassA))",
 					ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
 			}
-			public int C() { return x + 5; }
 
-			public bool MyEquals(ClassA other) { return other != null && x == other.x; }
+			int C() { return x + 5; }
+
+			bool MyEquals(ClassA other) { return other != null && x == other.x; }
 		}
 
 		[Test]
@@ -365,6 +366,13 @@ namespace ExpressionToCodeTest {
 
 		[Test]
 		public void StringAccessor() {
+			Assert.AreEqual(
+				@"() => (int)""abc""[1] == 98",
+				ExpressionToCode.ToCode(() => (int)"abc"[1] == 98));
+		}
+
+		[Test, Ignore]
+		public void CharNoCast() {
 			Assert.AreEqual(
 				@"() => ""abc""[1] == 'b'",
 				ExpressionToCode.ToCode(() => "abc"[1] == 'b'));
