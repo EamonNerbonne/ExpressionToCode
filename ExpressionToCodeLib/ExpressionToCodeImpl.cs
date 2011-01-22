@@ -82,11 +82,11 @@ namespace ExpressionToCodeLib {
 
 		static bool isThisRef(Expression e) {
 			return
-				e.NodeType == ExpressionType.Constant && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
+				e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 		}
 		static bool isClosureRef(Expression e) {
 			return
-				e.NodeType == ExpressionType.Constant && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
+				e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
 		}
 
 		public void DispatchMemberAccess(Expression e) {
@@ -103,6 +103,7 @@ namespace ExpressionToCodeLib {
 
 		public void DispatchCall(Expression e) {
 			MethodCallExpression mce = (MethodCallExpression)e;
+
 			var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
 			if (optPropertyInfo != null && optPropertyInfo.Name == "Item") {
 				NestExpression(mce.NodeType, mce.Object);

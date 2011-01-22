@@ -139,6 +139,24 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => default(DateTime).Ticks == 0",
 				ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0));
+			Assert.AreEqual(
+				@"() => default(int[]).Length == 0",
+				ExpressionToCode.ToCode(() => default(int[]).Length == 0));
+			Assert.AreEqual(
+				@"() => default(Type).IsLayoutSequential",
+				ExpressionToCode.ToCode(() => default(Type).IsLayoutSequential));
+			Assert.AreEqual(
+				@"() => default(List<int>).Count",
+				ExpressionToCode.ToCode(() => default(List<int>).Count));
+			Assert.AreEqual(
+				@"() => default(int[]).Clone() == null",
+				ExpressionToCode.ToCode(() => default(int[]).Clone() == null));
+			Assert.AreEqual(
+				@"() => default(Type).IsInstanceOfType(new object())",
+				ExpressionToCode.ToCode(() => default(Type).IsInstanceOfType(new object())));
+			Assert.AreEqual(
+				@"() => default(List<int>).AsReadOnly()",
+				ExpressionToCode.ToCode(() => default(List<int>).AsReadOnly()));
 		}
 
 		class ClassA {
