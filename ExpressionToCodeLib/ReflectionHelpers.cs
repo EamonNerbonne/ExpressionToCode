@@ -63,6 +63,7 @@ namespace ExpressionToCodeLib {
 			BuiltinType,
 			AnonymousType,
 			ClosureType,
+			StructType,
 			NormalType,
 		}
 
@@ -85,7 +86,7 @@ namespace ExpressionToCodeLib {
 				else
 					throw new ArgumentException("Can't deal with unknown-style compiler generated class " + type.FullName);
 			} else if (!compilerGenerated && !name_StartWithLessThan) {
-				return isBuiltin ? TypeClass.BuiltinType : TypeClass.NormalType;
+				return isBuiltin ? TypeClass.BuiltinType : type.IsValueType ? TypeClass.StructType : TypeClass.NormalType;
 			} else
 				throw new ArgumentException("Unusual type, heuristics uncertain:" + name);
 		}
