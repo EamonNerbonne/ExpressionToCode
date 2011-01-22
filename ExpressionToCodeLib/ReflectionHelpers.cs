@@ -66,8 +66,6 @@ namespace ExpressionToCodeLib {
 			NormalType,
 		}
 
-		static readonly HashSet<Type> builtins = new HashSet<Type>(new[] { typeof(decimal), typeof(string), });
-
 		public static TypeClass GuessTypeClass(this Type type) {
 			bool compilerGenerated = type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
 			string name = type.Name;
