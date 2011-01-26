@@ -1,4 +1,5 @@
-﻿// ReSharper disable RedundantNameQualifier
+﻿// ReSharper disable RedundantEnumerableCastCall
+// ReSharper disable RedundantNameQualifier
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantLogicalConditionalExpressionOperand
 // ReSharper disable RedundantCast
@@ -329,6 +330,43 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => new[] { typeof(int), typeof(string) }",
 				ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string) }));
+		}
+
+		static int Consume<T>(T val) { return 42; }
+		static int Consume(int val) { return 1337; }
+		static int IndirectConsume<T>(T val) { return Consume(val); }
+
+		[Test]
+		public void TypeParameters() {
+			Assert.AreEqual(1337, ExpressionToCodeTest.Consume(12));
+			Assert.AreEqual(42, ExpressionToCodeTest.Consume<int>(12));
+			Assert.AreEqual(42, ExpressionToCodeTest.Consume('a'));
+			Assert.AreEqual(42, ExpressionToCodeTest.IndirectConsume(12));
+
+			Assert.AreEqual(
+				@"() => 1337 == ExpressionToCodeTest.Consume(12)",
+				ExpressionToCode.ToCode(() => 1337 == ExpressionToCodeTest.Consume(12))
+			);
+			Assert.AreEqual(
+				@"() => 42 == ExpressionToCodeTest.Consume('a')",
+				ExpressionToCode.ToCode(() => 42 == ExpressionToCodeTest.Consume('a'))
+			);
+			Assert.AreEqual(
+				@"() => 42 == ExpressionToCodeTest.IndirectConsume(12)",
+				ExpressionToCode.ToCode(() => 42 == ExpressionToCodeTest.IndirectConsume(12))
+			);
+			Assert.AreEqual(
+				@"() => 42 == ExpressionToCodeTest.Consume<int>(12)",
+				ExpressionToCode.ToCode(() => 42 == ExpressionToCodeTest.Consume<int>(12))
+			);//should not remove type parameters where this would cause ambiguity due to overloads!
+		}
+
+		[Test]
+		public void TypeParameters2() {
+			Assert.AreEqual(
+				@"() => new[] { 1, 2, 3 }.Cast<int>()",
+				ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.Cast<int>())
+				);//should not remove type parameters where these cannot be inferred!
 		}
 
 
