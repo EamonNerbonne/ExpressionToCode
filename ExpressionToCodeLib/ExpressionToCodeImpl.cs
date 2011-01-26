@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace ExpressionToCodeLib {
 	class ExpressionToCodeImpl : IExpressionTypeDispatch {
@@ -101,6 +102,8 @@ namespace ExpressionToCodeLib {
 			Sink(me.Member.Name, e);
 		}
 
+		static readonly MethodInfo createDelegate = typeof(Delegate).GetMethod("CreateDelegate", new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
+
 		public void DispatchCall(Expression e) {
 			MethodCallExpression mce = (MethodCallExpression)e;
 
@@ -108,23 +111,29 @@ namespace ExpressionToCodeLib {
 			if (optPropertyInfo != null && (optPropertyInfo.Name == "Item" || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
 				NestExpression(mce.NodeType, mce.Object);
 				ArgListDispatch(mce.Arguments, mce, "[", "]");
+			} else if (mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
+				&& mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof(MethodInfo)) {
+				//implicitly constructed delegate from method group.
+				var targetMethod = (MethodInfo)((ConstantExpression)mce.Arguments[2]).Value;
+				var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant && ((ConstantExpression)mce.Arguments[1]).Value == null ? null : mce.Arguments[1];
+				SinkMethodName(mce, targetMethod, targetExpr);
 			} else {
 				bool isExtensionMethod = mce.Method.IsStatic && mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any() && mce.Object == null;
 				Expression objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
-				SinkMethodName(mce, objectExpr);
+				SinkMethodName(mce, mce.Method, objectExpr);
 				ArgListDispatch(isExtensionMethod ? mce.Arguments.Skip(1) : mce.Arguments);
 			}
 		}
 
-		void SinkMethodName(MethodCallExpression mce, Expression objExpr) {
+		void SinkMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr) {
 			if (objExpr != null) {
 				if (!(isThisRef(objExpr) || isClosureRef(objExpr))) {
 					NestExpression(mce.NodeType, objExpr);
 					Sink(".");
 				}
-			} else if (mce.Method.IsStatic)
-				Sink(CSharpFriendlyTypeName.Get(mce.Method.DeclaringType) + ".");//TODO:better reference avoiding for this?
-			Sink(mce.Method.Name, mce);
+			} else if (method.IsStatic)
+				Sink(CSharpFriendlyTypeName.Get(method.DeclaringType) + ".");//TODO:better reference avoiding for this?
+			Sink(method.Name, mce);
 		}
 
 #if DOTNET40

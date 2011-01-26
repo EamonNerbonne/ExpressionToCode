@@ -89,6 +89,5 @@ namespace ExpressionToCodeLib {
 			} else
 				throw new ArgumentException("Unusual type, heuristics uncertain:" + name);
 		}
-
 	}
 }
