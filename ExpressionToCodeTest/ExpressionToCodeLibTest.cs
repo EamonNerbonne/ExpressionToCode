@@ -6,6 +6,7 @@
 // ReSharper disable ConstantNullCoalescingCondition
 // ReSharper disable EqualExpressionComparison
 // ReSharper disable RedundantToStringCall
+#pragma warning disable 1720
 using System;
 using System.Collections.Generic;
 using System.Linq;
