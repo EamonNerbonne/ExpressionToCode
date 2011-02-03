@@ -18,7 +18,6 @@ using ExpressionToCodeLib;
 namespace ExpressionToCodeTest {
 	[TestFixture]
 	public class ExpressionToCodeTest {
-
 		[Test]
 		public void AddOperator() {
 			int x = 0;
@@ -227,6 +226,47 @@ namespace ExpressionToCodeTest {
 				ExpressionToCode.ToCode(() => 3.ToString().ToString().Length > 0));
 		}
 
+		[Test]
+		public void NestedLambda() {
+			Func<Func<int>, int> call = f => f();
+			Assert.AreEqual(
+				@"() => call(() => 42)",
+				ExpressionToCode.ToCode(() => call(() => 42))
+				);//no params
+			Assert.AreEqual(
+				@"() => new[] { 37, 42 }.Select(x => x * 2)",
+				ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select(x => x * 2))
+				);//one param
+			Assert.AreEqual(
+				@"() => new[] { 37, 42 }.Select((x, i) => x * 2)",
+				ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select((x, i) => x * 2))
+				);//two params
+		}
+
+		bool Fizz(Func<int, bool> a) { return a(42); }
+		bool Buzz(Func<int, bool> a) { return a(42); }
+		bool Fizz(Func<string, bool> a) { return a("42"); }
+
+		[Test]
+		public void NestedLambda2() {
+			Assert.AreEqual(
+				@"() => Fizz(x => x == ""a"")",
+				ExpressionToCode.ToCode(() => Fizz(x => x == "a"))
+				);
+			Assert.AreEqual(
+				@"() => Fizz(x => x == 37)",
+				ExpressionToCode.ToCode(() => Fizz(x => x == 37))
+				);
+
+			Assert.AreEqual(
+				@"() => Fizz((int x) => true)",
+				ExpressionToCode.ToCode(() => Fizz((int x) => true))
+				);//hard case!
+			Assert.AreEqual(
+				@"() => Buzz(x => true)",
+				ExpressionToCode.ToCode(() => Buzz(x => true))
+				);//hard case!
+		}
 
 		[Test]
 		public void NewArrayAndExtensionMethod() {
