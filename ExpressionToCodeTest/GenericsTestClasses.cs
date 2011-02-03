@@ -120,7 +120,7 @@ namespace ExpressionToCodeTest {
 		}
 
 		[Test]
-		public void CannotInferNoTParam() {
+		public void CannotInferWithoutTParam() {
 			Assert.AreEqual(
 				@"() => StaticTestClass.TEqualsInt<int>(3)",
 				ExpressionToCode.ToCode(() => StaticTestClass.TEqualsInt<int>(3))
@@ -162,6 +162,31 @@ namespace ExpressionToCodeTest {
 				ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
 			);
 		}
+
+		[Test]
+		public void CanInferIndirect() {
+			Assert.That(GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 }));
+			Assert.That(GenericClass<int>.IsFuncOfType(() => 3));
+			Assert.That(!GenericClass<int>.IsFuncOfType(() => 3.0));
+			Assert.That(GenericClass<int>.IsFunc2OfType((int x) => x));
+
+			Assert.AreEqual(
+				@"() => GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 })",
+				ExpressionToCode.ToCode(() => GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 }))
+				);
+			Assert.AreEqual(
+				@"() => GenericClass<int>.IsFuncOfType(() => 3)",
+				ExpressionToCode.ToCode(() => GenericClass<int>.IsFuncOfType(() => 3))
+				);
+			Assert.AreEqual(
+				@"() => !GenericClass<int>.IsFuncOfType(() => 3.0)",
+				ExpressionToCode.ToCode(() => !GenericClass<int>.IsFuncOfType(() => 3.0))
+				);
+			Assert.AreEqual(
+				@"() => GenericClass<int>.IsFunc2OfType((int x) => x)",
+				ExpressionToCode.ToCode(() => GenericClass<int>.IsFunc2OfType((int x) => x))
+				);
+		}
 	}
 
 	class GenericClass<T> {
@@ -176,6 +201,9 @@ namespace ExpressionToCodeTest {
 		public void Reset() { val = default(T); }
 		public bool IsSet() { return Equals(default(T), val); }
 		public static T GetDefault() { return default(T); }
+		public static bool IsEnumerableOfType<U>(IEnumerable<U> x) { return typeof(T).IsAssignableFrom(typeof(U)); }
+		public static bool IsFuncOfType<U>(Func<U> x) { return typeof(T).IsAssignableFrom(typeof(U)); }
+		public static bool IsFunc2OfType<U>(Func<U, U> x) { return typeof(T).IsAssignableFrom(typeof(U)); }
 
 		public bool IsSubClass<U>() where U : T { return val is U; }
 		public bool IsSubEqual<U>(U other) where U : T, IEquatable<T> { return other.Equals(val); }
