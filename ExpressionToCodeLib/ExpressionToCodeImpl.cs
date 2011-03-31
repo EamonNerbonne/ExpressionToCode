@@ -67,7 +67,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		void UnaryPostfixDispatch(string op, Expression e) { UnaryExpression ue = (UnaryExpression)e; NestExpression(ue.NodeType, ue.Operand); Sink(op, e); }
-		void TypeOpDispatch(string op, Expression e) { NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression); Sink(" " + op + " " + CSharpFriendlyTypeName.Get(((TypeBinaryExpression)e).TypeOperand), e); }
+		void TypeOpDispatch(string op, Expression e) { NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression); Sink(" " + op + " ", e); Sink(CSharpFriendlyTypeName.Get(((TypeBinaryExpression)e).TypeOperand)); }
 		#endregion
 
 		#region Hard Cases
