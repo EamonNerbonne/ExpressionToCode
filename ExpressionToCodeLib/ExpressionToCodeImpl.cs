@@ -55,7 +55,7 @@ namespace ExpressionToCodeLib {
 			bool needsSpace = ExpressionPrecedence.TokenizerConfusable(ue.NodeType, ue.Operand.NodeType);
 			Sink(op + (needsSpace ? " " : ""), e);
 			NestExpression(ue.NodeType, ue.Operand);
-		}//"(" + CSharpFriendlyTypeName.Get(e.Type) + ")",
+		}
 
 		void UnaryDispatchConvert(Expression e) {
 			var ue = (UnaryExpression)e;

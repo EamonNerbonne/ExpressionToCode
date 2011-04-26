@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ExpressionToCodeLib</RootNamespace>
     <AssemblyName>ExpressionToCodeLib</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;DOTNET40</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CSharpFriendlyTypeName.cs" />
+    <Compile Include="EqualityExpressions.cs" />
     <Compile Include="ExpressionToCode.cs" />
     <Compile Include="ExpressionToCodeImpl.cs" />
     <Compile Include="ExpressionPrecedence.cs" />
