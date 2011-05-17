@@ -40,6 +40,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EqualityComparingTest.cs" />
     <Compile Include="ExpressionToCodeLibTest.cs" />
     <Compile Include="GenericsTestClasses.cs" />
     <Compile Include="ImplicitCastingTest.cs" />
