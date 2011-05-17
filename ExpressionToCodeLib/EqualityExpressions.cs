@@ -19,16 +19,14 @@ namespace ExpressionToCodeLib {
 
 	public static class EqualityExpressions {
 
-		public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e) {
-			return CheckForEquality(e.Body).Item1;
-		}
 
 		readonly static MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).Method;
 		readonly static MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).Method;
 		readonly static MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>)object.ReferenceEquals).Method;
 
-
-		public static Tuple<EqualityExpressionClass, Expression, Expression> CheckForEquality(Expression e) {
+		public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e) { return ExtractEqualityType(e).Item1; }
+		public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression<Func<bool>> e) { return ExtractEqualityType(e.Body); }
+		public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression e) {
 			if (e.Type.Equals(typeof(bool))) {
 				if (e is BinaryExpression) {
 					var binExpr = (BinaryExpression)e;
@@ -72,26 +70,15 @@ namespace ExpressionToCodeLib {
 			}
 		}
 
-		static bool? EvalBooleanExpr(Expression e) {
-			try {
-				Delegate func = Expression.Lambda(e).Compile();
-				try {
-					return (bool)func.DynamicInvoke();
-				} catch (Exception) {
-					return null;//todo:more specific?
-				}
-			} catch (InvalidOperationException) {
-				return null;
-			}
-		}
+		static bool? EvalBoolExpr(Expression e) { try { return EvalBoolLambda(Expression.Lambda<Func<bool>>(e)); } catch (InvalidCastException) { return null; } }
+		static bool? EvalBoolLambda(Expression<Func<bool>> e) { try { return EvalBoolFunc(e.Compile()); } catch (InvalidOperationException) { return null; } }
+		static bool? EvalBoolFunc(Func<bool> func) { try { return func(); } catch (Exception) { return null; } }
 
-		public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(Expression e) {
-			var currEquals = CheckForEquality(e);
-			if (currEquals.Item1 == EqualityExpressionClass.None)
-				return null;
-			var currVal = EvalBooleanExpr(e);
-			if (!currVal.HasValue)
-				return null;
+		public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(Expression<Func<bool>> e) {
+			var currEquals = ExtractEqualityType(e);
+			if (currEquals.Item1 == EqualityExpressionClass.None) return null;
+			var currVal = EvalBoolLambda(e);
+			if (!currVal.HasValue) return null;
 			return DisagreeingEqualities(currEquals.Item2, currEquals.Item3, currVal.Value);
 		}
 
@@ -118,21 +105,21 @@ namespace ExpressionToCodeLib {
 
 
 			var errs = new[]{
-			 reportIfError(EqualityExpressionClass.EqualsOp, EvalBooleanExpr(Expression.Equal(leftC,rightC))),
-			 reportIfError(EqualityExpressionClass.NotEqualsOp, EvalBooleanExpr(Expression.Not(Expression.NotEqual(leftC,rightC)))),
-			 reportIfError(EqualityExpressionClass.ObjectEquals, EvalBooleanExpr(Expression.Call(leftC,objEqualInstanceMethod,rightC))),
-			 reportIfError(EqualityExpressionClass.ObjectEqualsStatic, EvalBooleanExpr(Expression.Call(objEqualStaticMethod,leftC,rightC))),
+			 reportIfError(EqualityExpressionClass.EqualsOp, EvalBoolExpr(Expression.Equal(leftC,rightC))),
+			 reportIfError(EqualityExpressionClass.NotEqualsOp, EvalBoolExpr(Expression.Not(Expression.NotEqual(leftC,rightC)))),
+			 reportIfError(EqualityExpressionClass.ObjectEquals, EvalBoolExpr(Expression.Call(leftC,objEqualInstanceMethod,rightC))),
+			 reportIfError(EqualityExpressionClass.ObjectEqualsStatic, EvalBoolExpr(Expression.Call(objEqualStaticMethod,leftC,rightC))),
 			 reportIfError(EqualityExpressionClass.ObjectReferenceEquals, object.ReferenceEquals(leftC.Value, rightC.Value)),
 #if DOTNET40
 			 reportIfError(EqualityExpressionClass.StructuralEquals, StructuralComparisons.StructuralEqualityComparer.Equals(leftC.Value,rightC.Value)),
 #endif
 			}.Concat(
 				iequatableEqualsMethods.Select(method =>
-					reportIfError(EqualityExpressionClass.EquatableEquals, EvalBooleanExpr(
+					reportIfError(EqualityExpressionClass.EquatableEquals, EvalBoolExpr(
 						Expression.Call(leftC, method, rightC))))
 			).Concat(
 				ienumerableTypes.Select(elemType =>
-					reportIfError(EqualityExpressionClass.SequenceEqual, EvalBooleanExpr(
+					reportIfError(EqualityExpressionClass.SequenceEqual, EvalBoolExpr(
 						Expression.Call(seqEqualsMethod.MakeGenericMethod(elemType), leftC, rightC))))
 			);
 			return errs.Where(err => err != null).Distinct().ToArray();
@@ -144,7 +131,7 @@ namespace ExpressionToCodeLib {
 		}
 
 
-		public static bool IsImplementationOfGenericInterfaceMethod(MethodInfo method, Type genericInterfaceType, string methodName) {
+		static bool IsImplementationOfGenericInterfaceMethod(MethodInfo method, Type genericInterfaceType, string methodName) {
 			return
 				GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
 				.Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
