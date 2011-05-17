@@ -11,7 +11,7 @@ namespace ExpressionToCodeLib {
 	public enum EqualityExpressionClass {
 		None, EqualsOp, NotEqualsOp, ObjectEquals, ObjectEqualsStatic, ObjectReferenceEquals,
 		EquatableEquals,
-		SequenceEquals
+		SequenceEqual
 #if DOTNET40
 , StructuralEquals
 #endif
@@ -51,7 +51,7 @@ namespace ExpressionToCodeLib {
 						return Tuple.Create(EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
 #endif
 					else if (HaveSameGenericDefinition(mce.Method, ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).Method))
-						return Tuple.Create(EqualityExpressionClass.SequenceEquals, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
+						return Tuple.Create(EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
 				}
 			}
 			return Tuple.Create(EqualityExpressionClass.None, default(Expression), default(Expression));
@@ -114,7 +114,7 @@ namespace ExpressionToCodeLib {
 				 let otherType = genEquatable.GetGenericArguments().Single()
 				 where otherType.IsAssignableFrom(rightC.Type)
 				 let ifacemap = leftC.Type.GetInterfaceMap(genEquatable)
-				 select ifacemap.InterfaceMethods.Zip(ifacemap.TargetMethods, Tuple.Create).Single(ifaceAndImpl => ifaceAndImpl.Item1.Name == "Equals").Item2).Distinct();
+				 select ifacemap.InterfaceMethods.Zip(ifacemap.InterfaceMethods, Tuple.Create).Single(ifaceAndImpl => ifaceAndImpl.Item1.Name == "Equals").Item2).Distinct();
 
 
 			var errs = new[]{
@@ -132,7 +132,7 @@ namespace ExpressionToCodeLib {
 						Expression.Call(leftC, method, rightC))))
 			).Concat(
 				ienumerableTypes.Select(elemType =>
-					reportIfError(EqualityExpressionClass.SequenceEquals, EvalBooleanExpr(
+					reportIfError(EqualityExpressionClass.SequenceEqual, EvalBooleanExpr(
 						Expression.Call(seqEqualsMethod.MakeGenericMethod(elemType), leftC, rightC))))
 			);
 			return errs.Where(err => err != null).Distinct().ToArray();
@@ -144,16 +144,15 @@ namespace ExpressionToCodeLib {
 		}
 
 
-		static bool IsImplementationOfGenericInterfaceMethod(MethodInfo method, Type genericInterfaceType, string methodName) {
+		public static bool IsImplementationOfGenericInterfaceMethod(MethodInfo method, Type genericInterfaceType, string methodName) {
 			return
 				GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
-				.Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName));
+				.Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
+				|| method.DeclaringType.IsInterface && method.Name == methodName && method.DeclaringType.IsGenericType && method.DeclaringType.GetGenericTypeDefinition() == genericInterfaceType;
 		}
 
 		static bool IsImplementationOfInterfaceMethod(MethodInfo method, Type interfaceType, string methodName) {
-			Console.WriteLine(method.DeclaringType);
 			if (!interfaceType.IsAssignableFrom(method.DeclaringType)) return false;
-			Console.WriteLine(method.DeclaringType);
 			var interfaceMap = method.DeclaringType.GetInterfaceMap(interfaceType);
 			return interfaceMap.InterfaceMethods.Where((t, i) => t.Name == methodName && method.Equals(interfaceMap.TargetMethods[i])).Any();
 		}
