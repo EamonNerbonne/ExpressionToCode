@@ -58,7 +58,47 @@ namespace ExpressionToCodeTest {
 		[Test]
 		public void SequenceEqualsDetected() {
 			Assert.AreEqual(EqualityExpressionClass.SequenceEqual, EqualityExpressions.CheckForEquality(() => bla.AsEnumerable().SequenceEqual(bla2string)));
-			Assert.AreEqual(EqualityExpressionClass.SequenceEqual, EqualityExpressions.CheckForEquality(() => new[]{'b','l','a'}.SequenceEqual(bla2string)));
+			Assert.AreEqual(EqualityExpressionClass.SequenceEqual, EqualityExpressions.CheckForEquality(() => new[] { 'b', 'l', 'a' }.SequenceEqual(bla2string)));
+		}
+
+		static Tuple<EqualityExpressionClass, bool>[] eqclasses(params EqualityExpressionClass[] classes) {
+			return classes.Select(eqClass => Tuple.Create(eqClass, false)).ToArray();
+		}
+
+		[Test]
+		public void StringEqDisagreement() {
+			Assert.That(
+				EqualityExpressions.DisagreeingEqualities(() => object.ReferenceEquals(1000.ToString(), 10 + "00")).ToArray(),
+				Is.EquivalentTo(eqclasses(
+					EqualityExpressionClass.EqualsOp, EqualityExpressionClass.NotEqualsOp, EqualityExpressionClass.ObjectEquals, EqualityExpressionClass.ObjectEqualsStatic,
+					EqualityExpressionClass.EquatableEquals,
+					EqualityExpressionClass.SequenceEqual
+#if DOTNET40
+, EqualityExpressionClass.StructuralEquals
+#endif
+)));
+			Assert.That(
+				EqualityExpressions.DisagreeingEqualities(() => 1000.ToString().Equals(10 + "00")).ToArray(),
+				Is.EquivalentTo(eqclasses(EqualityExpressionClass.ObjectReferenceEquals)));
+		}
+
+		[Test]
+		public void DtRefEqDisagreement() {
+			Assert.That(
+				EqualityExpressions.DisagreeingEqualities(() => object.ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17))).ToArray(),
+				Is.EquivalentTo(eqclasses(
+					EqualityExpressionClass.EqualsOp, EqualityExpressionClass.NotEqualsOp, EqualityExpressionClass.ObjectEquals, EqualityExpressionClass.ObjectEqualsStatic,
+					EqualityExpressionClass.EquatableEquals
+#if DOTNET40
+, EqualityExpressionClass.StructuralEquals
+#endif
+)));
+		}
+		[Test]
+		public void DtEqDisagreement() {
+			Assert.That(
+				EqualityExpressions.DisagreeingEqualities(() => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17))).ToArray(),
+				Is.EquivalentTo(eqclasses(EqualityExpressionClass.ObjectReferenceEquals)));
 		}
 	}
 }
