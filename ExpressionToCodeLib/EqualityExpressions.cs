@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
+
 // ReSharper disable RedundantNameQualifier
 
 namespace ExpressionToCodeLib {
 	public enum EqualityExpressionClass {
-		None, EqualsOp, NotEqualsOp, ObjectEquals, ObjectEqualsStatic,
+		None, EqualsOp, NotEqualsOp, ObjectEquals, ObjectEqualsStatic, ObjectReferenceEquals,
 		EquatableEquals,
 		SequenceEquals
 #if DOTNET40
@@ -17,7 +17,7 @@ namespace ExpressionToCodeLib {
 #endif
 	}
 
-	public class EqualityExpressions {
+	public static class EqualityExpressions {
 
 		public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e) {
 			return CheckForEquality(e.Body).Item1;
@@ -25,6 +25,7 @@ namespace ExpressionToCodeLib {
 
 		readonly static MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).Method;
 		readonly static MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).Method;
+		readonly static MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>)object.ReferenceEquals).Method;
 
 
 		public static Tuple<EqualityExpressionClass, Expression, Expression> CheckForEquality(Expression e) {
@@ -39,12 +40,16 @@ namespace ExpressionToCodeLib {
 					MethodCallExpression mce = (MethodCallExpression)e;
 					if (mce.Method.Equals(((Func<object, bool>)new object().Equals).Method))
 						return Tuple.Create(EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
-					else if (mce.Method.Equals(((Func<object, object, bool>)object.Equals).Method))
+					else if (mce.Method.Equals(objEqualStaticMethod))
 						return Tuple.Create(EqualityExpressionClass.ObjectEqualsStatic, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
+					else if (mce.Method.Equals(objEqualReferenceMethod))
+						return Tuple.Create(EqualityExpressionClass.ObjectReferenceEquals, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
 					else if (IsImplementationOfGenericInterfaceMethod(mce.Method, typeof(IEquatable<>), "Equals"))
 						return Tuple.Create(EqualityExpressionClass.EquatableEquals, mce.Object, mce.Arguments.Single());
+#if DOTNET40
 					else if (IsImplementationOfInterfaceMethod(mce.Method, typeof(IStructuralEquatable), "Equals"))
 						return Tuple.Create(EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
+#endif
 					else if (HaveSameGenericDefinition(mce.Method, ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).Method))
 						return Tuple.Create(EqualityExpressionClass.SequenceEquals, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
 				}
@@ -52,7 +57,8 @@ namespace ExpressionToCodeLib {
 			return Tuple.Create(EqualityExpressionClass.None, default(Expression), default(Expression));
 		}
 
-		public static ConstantExpression ToConstantExpr(Expression e) {
+
+		static ConstantExpression ToConstantExpr(Expression e) {
 			try {
 				Delegate func = Expression.Lambda(e).Compile();
 				try {
@@ -66,7 +72,7 @@ namespace ExpressionToCodeLib {
 			}
 		}
 
-		public static bool? EvalBooleanExpr(Expression e) {
+		static bool? EvalBooleanExpr(Expression e) {
 			try {
 				Delegate func = Expression.Lambda(e).Compile();
 				try {
@@ -79,6 +85,17 @@ namespace ExpressionToCodeLib {
 			}
 		}
 
+		public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(Expression e) {
+			var currEquals = CheckForEquality(e);
+			if (currEquals.Item1 == EqualityExpressionClass.None)
+				return null;
+			var currVal = EvalBooleanExpr(e);
+			if (!currVal.HasValue)
+				return null;
+			return DisagreeingEqualities(currEquals.Item2, currEquals.Item3, currVal.Value);
+		}
+
+
 		public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(Expression left, Expression right, bool shouldBeEqual) {
 			var leftC = ToConstantExpr(left);
 			var rightC = ToConstantExpr(right);
@@ -88,9 +105,16 @@ namespace ExpressionToCodeLib {
 			var ienumerableTypes =
 				GetGenericInterfaceImplementation(leftC.Type, typeof(IEnumerable<>))
 					.Intersect(GetGenericInterfaceImplementation(rightC.Type, typeof(IEnumerable<>)))
-					.Select(seqType=> seqType.GetGenericArguments().Single());
+					.Select(seqType => seqType.GetGenericArguments().Single());
 
 			var seqEqualsMethod = ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).Method.GetGenericMethodDefinition();
+
+			var iequatableEqualsMethods =
+				(from genEquatable in GetGenericInterfaceImplementation(leftC.Type, typeof(IEquatable<>))
+				 let otherType = genEquatable.GetGenericArguments().Single()
+				 where otherType.IsAssignableFrom(rightC.Type)
+				 let ifacemap = leftC.Type.GetInterfaceMap(genEquatable)
+				 select ifacemap.InterfaceMethods.Zip(ifacemap.TargetMethods, Tuple.Create).Single(ifaceAndImpl => ifaceAndImpl.Item1.Name == "Equals").Item2).Distinct();
 
 
 			var errs = new[]{
@@ -98,15 +122,21 @@ namespace ExpressionToCodeLib {
 			 reportIfError(EqualityExpressionClass.NotEqualsOp, EvalBooleanExpr(Expression.Not(Expression.NotEqual(leftC,rightC)))),
 			 reportIfError(EqualityExpressionClass.ObjectEquals, EvalBooleanExpr(Expression.Call(leftC,objEqualInstanceMethod,rightC))),
 			 reportIfError(EqualityExpressionClass.ObjectEqualsStatic, EvalBooleanExpr(Expression.Call(objEqualStaticMethod,leftC,rightC))),
+			 reportIfError(EqualityExpressionClass.ObjectReferenceEquals, object.ReferenceEquals(leftC.Value, rightC.Value)),
+#if DOTNET40
+			 reportIfError(EqualityExpressionClass.StructuralEquals, StructuralComparisons.StructuralEqualityComparer.Equals(leftC.Value,rightC.Value)),
+#endif
 			}.Concat(
-				ienumerableTypes.Select(elemType=>
+				iequatableEqualsMethods.Select(method =>
+					reportIfError(EqualityExpressionClass.EquatableEquals, EvalBooleanExpr(
+						Expression.Call(leftC, method, rightC))))
+			).Concat(
+				ienumerableTypes.Select(elemType =>
 					reportIfError(EqualityExpressionClass.SequenceEquals, EvalBooleanExpr(
-						Expression.Call(seqEqualsMethod.MakeGenericMethod( elemType),leftC,rightC))))
+						Expression.Call(seqEqualsMethod.MakeGenericMethod(elemType), leftC, rightC))))
 			);
 			return errs.Where(err => err != null).Distinct().ToArray();
 		}
-
-
 
 
 		static bool HaveSameGenericDefinition(MethodInfo a, MethodInfo b) {
