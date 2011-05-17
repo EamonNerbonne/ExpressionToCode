@@ -76,7 +76,7 @@ namespace ExpressionToCodeLib {
 			if (le.Parameters.Count == 1)
 				NestExpression(e.NodeType, le.Parameters.Single());
 			else
-				ArgListDispatch(le.Parameters.Cast<Expression>());//cast required for .NET 3.5
+				ArgListDispatch(le.Parameters.Cast<Expression>());//cast required for .NET 3.5 due to lack of covariance support.
 			Sink(" => ");
 			NestExpression(le.NodeType, le.Body);
 		}
