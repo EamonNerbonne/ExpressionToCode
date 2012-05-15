@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ExpressionToCodeLib {
-	public class PAssertFailedException : Exception {
+	public sealed class PAssertFailedException : Exception {
 		public PAssertFailedException(string message) : base(message) { }
+		public PAssertFailedException(string message, Exception inner) : base(message, inner) { }
 	}
 }

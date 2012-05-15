@@ -9,16 +9,28 @@ using System.Text;
 
 namespace ExpressionToCodeLib {
 	public static class ObjectToCode {
-		public static string ComplexObjectToPseudoCode(object val) {
+		public static string ComplexObjectToPseudoCode(object val, int indent = 0) {
 			string retval = PlainObjectToCode(val);
 			if (retval != null) return retval;
+			else if (val is Array)
+				return "new [] " + FormatEnumerable((IEnumerable)val);
 			else if (val is IEnumerable)
 				return FormatEnumerable((IEnumerable)val);
 			else if (val is Expression)
 				return ExpressionToCode.ToCode((Expression)val);
-			else
+			else if (val.GetType().GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
+				var type = val.GetType();
+				return "\n" + new string(' ', indent * 2) +
+					"new {" +
+					string.Join("",
+						type.GetProperties()
+							.Select(pi => "\n" + new string(' ', indent * 2 + 2) + pi.Name + " = " + ComplexObjectToPseudoCode(pi.GetValue(val, null), indent + 2) + ",")
+							)
+							+ "\n" + new string(' ', indent * 2) + "}";
+			} else
 				return val.ToString();
 		}
+
 		public static string PlainObjectToCode(object val) {
 			return PlainObjectToCode(val, val == null ? null : val.GetType());
 		}
@@ -57,6 +69,8 @@ namespace ExpressionToCodeLib {
 			else
 				return null;
 		}
+
+		public static string GetCSharpFriendlyTypeName(Type type) { return CSharpFriendlyTypeName.Get(type); }
 
 		static string EscapeChar(char c) {
 			if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) { //this is a little too rigorous; but easier to read 

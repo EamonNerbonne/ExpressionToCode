@@ -86,6 +86,7 @@ namespace ExpressionToCodeLib {
 		public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(Expression left, Expression right, bool shouldBeEqual) {
 			ConstantExpression leftC = ToConstantExpr(left);
 			ConstantExpression rightC = ToConstantExpr(right);
+
 			Func<EqualityExpressionClass, bool?, Tuple<EqualityExpressionClass, bool>> reportIfError =
 				(eqClass, itsVal) => shouldBeEqual == itsVal ? null : Tuple.Create(eqClass, !itsVal.HasValue);
 
@@ -107,8 +108,8 @@ namespace ExpressionToCodeLib {
 			var errs = new[]{
 			 reportIfError(EqualityExpressionClass.EqualsOp, EvalBoolExpr(Expression.Equal(leftC, rightC))),
 			 reportIfError(EqualityExpressionClass.NotEqualsOp, EvalBoolExpr(Expression.Not(Expression.NotEqual(leftC,rightC)))),
-			 reportIfError(EqualityExpressionClass.ObjectEquals, EvalBoolExpr(Expression.Call(leftC,objEqualInstanceMethod,Expression.Convert(rightC,typeof(object))))),
-			 reportIfError(EqualityExpressionClass.ObjectEqualsStatic, EvalBoolExpr(Expression.Call(objEqualStaticMethod,Expression.Convert(leftC,typeof(object)),Expression.Convert(rightC,typeof(object))))),
+			 reportIfError(EqualityExpressionClass.ObjectEquals, EvalBoolExpr(Expression.Call(leftC,objEqualInstanceMethod, Expression.Convert(rightC, typeof(object)) ))),
+			 reportIfError(EqualityExpressionClass.ObjectEqualsStatic, EvalBoolExpr(Expression.Call(objEqualStaticMethod,Expression.Convert(leftC, typeof(object)), Expression.Convert(rightC, typeof(object))))),
 			 reportIfError(EqualityExpressionClass.ObjectReferenceEquals, object.ReferenceEquals(leftC.Value, rightC.Value)),
 #if DOTNET40
 			 reportIfError(EqualityExpressionClass.StructuralEquals, StructuralComparisons.StructuralEqualityComparer.Equals(leftC.Value,rightC.Value)),
