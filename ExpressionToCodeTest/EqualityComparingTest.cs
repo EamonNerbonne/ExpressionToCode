@@ -87,7 +87,7 @@ namespace ExpressionToCodeTest {
 			Assert.That(
 				EqualityExpressions.DisagreeingEqualities(() => object.ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17))).ToArray(),
 				Is.EquivalentTo(eqclasses(
-					EqualityExpressionClass.EqualsOp, EqualityExpressionClass.NotEqualsOp, EqualityExpressionClass.ObjectEquals, EqualityExpressionClass.ObjectEqualsStatic,
+					EqualityExpressionClass.ObjectEquals, EqualityExpressionClass.ObjectEqualsStatic,
 					EqualityExpressionClass.EquatableEquals
 #if DOTNET40
 , EqualityExpressionClass.StructuralEquals
