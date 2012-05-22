@@ -72,20 +72,21 @@ namespace ExpressionToCodeLib {
 
 		public static string GetCSharpFriendlyTypeName(Type type) { return CSharpFriendlyTypeName.Get(type); }
 
-		static string EscapeChar(char c) {
+		static string EscapeCharForString(char c) {
 			if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) { //this is a little too rigorous; but easier to read 
 				if (c == '\r') return "\\r";
 				else if (c == '\t') return "\\t";
 				else if (c == '\n') return "\\n";
 				else return "\\x" + Convert.ToString(c, 16);
-			} else if (c == '\\') return "\\\\";
+			} else if (c == '\\') return @"\\";
+			else if (c == '\"') return "\\\"";
 			else return c.ToString();
 		}
 
 		static string EscapeStringChars(string str) {
 			StringBuilder sb = new StringBuilder(str.Length);
 			foreach (char c in str)
-				sb.Append(EscapeChar(c));
+				sb.Append(EscapeCharForString(c));
 			return sb.ToString();
 		}
 
