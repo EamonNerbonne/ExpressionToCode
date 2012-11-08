@@ -9,7 +9,7 @@ using System;
 using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib {
-  interface IExpressionTypeDispatch {
+  public interface IExpressionTypeDispatch {
 <#
 	foreach(var v in ExpressionTypes3_5()) {
 #>
@@ -19,7 +19,7 @@ namespace ExpressionToCodeLib {
 #>
   }
 
-    internal static class ExpressionTypeDispatch {
+    public static class ExpressionTypeDispatcher {
 		public static void ExpressionDispatch(this IExpressionTypeDispatch dispatcher, Expression e) {
 			try{
 				switch(e.NodeType) {

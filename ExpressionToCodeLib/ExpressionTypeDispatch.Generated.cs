@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib {
-  interface IExpressionTypeDispatch {
+  public interface IExpressionTypeDispatch {
 		void DispatchAdd(Expression e);
 		void DispatchAddChecked(Expression e);
 		void DispatchAnd(Expression e);
@@ -51,7 +51,7 @@ namespace ExpressionToCodeLib {
 		void DispatchTypeIs(Expression e);
   }
 
-    internal static class ExpressionTypeDispatch {
+    public static class ExpressionTypeDispatcher {
 		public static void ExpressionDispatch(this IExpressionTypeDispatch dispatcher, Expression e) {
 			try{
 				switch(e.NodeType) {
