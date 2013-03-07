@@ -48,6 +48,7 @@
     <Compile Include="NestedClassTest.cs" />
     <Compile Include="PAssertTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubExprExceptionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExpressionToCodeLib\ExpressionToCodeLib.csproj">
