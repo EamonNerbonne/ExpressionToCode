@@ -44,6 +44,7 @@
     <Compile Include="ExpressionToCodeLibTest.cs" />
     <Compile Include="GenericsTestClasses.cs" />
     <Compile Include="ImplicitCastingTest.cs" />
+    <Compile Include="MultipleIndexerTest.cs" />
     <Compile Include="PAssertTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
