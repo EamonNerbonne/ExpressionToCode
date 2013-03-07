@@ -5,8 +5,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ExpressionToCodeLib")]
-[assembly: AssemblyDescription("Generates C# from an Expression Tree; provides Power Assert clone that includes the expression and its subexpressions' values in assertion failure messages")]
+[assembly: AssemblyDescription("Generates readable C# from an Expression Tree and can annotate subexpressions with their runtime value.  Useful for assertions when unit testing (PowerAssert clone).")]
 [assembly: AssemblyProduct("ExpressionToCodeLib")]
+[assembly: AssemblyCompany("Eamon Nerbonne")]
 [assembly: AssemblyCopyright("Copyright © Eamon Nerbonne")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -27,5 +28,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.5.0")]
+[assembly: AssemblyVersion("1.1.0.1")]
 //[assembly: AssemblyFileVersion("1.0.0.0")]
