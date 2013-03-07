@@ -17,6 +17,7 @@ namespace ExpressionToCodeTest
 		[Test]
 		public void ExceptionDoesntCauseFailure()
 		{
+			
 			Assert.AreEqual(
 @"() => FailingClass.SomeFunction()
                          |
