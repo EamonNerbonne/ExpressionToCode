@@ -14,12 +14,14 @@ namespace ExpressionToCodeLib {
 			try {
 				ok = compiled();
 			} catch (Exception e) {
-				throw new PAssertFailedException((msg ?? "PAssert.That failed for:") + "\n\n" +
-													 ExpressionToCode.AnnotatedToCode(assertion.Body), e);
+				throw UnitTestingFailure.AssertionExceptionFactory(msg + "\n" +
+					ExpressionToCode.AnnotatedToCode(assertion.Body), e);
+				//throw new PAssertFailedException((msg ?? "PAssert.That failed for:") + "\n\n" +
+				//									 ExpressionToCode.AnnotatedToCode(assertion.Body), e);
 			}
 			if (ok == false)
-				throw new PAssertFailedException((msg ?? "PAssert.That failed for:") + "\n\n" +
-													 ExpressionToCode.AnnotatedToCode(assertion.Body));
+				throw UnitTestingFailure.AssertionExceptionFactory(msg + "\n" +
+													 ExpressionToCode.AnnotatedToCode(assertion.Body), null);
 		}
 	}
 }

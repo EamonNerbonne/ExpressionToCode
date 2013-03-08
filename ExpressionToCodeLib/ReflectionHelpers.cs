@@ -8,26 +8,6 @@ namespace ExpressionToCodeLib
 {
 	static class ReflectionHelpers
 	{
-		interface IPropLookup
-		{
-			PropertyInfo GetProp(MethodInfo getter);
-		}
-
-		class MetaCache<T> : IPropLookup //TODO:remove.
-		{
-			static readonly Dictionary<MethodInfo, PropertyInfo> PropsByGetter =
-				typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-					.ToDictionary(pi => pi.GetGetMethod(true));
-
-
-			public PropertyInfo GetProp(MethodInfo getter)
-			{
-				PropertyInfo prop;
-				PropsByGetter.TryGetValue(getter, out prop);
-				return prop;
-			}
-		}
-
 		public static PropertyInfo GetPropertyIfGetter(MethodInfo mi)
 		{
 			bool supposedGetter = mi.Name.StartsWith("get_");

@@ -3,3 +3,6 @@ glob:bin/
 glob:obj/
 glob:_ReSharper.*
 glob:*.user
+syntax: glob
+packages/
+ExpressionToCodeLib/*.nupkg
