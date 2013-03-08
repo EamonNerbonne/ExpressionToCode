@@ -7,19 +7,22 @@ using NUnit.Framework;
 
 namespace ExpressionToCodeTest
 {
+
+	class HasIndexers
+	{
+		public object this[string s] { get { return null; } }
+		public object this[int i] { get { return null; } }
+	}
+
 	public class MultipleIndexerTest
 	{
-		class Bar
-		{
-			public object this[string s] { get { return null; } }
-			public object this[int i] { get { return null; } }
-		}
+
 
 		[Test]
 		public void CanPrettyPrintVariousIndexers() { 
 			Assert.AreEqual(
-				"() => new Bar()[3] == new Bar()[\"three\"]",
-				ExpressionToCode.ToCode(() => new Bar()[3] == new Bar()["three"])
+				"() => new HasIndexers()[3] == new HasIndexers()[\"three\"]",
+				ExpressionToCode.ToCode(() => new HasIndexers()[3] == new HasIndexers()["three"])
 				);
 		}
 

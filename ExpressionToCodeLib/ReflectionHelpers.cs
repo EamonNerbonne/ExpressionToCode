@@ -13,7 +13,7 @@ namespace ExpressionToCodeLib
 			PropertyInfo GetProp(MethodInfo getter);
 		}
 
-		class MetaCache<T> : IPropLookup
+		class MetaCache<T> : IPropLookup //TODO:remove.
 		{
 			static readonly Dictionary<MethodInfo, PropertyInfo> PropsByGetter =
 				typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
