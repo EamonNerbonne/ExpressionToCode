@@ -29,14 +29,5 @@ namespace ExpressionToCodeTest
 				ExpressionToCode.ToCode(() => new HasIndexers()[3] == new HasIndexers()["three"])
 				);
 		}
-
-
-		[Test]
-		public void Bla()
-		{
-			PAssert.That(() => "asdfasdfasdf" + 13 == int.Parse("13").ToString());
-			//Xunit.Sdk.AssertException
-			//AssertFailedException
-		}
 	}
 }
