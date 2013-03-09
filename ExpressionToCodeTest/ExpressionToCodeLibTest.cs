@@ -16,16 +16,6 @@ using NUnit.Framework;
 using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest {
-	public enum SomeEnum { A, B }
-
-	[Flags]
-	public enum SomeFlagsEnum {
-		None = 0,
-		A = 1,
-		B = 2,
-		AB = 3,
-		C = 4,
-	}
 
 	public class ExpressionToCodeTest {
 		[Test]
@@ -77,39 +67,6 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => new TimeSpan(1, 2, 3) == default(TimeSpan)",
 				ExpressionToCode.ToCode(() => new TimeSpan(1, 2, 3) == default(TimeSpan)));
-		}
-
-		[Test]
-		public void EnumConstant() {
-			Assert.AreEqual(
-				@"() => new object().Equals((object)MidpointRounding.ToEven)",
-				ExpressionToCode.ToCode(() => new object().Equals(MidpointRounding.ToEven)));
-		}
-
-
-		[Test]
-		public void EnumConstant2() {
-			var a = SomeEnum.A;
-			Assert.AreEqual(
-				@"() => a == SomeEnum.B",
-				ExpressionToCode.ToCode(() => a == SomeEnum.B));
-		}
-
-
-		[Test]
-		public void FlagsEnumConstant() {
-			var ab = SomeFlagsEnum.A | SomeFlagsEnum.B;
-			Assert.AreEqual(
-				@"() => ab == SomeFlagsEnum.AB",
-				ExpressionToCode.ToCode(() => ab == SomeFlagsEnum.AB));
-		}
-
-		[Test]
-		public void FlagsEnumConstant2() {
-			var abc = SomeFlagsEnum.A | SomeFlagsEnum.B | SomeFlagsEnum.C;
-			Assert.AreEqual(
-				@"() => (SomeFlagsEnum)7 == (SomeFlagsEnum.AB | SomeFlagsEnum.C)",
-				ExpressionToCode.ToCode(() => (SomeFlagsEnum)7 == (SomeFlagsEnum.AB | SomeFlagsEnum.C)));
 		}
 
 		[Test]

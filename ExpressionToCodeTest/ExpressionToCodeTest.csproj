@@ -43,6 +43,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EnumTests.cs" />
     <Compile Include="EqualityComparingTest.cs" />
     <Compile Include="ExpressionToCodeLibTest.cs" />
     <Compile Include="GenericsTestClasses.cs" />
