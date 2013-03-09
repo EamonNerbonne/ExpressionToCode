@@ -10,7 +10,7 @@ namespace ExpressionToCodeTest {
 	public class PAssertTest {
 		[Test]
 		public void TestBasicStalks() {
-			var exc = Assert.Throws<PAssertFailedException>(() => 
+			var exc = Assert.Throws<Exception>(() => 
 				PAssert.IsTrue(() => 
 					TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
 				));
@@ -29,7 +29,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
 
 		[Test]
 		public void NoValuesForBoringCasts() {
-			var exc = Assert.Throws<PAssertFailedException>(() => 
+			var exc = Assert.Throws<Exception>(() => 
 				PAssert.IsTrue(() => 
 					Equals(3,4)
 				));
@@ -42,7 +42,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
 		[Test]
 		public void ValuesForNonBoringCasts() {
 			ulong x = ulong.MaxValue;
-			var exc = Assert.Throws<PAssertFailedException>(() => 
+			var exc = Assert.Throws<Exception>(() => 
 					PAssert.IsTrue(
 						() => 0 == (ulong)(uint)x
 					)
