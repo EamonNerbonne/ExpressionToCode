@@ -45,33 +45,40 @@ namespace ExpressionToCodeLib {
 
 		void BinaryDispatch(string op, Expression e) {
 			BinaryExpression be = (BinaryExpression)e;
-			be = UnwrapEnumOp(be);
-			NestExpression(be.NodeType, be.Left);
+			Expression left, right;
+			UnwrapEnumOp(be, out left, out right);
+			NestExpression(be.NodeType, left);
 			Sink(" " + op + " ", e);
-			NestExpression(be.NodeType, be.Right, true);
+			NestExpression(be.NodeType, right, true);
 		}
 
-		BinaryExpression UnwrapEnumOp(BinaryExpression be) {
-			//return be;
-
-			var left = be.Left;
-			var right = be.Right;
+		void UnwrapEnumOp(BinaryExpression be, out Expression left, out Expression right) {
+			left = be.Left;
+			right = be.Right;
 			var uleft = left.NodeType == ExpressionType.Convert ? ((UnaryExpression)left).Operand : null;
 			var uright = right.NodeType == ExpressionType.Convert ? ((UnaryExpression)right).Operand : null;
-			if (uleft == null && uright == null)
-				return be;
-			if (uleft != null && uright != null)
-				if (uleft.Type != uright.Type)
-					return be;
-				else
-					return Expression.MakeBinary(be.NodeType, uleft, uright);
-			if (uleft != null && uleft.Type.IsEnum && uleft.Type.GetEnumUnderlyingType() == right.Type)
-				return Expression.MakeBinary(be.NodeType, uleft, right.NodeType == ExpressionType.Constant ? Expression.Constant(Enum.ToObject(uleft.Type, ((ConstantExpression)right).Value)) : (Expression)Expression.Convert(right, uleft.Type));
-			if (uright != null && uright.Type.IsEnum && uright.Type.GetEnumUnderlyingType() == left.Type)
-				return Expression.MakeBinary(be.NodeType,
-					 left.NodeType == ExpressionType.Constant ? Expression.Constant(Enum.ToObject(uright.Type, ((ConstantExpression)left).Value)) : (Expression)Expression.Convert(left, uright.Type)
-					, uright);
-			return be;
+			if (uleft != null) {
+				if (uright != null) {
+					if (uright.Type == uleft.Type) {
+						left = uleft;
+						right = uright;
+					}
+				} else {
+					UnwrapEnumBinOp(uleft, ref left, ref right);
+				}
+			} else {//uleft != null
+				if (uright != null)
+					UnwrapEnumBinOp(uright, ref right, ref left);
+			}
+		}
+
+		void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2) {
+			if (expr1uncast.Type.IsEnum && expr1uncast.Type.GetEnumUnderlyingType()  == expr2.Type) {
+				expr1 = expr1uncast;
+				expr2 = expr2.NodeType == ExpressionType.Constant 
+					? Expression.Constant(Enum.ToObject(expr1uncast.Type, ((ConstantExpression)expr2).Value)) 
+					: (Expression)Expression.Convert(expr2, expr1uncast.Type);
+			}
 		}
 
 		void UnaryDispatch(string op, Expression e) {

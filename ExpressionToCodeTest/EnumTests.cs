@@ -47,14 +47,25 @@ namespace ExpressionToCodeTest {
 		}
 
 		[Test]
-		public void EnumVarOpConstant() {
+		public void EnumVarNeqConstant() {
 			var a = SomeEnum.A;
 			Assert.AreEqual(
 				@"() => a != SomeEnum.B",
 				ExpressionToCode.ToCode(() => a != SomeEnum.B));
 			Assert.AreEqual(
-				@"() => SomeEnum.B <a",
-				ExpressionToCode.ToCode(() => SomeEnum.B < a));
+				@"() => SomeEnum.B != a",
+				ExpressionToCode.ToCode(() => SomeEnum.B != a));
+		}
+
+		[Test]
+		public void EnumVarLtConstant() {
+			var a = SomeEnum.A;
+			Assert.AreEqual(
+				@"() => a < SomeEnum.B",
+				ExpressionToCode.ToCode(() => a < SomeEnum.B));
+			Assert.AreEqual(
+				@"() => SomeEnum.B > a",
+				ExpressionToCode.ToCode(() => SomeEnum.B > a));
 		}
 
 		[Test]
@@ -70,6 +81,9 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => a == (SomeEnum)b",//but it does here!
 				ExpressionToCode.ToCode(() => a == (SomeEnum)b));
+			Assert.AreEqual(
+				@"() => (SomeFlagsEnum)a == b",//but it does here!
+				ExpressionToCode.ToCode(() => (SomeFlagsEnum)a == b));
 		}
 
 		[Test]
