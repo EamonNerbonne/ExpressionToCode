@@ -60,7 +60,7 @@ namespace ExpressionToCodeLib
 					for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++)
 						argsNames.Add(Get(typeArgs[i]));
 					typeArgIdx -= thisTypeArgCount;
-					revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + string.Join(",", argsNames) + ">");
+					revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + string.Join(", ", argsNames) + ">");
 				}
 				type = type.DeclaringType;
 			}
