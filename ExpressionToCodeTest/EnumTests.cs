@@ -185,7 +185,7 @@ namespace ExpressionToCodeTest {
 			SomeFlagsEnum a = SomeFlagsEnum.A;
 			SomeFlagsEnum? b = SomeFlagsEnum.B;
 			Assert.AreEqual(
-				@"() => (a | b) == SomeFlagsEnum.AB)",
+				@"() => (SomeFlagsEnum?)(a | b) == SomeFlagsEnum.AB",
 				ExpressionToCode.ToCode(() => (a | b) == SomeFlagsEnum.AB));
 		}
 

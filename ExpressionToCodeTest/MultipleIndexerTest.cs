@@ -10,7 +10,6 @@ using Assert = NUnit.Framework.Assert;
 
 namespace ExpressionToCodeTest
 {
-
 	class HasIndexers
 	{
 		public object this[string s] { get { return null; } }

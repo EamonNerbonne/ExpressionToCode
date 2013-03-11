@@ -16,7 +16,7 @@
 		  
 		  ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 	  </description>
-    <releaseNotes>Added support for nested and nested generic classes; Added support for expressions on types with multiple indexers; Now uses NUnit/xUnit.NET/mstest native exceptions where possible.</releaseNotes>
+    <releaseNotes>Supports Inferring enum constants in expressions such as "someVar == MyEnum.AMember"; Marked PAssertFailedException as obsolete (breaking change) since it is not necessarily thrown by PAssert on assertion failure.</releaseNotes>
     <copyright>Copyright 2013 © Eamon Nerbonne</copyright>
     <tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert</tags>
   </metadata>
