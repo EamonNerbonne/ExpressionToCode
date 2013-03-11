@@ -55,7 +55,7 @@
     <Compile Include="ExprTextPart.cs" />
     <Compile Include="ObjectToCode.cs" />
     <Compile Include="PAssert.cs" />
-    <Compile Include="PAssertFailedException.cs" />
+    <Compile Include="AssertFailedException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionHelpers.cs" />
     <Compile Include="UnitTestingFailure.cs" />

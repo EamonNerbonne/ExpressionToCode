@@ -45,9 +45,40 @@ namespace ExpressionToCodeLib {
 
 		void BinaryDispatch(string op, Expression e) {
 			BinaryExpression be = (BinaryExpression)e;
-			NestExpression(be.NodeType, be.Left);
+			Expression left, right;
+			UnwrapEnumOp(be, out left, out right);
+			NestExpression(be.NodeType, left);
 			Sink(" " + op + " ", e);
-			NestExpression(be.NodeType, be.Right, true);
+			NestExpression(be.NodeType, right, true);
+		}
+
+		void UnwrapEnumOp(BinaryExpression be, out Expression left, out Expression right) {
+			left = be.Left;
+			right = be.Right;
+			var uleft = left.NodeType == ExpressionType.Convert ? ((UnaryExpression)left).Operand : null;
+			var uright = right.NodeType == ExpressionType.Convert ? ((UnaryExpression)right).Operand : null;
+			if (uleft != null) {
+				if (uright != null) {
+					if (uright.Type == uleft.Type) {
+						left = uleft;
+						right = uright;
+					}
+				} else {
+					UnwrapEnumBinOp(uleft, ref left, ref right);
+				}
+			} else {//uleft != null
+				if (uright != null)
+					UnwrapEnumBinOp(uright, ref right, ref left);
+			}
+		}
+
+		void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2) {
+			if (expr1uncast.Type.IsEnum && expr1uncast.Type.GetEnumUnderlyingType()  == expr2.Type) {
+				expr1 = expr1uncast;
+				expr2 = expr2.NodeType == ExpressionType.Constant 
+					? Expression.Constant(Enum.ToObject(expr1uncast.Type, ((ConstantExpression)expr2).Value)) 
+					: (Expression)Expression.Convert(expr2, expr1uncast.Type);
+			}
 		}
 
 		void UnaryDispatch(string op, Expression e) {
@@ -106,7 +137,7 @@ namespace ExpressionToCodeLib {
 
 		public void DispatchCall(Expression e) {
 			MethodCallExpression mce = (MethodCallExpression)e;
-			
+
 			var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
 			if (optPropertyInfo != null && (optPropertyInfo.Name == "Item" || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
 				NestExpression(mce.NodeType, mce.Object);

@@ -65,7 +65,7 @@ namespace ExpressionToCodeLib
 					yield return Tuple.Create(3, Expression.Lambda<Func<string, Exception, Exception>>(Expression.New(exConstructor, failureMessageArg, innerExceptionArg), failureMessageArg, innerExceptionArg).Compile());
 				}
 			}
-			yield return Tuple.Create(0, F((string s, Exception e) => (Exception)new PAssertFailedException(s, e)));
+			yield return Tuple.Create(0, F((string s, Exception e) => (Exception)new AssertFailedException(s, e)));
 		}
 	}
 }
