@@ -62,7 +62,9 @@
     <Compile Include="UnitTestingFailure.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ExpressionToCodeLib.nuspec" />
+    <None Include="ExpressionToCodeLib.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ExpressionTypeDispatch.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>

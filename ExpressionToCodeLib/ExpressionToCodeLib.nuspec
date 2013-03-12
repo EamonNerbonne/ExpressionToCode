@@ -1,23 +1,26 @@
 <?xml version="1.0"?>
 <package >
-  <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <projectUrl>http://code.google.com/p/expressiontocode/</projectUrl>
-    <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>$description$</summary>
-	  <description>
-		  Generates valid, readable C# from an Expression Tree, and can annotate that code with runtime values.  This can be useful for code generation and for unit testing: ExpressionToCode detects NUnit, xUnit.NET and MSTest and uses their assertions if available, and a normal Exception otherwise (so it runs fine outside those specific unit testing frameworks too).
-		  
-		  ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
-	  </description>
-    <releaseNotes>Supports Inferring enum constants in expressions such as "someVar == MyEnum.AMember"; Marked PAssertFailedException as obsolete (breaking change) since it is not necessarily thrown by PAssert on assertion failure.</releaseNotes>
-    <copyright>Copyright 2013 © Eamon Nerbonne</copyright>
-    <tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert</tags>
-  </metadata>
+	<metadata>
+		<id>$id$</id>
+		<version>$version$</version>
+		<title>$title$</title>
+		<authors>$author$</authors>
+		<owners>$author$</owners>
+		<licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+		<projectUrl>http://code.google.com/p/expressiontocode/</projectUrl>
+		<!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<summary>$description$</summary>
+		<description>
+			Generates valid, readable C# from an Expression Tree, and can annotate that code with runtime values.  This can be useful for code generation and for unit testing: ExpressionToCode detects NUnit, xUnit.NET and MSTest and uses their assertions if available, and a normal Exception otherwise (so it runs fine outside those specific unit testing frameworks too).
+
+			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
+		</description>
+		<releaseNotes>
+			Better layout in the face of non-fixed-width rendering: Although fixed-width rendering is the only way to be sure the subexpression annotations line up with the actual expression, ExpressionToCode now uses a mixture of normal spaces and en spaces in the subexpression annotation so that the alignment is roughly OK in many cases even with variable width fonts.
+			Supports inferring char constants in expressions such as "someVar == 'b'" (C# compiles these as integer constants, heuristics are used to identify those integers that were likely chars in the original code).
+		</releaseNotes>
+		<copyright>Copyright 2013 © Eamon Nerbonne</copyright>
+		<tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert</tags>
+	</metadata>
 </package>
