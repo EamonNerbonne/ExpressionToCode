@@ -16,15 +16,34 @@ namespace ExpressionToCodeTest {
 		}
 
 		[Test]
-		public void StringsImplicitCast() {
+		public void CharComp() {
+			var c = 'c';
+			Assert.AreEqual(
+				@"() => c == 'b'",
+				ExpressionToCode.ToCode(() => c == 'b'));
+		}
+
+
+		[Test, Ignore("issue 4")]
+		public void DecimalImplicitCast() {
 			var i = 1;
 			var x = "X";
 			Assert.AreEqual(
-				@"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true && (1m + -i > 0 || false)",
-				ExpressionToCode.ToCode(() => (("a\n\\b" ?? x) + x).Length == 2 ? false : true && (1m + -i > 0 || false)));
+				@"() => (1m + -i > 0 || false)",
+				ExpressionToCode.ToCode(() => (1m + -i > 0 || false)));
 		}
 
-		[Test]
+
+		[Test, Ignore("issue 4")]
+		public void StringImplicitConcat() {
+			var i = 1;
+			var x = "X";
+			Assert.AreEqual(
+				@"() => 1m + x + ""!!"" + i)",
+				ExpressionToCode.ToCode(() => 1m + x + "!!" + i));
+		}
+
+		[Test, Ignore("issue 4")]
 		public void NotImplicitCast() {
 			byte z = 42;
 			Assert.AreEqual(
