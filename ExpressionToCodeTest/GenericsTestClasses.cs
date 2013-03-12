@@ -1,5 +1,6 @@
 ﻿// ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantEnumerableCastCall
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using ExpressionToCodeLib;
 namespace ExpressionToCodeTest {
 	[TestFixture]
 	public class TestGenerics {
-		[Test]
+		[Test, Ignore("issue 13")]
 		public void TypeParameters() {
 			Assert.AreEqual(1337, StaticTestClass.Consume(12));
 			Assert.AreEqual(42, StaticTestClass.Consume<int>(12));
@@ -19,19 +20,19 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => 1337 == StaticTestClass.Consume(12)",
 				ExpressionToCode.ToCode(() => 1337 == StaticTestClass.Consume(12))
-			);
+				);
 			Assert.AreEqual(
 				@"() => 42 == StaticTestClass.Consume('a')",
 				ExpressionToCode.ToCode(() => 42 == StaticTestClass.Consume('a'))
-			);
+				);
 			Assert.AreEqual(
 				@"() => 42 == StaticTestClass.IndirectConsume(12)",
 				ExpressionToCode.ToCode(() => 42 == StaticTestClass.IndirectConsume(12))
-			);
+				);
 			Assert.AreEqual(
 				@"() => 42 == StaticTestClass.Consume<int>(12)",
 				ExpressionToCode.ToCode(() => 42 == StaticTestClass.Consume<int>(12))
-			);//should not remove type parameters where this would cause ambiguity due to overloads!
+				); //should not remove type parameters where this would cause ambiguity due to overloads!
 		}
 
 		[Test]
@@ -39,34 +40,36 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => new[] { 1, 2, 3 }.First()",
 				ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.First())
-				);//should remove type parameters where they can be inferred.
+				); //should remove type parameters where they can be inferred.
 
 			Assert.AreEqual(
 				@"() => new[] { 1, 2, 3 }.Select(x => x.ToString())",
 				ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.Select(x => x.ToString()))
-				);//should remove type parameters where they can be inferred.
+				); //should remove type parameters where they can be inferred.
+		}
 
+		[Test, Ignore("issue 13")]
+		public void TypeParameters3() {
 			Assert.AreEqual(
 				@"() => new[] { 1, 2, 3 }.Cast<int>()",
 				ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.Cast<int>())
-				);//should not remove type parameters where these cannot be inferred!
+				); //should not remove type parameters where these cannot be inferred!
 		}
-
 
 		[Test]
 		public void GenericConstructor() {
 			Assert.AreEqual(
 				@"() => new GenericClass<int>()",
 				ExpressionToCode.ToCode(() => new GenericClass<int>())
-			);
+				);
 			Assert.AreEqual(
 				@"() => new GenericClass<int>(3)",
 				ExpressionToCode.ToCode(() => new GenericClass<int>(3))
-			);
+				);
 			Assert.AreEqual(
 				@"() => new GenericSubClass<IEnumerable<int>, int>(new[] { 3 })",
 				ExpressionToCode.ToCode(() => new GenericSubClass<IEnumerable<int>, int>(new[] { 3 }))
-			);
+				);
 		}
 
 		[Test]
@@ -74,14 +77,14 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => new GenericClass<int>().IsSet()",
 				ExpressionToCode.ToCode(() => new GenericClass<int>().IsSet())
-			);
+				);
 			Assert.AreEqual(
 				@"() => GenericClass<int>.GetDefault()",
 				ExpressionToCode.ToCode(() => GenericClass<int>.GetDefault())
-			);
+				);
 		}
 
-		[Test]
+		[Test, Ignore("issue 13")]
 		public void GenericMethodInGenericClass() {
 			var x = new GenericClass<string>("42");
 			var y = new GenericClass<object>("42");
@@ -91,15 +94,15 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => x.IsSubEqual(""42"")",
 				ExpressionToCode.ToCode(() => x.IsSubEqual("42"))
-			);
+				);
 			Assert.AreEqual(
 				@"() => x.IsSubClass<string>()",
 				ExpressionToCode.ToCode(() => x.IsSubClass<string>())
-			);
+				);
 			Assert.AreEqual(
 				@"() => y.IsSubClass<string>()",
 				ExpressionToCode.ToCode(() => y.IsSubClass<string>())
-			);
+				);
 		}
 
 		[Test]
@@ -110,7 +113,7 @@ namespace ExpressionToCodeTest {
 				);
 		}
 
-		[Test]
+		[Test, Ignore("issue 13")]
 		public void CannotInferOneParam() {
 			Assert.AreEqual(
 				@"() => StaticTestClass.IsType<int, int>(3)",
@@ -118,7 +121,7 @@ namespace ExpressionToCodeTest {
 				);
 		}
 
-		[Test]
+		[Test, Ignore("issue 13")]
 		public void CannotInferWithoutTParam() {
 			Assert.AreEqual(
 				@"() => StaticTestClass.TEqualsInt<int>(3)",
@@ -142,7 +145,7 @@ namespace ExpressionToCodeTest {
 				);
 		}
 
-		[Test]
+		[Test, Ignore("issue 14")]
 		public void CanInferTwoArg() {
 			Assert.AreEqual(
 				@"() => StaticTestClass.TwoArgsTwoGeneric(3, 3)",
@@ -159,10 +162,10 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
 				ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
-			);
+				);
 		}
 
-		[Test]
+		[Test, Ignore("issue 14")]
 		public void CanInferIndirect() {
 			Assert.That(GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 }));
 			Assert.That(GenericClass<int>.IsFuncOfType(() => 3));
@@ -190,9 +193,7 @@ namespace ExpressionToCodeTest {
 
 	class GenericClass<T> {
 		T val;
-		public GenericClass(T pVal) {
-			val = pVal;
-		}
+		public GenericClass(T pVal) { val = pVal; }
 		public GenericClass() { val = default(T); }
 
 		public T Value { get { return val; } }
