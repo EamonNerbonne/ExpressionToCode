@@ -48,7 +48,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		void BinaryDispatch(string op, Expression e) {
-			BinaryExpression be = (BinaryExpression) e;
+			BinaryExpression be = (BinaryExpression)e;
 			Expression left, right;
 			UnwrapEnumOp(be, out left, out right);
 			NestExpression(be.NodeType, left);
@@ -59,8 +59,8 @@ namespace ExpressionToCodeLib {
 		void UnwrapEnumOp(BinaryExpression be, out Expression left, out Expression right) {
 			left = be.Left;
 			right = be.Right;
-			var uleft = left.NodeType == ExpressionType.Convert ? ((UnaryExpression) left).Operand : null;
-			var uright = right.NodeType == ExpressionType.Convert ? ((UnaryExpression) right).Operand : null;
+			var uleft = left.NodeType == ExpressionType.Convert ? ((UnaryExpression)left).Operand : null;
+			var uright = right.NodeType == ExpressionType.Convert ? ((UnaryExpression)right).Operand : null;
 			if (uleft != null)
 				if (uright != null) {
 					if (uright.Type.EnusureNullability() == uleft.Type.EnusureNullability()) {
@@ -76,30 +76,36 @@ namespace ExpressionToCodeLib {
 		}
 
 		void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2) {
-			if (expr1uncast.Type.AvoidNullability().IsEnum
-				&& expr1uncast.Type.AvoidNullability().GetEnumUnderlyingType() == expr2.Type.AvoidNullability()) {
+			Type expr1nonnullableType = expr1uncast.Type.AvoidNullability();
+			Type expr2nonnullableType = expr2.Type.AvoidNullability();
+			if (expr1nonnullableType.IsEnum
+				&& expr1nonnullableType.GetEnumUnderlyingType() == expr2nonnullableType
+				|| expr1nonnullableType == typeof(char) && expr2nonnullableType == typeof(int)
+				) {
 				expr1 = expr1uncast;
 
 				if (expr2.NodeType == ExpressionType.Constant) {
-					object value = ((ConstantExpression) expr2).Value;
+					object value = ((ConstantExpression)expr2).Value;
 					if (value == null)
 						expr2 = Expression.Default(expr1uncast.Type.EnusureNullability());
+					else if (expr1nonnullableType == typeof(char))
+						expr2 = Expression.Constant((char)(int)value);
 					else
-						expr2 = Expression.Constant(Enum.ToObject(expr1uncast.Type.AvoidNullability(), value));
+						expr2 = Expression.Constant(Enum.ToObject(expr1nonnullableType, value));
 				} else
 					expr2 = Expression.Convert(expr2, expr1uncast.Type);
 			}
 		}
 
 		void UnaryDispatch(string op, Expression e) {
-			var ue = (UnaryExpression) e;
+			var ue = (UnaryExpression)e;
 			bool needsSpace = ExpressionPrecedence.TokenizerConfusable(ue.NodeType, ue.Operand.NodeType);
 			Sink(op + (needsSpace ? " " : ""), e);
 			NestExpression(ue.NodeType, ue.Operand);
 		}
 
 		void UnaryDispatchConvert(Expression e) {
-			var ue = (UnaryExpression) e;
+			var ue = (UnaryExpression)e;
 			if (e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
 				Sink("(" + CSharpFriendlyTypeName.Get(e.Type) + ")");
 			else
@@ -108,15 +114,15 @@ namespace ExpressionToCodeLib {
 		}
 
 		void UnaryPostfixDispatch(string op, Expression e) {
-			UnaryExpression ue = (UnaryExpression) e;
+			UnaryExpression ue = (UnaryExpression)e;
 			NestExpression(ue.NodeType, ue.Operand);
 			Sink(op, e);
 		}
 
 		void TypeOpDispatch(string op, Expression e) {
-			NestExpression(e.NodeType, ((TypeBinaryExpression) e).Expression);
+			NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression);
 			Sink(" " + op + " ", e);
-			Sink(CSharpFriendlyTypeName.Get(((TypeBinaryExpression) e).TypeOperand));
+			Sink(CSharpFriendlyTypeName.Get(((TypeBinaryExpression)e).TypeOperand));
 		}
 
 		#endregion
@@ -124,7 +130,7 @@ namespace ExpressionToCodeLib {
 		#region Hard Cases
 
 		public void DispatchLambda(Expression e) {
-			LambdaExpression le = (LambdaExpression) e;
+			LambdaExpression le = (LambdaExpression)e;
 			if (le.Parameters.Count == 1)
 				NestExpression(e.NodeType, le.Parameters.Single());
 			else
@@ -135,18 +141,18 @@ namespace ExpressionToCodeLib {
 
 		static bool isThisRef(Expression e) {
 			return
-				e.NodeType == ExpressionType.Constant && ((ConstantExpression) e).Value != null
+				e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
 					&& e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 		}
 
 		static bool isClosureRef(Expression e) {
 			return
-				e.NodeType == ExpressionType.Constant && ((ConstantExpression) e).Value != null
+				e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
 					&& e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
 		}
 
 		public void DispatchMemberAccess(Expression e) {
-			MemberExpression me = (MemberExpression) e;
+			MemberExpression me = (MemberExpression)e;
 			Expression memberOfExpr = me.Expression;
 			if (memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr)) {
 				NestExpression(e.NodeType, memberOfExpr);
@@ -157,29 +163,29 @@ namespace ExpressionToCodeLib {
 			Sink(me.Member.Name, e);
 		}
 
-		static readonly MethodInfo createDelegate = typeof (Delegate).GetMethod("CreateDelegate",
-			new[] {typeof (Type), typeof (object), typeof (MethodInfo)});
+		static readonly MethodInfo createDelegate = typeof(Delegate).GetMethod("CreateDelegate",
+			new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
 
 		public void DispatchCall(Expression e) {
-			MethodCallExpression mce = (MethodCallExpression) e;
+			MethodCallExpression mce = (MethodCallExpression)e;
 
 			var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
 			if (optPropertyInfo != null
-				&& (optPropertyInfo.Name == "Item" || mce.Object.Type == typeof (string) && optPropertyInfo.Name == "Chars")) {
+				&& (optPropertyInfo.Name == "Item" || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
 				NestExpression(mce.NodeType, mce.Object);
 				ArgListDispatch(mce.Arguments, mce, "[", "]");
 			} else if (mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
-				&& mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof (MethodInfo)) {
+				&& mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof(MethodInfo)) {
 				//implicitly constructed delegate from method group.
-				var targetMethod = (MethodInfo) ((ConstantExpression) mce.Arguments[2]).Value;
+				var targetMethod = (MethodInfo)((ConstantExpression)mce.Arguments[2]).Value;
 				var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
-					&& ((ConstantExpression) mce.Arguments[1]).Value == null
+					&& ((ConstantExpression)mce.Arguments[1]).Value == null
 					? null
 					: mce.Arguments[1];
 				SinkMethodName(mce, targetMethod, targetExpr);
 			} else {
 				bool isExtensionMethod = mce.Method.IsStatic
-					&& mce.Method.GetCustomAttributes(typeof (ExtensionAttribute), false).Any() && mce.Arguments.Any()
+					&& mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any()
 					&& mce.Object == null;
 				Expression objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
 				SinkMethodName(mce, mce.Method, objectExpr);
@@ -202,20 +208,20 @@ namespace ExpressionToCodeLib {
 		public void DispatchIndex(Expression e) {
 			var ie = (IndexExpression)e;
 			NestExpression(ie.NodeType, ie.Object);
-			if (ie.Indexer.Name != "Item") Sink("." + ie.Indexer.Name);//TODO: is this OK?
+			if (ie.Indexer.Name != "Item") Sink("." + ie.Indexer.Name); //TODO: is this OK?
 			ArgListDispatch(ie.Arguments, ie, "[", "]");
 		}
 #endif
 
 		public void DispatchInvoke(Expression e) {
-			InvocationExpression ie = (InvocationExpression) e;
+			InvocationExpression ie = (InvocationExpression)e;
 			NestExpression(ie.NodeType, ie.Expression);
 			ArgListDispatch(ie.Arguments, ie);
 		}
 
 
 		public void DispatchConstant(Expression e) {
-			var const_Val = ((ConstantExpression) e).Value;
+			var const_Val = ((ConstantExpression)e).Value;
 			string codeRepresentation = ObjectToCode.PlainObjectToCode(const_Val, e.Type);
 			//e.Type.IsVisible
 			if (codeRepresentation == null) {
@@ -230,7 +236,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		public void DispatchConditional(Expression e) {
-			ConditionalExpression ce = (ConditionalExpression) e;
+			ConditionalExpression ce = (ConditionalExpression)e;
 			NestExpression(ce.NodeType, ce.Test);
 			Sink(" ? ", e);
 			NestExpression(ce.NodeType, ce.IfTrue);
@@ -239,7 +245,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		public void DispatchListInit(Expression e) {
-			ListInitExpression lie = (ListInitExpression) e;
+			ListInitExpression lie = (ListInitExpression)e;
 			Sink("new ", lie);
 			Sink(CSharpFriendlyTypeName.Get(lie.NewExpression.Constructor.ReflectedType));
 			if (lie.NewExpression.Arguments.Any())
@@ -260,23 +266,23 @@ namespace ExpressionToCodeLib {
 		void DispatchMemberBinding(MemberBinding mb) {
 			Sink(mb.Member.Name + " = ");
 			if (mb is MemberMemberBinding) {
-				var mmb = (MemberMemberBinding) mb;
+				var mmb = (MemberMemberBinding)mb;
 				Sink("{ ");
 				JoinDispatch(mmb.Bindings, ", ", DispatchMemberBinding);
 				Sink(" }");
 			} else if (mb is MemberListBinding) {
-				var mlb = (MemberListBinding) mb;
+				var mlb = (MemberListBinding)mb;
 				Sink("{ ");
 				JoinDispatch(mlb.Initializers, ", ", DispatchElementInit);
 				Sink(" }");
 			} else if (mb is MemberAssignment)
-				RawChildDispatch(((MemberAssignment) mb).Expression);
+				RawChildDispatch(((MemberAssignment)mb).Expression);
 			else
 				throw new NotImplementedException("Member binding of unknown type: " + mb.GetType());
 		}
 
 		public void DispatchMemberInit(Expression e) {
-			var mie = (MemberInitExpression) e;
+			var mie = (MemberInitExpression)e;
 			Sink("new ", mie);
 			Sink(CSharpFriendlyTypeName.Get(mie.NewExpression.Constructor.ReflectedType));
 			if (mie.NewExpression.Arguments.Any())
@@ -288,13 +294,13 @@ namespace ExpressionToCodeLib {
 		}
 
 		public void DispatchNew(Expression e) {
-			NewExpression ne = (NewExpression) e;
+			NewExpression ne = (NewExpression)e;
 			if (ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
 				var parms = ne.Type.GetConstructors().Single().GetParameters();
 				var props = ne.Type.GetProperties();
 				if (
-					!parms.Select(p => new {p.Name, Type = p.ParameterType})
-						.SequenceEqual(props.Select(p => new {p.Name, Type = p.PropertyType})))
+					!parms.Select(p => new { p.Name, Type = p.ParameterType })
+						.SequenceEqual(props.Select(p => new { p.Name, Type = p.PropertyType })))
 					throw new InvalidOperationException("Constructor params for anonymous type don't match it's properties!");
 				if (!parms.Select(p => p.ParameterType).SequenceEqual(ne.Arguments.Select(argE => argE.Type)))
 					throw new InvalidOperationException("Constructor Arguments for anonymous type don't match it's type signature!");
@@ -313,7 +319,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		public void DispatchNewArrayInit(Expression e) {
-			NewArrayExpression nae = (NewArrayExpression) e;
+			NewArrayExpression nae = (NewArrayExpression)e;
 			Type arrayElemType = nae.Type.GetElementType();
 			bool implicitTypeOK = nae.Expressions.Any() && nae.Expressions.All(expr => expr.Type == arrayElemType);
 			Sink("new" + (implicitTypeOK ? "" : " " + CSharpFriendlyTypeName.Get(arrayElemType)) + "[] ", nae);
@@ -321,7 +327,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		public void DispatchNewArrayBounds(Expression e) {
-			NewArrayExpression nae = (NewArrayExpression) e;
+			NewArrayExpression nae = (NewArrayExpression)e;
 			Type arrayElemType = nae.Type.GetElementType();
 			Sink("new " + CSharpFriendlyTypeName.Get(arrayElemType), nae);
 			ArgListDispatch(nae.Expressions, open: "[", close: "]");
@@ -333,7 +339,7 @@ namespace ExpressionToCodeLib {
 
 		public void DispatchPower(Expression e) {
 			Sink("Math.Pow", e);
-			ArgListDispatch(new[] {((BinaryExpression) e).Left, ((BinaryExpression) e).Right});
+			ArgListDispatch(new[] { ((BinaryExpression)e).Left, ((BinaryExpression)e).Right });
 		}
 
 		public void DispatchAdd(Expression e) { BinaryDispatch("+", e); }
@@ -342,14 +348,14 @@ namespace ExpressionToCodeLib {
 		public void DispatchAndAlso(Expression e) { BinaryDispatch("&&", e); }
 
 		public void DispatchArrayLength(Expression e) {
-			NestExpression(e.NodeType, ((UnaryExpression) e).Operand);
+			NestExpression(e.NodeType, ((UnaryExpression)e).Operand);
 			Sink(".Length", e);
 		}
 
 		public void DispatchArrayIndex(Expression e) {
-			NestExpression(e.NodeType, ((BinaryExpression) e).Left);
+			NestExpression(e.NodeType, ((BinaryExpression)e).Left);
 			Sink("[", e);
-			NestExpression(null, ((BinaryExpression) e).Right);
+			NestExpression(null, ((BinaryExpression)e).Right);
 			Sink("]");
 		}
 
@@ -371,12 +377,12 @@ namespace ExpressionToCodeLib {
 		public void DispatchNegate(Expression e) { UnaryDispatch("-", e); }
 		public void DispatchUnaryPlus(Expression e) { UnaryDispatch("+", e); }
 		public void DispatchNegateChecked(Expression e) { UnaryDispatch("-", e); }
-		public void DispatchNot(Expression e) { UnaryDispatch(e.Type == typeof (bool) || e.Type == typeof (bool?) ? "!" : "~", e); }
+		public void DispatchNot(Expression e) { UnaryDispatch(e.Type == typeof(bool) || e.Type == typeof(bool?) ? "!" : "~", e); }
 		public void DispatchNotEqual(Expression e) { BinaryDispatch("!=", e); }
 		public void DispatchOr(Expression e) { BinaryDispatch("|", e); }
 		public void DispatchOrElse(Expression e) { BinaryDispatch("||", e); }
-		public void DispatchParameter(Expression e) { Sink(((ParameterExpression) e).Name, e); }
-		public void DispatchQuote(Expression e) { NestExpression(e.NodeType, ((UnaryExpression) e).Operand); }
+		public void DispatchParameter(Expression e) { Sink(((ParameterExpression)e).Name, e); }
+		public void DispatchQuote(Expression e) { NestExpression(e.NodeType, ((UnaryExpression)e).Operand); }
 		public void DispatchRightShift(Expression e) { BinaryDispatch(">>", e); }
 		public void DispatchSubtract(Expression e) { BinaryDispatch("-", e); }
 		public void DispatchSubtractChecked(Expression e) { BinaryDispatch("-", e); }
