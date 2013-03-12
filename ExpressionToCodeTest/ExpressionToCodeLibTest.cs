@@ -6,6 +6,7 @@
 // ReSharper disable ConstantNullCoalescingCondition
 // ReSharper disable EqualExpressionComparison
 // ReSharper disable RedundantToStringCall
+
 #pragma warning disable 1720
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,6 @@ using NUnit.Framework;
 using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest {
-
 	public class ExpressionToCodeTest {
 		[Test]
 		public void AddOperator() {
@@ -153,37 +153,15 @@ namespace ExpressionToCodeTest {
 				ExpressionToCode.ToCode(() => default(List<int>).AsReadOnly()));
 		}
 
-		class ClassA {
-			int x;
-			public void DoAssert() {
-				x = 37;
-				Assert.AreEqual(
-					@"() => x != C()",
-					ExpressionToCode.ToCode(() => x != C()));
-				Assert.AreEqual(
-					@"() => !object.ReferenceEquals(this, new ClassA())",
-					ExpressionToCode.ToCode(() => !ReferenceEquals(this, new ClassA())));
-				Assert.AreEqual(
-					@"() => MyEquals(this) && !MyEquals(default(ClassA))",
-					ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
-			}
-
-			int C() { return x + 5; }
-
-			bool MyEquals(ClassA other) { return other != null && x == other.x; }
-		}
-
 		[Test]
-		public void MembersThis() {
-			new ClassA().DoAssert();
-		}
+		public void MembersThis() { new ClassA().DoAssert(); }
 
 
 		[Test]
 		public void MethodGroupAsExtensionMethod() {
 			Assert.AreEqual(
-			   "() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any"
-			   , ExpressionToCode.ToCode(() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any));
+				"() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any"
+				, ExpressionToCode.ToCode(() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any));
 		}
 
 
@@ -225,15 +203,15 @@ namespace ExpressionToCodeTest {
 			Assert.AreEqual(
 				@"() => call(() => 42)",
 				ExpressionToCode.ToCode(() => call(() => 42))
-				);//no params
+				); //no params
 			Assert.AreEqual(
 				@"() => new[] { 37, 42 }.Select(x => x * 2)",
 				ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select(x => x * 2))
-				);//one param
+				); //one param
 			Assert.AreEqual(
 				@"() => new[] { 37, 42 }.Select((x, i) => x * 2)",
 				ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select((x, i) => x * 2))
-				);//two params
+				); //two params
 		}
 
 		bool Fizz(Func<int, bool> a) { return a(42); }
@@ -250,15 +228,18 @@ namespace ExpressionToCodeTest {
 				@"() => Fizz(x => x == 37)",
 				ExpressionToCode.ToCode(() => Fizz(x => x == 37))
 				);
+		}
 
+		[Test, Ignore("issue 14")]
+		public void NestedLambda3() {
 			Assert.AreEqual(
 				@"() => Fizz((int x) => true)",
 				ExpressionToCode.ToCode(() => Fizz((int x) => true))
-				);//hard case!
+				); //hard case!
 			Assert.AreEqual(
 				@"() => Buzz(x => true)",
 				ExpressionToCode.ToCode(() => Buzz(x => true))
-				);//hard case!
+				); //hard case!
 		}
 
 		[Test]
@@ -272,7 +253,7 @@ namespace ExpressionToCodeTest {
 		public void NewMultiDimArray() {
 			Assert.AreEqual(
 				@"() => new int[3, 4].Length == 1",
-				ExpressionToCode.ToCode(() => new int[3, 4].Length == 1));
+				ExpressionToCode.ToCode(() => new int[3,4].Length == 1));
 		}
 
 		[Test]
@@ -306,7 +287,8 @@ namespace ExpressionToCodeTest {
 			};
 			Assert.AreEqual(
 				@"() => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)",
-				ExpressionToCode.ToCode(() => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)));
+				ExpressionToCode.ToCode(
+					() => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)));
 		}
 
 		[Test]
@@ -369,17 +351,10 @@ namespace ExpressionToCodeTest {
 		public void StaticMembers() {
 			Assert.AreEqual(
 				@"() => (DateTime.Now > DateTime.Now + TimeSpan.FromMilliseconds(10.001)).ToString() == ""False""",
-				ExpressionToCode.ToCode(() => (DateTime.Now > DateTime.Now + TimeSpan.FromMilliseconds(10.001)).ToString() == "False"));
+				ExpressionToCode.ToCode(
+					() => (DateTime.Now > DateTime.Now + TimeSpan.FromMilliseconds(10.001)).ToString() == "False"));
 		}
 
-		[Test]
-		public void Strings() {
-			var i = 1;
-			var x = "X";
-			Assert.AreEqual(
-				@"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true && (1m + (decimal)-i > 0m || false)",
-				ExpressionToCode.ToCode(() => (("a\n\\b" ?? x) + x).Length == 2 ? false : true && (1m + (decimal)-i > 0m || false)));
-		}
 
 		[Test]
 		public void Strings2() {
@@ -393,8 +368,38 @@ namespace ExpressionToCodeTest {
 		[Test]
 		public void StringAccessor() {
 			Assert.AreEqual(
-				@"() => (int)""abc""[1] == 98",
-				ExpressionToCode.ToCode(() => (int)"abc"[1] == 98));
+				@"() => ""abc""[1] == 'b'",
+				ExpressionToCode.ToCode(() => "abc"[1] == 'b'));
 		}
+
+		[Test]
+		public void StringConcat() {
+			var i = 1;
+			var x = "X";
+			Assert.AreEqual(
+				@"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true",
+				ExpressionToCode.ToCode(() => (("a\n\\b" ?? x) + x).Length == 2 ? false : true));
+		}
+	}
+
+	class ClassA {
+		int x;
+
+		public void DoAssert() {
+			x = 37;
+			Assert.AreEqual(
+				@"() => x != C()",
+				ExpressionToCode.ToCode(() => x != C()));
+			Assert.AreEqual(
+				@"() => !object.ReferenceEquals(this, new ClassA())",
+				ExpressionToCode.ToCode(() => !ReferenceEquals(this, new ClassA())));
+			Assert.AreEqual(
+				@"() => MyEquals(this) && !MyEquals(default(ClassA))",
+				ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
+		}
+
+		int C() { return x + 5; }
+
+		bool MyEquals(ClassA other) { return other != null && x == other.x; }
 	}
 }
