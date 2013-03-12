@@ -7,14 +7,14 @@ using System.Text;
 
 namespace ExpressionToCodeLib {
 	public static class ExpressionToCode {
-		public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToCode((Expression) e); }
-		public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToCode((Expression) e); }
-		public static string ToCode<T, T1>(Expression<Func<T, T1>> e) { return ToCode((Expression) e); }
-		public static string ToCode<T>(Expression<Func<T>> e) { return ToCode((Expression) e); }
-		public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return AnnotatedToCode((Expression) e); }
-		public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return AnnotatedToCode((Expression) e); }
-		public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) { return AnnotatedToCode((Expression) e); }
-		public static string AnnotatedToCode<T>(Expression<Func<T>> e) { return AnnotatedToCode((Expression) e); }
+		public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToCode((Expression)e); }
+		public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToCode((Expression)e); }
+		public static string ToCode<T, T1>(Expression<Func<T, T1>> e) { return ToCode((Expression)e); }
+		public static string ToCode<T>(Expression<Func<T>> e) { return ToCode((Expression)e); }
+		public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return AnnotatedToCode((Expression)e); }
+		public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return AnnotatedToCode((Expression)e); }
+		public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) { return AnnotatedToCode((Expression)e); }
+		public static string AnnotatedToCode<T>(Expression<Func<T>> e) { return AnnotatedToCode((Expression)e); }
 
 		public static string ToCode(Expression e) {
 			StringBuilder sb = new StringBuilder();
@@ -31,10 +31,15 @@ namespace ExpressionToCodeLib {
 
 			StringBuilder exprWithStalkedValues = new StringBuilder();
 			exprWithStalkedValues.AppendLine(splitLine.Line);
+
 			for (int nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
-				char[] stalkLine = new string(' ', splitLine.Nodes[nodeI].Location).ToCharArray();
+				char[] stalkLine = new string('\u2002', splitLine.Nodes[nodeI].Location).ToCharArray(); //en-spaces.
+				for (int i = 0; i < stalkLine.Length; i++)
+					if (splitLine.Line[i] == ' ')
+						stalkLine[i] = ' '; //use normal spaces where the expr used normal spaces for more natural spacing.
+
 				for (int prevI = 0; prevI < nodeI; prevI++)
-					stalkLine[splitLine.Nodes[prevI].Location] = '|';
+					stalkLine[splitLine.Nodes[prevI].Location] = '\u2502'; //light vertical lines
 				exprWithStalkedValues.AppendLine((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
 			}
 
@@ -55,10 +60,10 @@ namespace ExpressionToCodeLib {
 				ignoreInitialSpace = etp.Text.Any() && ShouldIgnoreSpaceAfter(etp.Text[etp.Text.Length - 1]);
 				string valueString = etp.OptionalValue == null ? null : ExpressionValueAsCode(etp.OptionalValue);
 				if (valueString != null)
-					nodeInfos.Add(new SubExpressionInfo {Location = pos0 + trimmedText.Length/2, Value = valueString});
+					nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
 			}).ExpressionDispatch(e);
-			nodeInfos.Add(new SubExpressionInfo {Location = sb.Length, Value = null});
-			return new SplitExpressionLine {Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray()};
+			nodeInfos.Add(new SubExpressionInfo { Location = sb.Length, Value = null });
+			return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };
 		}
 
 		static string ExpressionValueAsCode(Expression expression) {
