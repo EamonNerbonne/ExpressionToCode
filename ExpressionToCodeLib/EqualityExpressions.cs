@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+// ReSharper disable PossiblyMistakenUseOfParamsMethod
 // ReSharper disable RedundantNameQualifier
 
 namespace ExpressionToCodeLib {
@@ -31,7 +32,7 @@ namespace ExpressionToCodeLib {
 		public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression<Func<bool>> e) { return ExtractEqualityType(e.Body); }
 
 		public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression e) {
-			if (e.Type.Equals(typeof (bool)))
+			if (e.Type == typeof (bool))
 				if (e is BinaryExpression) {
 					var binExpr = (BinaryExpression) e;
 					if (binExpr.NodeType == ExpressionType.Equal)
@@ -39,7 +40,7 @@ namespace ExpressionToCodeLib {
 					else if (e.NodeType == ExpressionType.NotEqual)
 						return Tuple.Create(EqualityExpressionClass.NotEqualsOp, binExpr.Left, binExpr.Right);
 				} else if (e.NodeType == ExpressionType.Call) {
-					MethodCallExpression mce = (MethodCallExpression) e;
+					var mce = (MethodCallExpression) e;
 					if (mce.Method.Equals(((Func<object, bool>) new object().Equals).Method))
 						return Tuple.Create(EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
 					else if (mce.Method.Equals(objEqualStaticMethod))
@@ -187,7 +188,7 @@ namespace ExpressionToCodeLib {
 		static IEnumerable<Type> GetGenericInterfaceImplementation(Type type, Type genericInterfaceType) {
 			return
 				from itype in type.GetInterfaces()
-				where itype.IsGenericType && itype.GetGenericTypeDefinition().Equals(genericInterfaceType)
+				where itype.IsGenericType && itype.GetGenericTypeDefinition() == genericInterfaceType
 				select itype
 				;
 		}

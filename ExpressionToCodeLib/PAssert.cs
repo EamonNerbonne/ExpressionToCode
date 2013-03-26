@@ -13,10 +13,8 @@ namespace ExpressionToCodeLib {
 			try {
 				ok = compiled();
 			} catch (Exception e) {
-				throw UnitTestingFailure.AssertionExceptionFactory(msg + "\n" +
+				throw UnitTestingFailure.AssertionExceptionFactory((msg == null ? "" : msg + "\n") +
 					ExpressionToCode.AnnotatedToCode(assertion.Body), e);
-				//throw new PAssertFailedException((msg ?? "PAssert.That failed for:") + "\n\n" +
-				//									 ExpressionToCode.AnnotatedToCode(assertion.Body), e);
 			}
 			if (ok == false)
 				throw UnitTestingFailure.AssertionExceptionFactory(msg + "\n" +

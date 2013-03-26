@@ -17,8 +17,7 @@
 			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 		</description>
 		<releaseNotes>
-			Better layout in the face of non-fixed-width rendering: Although fixed-width rendering is the only way to be sure the subexpression annotations line up with the actual expression, ExpressionToCode now uses a mixture of normal spaces and en spaces in the subexpression annotation so that the alignment is roughly OK in many cases even with variable width fonts.
-			Supports inferring char constants in expressions such as "someVar == 'b'" (C# compiles these as integer constants, heuristics are used to identify those integers that were likely chars in the original code).
+			Better result layout in visual studio 2010 by ensuring the first line is non-empty.
 		</releaseNotes>
 		<copyright>Copyright 2013 © Eamon Nerbonne</copyright>
 		<tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert</tags>
