@@ -23,7 +23,7 @@ namespace ExpressionToCodeLib {
 		}
 
 		static Exception Err(Expression<Func<bool>> assertion, string msg, Exception innerException) {
-			return UnitTestingFailure.AssertionExceptionFactory(ExpressionToCode.AnnotatedToCode(assertion.Body, msg), innerException);
+			return UnitTestingFailure.AssertionExceptionFactory(ExpressionToCode.AnnotatedToCode(assertion.Body, msg, true), innerException);
 		}
 	}
 }

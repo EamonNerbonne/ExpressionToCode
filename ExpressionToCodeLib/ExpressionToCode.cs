@@ -19,16 +19,16 @@ namespace ExpressionToCodeLib {
 		public static string ToCode(Expression e) {
 			StringBuilder sb = new StringBuilder();
 			bool ignoreInitialSpace = true;
-			new ExpressionToCodeImpl(etp => {
+			new ExpressionToCodeImpl((etp, depth) => {
 				sb.Append(ignoreInitialSpace ? etp.Text.TrimStart() : etp.Text);
 				ignoreInitialSpace = etp.Text.Any() && ShouldIgnoreSpaceAfter(etp.Text[etp.Text.Length - 1]);
 			}).ExpressionDispatch(e);
 			return sb.ToString();
 		}
 
-		public static string AnnotatedToCode(Expression expr) { return AnnotatedToCode(expr, null); }
-		internal static string AnnotatedToCode(Expression expr, string msg) {
-			var splitLine = ExpressionToStringWithValues(expr);
+		public static string AnnotatedToCode(Expression expr) { return AnnotatedToCode(expr, null, false); }
+		internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue) {
+			var splitLine = ExpressionToStringWithValues(expr, ignoreOutermostValue);
 
 			var exprWithStalkedValues = new StringBuilder();
 			if (msg == null)
@@ -60,15 +60,17 @@ namespace ExpressionToCodeLib {
 
 		static bool ShouldIgnoreSpaceAfter(char c) { return c == ' ' || c == '('; }
 
-		static SplitExpressionLine ExpressionToStringWithValues(Expression e) {
+		static SplitExpressionLine ExpressionToStringWithValues(Expression e, bool ignoreOutermostValue) {
 			var nodeInfos = new List<SubExpressionInfo>();
 			StringBuilder sb = new StringBuilder();
 			bool ignoreInitialSpace = true;
-			new ExpressionToCodeImpl(etp => {
+			new ExpressionToCodeImpl((etp, depth) => {
 				var trimmedText = ignoreInitialSpace ? etp.Text.TrimStart() : etp.Text;
 				var pos0 = sb.Length;
 				sb.Append(trimmedText);
 				ignoreInitialSpace = etp.Text.Any() && ShouldIgnoreSpaceAfter(etp.Text[etp.Text.Length - 1]);
+				if (depth == 0 && ignoreOutermostValue)
+					return;
 				string valueString = etp.OptionalValue == null ? null : ExpressionValueAsCode(etp.OptionalValue);
 				if (valueString != null)
 					nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });

@@ -17,8 +17,7 @@ namespace ExpressionToCodeTest {
 			Assert.That(msgLines[0], Is.EqualTo(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed"));
 			Assert.That(string.Join("\n", msgLines), Is.EqualTo(
 @"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed
-                 │                  │                   │            │
-                 │                  │                   │            false
+                 │                  │                   │
                  │                  │                   00:01:00
                  │                  -1
                  00:00:00.0100000
@@ -33,7 +32,7 @@ namespace ExpressionToCodeTest {
 				));
 			Assert.That(msgLines[0], Contains.Substring("failed"));
 			Assert.That(msgLines[0], Contains.Substring("Equals"));
-			Assert.That(msgLines[1].Count(c => c == '│'), Is.EqualTo(1));
+			Assert.That(msgLines.Length, Is.EqualTo(1));
 		}
 
 		[Test]
@@ -43,7 +42,7 @@ namespace ExpressionToCodeTest {
 						() => 0 == (ulong)(uint)x
 					));
 			Assert.That(msgLines[0], Is.EqualTo(@"0 == (ulong)(uint)x  :  failed"));
-			Assert.That(msgLines[1].Count(c => c == '│'), Is.EqualTo(4));//for x, x+cast,x+cast+cast, ==, NOT for constant 0
+			Assert.That(msgLines[1].Count(c => c == '│'), Is.EqualTo(3));//for x, x+cast,x+cast+cast, NOT for ==, NOT for constant 0
 		}
 
 		[Test]
@@ -72,7 +71,7 @@ namespace ExpressionToCodeTest {
 			var x = 0;
 			var msgLines = PAssertLines(() => PAssert.That(() => x == 1, "oops\n"));
 			Assert.That(msgLines[0], Is.EqualTo(@"x == 1  :  oops"));
-			Assert.That(msgLines.Length, Is.EqualTo(4)); //expression, empty, x==1, x
+			Assert.That(msgLines.Length, Is.EqualTo(3)); //expression, empty, NOT x==1, x
 		}
 
 
@@ -83,7 +82,7 @@ namespace ExpressionToCodeTest {
 			Assert.That(msgLines[0], Is.EqualTo(@"oops"));
 			Assert.That(msgLines[1], Is.EqualTo(@"again"));
 			Assert.That(msgLines[2], Is.EqualTo(@"x == 1"));
-			Assert.That(msgLines.Length, Is.EqualTo(6)); //oops,again,expression, empty, x==1, x
+			Assert.That(msgLines.Length, Is.EqualTo(5)); //oops,again,expression, empty, NOT x==1, x
 		}
 
 

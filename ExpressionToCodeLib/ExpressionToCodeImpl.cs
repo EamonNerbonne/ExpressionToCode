@@ -9,21 +9,26 @@ namespace ExpressionToCodeLib {
 	class ExpressionToCodeImpl : IExpressionTypeDispatch {
 		#region General Helpers
 
-		readonly Action<ExprTextPart> sink;
-		internal ExpressionToCodeImpl(Action<ExprTextPart> sink) { this.sink = sink; }
-		void Sink(string text) { sink(ExprTextPart.TextOnly(text)); }
-		void Sink(string text, Expression value) { sink(ExprTextPart.TextAndExpr(text, value)); }
+		readonly Action<ExprTextPart, int> sink;
+		int Depth = 0;//TODO: refactor IExpressionTypeDispatch into an input/output model to avoid this tricky side-effect approach.
+		internal ExpressionToCodeImpl(Action<ExprTextPart, int> sink) { this.sink = sink; }
+		void Sink(string text) { sink(ExprTextPart.TextOnly(text), Depth); }
+		void Sink(string text, Expression value) { sink(ExprTextPart.TextAndExpr(text, value), Depth); }
 
 		void NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false) {
 			int parentRank = parentType == null ? 0 : ExpressionPrecedence.Rank(parentType.Value);
 			bool needsParens = parentRank > 0
 				&& (parensIfEqualRank ? parentRank - 1 : parentRank) < ExpressionPrecedence.Rank(child.NodeType);
-			if (needsParens) sink(ExprTextPart.TextOnly("("));
+			if (needsParens) sink(ExprTextPart.TextOnly("("), Depth);
 			RawChildDispatch(child);
-			if (needsParens) sink(ExprTextPart.TextOnly(")"));
+			if (needsParens) sink(ExprTextPart.TextOnly(")"), Depth);
 		}
 
-		void RawChildDispatch(Expression child) { this.ExpressionDispatch(child); }
+		void RawChildDispatch(Expression child) {
+			Depth++;
+			this.ExpressionDispatch(child);
+			Depth--;
+		}
 
 		void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor) {
 			bool isfirst = true;
