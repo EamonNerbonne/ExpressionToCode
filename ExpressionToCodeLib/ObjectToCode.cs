@@ -13,7 +13,7 @@ namespace ExpressionToCodeLib {
 			string retval = PlainObjectToCode(val);
 			if (retval != null) return retval;
 			else if (val is Array)
-				return "new [] " + FormatEnumerable((IEnumerable) val);
+				return "new[] " + FormatEnumerable((IEnumerable) val);
 			else if (val is IEnumerable)
 				return FormatEnumerable((IEnumerable) val);
 			else if (val is Expression)

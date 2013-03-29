@@ -26,11 +26,18 @@ namespace ExpressionToCodeLib {
 			return sb.ToString();
 		}
 
-		public static string AnnotatedToCode(Expression expr) {
+		public static string AnnotatedToCode(Expression expr) { return AnnotatedToCode(expr, null); }
+		internal static string AnnotatedToCode(Expression expr, string msg) {
 			var splitLine = ExpressionToStringWithValues(expr);
 
-			StringBuilder exprWithStalkedValues = new StringBuilder();
-			exprWithStalkedValues.AppendLine(splitLine.Line);
+			var exprWithStalkedValues = new StringBuilder();
+			if (msg == null)
+				exprWithStalkedValues.AppendLine(splitLine.Line);
+			else if (IsMultiline(msg)) {
+				exprWithStalkedValues.AppendLine(msg);
+				exprWithStalkedValues.AppendLine(splitLine.Line);
+			} else
+				exprWithStalkedValues.AppendLine(splitLine.Line + "  :  " + msg);
 
 			for (int nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
 				char[] stalkLine = new string('\u2002', splitLine.Nodes[nodeI].Location).ToCharArray(); //en-spaces.
@@ -46,6 +53,10 @@ namespace ExpressionToCodeLib {
 			return exprWithStalkedValues.ToString();
 		}
 
+		static bool IsMultiline(string msg) {
+			var idxAfterNewline = msg.IndexOf('\n') + 1;
+			return idxAfterNewline > 0 && idxAfterNewline < msg.Length;
+		}
 
 		static bool ShouldIgnoreSpaceAfter(char c) { return c == ' ' || c == '('; }
 
