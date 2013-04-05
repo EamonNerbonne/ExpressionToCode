@@ -40,7 +40,7 @@ namespace ExpressionToCodeLib {
 				exprWithStalkedValues.AppendLine(splitLine.Line + "  :  " + msg);
 
 			for (int nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
-				char[] stalkLine = new string('\u2002', splitLine.Nodes[nodeI].Location).ToCharArray(); //en-spaces.
+				char[] stalkLine = new string('\u2007', splitLine.Nodes[nodeI].Location).ToCharArray(); //figure-spaces.
 				for (int i = 0; i < stalkLine.Length; i++)
 					if (splitLine.Line[i] == ' ')
 						stalkLine[i] = ' '; //use normal spaces where the expr used normal spaces for more natural spacing.

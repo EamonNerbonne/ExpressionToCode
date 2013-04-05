@@ -20,8 +20,8 @@ namespace ExpressionToCodeTest
 			
 			Assert.AreEqual(
 @"() => FailingClass.SomeFunction()
-                         │
-                         throws System.Exception
+                         │
+                         throws System.Exception
 ", ExpressionToCode.AnnotatedToCode(() => FailingClass.SomeFunction()));
 		}
 

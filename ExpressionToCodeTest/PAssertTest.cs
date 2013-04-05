@@ -17,10 +17,10 @@ namespace ExpressionToCodeTest {
 			Assert.That(msgLines[0], Is.EqualTo(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed"));
 			Assert.That(string.Join("\n", msgLines), Is.EqualTo(
 @"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed
-                 │                  │                   │
-                 │                  │                   00:01:00
-                 │                  -1
-                 00:00:00.0100000
+                 │                  │                   │
+                 │                  │                   00:01:00
+                 │                  -1
+                 00:00:00.0100000
 ".Replace("\r", "").Trim()));
 		}
 
