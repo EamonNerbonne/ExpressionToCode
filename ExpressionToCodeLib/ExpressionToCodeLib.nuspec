@@ -16,7 +16,7 @@
 
 			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 		</description>
-		<releaseNotes>Minor layout fix for buggy monospaced fonts such as courier new where the en-space causes the stalks to fail to be aligned.
+		<releaseNotes>Fix obscure bug walking the expression tree with a generic compiler-generated closure.
 		</releaseNotes>
 		<copyright>Copyright 2013 © Eamon Nerbonne</copyright>
 		<tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert</tags>
