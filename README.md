@@ -1,24 +1,25 @@
 ExpressionToCode
 ================
+
 Generates valid, readable C# from an Expression Tree, for example:
 
-{{{
+```C#
   @"() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })"
 == 
   ExpressionToCode.ToCode(
     () => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })
   )
-}}}
+```
 
-!ExpressionToCode also provides a clone of Groovy's [http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/ Power Assert] which includes the code of the failing assertion's expression and the values of its subexpressions.  This functionality is particularly useful in a unit testing framework such as [http://www.nunit.org/ NUnit] or [http://xunit.codeplex.com/ xUnit.NET].  When you execute the following (invalid) assertion:
+ExpressionToCode also provides a clone of Groovy's [Power Assert](http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/) which includes the code of the failing assertion's expression and the values of its subexpressions.  This functionality is particularly useful in a unit testing framework such as [NUnit](http://www.nunit.org/) or [xUnit.NET](http://xunit.codeplex.com/).  When you execute the following (failing) assertion:
 
-{{{
+```C#
 PAssert.That(()=>Enumerable.Range(0,1000).ToDictionary(i=>"n"+i)["n3"].ToString() == (3.5).ToString());
-}}}
+```
 
 The assertion fails with the following message:
 
-{{{
+```
 PAssert.That failed for:
 
 Enumerable.Range(0, 1000).ToDictionary(i => "n" + (object)i)["n3"].ToString() == 3.5.ToString()
@@ -29,9 +30,9 @@ Enumerable.Range(0, 1000).ToDictionary(i => "n" + (object)i)["n3"].ToString() ==
              |                 |                            3
              |                 {[n0, 0], [n1, 1], [n2, 2], [n3, 3], [n4, 4], [n5, 5], [n6, 6], [n7, 7], [n8, 8], [n9, 9], ...}
              {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...}
-}}}
+```
 
-!ExpressionToCode was inspired by [http://powerassert.codeplex.com/ Power Asssert.NET].  It differs from !PowerAssert.NET by support a larger portion of the lambda syntax; the aim is to generate valid C# for *all* expression trees created from lambda's.  Currently supported:
+ExpressionToCode was inspired by [Power Asssert.NET](http://powerassert.codeplex.com/).  It differs from PowerAssert.NET by supporting a larger portion of the lambda syntax and that the generated C# is more frequently valid; the aim is to generate valid C# for *all* expression trees created from lambda's.  Currently supported:
 
  * Supports static field and property access
  * Supports more operators, e.g. logical and bitwise negation
@@ -57,7 +58,7 @@ Requires .NET 4.0 (.NET 3.5 could be supported by omitting support for newer exp
 
 If you have any questions, you can contact me at eamon at nerbonne dot org.
 
-See the [Documentation documentation] and [http://code.google.com/p/expressiontocode/downloads download the library], [http://nuget.org/packages/ExpressionToCodeLib/ import it using NuGet], or checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
+See the [Documentation documentation] and [http://code.google.com/p/expressiontocode/downloads download the library], [import it using NuGet](http://nuget.org/packages/ExpressionToCodeLib/), or checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
 
 
 
