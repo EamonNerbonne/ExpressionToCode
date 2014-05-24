@@ -14,7 +14,7 @@ Generates valid, readable C# from an Expression Tree, for example:
 ExpressionToCode also provides a clone of Groovy's [Power Assert](http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/) which includes the code of the failing assertion's expression and the values of its subexpressions.  This functionality is particularly useful in a unit testing framework such as [NUnit](http://www.nunit.org/) or [xUnit.NET](http://xunit.codeplex.com/).  When you execute the following (failing) assertion:
 
 ```C#
-PAssert.That(()=>Enumerable.Range(0,1000).ToDictionary(i=>"n"+i)["n3"].ToString() == (3.5).ToString());
+PAssert.That(()=>Enumerable.Range(0,1000).ToDictionary(i=>"n"+i)["n3"].ToString()==(3.5).ToString());
 ```
 
 The assertion fails with the following message:
