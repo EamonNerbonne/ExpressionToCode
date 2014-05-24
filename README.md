@@ -1,14 +1,13 @@
 ExpressionToCode
 ================
 
-Generates valid, readable C# from an Expression Tree, for example:
+Generates valid, readable C# from an Expression Tree.  For example, this is true:
 
 ```C#
-  @"() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })"
-== 
   ExpressionToCode.ToCode(
     () => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })
   )
+== "() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })"
 ```
 
 ExpressionToCode also provides a clone of Groovy's [Power Assert](http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/) which includes the code of the failing assertion's expression and the values of its subexpressions.  This functionality is particularly useful in a unit testing framework such as [NUnit](http://www.nunit.org/) or [xUnit.NET](http://xunit.codeplex.com/).  When you execute the following (failing) assertion:
