@@ -60,22 +60,21 @@ If you have any questions, you can contact me via github or mail eamon at nerbon
 
 See the documentation below, then download or [import it using NuGet](http://nuget.org/packages/ExpressionToCodeLib/), or checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
 
-#summary Short overview of ExpressionToCode's API
-
-= `ExpressionToCode` API =
+`ExpressionToCode` API 
+-----
 
 All classes live in the `ExpressionToCodeLib` namespace.
 
 These are:
- * *`PAssert`* for making assertions in NUnit tests and elsewhere.
-   * *`PAssert.That`* and *`PAssert.IsTrue`* are identical; both test the provided boolean expression and print a readable error message on failure
- * *`ExpressionToCode`* Renders a System.Linq.Expressions.Expression object to source code.
-   * *`ExpressionToCode.ToCode`* (several overloads) simply renders the expression as source code.
-   * *`ExpressionToCode.AnnotatedToCode`* (several overloads) renders the expression as source code, then annotates all subexpressions which are computable with their value using the stalk-like rendering as shown on the Project Home page.
+ * `PAssert` for making assertions in NUnit tests and elsewhere.
+   * `PAssert.That` and `PAssert.IsTrue` are identical; both test the provided boolean expression and print a readable error message on failure
+ * `ExpressionToCode` Renders a System.Linq.Expressions.Expression object to source code.
+   * `ExpressionToCode.ToCode` (several overloads) simply renders the expression as source code.
+   * `ExpressionToCode.AnnotatedToCode` (several overloads) renders the expression as source code, then annotates all subexpressions which are computable with their value using the stalk-like rendering as shown on the Project Home page.
 
 Two public helper classes exist:
 
- * *`PAssertFailedException`* thrown on assertion failure.
- * *`ObjectToCode`* Renders .NET objects to code; a helper class.
-   * *`ObjectToCode.PlainObjectToCode`* renders simple objects that can be parsed by the C# compiler.  This includes strings, chars, decimals, floats, doubles, all the integer types, booleans, enums, nulls, and default struct values.
-   * *`ObjectToCode.ComplexObjectToPseudoCode`* renders as best it can anything thrown at it; but the resultant rendering is not necessarily compilable.  This is used to display the values of subexpressions.
+ * `PAssertFailedException` thrown on assertion failure.
+ * `ObjectToCode` Renders .NET objects to code; a helper class.
+   * `ObjectToCode.PlainObjectToCode` renders simple objects that can be parsed by the C# compiler.  This includes strings, chars, decimals, floats, doubles, all the integer types, booleans, enums, nulls, and default struct values.
+   * `ObjectToCode.ComplexObjectToPseudoCode` renders as best it can anything thrown at it; but the resultant rendering is not necessarily compilable.  This is used to display the values of subexpressions.
