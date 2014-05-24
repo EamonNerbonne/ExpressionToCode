@@ -34,6 +34,9 @@ Enumerable.Range(0, 1000).ToDictionary(i => "n" + (object)i)["n3"].ToString() ==
 
 ExpressionToCode was inspired by [Power Asssert.NET](http://powerassert.codeplex.com/).  It differs from PowerAssert.NET by supporting a larger portion of the lambda syntax and that the generated C# is more frequently valid; the aim is to generate valid C# for *all* expression trees created from lambda's.  Currently supported:
 
+Expression tree support
+---
+
  * Supports static field and property access
  * Supports more operators, e.g. logical and bitwise negation
  * Recognizes C# indexer use (e.g. `dict["mykey"]==3`), in addition to special cases for array indexers and string indexers
@@ -45,7 +48,7 @@ ExpressionToCode was inspired by [Power Asssert.NET](http://powerassert.codeplex
  * Expands generic type instances and nullable types into normal C# (e.g. `Func<int, bool>` and `int?`)
  * Recognizes references to `this` and omits the keyword where possible ([http://code.google.com/p/expressiontocode/issues/list?cursor=5&updated=5&ts=1295683070&can=1 5])  
 
-Not yet implemented:
+**Not implemented (yet?):**
 
  * Recognize when `==` differs from `.Equals` or `.SequenceEquals`, as Power Assert.NET does (issue 2).
  * Omit implicit casts (e.g. `object.Equals((object)3, (object)4)`) - issue 4.
@@ -53,12 +56,6 @@ Not yet implemented:
  * Detect when type parameters to methods are superfluous - issue 13.
  * Detect when nested lambda parameters require type annotation - issue 14.
  * See all [http://code.google.com/p/expressiontocode/issues/list open issues].
-
-Requires .NET 4.0 (.NET 3.5 could be supported by omitting support for newer expression types, this would require a few simple source changes).
-
-If you have any questions, you can contact me via github or mail eamon at nerbonne dot org.
-
-See the documentation below, then download or [import it using NuGet](http://nuget.org/packages/ExpressionToCodeLib/), or checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
 
 `ExpressionToCode` API 
 -----
@@ -78,3 +75,13 @@ Two public helper classes exist:
  * `ObjectToCode` Renders .NET objects to code; a helper class.
    * `ObjectToCode.PlainObjectToCode` renders simple objects that can be parsed by the C# compiler.  This includes strings, chars, decimals, floats, doubles, all the integer types, booleans, enums, nulls, and default struct values.
    * `ObjectToCode.ComplexObjectToPseudoCode` renders as best it can anything thrown at it; but the resultant rendering is not necessarily compilable.  This is used to display the values of subexpressions.
+
+Dependencies
+---
+Requires .NET 4.0 (.NET 3.5 could be supported by omitting support for newer expression types, this would require a few simple source changes).
+
+---
+
+If you have any questions, you can contact me via github or mail eamon at nerbonne dot org.
+
+See the documentation below, then download or [import it using NuGet](http://nuget.org/packages/ExpressionToCodeLib/), or checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
