@@ -1,12 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCodeLib", "ExpressionToCodeLib\ExpressionToCodeLib.csproj", "{2472FFFC-E2F9-4043-8CA6-EB65D4059A0F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCodeTest", "ExpressionToCodeTest\ExpressionToCodeTest.csproj", "{404475DF-91DC-40B2-A933-1C4A3C9B7710}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA5B9979-2CAD-4D93-9591-128F5F8BA053}"
 	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
 		VisualStudioTextEditor.vssettings = VisualStudioTextEditor.vssettings
 		VsMacroForCodingStyle.txt = VsMacroForCodingStyle.txt
 	EndProjectSection
