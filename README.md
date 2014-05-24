@@ -42,20 +42,20 @@ Expression tree support
  * Recognizes C# indexer use (e.g. `dict["mykey"]==3`), in addition to special cases for array indexers and string indexers
  * Adds parentheses where required by operator precedence and associativity (e.g. `() => x - (a - b) + x * (a + b)` is correctly regenerated)
  * Generates valid numeric and other constant literals including escapes and suffixes where required (e.g. `1m + (decimal)Math.Sqrt(1.41)`)
- * Supports C# syntactic sugar for object initializers, object member initializers, list initializers, extension methods, anonymous types ([http://code.google.com/p/expressiontocode/issues/detail?id=12&can=1&q=anonymous 12], [http://code.google.com/p/expressiontocode/issues/detail?id=3&can=1&q=anonymous 3]), etc
+ * Supports C# syntactic sugar for object initializers, object member initializers, list initializers, extension methods, anonymous types (issues #12, #3), etc
  * Uses the same spacing rules Visual Studio does by default
  * Supports nested Lambdas
  * Expands generic type instances and nullable types into normal C# (e.g. `Func<int, bool>` and `int?`)
- * Recognizes references to `this` and omits the keyword where possible ([http://code.google.com/p/expressiontocode/issues/list?cursor=5&updated=5&ts=1295683070&can=1 5])  
+ * Recognizes references to `this` and omits the keyword where possible (#5)  
 
 **Not implemented (yet?):**
 
- * Recognize when `==` differs from `.Equals` or `.SequenceEquals`, as Power Assert.NET does (issue 2).
- * Omit implicit casts (e.g. `object.Equals((object)3, (object)4)`) - issue 4.
- * Use LINQ query syntax where required - issue 6.
- * Detect when type parameters to methods are superfluous - issue 13.
- * Detect when nested lambda parameters require type annotation - issue 14.
- * See all [http://code.google.com/p/expressiontocode/issues/list open issues].
+ * Omit implicit casts (e.g. `object.Equals((object)3, (object)4)`) - issue #4.
+ * Use LINQ query syntax where possible - issue #6.
+ * Detect when type parameters to methods are superfluous - issue #13.
+ * Detect when nested lambda parameters require type annotation - issue #14.
+ * Warn when `==` differs from `.Equals` or `.SequenceEquals`, as Power Assert.NET does (issue #2).
+ * See all [open issues](https://github.com/EamonNerbonne/ExpressionToCode/issues).
 
 `ExpressionToCode` API 
 -----
@@ -84,4 +84,4 @@ Requires .NET 4.0 (.NET 3.5 could be supported by omitting support for newer exp
 
 If you have any questions, you can contact me via github or mail eamon at nerbonne dot org.
 
-See the documentation below, then download or [import it using NuGet](http://nuget.org/packages/ExpressionToCodeLib/), or checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
+See the documentation below, then download from or [import using NuGet](http://nuget.org/packages/ExpressionToCodeLib/), or just checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
