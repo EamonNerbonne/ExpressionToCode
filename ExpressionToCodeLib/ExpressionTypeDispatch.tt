@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 namespace ExpressionToCodeLib {
   public interface IExpressionTypeDispatch {
 <#
-	foreach(var v in ExpressionTypes3_5()) {
+	foreach(var v in ExpressionTypes()) {
 #>
 		void Dispatch<#=v.ToString()#>(Expression e);
 <#
@@ -24,7 +24,7 @@ namespace ExpressionToCodeLib {
 			try{
 				switch(e.NodeType) {
 <#
-	foreach(var v in ExpressionTypes3_5()) {
+	foreach(var v in ExpressionTypes()) {
 #>
 					case ExpressionType.<#=v.ToString()#>: dispatcher.Dispatch<#=v.ToString()#>(e); return;
 <#
@@ -44,7 +44,9 @@ namespace ExpressionToCodeLib {
 }
  
 <#+
-	IEnumerable<ExpressionType> ExpressionTypes3_5() {
-		return Enum.GetValues(typeof(ExpressionType)).Cast<ExpressionType>().Where(et=>et<= ExpressionType.TypeIs);
+	IEnumerable<ExpressionType> ExpressionTypes() {
+		return Enum.GetValues(typeof(ExpressionType)).Cast<ExpressionType>()
+							//.Where(et=>et<= ExpressionType.TypeIs) //This check limits support to .NET 4.0 expressions
+							;
 	}
 #>
