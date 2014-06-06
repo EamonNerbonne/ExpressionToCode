@@ -27,7 +27,6 @@ namespace ExpressionToCodeTest {
 		[Test, Ignore("issue 4")]
 		public void DecimalImplicitCast() {
 			var i = 1;
-			var x = "X";
 			Assert.AreEqual(
 				@"() => (1m + -i > 0 || false)",
 				ExpressionToCode.ToCode(() => (1m + -i > 0 || false)));

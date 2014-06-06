@@ -374,7 +374,6 @@ namespace ExpressionToCodeTest {
 
 		[Test]
 		public void StringConcat() {
-			var i = 1;
 			var x = "X";
 			Assert.AreEqual(
 				@"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true",
