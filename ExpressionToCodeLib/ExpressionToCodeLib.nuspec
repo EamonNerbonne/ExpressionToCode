@@ -12,13 +12,16 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<summary>$description$</summary>
 		<description>
-			Generates valid, readable C# from an Expression Tree, and can annotate that code with runtime values.  This can be useful for code generation and for unit testing: ExpressionToCode detects NUnit, xUnit.NET and MSTest and uses their assertions if available, and a normal Exception otherwise (so it runs fine outside those specific unit testing frameworks too).
+			Generates valid, readable C# from an expression tree, and can annotate that code with runtime values. This can
+      be useful for code generation and for unit testing: ExpressionToCode detects NUnit, xUnit.NET and MSTest and
+      uses their assertions if available, and a normal Exception otherwise (so it runs fine outside those specific unit 
+      testing frameworks too).
 
-			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
+			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger
+      portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 		</description>
-		<releaseNotes>Fix obscure bug walking the expression tree with a generic compiler-generated closure.
-		</releaseNotes>
-		<copyright>Copyright 2013 © Eamon Nerbonne</copyright>
-		<tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert</tags>
+		<releaseNotes>Support ExpressionType.Default (for codegen scenario's; C# expression trees don't use such nodes).</releaseNotes>
+		<copyright>Copyright 2014 © Eamon Nerbonne</copyright>
+		<tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</tags>
 	</metadata>
 </package>
