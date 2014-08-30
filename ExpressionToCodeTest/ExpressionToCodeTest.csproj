@@ -32,6 +32,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
@@ -45,6 +52,7 @@
   <ItemGroup>
     <Compile Include="EnumTests.cs" />
     <Compile Include="EqualityComparingTest.cs" />
+    <Compile Include="ExceptionsSerialization.cs" />
     <Compile Include="ExpressionToCodeLibTest.cs" />
     <Compile Include="GenericsTestClasses.cs" />
     <Compile Include="ImplicitCastingTest.cs" />
