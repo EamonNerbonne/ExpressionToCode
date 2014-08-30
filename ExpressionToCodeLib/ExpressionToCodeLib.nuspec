@@ -20,7 +20,7 @@
 			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger
       portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 		</description>
-		<releaseNotes>Support ExpressionType.Default (for codegen scenario's; C# expression trees don't use such nodes).</releaseNotes>
+		<releaseNotes>Make AssertFailedException serializable (resolves issue 24)</releaseNotes>
 		<copyright>Copyright 2014 © Eamon Nerbonne</copyright>
 		<tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</tags>
 	</metadata>

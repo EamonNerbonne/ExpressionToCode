@@ -18,5 +18,5 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("008ee713-7baa-491a-96f3-0a8ce3a473b1")]
 
-[assembly: AssemblyVersion("1.4.5")]
+[assembly: AssemblyVersion("1.4.6")]
 
