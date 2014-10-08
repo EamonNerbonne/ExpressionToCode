@@ -135,11 +135,11 @@ namespace ExpressionToCodeLib {
         #region Hard Cases
 
         public void DispatchLambda(Expression e) {
-            LambdaExpression le = (LambdaExpression)e;
+            var le = (LambdaExpression)e;
             if (le.Parameters.Count == 1)
                 NestExpression(e.NodeType, le.Parameters.Single());
             else
-                ArgListDispatch(le.Parameters.Cast<Expression>()); //cast required for .NET 3.5 due to lack of covariance support.
+                ArgListDispatch(le.Parameters); //cast required for .NET 3.5 due to lack of covariance support.
             Sink(" => ");
             NestExpression(le.NodeType, le.Body);
         }
@@ -209,14 +209,12 @@ namespace ExpressionToCodeLib {
             Sink(method.Name, mce);
         }
 
-#if DOTNET40
         public void DispatchIndex(Expression e) {
             var ie = (IndexExpression)e;
             NestExpression(ie.NodeType, ie.Object);
             if (ie.Indexer.Name != "Item") Sink("." + ie.Indexer.Name); //TODO: is this OK?
             ArgListDispatch(ie.Arguments, ie, "[", "]");
         }
-#endif
 
         public void DispatchInvoke(Expression e) {
             InvocationExpression ie = (InvocationExpression)e;
@@ -396,7 +394,7 @@ namespace ExpressionToCodeLib {
         public void DispatchAssign(Expression e) { BinaryDispatch("=", e); }
         public void DispatchDecrement(Expression e) { UnaryPostfixDispatch(" - 1", e); }
         public void DispatchIncrement(Expression e) { UnaryPostfixDispatch(" + 1", e); }
-        public void DispatchAddAssign(Expression e) { BinaryDispatch("+=", e); }
+	    public void DispatchAddAssign(Expression e) { BinaryDispatch("+=", e); }
         public void DispatchAndAssign(Expression e) { BinaryDispatch("&=", e); }
         public void DispatchDivideAssign(Expression e) { BinaryDispatch("/=", e); }
         public void DispatchExclusiveOrAssign(Expression e) { BinaryDispatch("^=", e); }

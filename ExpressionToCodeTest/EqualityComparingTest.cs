@@ -82,9 +82,7 @@ namespace ExpressionToCodeTest {
 				Is.EquivalentTo(eqclasses(
 					EqualityExpressionClass.EqualsOp, EqualityExpressionClass.NotEqualsOp, EqualityExpressionClass.ObjectEquals,
 					EqualityExpressionClass.ObjectEqualsStatic, EqualityExpressionClass.EquatableEquals, EqualityExpressionClass.SequenceEqual
-#if DOTNET40
 , EqualityExpressionClass.StructuralEquals
-#endif
 )));
 			Assert.That(
 				EqualityExpressions.DisagreeingEqualities(() => 1000.ToString(CultureInfo.InvariantCulture).Equals(10 + "00")).ToArray(),
@@ -100,9 +98,7 @@ namespace ExpressionToCodeTest {
 				// ReSharper restore ReferenceEqualsWithValueType
 				Is.EquivalentTo(eqclasses(
 					EqualityExpressionClass.ObjectEquals, EqualityExpressionClass.ObjectEqualsStatic
-#if DOTNET40
 , EqualityExpressionClass.StructuralEquals
-#endif
 )));
 			//EqualityExpressionClass.EqualsOp, EqualityExpressionClass.NotEqualsOp, EqualityExpressionClass.EquatableEquals: these are equivalent because syntax-type sensitive.
 		}

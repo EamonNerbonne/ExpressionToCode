@@ -17,31 +17,34 @@ namespace ExpressionToCodeLib {
 		ObjectEqualsStatic,
 		ObjectReferenceEquals,
 		EquatableEquals,
-		SequenceEqual
-#if DOTNET40
-, StructuralEquals
-#endif
+		SequenceEqual,
+		StructuralEquals,
 	}
 
 	public static class EqualityExpressions {
-		static readonly MethodInfo objEqualInstanceMethod = ((Func<object, bool>) new object().Equals).Method;
-		static readonly MethodInfo objEqualStaticMethod = ((Func<object, object, bool>) object.Equals).Method;
-		static readonly MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>) object.ReferenceEquals).Method;
+		static readonly MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).Method;
+		static readonly MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).Method;
+		static readonly MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>)object.ReferenceEquals).Method;
 
-		public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e) { return ExtractEqualityType(e).Item1; }
-		public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression<Func<bool>> e) { return ExtractEqualityType(e.Body); }
+		public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e) {
+			return ExtractEqualityType(e).Item1;
+		}
+
+		public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression<Func<bool>> e) {
+			return ExtractEqualityType(e.Body);
+		}
 
 		public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression e) {
-			if (e.Type == typeof (bool))
+			if (e.Type == typeof(bool))
 				if (e is BinaryExpression) {
-					var binExpr = (BinaryExpression) e;
+					var binExpr = (BinaryExpression)e;
 					if (binExpr.NodeType == ExpressionType.Equal)
 						return Tuple.Create(EqualityExpressionClass.EqualsOp, binExpr.Left, binExpr.Right);
 					else if (e.NodeType == ExpressionType.NotEqual)
 						return Tuple.Create(EqualityExpressionClass.NotEqualsOp, binExpr.Left, binExpr.Right);
 				} else if (e.NodeType == ExpressionType.Call) {
-					var mce = (MethodCallExpression) e;
-					if (mce.Method.Equals(((Func<object, bool>) new object().Equals).Method))
+					var mce = (MethodCallExpression)e;
+					if (mce.Method.Equals(((Func<object, bool>)new object().Equals).Method))
 						return Tuple.Create(EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
 					else if (mce.Method.Equals(objEqualStaticMethod))
 						return Tuple.Create(EqualityExpressionClass.ObjectEqualsStatic, mce.Arguments.First(),
@@ -49,14 +52,12 @@ namespace ExpressionToCodeLib {
 					else if (mce.Method.Equals(objEqualReferenceMethod))
 						return Tuple.Create(EqualityExpressionClass.ObjectReferenceEquals, mce.Arguments.First(),
 							mce.Arguments.Skip(1).Single());
-					else if (IsImplementationOfGenericInterfaceMethod(mce.Method, typeof (IEquatable<>), "Equals"))
+					else if (IsImplementationOfGenericInterfaceMethod(mce.Method, typeof(IEquatable<>), "Equals"))
 						return Tuple.Create(EqualityExpressionClass.EquatableEquals, mce.Object, mce.Arguments.Single());
-#if DOTNET40
 					else if (IsImplementationOfInterfaceMethod(mce.Method, typeof(IStructuralEquatable), "Equals"))
 						return Tuple.Create(EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
-#endif
 					else if (HaveSameGenericDefinition(mce.Method,
-						((Func<IEnumerable<int>, IEnumerable<int>, bool>) Enumerable.SequenceEqual).Method))
+						((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).Method))
 						return Tuple.Create(EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
 				}
 			return Tuple.Create(EqualityExpressionClass.None, default(Expression), default(Expression));
@@ -119,15 +120,15 @@ namespace ExpressionToCodeLib {
 				(eqClass, itsVal) => shouldBeEqual == itsVal ? null : Tuple.Create(eqClass, !itsVal.HasValue);
 
 			var ienumerableTypes =
-				GetGenericInterfaceImplementation(leftC.Type, typeof (IEnumerable<>))
-					.Intersect(GetGenericInterfaceImplementation(rightC.Type, typeof (IEnumerable<>)))
+				GetGenericInterfaceImplementation(leftC.Type, typeof(IEnumerable<>))
+					.Intersect(GetGenericInterfaceImplementation(rightC.Type, typeof(IEnumerable<>)))
 					.Select(seqType => seqType.GetGenericArguments().Single());
 
 			var seqEqualsMethod =
-				((Func<IEnumerable<int>, IEnumerable<int>, bool>) Enumerable.SequenceEqual).Method.GetGenericMethodDefinition();
+				((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).Method.GetGenericMethodDefinition();
 
 			var iequatableEqualsMethods =
-				(from genEquatable in GetGenericInterfaceImplementation(leftC.Type, typeof (IEquatable<>))
+				(from genEquatable in GetGenericInterfaceImplementation(leftC.Type, typeof(IEquatable<>))
 					let otherType = genEquatable.GetGenericArguments().Single()
 					where otherType.IsAssignableFrom(rightC.Type)
 					let ifacemap = leftC.Type.GetInterfaceMap(genEquatable)
@@ -142,14 +143,13 @@ namespace ExpressionToCodeLib {
 				reportIfError(EqualityExpressionClass.NotEqualsOp, EvalBoolExpr(Expression.Not(Expression.NotEqual(leftC, rightC))))
 				,
 				reportIfError(EqualityExpressionClass.ObjectEquals,
-					EvalBoolExpr(Expression.Call(leftC, objEqualInstanceMethod, Expression.Convert(rightC, typeof (object))))),
+					EvalBoolExpr(Expression.Call(leftC, objEqualInstanceMethod, Expression.Convert(rightC, typeof(object))))),
 				reportIfError(EqualityExpressionClass.ObjectEqualsStatic,
-					EvalBoolExpr(Expression.Call(objEqualStaticMethod, Expression.Convert(leftC, typeof (object)),
-						Expression.Convert(rightC, typeof (object))))),
+					EvalBoolExpr(Expression.Call(objEqualStaticMethod, Expression.Convert(leftC, typeof(object)),
+						Expression.Convert(rightC, typeof(object))))),
 				reportIfError(EqualityExpressionClass.ObjectReferenceEquals, object.ReferenceEquals(leftC.Value, rightC.Value)),
-#if DOTNET40
-			 reportIfError(EqualityExpressionClass.StructuralEquals, StructuralComparisons.StructuralEqualityComparer.Equals(leftC.Value,rightC.Value)),
-#endif
+				reportIfError(EqualityExpressionClass.StructuralEquals,
+					StructuralComparisons.StructuralEqualityComparer.Equals(leftC.Value, rightC.Value)),
 			}.Concat(
 				iequatableEqualsMethods.Select(method =>
 					reportIfError(EqualityExpressionClass.EquatableEquals, EvalBoolExpr(
@@ -169,7 +169,8 @@ namespace ExpressionToCodeLib {
 		}
 
 
-		static bool IsImplementationOfGenericInterfaceMethod(MethodInfo method, Type genericInterfaceType, string methodName) {
+		static bool IsImplementationOfGenericInterfaceMethod(
+			MethodInfo method, Type genericInterfaceType, string methodName) {
 			return
 				GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
 					.Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
