@@ -85,6 +85,14 @@ namespace ExpressionToCodeTest {
 		}
 
 		[Test]
+		public void ArrayOfFuncInitializer()
+		{
+				Assert.AreEqual(
+				@"() => new Func<int>[] { () => 1, () => 2 }",
+				ExpressionToCode.ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+		}
+
+		[Test]
 		public void ListInitializer() {
 			Assert.AreEqual(
 				@"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",
@@ -379,6 +387,28 @@ namespace ExpressionToCodeTest {
 				@"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true",
 				ExpressionToCode.ToCode(() => (("a\n\\b" ?? x) + x).Length == 2 ? false : true));
 		}
+
+		[Test]
+		public void ArgumentWithRefModifier() {
+			var x = "a";
+			Assert.AreEqual(
+				@"() => MethodWithRefParam(ref x)",
+				ExpressionToCode.ToCode(() => MethodWithRefParam(ref x)));
+		}
+
+		T MethodWithRefParam<T>(ref T input) { return input; }
+
+		[Test]
+		public void ArgumentWithOutModifier()
+		{
+			var x = "a";
+			string y;
+			Assert.AreEqual(
+				@"() => MethodWithOutParam(ref x, out y)",
+				ExpressionToCode.ToCode(() => MethodWithOutParam(ref x, out y)));
+		}
+
+		T MethodWithOutParam<T>(ref T input, out T output) { return output = input; }
 	}
 
 	class ClassA {

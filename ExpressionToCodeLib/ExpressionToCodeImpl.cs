@@ -34,28 +34,32 @@ namespace ExpressionToCodeLib
 			Depth--;
 		}
 
-		void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor)
+		void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor, string[] prefixes = null)
 		{
-			bool isfirst = true;
+			int index = 0;
 			foreach(var child in children)
 			{
-				if(isfirst) isfirst = false;
-				else Sink(joiner);
+				if(index != 0) Sink(joiner);
+				if(prefixes != null && !string.IsNullOrEmpty(prefixes[index])) Sink(prefixes[index]);
 				childVisitor(child);
+				++index;
 			}
 		}
 
-		void JoinDispatch(IEnumerable<Expression> children, string joiner) { JoinDispatch(children, joiner, RawChildDispatch); }
+		void JoinDispatch(IEnumerable<Expression> children, string joiner, string[] prefixes = null) 
+		{
+			JoinDispatch(children, joiner, RawChildDispatch, prefixes);
+		}
 
 		void ArgListDispatch(
 			IEnumerable<Expression> children, Expression value = null, string open = "(", string close = ")",
-			string joiner = ", ")
+			string joiner = ", ", string[] prefixes = null)
 		{
 			if(value != null)
 				Sink(open, value);
 			else
 				Sink(open);
-			JoinDispatch(children, joiner);
+			JoinDispatch(children, joiner, prefixes);
 			Sink(close);
 		}
 
@@ -226,7 +230,10 @@ namespace ExpressionToCodeLib
 					&& mce.Object == null;
 				Expression objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
 				SinkMethodName(mce, mce.Method, objectExpr);
-				ArgListDispatch(isExtensionMethod ? mce.Arguments.Skip(1) : mce.Arguments);
+				var parameters = mce.Method.GetParameters();
+				var argPrefixes = parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
+				argPrefixes = argPrefixes.All(string.IsNullOrEmpty) ? null : argPrefixes;
+				ArgListDispatch(isExtensionMethod ? mce.Arguments.Skip(1) : mce.Arguments, prefixes: argPrefixes);
 			}
 		}
 
@@ -380,7 +387,8 @@ namespace ExpressionToCodeLib
 		{
 			NewArrayExpression nae = (NewArrayExpression)e;
 			Type arrayElemType = nae.Type.GetElementType();
-			bool implicitTypeOK = nae.Expressions.Any() && nae.Expressions.All(expr => expr.Type == arrayElemType);
+			bool isDelegate = typeof(Delegate).IsAssignableFrom(arrayElemType);
+			bool implicitTypeOK = !isDelegate && nae.Expressions.Any() && nae.Expressions.All(expr => expr.Type == arrayElemType);
 			Sink("new" + (implicitTypeOK ? "" : " " + CSharpFriendlyTypeName.Get(arrayElemType)) + "[] ", nae);
 			ArgListDispatch(nae.Expressions, open: "{ ", close: " }");
 		}
