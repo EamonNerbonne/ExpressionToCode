@@ -138,7 +138,7 @@ namespace ExpressionToCodeLib
 
 		void UnaryPostfixDispatch(string op, Expression e)
 		{
-			UnaryExpression ue = (UnaryExpression)e;
+			var ue = (UnaryExpression)e;
 			NestExpression(ue.NodeType, ue.Operand);
 			Sink(op, e);
 		}
@@ -181,7 +181,7 @@ namespace ExpressionToCodeLib
 
 		public void DispatchMemberAccess(Expression e)
 		{
-			MemberExpression me = (MemberExpression)e;
+			var me = (MemberExpression)e;
 			Expression memberOfExpr = me.Expression;
 			if(memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr))
 			{
@@ -199,7 +199,7 @@ namespace ExpressionToCodeLib
 
 		public void DispatchCall(Expression e)
 		{
-			MethodCallExpression mce = (MethodCallExpression)e;
+			var mce = (MethodCallExpression)e;
 
 			var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
 			if(optPropertyInfo != null
@@ -255,7 +255,7 @@ namespace ExpressionToCodeLib
 
 		public void DispatchInvoke(Expression e)
 		{
-			InvocationExpression ie = (InvocationExpression)e;
+			var ie = (InvocationExpression)e;
 			NestExpression(ie.NodeType, ie.Expression);
 			ArgListDispatch(ie.Arguments, ie);
 		}
@@ -281,7 +281,7 @@ namespace ExpressionToCodeLib
 
 		public void DispatchConditional(Expression e)
 		{
-			ConditionalExpression ce = (ConditionalExpression)e;
+			var ce = (ConditionalExpression)e;
 			NestExpression(ce.NodeType, ce.Test);
 			Sink(" ? ", e);
 			NestExpression(ce.NodeType, ce.IfTrue);
@@ -291,7 +291,7 @@ namespace ExpressionToCodeLib
 
 		public void DispatchListInit(Expression e)
 		{
-			ListInitExpression lie = (ListInitExpression)e;
+			var lie = (ListInitExpression)e;
 			Sink("new ", lie);
 			Sink(CSharpFriendlyTypeName.Get(lie.NewExpression.Constructor.ReflectedType));
 			if(lie.NewExpression.Arguments.Any())
@@ -348,7 +348,7 @@ namespace ExpressionToCodeLib
 
 		public void DispatchNew(Expression e)
 		{
-			NewExpression ne = (NewExpression)e;
+			var ne = (NewExpression)e;
 			if(ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType)
 			{
 				var parms = ne.Type.GetConstructors().Single().GetParameters();
@@ -378,7 +378,7 @@ namespace ExpressionToCodeLib
 
 		public void DispatchNewArrayInit(Expression e)
 		{
-			NewArrayExpression nae = (NewArrayExpression)e;
+			var nae = (NewArrayExpression)e;
 			Type arrayElemType = nae.Type.GetElementType();
 			bool implicitTypeOK = nae.Expressions.Any() && nae.Expressions.All(expr => expr.Type == arrayElemType);
 			Sink("new" + (implicitTypeOK ? "" : " " + CSharpFriendlyTypeName.Get(arrayElemType)) + "[] ", nae);
@@ -387,7 +387,7 @@ namespace ExpressionToCodeLib
 
 		public void DispatchNewArrayBounds(Expression e)
 		{
-			NewArrayExpression nae = (NewArrayExpression)e;
+			var nae = (NewArrayExpression)e;
 			Type arrayElemType = nae.Type.GetElementType();
 			Sink("new " + CSharpFriendlyTypeName.Get(arrayElemType), nae);
 			ArgListDispatch(nae.Expressions, open: "[", close: "]");
