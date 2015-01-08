@@ -61,7 +61,7 @@ namespace ExpressionToCodeLib
 
 		void BinaryDispatch(string op, Expression e)
 		{
-			BinaryExpression be = (BinaryExpression)e;
+			var be = (BinaryExpression)e;
 			Expression left, right;
 			UnwrapEnumOp(be, out left, out right);
 			NestExpression(be.NodeType, left);
