@@ -160,7 +160,7 @@ namespace ExpressionToCodeLib
 			if(le.Parameters.Count == 1)
 				NestExpression(e.NodeType, le.Parameters.Single());
 			else
-				ArgListDispatch(le.Parameters); //cast required for .NET 3.5 due to lack of covariance support.
+				ArgListDispatch(le.Parameters);
 			Sink(" => ");
 			NestExpression(le.NodeType, le.Body);
 		}
