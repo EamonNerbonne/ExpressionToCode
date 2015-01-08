@@ -12,7 +12,7 @@ namespace ExpressionToCodeLib
 		#region General Helpers
 
 		readonly Action<ExprTextPart, int> sink;
-		int Depth = 0;//TODO: refactor IExpressionTypeDispatch into an input/output model to avoid this tricky side-effect approach.
+		int Depth;//TODO: refactor IExpressionTypeDispatch into an input/output model to avoid this tricky side-effect approach.
 		internal ExpressionToCodeImpl(Action<ExprTextPart, int> sink) { this.sink = sink; }
 		void Sink(string text) { sink(ExprTextPart.TextOnly(text), Depth); }
 		void Sink(string text, Expression value) { sink(ExprTextPart.TextAndExpr(text, value), Depth); }
