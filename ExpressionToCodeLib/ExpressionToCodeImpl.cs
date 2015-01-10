@@ -27,39 +27,53 @@ namespace ExpressionToCodeLib
 			if(needsParens) sink(ExprTextPart.TextOnly(")"), Depth);
 		}
 
-		void RawChildDispatch(Expression child)
+        void RawChildDispatch(Expression child) {
+            RawChildDispatch(new Argument { Expr = child });
+        }
+
+		void RawChildDispatch(Argument child)
 		{
 			Depth++;
-			this.ExpressionDispatch(child);
+            if (child.PrefixOrNull != null) Sink(child.PrefixOrNull);
+			this.ExpressionDispatch(child.Expr);
 			Depth--;
 		}
 
-		void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor, string[] prefixes = null)
+		void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor)
 		{
 			int index = 0;
 			foreach(var child in children)
 			{
 				if(index != 0) Sink(joiner);
-				if(prefixes != null && !string.IsNullOrEmpty(prefixes[index])) Sink(prefixes[index]);
 				childVisitor(child);
 				++index;
 			}
 		}
 
-		void JoinDispatch(IEnumerable<Expression> children, string joiner, string[] prefixes = null) 
+        void JoinDispatch(IEnumerable<Argument> children, string joiner) 
 		{
-			JoinDispatch(children, joiner, RawChildDispatch, prefixes);
+			JoinDispatch(children, joiner, RawChildDispatch);
 		}
 
-		void ArgListDispatch(
-			IEnumerable<Expression> children, Expression value = null, string open = "(", string close = ")",
-			string joiner = ", ", string[] prefixes = null)
+	    struct Argument {
+	        public Expression Expr;
+	        public string PrefixOrNull;
+	    }
+        void ArgListDispatch(
+            IEnumerable<Expression> arguments, Expression value = null, string open = "(", string close = ")",
+            string joiner = ", ") {
+            ArgListDispatch(arguments.Select(e=>new Argument{Expr=e}), value, open, close, joiner);
+        }
+
+	    void ArgListDispatch(
+            IEnumerable<Argument> arguments, Expression value = null, string open = "(", string close = ")",
+			string joiner = ", ")
 		{
 			if(value != null)
 				Sink(open, value);
 			else
 				Sink(open);
-			JoinDispatch(children, joiner, prefixes);
+			JoinDispatch(arguments, joiner);
 			Sink(close);
 		}
 
@@ -164,7 +178,7 @@ namespace ExpressionToCodeLib
 			if(le.Parameters.Count == 1)
 				NestExpression(e.NodeType, le.Parameters.Single());
 			else
-				ArgListDispatch(le.Parameters);
+				ArgListDispatch(le.Parameters.Select(pe=>new Argument { Expr = pe}) );
 			Sink(" => ");
 			NestExpression(le.NodeType, le.Body);
 		}
@@ -210,7 +224,7 @@ namespace ExpressionToCodeLib
 				&& (optPropertyInfo.Name == "Item" || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars"))
 			{
 				NestExpression(mce.NodeType, mce.Object);
-				ArgListDispatch(mce.Arguments, mce, "[", "]");
+				ArgListDispatch(mce.Arguments.Select(pe=>new Argument{Expr = pe}), mce, "[", "]");
 			}
 			else if(mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
 			  && mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof(MethodInfo))
@@ -232,8 +246,10 @@ namespace ExpressionToCodeLib
 				SinkMethodName(mce, mce.Method, objectExpr);
 				var parameters = mce.Method.GetParameters();
 				var argPrefixes = parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
-				argPrefixes = argPrefixes.All(string.IsNullOrEmpty) ? null : argPrefixes;
-				ArgListDispatch(isExtensionMethod ? mce.Arguments.Skip(1) : mce.Arguments, prefixes: argPrefixes);
+			    var argumentValues = isExtensionMethod ? mce.Arguments.Skip(1) : mce.Arguments;
+			    var args = argumentValues.Zip(argPrefixes, (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
+
+                ArgListDispatch(args);
 			}
 		}
 
