@@ -10,34 +10,28 @@ using ExpressionToCodeLib.Internal;
 using NUnit.Framework;
 
 namespace ExpressionToCodeTest {
-	public class ExceptionsSerialization {
-		[MethodImpl(MethodImplOptions.NoInlining)]
-		static void IntentionallyFailingMethod() {
-			PAssert.That(() => false);
-		}
-		[MethodImpl(MethodImplOptions.NoInlining)]
-		static void IntentionallyFailingMethod2() {
-			throw UnitTestingInternalsAccess.CreateException("Hello World!");
-		}
+    public class ExceptionsSerialization {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void IntentionallyFailingMethod() { PAssert.That(() => false); }
 
-		[Test]
-		public void NUnitExceptionIsSerializable() {
-			AssertMethodFailsWithSerializableException(IntentionallyFailingMethod);
-		}
-		[Test]
-		public void PAssertExceptionIsSerializable() {
-			AssertMethodFailsWithSerializableException(IntentionallyFailingMethod2);
-		}
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void IntentionallyFailingMethod2() { throw UnitTestingInternalsAccess.CreateException("Hello World!"); }
 
-		static void AssertMethodFailsWithSerializableException(TestDelegate intentionallyFailingMethod) {
-			var original = Assert.Catch<Exception>(intentionallyFailingMethod);
+        [Test]
+        public void NUnitExceptionIsSerializable() { AssertMethodFailsWithSerializableException(IntentionallyFailingMethod); }
 
-			var formatter = new BinaryFormatter();
-			var ms = new MemoryStream();
-			formatter.Serialize(ms, original);
-			object deserialized = formatter.Deserialize(new MemoryStream(ms.ToArray()));
+        [Test]
+        public void PAssertExceptionIsSerializable() { AssertMethodFailsWithSerializableException(IntentionallyFailingMethod2); }
 
-			Assert.AreEqual(original.ToString(), deserialized.ToString());
-		}
-	}
+        static void AssertMethodFailsWithSerializableException(TestDelegate intentionallyFailingMethod) {
+            var original = Assert.Catch<Exception>(intentionallyFailingMethod);
+
+            var formatter = new BinaryFormatter();
+            var ms = new MemoryStream();
+            formatter.Serialize(ms, original);
+            object deserialized = formatter.Deserialize(new MemoryStream(ms.ToArray()));
+
+            Assert.AreEqual(original.ToString(), deserialized.ToString());
+        }
+    }
 }
