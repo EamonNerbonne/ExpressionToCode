@@ -7,7 +7,7 @@
 		<authors>$author$</authors>
 		<owners>$author$</owners>
 		<licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-		<projectUrl>http://code.google.com/p/expressiontocode/</projectUrl>
+		<projectUrl>https://github.com/EamonNerbonne/ExpressionToCode</projectUrl>
 		<!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<summary>$description$</summary>
@@ -20,8 +20,8 @@
 			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger
       portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 		</description>
-		<releaseNotes>Make AssertFailedException serializable (resolves issue 24)</releaseNotes>
+    <releaseNotes>Support out and ref qualifiers in method calls; require explicit delegate type in arrays of lambdas.</releaseNotes>
 		<copyright>Copyright 2014 © Eamon Nerbonne</copyright>
-		<tags>NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</tags>
+		<tags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</tags>
 	</metadata>
 </package>
