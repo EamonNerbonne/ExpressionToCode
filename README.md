@@ -1,9 +1,9 @@
 ExpressionToCode
 ================
 
-Download via nuget: [ExpressionToCodeLib](http://nuget.org/packages/ExpressionToCodeLib/).
+Download package via nuget: [ExpressionToCodeLib](http://nuget.org/packages/ExpressionToCodeLib/)
 
-Generates valid, readable C# from an Expression Tree.  For example, this is true:
+ExpressionToCode generates valid, readable C# from an Expression Tree.  For example, this is true:
 
 ```C#
   ExpressionToCode.ToCode(
