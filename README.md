@@ -1,5 +1,7 @@
-ExpressionToCode (nuget: [ExpressionToCodeLib](http://nuget.org/packages/ExpressionToCodeLib/))
+ExpressionToCode
 ================
+
+Download via nuget: [ExpressionToCodeLib](http://nuget.org/packages/ExpressionToCodeLib/).
 
 Generates valid, readable C# from an Expression Tree.  For example, this is true:
 
