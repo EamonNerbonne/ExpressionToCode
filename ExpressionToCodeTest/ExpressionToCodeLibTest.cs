@@ -160,7 +160,9 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
-        public void MembersThis() { new ClassA().DoAssert(); }
+        public void MembersThis() {
+            new ClassA().DoAssert();
+        }
 
         [Test]
         public void MethodGroupAsExtensionMethod() {
@@ -237,12 +239,12 @@ namespace ExpressionToCodeTest {
         [Test, Ignore("issue 14")]
         public void NestedLambda3() {
             Assert.AreEqual(
-                @"() => Fizz((int x) => true)",
-                ExpressionToCode.ToCode(() => Fizz((int x) => true))
-                ); //hard case!
-            Assert.AreEqual(
                 @"() => Buzz(x => true)",
                 ExpressionToCode.ToCode(() => Buzz(x => true))
+                ); //easier case...
+            Assert.AreEqual(
+                @"() => Fizz((int x) => true)",
+                ExpressionToCode.ToCode(() => Fizz((int x) => true))
                 ); //hard case!
         }
 
@@ -403,10 +405,64 @@ namespace ExpressionToCodeTest {
         }
 
         T MethodWithOutParam<T>(ref T input, out T output) { return output = input; }
+
+        [Test]
+        public void StaticMethodWithRefAndOutModifiers() {
+            var x = "a";
+            object y;
+            Assert.AreEqual(
+                @"() => ClassA.MethodWithOutAndRefParam(ref x, out y, 3)",
+                ExpressionToCode.ToCode(() => ClassA.MethodWithOutAndRefParam(ref x, out y, 3)));
+        }
+
+        [Test]
+        public void ConstructorMethodWithRefAndOutModifiers() {
+            int x = 42;
+            int y;
+            Assert.AreEqual(
+                @"() => new ClassA(ref x, out y))",
+                ExpressionToCode.ToCode(() => new ClassA(ref x, out y)));
+        }
+
+
+        [Test]
+        public void ExtensionMethodWithRefAndOutModifiers() {
+            int x = 42;
+            long y;
+            Assert.AreEqual(
+                @"() => new ClassA(ref x, out y))",
+                ExpressionToCode.ToCode(() => DateTime.Now.AnExtensionMethod(ref x, 5, out y)));
+        }
+
+
+        [Test]
+        public void DelegateCallWithRefAndOutModifiers() {
+            int x = 42;
+            int y;
+            DelegateWithRefAndOut myDelegate = (ref int someVar, out int anotherVar) => anotherVar = someVar;
+            Assert.AreEqual(
+                @"() => new ClassA(ref x, out y))",
+                ExpressionToCode.ToCode(() => myDelegate(ref x, out y)));
+        }
+    }
+
+    public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
+
+    static class StaticHelperClass {
+        public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut) {
+            return alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
+        }
     }
 
     class ClassA {
+        public static int MethodWithOutAndRefParam<T>(ref T input, out object output, int x) {
+            output = x == 4 ? default(object) : input;
+            return x;
+        }
+
         int x;
+        public ClassA() { }
+        public ClassA(ref int something, out int output) { output = x = something; }
 
         public void DoAssert() {
             x = 37;
