@@ -266,6 +266,8 @@ namespace ExpressionToCodeLib {
 
         public void DispatchInvoke(Expression e) {
             var ie = (InvocationExpression)e;
+            if (ie.Expression.NodeType == ExpressionType.Lambda)
+                Sink("new " + CSharpFriendlyTypeName.Get(ie.Expression.Type));
             NestExpression(ie.NodeType, ie.Expression);
             ArgListDispatch(ie.Arguments, ie);
         }
