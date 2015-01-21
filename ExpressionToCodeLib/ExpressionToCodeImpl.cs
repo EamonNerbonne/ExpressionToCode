@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -234,12 +235,11 @@ namespace ExpressionToCodeLib {
                 var parameters = mce.Method.GetParameters();
                 var argPrefixes =
                     parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
-                var argumentValues = isExtensionMethod ? mce.Arguments.Skip(1) : mce.Arguments;
-                var args = argumentValues.Zip(
+                var args = mce.Arguments.Zip(
                     argPrefixes,
                     (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
 
-                ArgListDispatch(args);
+                ArgListDispatch(isExtensionMethod? args.Skip(1):args);
             }
         }
 
