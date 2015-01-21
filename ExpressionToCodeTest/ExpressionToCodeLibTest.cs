@@ -446,14 +446,14 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
-        public void FuncInvocation() {
+        public void LambdaInvocation_Func_int() {
             Assert.AreEqual(
                 "() => new Func<int>(() => 1)()",
                 ExpressionToCode.ToCode(() => new Func<int>(() => 1)()));
         }
 
         [Test]
-        public void CustomDelegateInvocation()
+        public void LambdaInvocation_CustomDelegate()
         {
             Assert.AreEqual(
                 "() => new CustomDelegate(n => n + 1)(1)",
