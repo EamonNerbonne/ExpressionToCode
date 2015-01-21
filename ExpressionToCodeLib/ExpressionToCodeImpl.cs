@@ -232,15 +232,17 @@ namespace ExpressionToCodeLib {
                     && mce.Object == null;
                 Expression objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
                 SinkMethodName(mce, mce.Method, objectExpr);
-                var parameters = mce.Method.GetParameters();
-                var argPrefixes =
-                    parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
-                var args = mce.Arguments.Zip(
-                    argPrefixes,
-                    (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
+                var args = GetArgumentsForMethod(mce.Method, mce.Arguments);
 
                 ArgListDispatch(isExtensionMethod? args.Skip(1):args);
             }
+        }
+
+        static IEnumerable<Argument> GetArgumentsForMethod(MethodInfo methodInfo, IEnumerable<Expression> argValueExprs) {
+            var parameters = methodInfo.GetParameters();
+            var argPrefixes = parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
+            var args = argValueExprs.Zip(argPrefixes, (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
+            return args;
         }
 
         void SinkMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr) {
@@ -261,7 +263,7 @@ namespace ExpressionToCodeLib {
             if (ie.Indexer.Name != "Item") {
                 Sink("." + ie.Indexer.Name); //TODO: is this OK?
             }
-            ArgListDispatch(ie.Arguments, ie, "[", "]");
+            ArgListDispatch(ie.Arguments.Select(e1 => new Argument { Expr = e1 }), ie, "[", "]");
         }
 
         public void DispatchInvoke(Expression e) {
@@ -269,7 +271,9 @@ namespace ExpressionToCodeLib {
             if (ie.Expression.NodeType == ExpressionType.Lambda)
                 Sink("new " + CSharpFriendlyTypeName.Get(ie.Expression.Type));
             NestExpression(ie.NodeType, ie.Expression);
-            ArgListDispatch(ie.Arguments, ie);
+            var invokeMethod = ie.Expression.Type.GetMethod("Invoke");
+            var args = GetArgumentsForMethod(invokeMethod, ie.Arguments);
+            ArgListDispatch(args, ie);
         }
 
         public void DispatchConstant(Expression e) {
