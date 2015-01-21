@@ -444,9 +444,26 @@ namespace ExpressionToCodeTest {
                 @"() => new ClassA(ref x, out y))",
                 ExpressionToCode.ToCode(() => myDelegate(ref x, out y)));
         }
+
+        [Test]
+        public void FuncInvocation() {
+            Assert.AreEqual(
+                "() => new Func<int>(() => 1)()",
+                ExpressionToCode.ToCode(() => new Func<int>(() => 1)()));
+        }
+
+        [Test]
+        public void CustomDelegateInvocation()
+        {
+            Assert.AreEqual(
+                "() => new CustomDelegate(n => n + 1)(1)",
+                ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
+        }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
+
+    public delegate int CustomDelegate(int input);
 
     static class StaticHelperClass {
         public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut) {
