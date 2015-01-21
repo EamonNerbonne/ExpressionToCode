@@ -430,7 +430,7 @@ namespace ExpressionToCodeTest {
             int x = 42;
             long y;
             Assert.AreEqual(
-                @"() => new ClassA(ref x, out y))",
+                @"() => DateTime.Now.AnExtensionMethod(ref x, 5, out y)",
                 ExpressionToCode.ToCode(() => DateTime.Now.AnExtensionMethod(ref x, 5, out y)));
         }
 
@@ -441,7 +441,7 @@ namespace ExpressionToCodeTest {
             int y;
             DelegateWithRefAndOut myDelegate = (ref int someVar, out int anotherVar) => anotherVar = someVar;
             Assert.AreEqual(
-                @"() => new ClassA(ref x, out y))",
+                @"() => myDelegate(ref x, out y)",
                 ExpressionToCode.ToCode(() => myDelegate(ref x, out y)));
         }
 
