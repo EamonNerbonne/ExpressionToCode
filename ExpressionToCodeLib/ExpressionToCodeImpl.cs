@@ -59,15 +59,6 @@ namespace ExpressionToCodeLib {
         }
 
         void ArgListDispatch(
-            IEnumerable<Expression> arguments,
-            Expression value = null,
-            string open = "(",
-            string close = ")",
-            string joiner = ", ") {
-            ArgListDispatch(arguments.Select(e => new Argument { Expr = e }), value, open, close, joiner);
-        }
-
-        void ArgListDispatch(
             IEnumerable<Argument> arguments,
             Expression value = null,
             string open = "(",
@@ -91,7 +82,7 @@ namespace ExpressionToCodeLib {
             NestExpression(be.NodeType, right, true);
         }
 
-        void UnwrapEnumOp(BinaryExpression be, out Expression left, out Expression right) {
+        static void UnwrapEnumOp(BinaryExpression be, out Expression left, out Expression right) {
             left = be.Left;
             right = be.Right;
             var uleft = left.NodeType == ExpressionType.Convert ? ((UnaryExpression)left).Operand : null;
@@ -112,7 +103,7 @@ namespace ExpressionToCodeLib {
                 }
         }
 
-        void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2) {
+        static void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2) {
             Type expr1nonnullableType = expr1uncast.Type.AvoidNullability();
             Type expr2nonnullableType = expr2.Type.AvoidNullability();
             if (expr1nonnullableType.IsEnum
@@ -173,6 +164,7 @@ namespace ExpressionToCodeLib {
             if (le.Parameters.Count == 1) {
                 NestExpression(e.NodeType, le.Parameters.Single());
             } else {
+                //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
                 ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe }));
             }
             Sink(" => ");
@@ -216,7 +208,8 @@ namespace ExpressionToCodeLib {
                 && (optPropertyInfo.Name == "Item"
                     || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
                 NestExpression(mce.NodeType, mce.Object);
-                ArgListDispatch(mce.Arguments.Select(pe => new Argument { Expr = pe }), mce, "[", "]");
+                //indexers don't support ref/out; so we can use unprefixed arguments
+                ArgListDispatch(GetArgumentsForMethod(mce.Method,mce.Arguments), mce, "[", "]");
             } else if (mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
                 && mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof(MethodInfo)) {
                 //implicitly constructed delegate from method group.
@@ -234,16 +227,19 @@ namespace ExpressionToCodeLib {
                 SinkMethodName(mce, mce.Method, objectExpr);
                 var args = GetArgumentsForMethod(mce.Method, mce.Arguments);
 
-                ArgListDispatch(isExtensionMethod? args.Skip(1):args);
+                ArgListDispatch(isExtensionMethod ? args.Skip(1) : args);
             }
         }
 
-        static IEnumerable<Argument> GetArgumentsForMethod(MethodInfo methodInfo, IEnumerable<Expression> argValueExprs) {
-            var parameters = methodInfo.GetParameters();
-            var argPrefixes = parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
-            var args = argValueExprs.Zip(argPrefixes, (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
-            return args;
+        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs) {
+            return GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
         }
+
+        static IEnumerable<Argument> GetArgumentsForMethod(ParameterInfo[] parameters, IEnumerable<Expression> argValueExprs) {
+            var argPrefixes = parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
+            return argValueExprs.Zip(argPrefixes, (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
+        }
+
 
         void SinkMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr) {
             if (objExpr != null) {
@@ -263,13 +259,16 @@ namespace ExpressionToCodeLib {
             if (ie.Indexer.Name != "Item") {
                 Sink("." + ie.Indexer.Name); //TODO: is this OK?
             }
-            ArgListDispatch(ie.Arguments.Select(e1 => new Argument { Expr = e1 }), ie, "[", "]");
+            var args = GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
+            ArgListDispatch(args, ie, "[", "]");
         }
+
 
         public void DispatchInvoke(Expression e) {
             var ie = (InvocationExpression)e;
-            if (ie.Expression.NodeType == ExpressionType.Lambda)
+            if (ie.Expression.NodeType == ExpressionType.Lambda) {
                 Sink("new " + CSharpFriendlyTypeName.Get(ie.Expression.Type));
+            }
             NestExpression(ie.NodeType, ie.Expression);
             var invokeMethod = ie.Expression.Type.GetMethod("Invoke");
             var args = GetArgumentsForMethod(invokeMethod, ie.Arguments);
@@ -310,7 +309,7 @@ namespace ExpressionToCodeLib {
             Sink("new ", lie);
             Sink(CSharpFriendlyTypeName.Get(lie.NewExpression.Constructor.ReflectedType));
             if (lie.NewExpression.Arguments.Any()) {
-                ArgListDispatch(lie.NewExpression.Arguments);
+                ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments));
             }
 
             Sink(" { ");
@@ -320,7 +319,7 @@ namespace ExpressionToCodeLib {
 
         void DispatchElementInit(ElementInit elemInit) {
             if (elemInit.Arguments.Count != 1) {
-                ArgListDispatch(elemInit.Arguments, open: "{ ", close: " }");
+                ArgListDispatch(elemInit.Arguments.Select(ae => new Argument { Expr = ae }), null, "{ ", " }");//??
             } else {
                 RawChildDispatch(elemInit.Arguments.Single());
             }
@@ -350,7 +349,7 @@ namespace ExpressionToCodeLib {
             Sink("new ", mie);
             Sink(CSharpFriendlyTypeName.Get(mie.NewExpression.Constructor.ReflectedType));
             if (mie.NewExpression.Arguments.Any()) {
-                ArgListDispatch(mie.NewExpression.Arguments);
+                ArgListDispatch(GetArgumentsForMethod(mie.NewExpression.Constructor, mie.NewExpression.Arguments));
             }
 
             Sink(" { ");
@@ -384,7 +383,7 @@ namespace ExpressionToCodeLib {
                 Sink(" }");
             } else {
                 Sink("new " + CSharpFriendlyTypeName.Get(ne.Type), ne);
-                ArgListDispatch(ne.Arguments);
+                ArgListDispatch(GetArgumentsForMethod(ne.Constructor, ne.Arguments));
             }
             //TODO: deal with anonymous types.
         }
@@ -396,21 +395,22 @@ namespace ExpressionToCodeLib {
             bool implicitTypeOK = !isDelegate && nae.Expressions.Any()
                 && nae.Expressions.All(expr => expr.Type == arrayElemType);
             Sink("new" + (implicitTypeOK ? "" : " " + CSharpFriendlyTypeName.Get(arrayElemType)) + "[] ", nae);
-            ArgListDispatch(nae.Expressions, open: "{ ", close: " }");
+            ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "{ ", " }");
         }
 
         public void DispatchNewArrayBounds(Expression e) {
             var nae = (NewArrayExpression)e;
             Type arrayElemType = nae.Type.GetElementType();
             Sink("new " + CSharpFriendlyTypeName.Get(arrayElemType), nae);
-            ArgListDispatch(nae.Expressions, open: "[", close: "]");
+            ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]");
         }
         #endregion
 
         #region Easy Cases
         public void DispatchPower(Expression e) {
             Sink("Math.Pow", e);
-            ArgListDispatch(new[] { ((BinaryExpression)e).Left, ((BinaryExpression)e).Right });
+            var binaryExpression = (BinaryExpression)e;
+            ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(e1 => new Argument { Expr = e1 }));
         }
 
         public void DispatchAdd(Expression e) { BinaryDispatch("+", e); }
@@ -424,9 +424,10 @@ namespace ExpressionToCodeLib {
         }
 
         public void DispatchArrayIndex(Expression e) {
-            NestExpression(e.NodeType, ((BinaryExpression)e).Left);
+            var binaryExpression = (BinaryExpression)e;
+            NestExpression(e.NodeType, binaryExpression.Left);
             Sink("[", e);
-            NestExpression(null, ((BinaryExpression)e).Right);
+            NestExpression(null, binaryExpression.Right);
             Sink("]");
         }
 

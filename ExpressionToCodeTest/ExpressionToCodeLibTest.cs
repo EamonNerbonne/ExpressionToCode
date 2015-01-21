@@ -420,7 +420,7 @@ namespace ExpressionToCodeTest {
             int x = 42;
             int y;
             Assert.AreEqual(
-                @"() => new ClassA(ref x, out y))",
+                @"() => new ClassA(ref x, out y)",
                 ExpressionToCode.ToCode(() => new ClassA(ref x, out y)));
         }
 
