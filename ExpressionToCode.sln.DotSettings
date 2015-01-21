@@ -59,7 +59,7 @@
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/CONTROL_STATEMENTS_BRACES/@EntryValue">NEXT_LINE</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/FORCE_CONTROL_STATEMENTS_BRACES/@EntryValue">ALWAYS_ADD</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/FUNCTION_BRACES/@EntryValue">NEXT_LINE</s:String>
-	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/INDENT_CASE_FROM_SWITCH/@EntryValue">True</s:Boolean>
+	
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/JavaScriptFormatBracesLayout/CONTROL_STATEMENTS_BRACES/@EntryValue">NEXT_LINE</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/JavaScriptFormatBracesLayout/FORCE_CONTROL_STATEMENTS_BRACES/@EntryValue">ALWAYS_ADD</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/JavaScriptFormatBracesLayout/FUNCTION_BRACES/@EntryValue">NEXT_LINE</s:String>
@@ -74,7 +74,7 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/PLACE_ELSE_ON_NEW_LINE/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/PLACE_FINALLY_ON_NEW_LINE/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/PLACE_WHILE_ON_NEW_LINE/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/SIMPLE_EMBEDDED_STATEMENT_STYLE/@EntryValue">LINE_BREAK</s:String>
+	
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/JavaScriptCodeFormatting/STICK_COMMENT/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/XmlFormatter/ProcessingInstructionAttributeIndenting/@EntryValue">TwoSteps</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/XmlFormatter/TagAttributeIndenting/@EntryValue">TwoSteps</s:String>
@@ -116,6 +116,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/VBNaming/PredefinedNamingRules/=PublicFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/VBNaming/PredefinedNamingRules/=StaticReadonly/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AA_BB" /&gt;</s:String>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateBlankLinesAroundFieldToBlankLinesAroundProperty/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002EJavaScript_002ECodeStyle_002ESettingsUpgrade_002EJsCodeFormatterSettingsUpgrader/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/UnitTesting/NUnitProvider/CustomNUnitFolder/@EntryValue">C:\Program Files (x86)\NUnit 2.5.3\bin\net-2.0\</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/NUnitProvider/UseAddins/@EntryValue">Never</s:String>
 	<s:Boolean x:Key="/Default/Housekeeping/SolutionSettingsUpgraded/IsUpgraded/@EntryValue">True</s:Boolean>
