@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace ExpressionToCodeTest
 {
 	[TestFixture]
-	public class AnnotatedToCodeTest
+	public class ToAnnotatedCodeTest
 	{
 		[Test]
 		public void A1PlusB2()
