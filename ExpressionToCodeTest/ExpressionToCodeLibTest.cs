@@ -264,12 +264,19 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
+        public void NewObject(){
+        	    Assert.AreEqual(
+                @"() => new object()",
+                ExpressionToCode.ToCode(() => new Object()));
+        }
+        
+        [Test]
         public void NewObjectNotEqualsNewObject() {
             Assert.AreEqual(
                 @"() => new object() != new object()",
                 ExpressionToCode.ToCode(() => new object() != new object()));
-        }
-
+        }        
+        
         [Test]
         public void NotOperator() {
             bool x = true;
@@ -446,12 +453,6 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => myDelegate(ref x, out y)));
         }
         
-        [Test]
-        public void NewObject(){
-        	    Assert.AreEqual(
-                @"() => new object()",
-                ExpressionToCode.ToCode(() => new Object()));
-        }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
