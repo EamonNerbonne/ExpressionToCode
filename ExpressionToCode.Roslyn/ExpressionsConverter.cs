@@ -35,6 +35,7 @@ namespace ExpressionToCode.Roslyn
 	    
 		public static CSharpCompilation ToCompilationUnit(Expression e) {
 	    	
+	    	//TODO: dump with all namespaces to prevent name clash
 			var tree =  CSharpSyntaxTree.ParseText(ExpressionToCodeLib.ExpressionToCode.ToCode(e));
 			
 			//TODO: grap all references from Expression tree
