@@ -11,10 +11,18 @@ namespace ExpressionToCodeLib {
         public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToCode((Expression)e); }
         public static string ToCode<T, T1>(Expression<Func<T, T1>> e) { return ToCode((Expression)e); }
         public static string ToCode<T>(Expression<Func<T>> e) { return ToCode((Expression)e); }
-        public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return AnnotatedToCode((Expression)e); }
-        public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return AnnotatedToCode((Expression)e); }
-        public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) { return AnnotatedToCode((Expression)e); }
-        public static string AnnotatedToCode<T>(Expression<Func<T>> e) { return AnnotatedToCode((Expression)e); }
+        public static string ToAnnotatedCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToAnnotatedCode((Expression)e); }
+        public static string ToAnnotatedCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToAnnotatedCode((Expression)e); }
+        public static string ToAnnotatedCode<T, T1>(Expression<Func<T, T1>> e) { return ToAnnotatedCode((Expression)e); }
+        public static string ToAnnotatedCode<T>(Expression<Func<T>> e) { return ToAnnotatedCode((Expression)e); }
+        [Obsolete("Use ToAnnotatedCode")]
+        public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToAnnotatedCode((Expression)e); }
+        [Obsolete("Use ToAnnotatedCode")]
+        public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToAnnotatedCode((Expression)e); }
+        [Obsolete("Use ToAnnotatedCode")]
+        public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) { return ToAnnotatedCode((Expression)e); }
+        [Obsolete("Use ToAnnotatedCode")]
+        public static string AnnotatedToCode<T>(Expression<Func<T>> e) { return ToAnnotatedCode((Expression)e); }
 
         public static string ToCode(Expression e) {
             StringBuilder sb = new StringBuilder();
@@ -27,9 +35,11 @@ namespace ExpressionToCodeLib {
             return sb.ToString();
         }
 
-        public static string AnnotatedToCode(Expression expr) { return AnnotatedToCode(expr, null, false); }
+        public static string ToAnnotatedCode(Expression expr) { return ToAnnotatedCode(expr, null, false); }
+        [Obsolete("Use ToAnnotatedCode")]
+        public static string AnnotatedToCode(Expression expr) { return ToAnnotatedCode(expr, null, false); }
 
-        internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue) {
+        internal static string ToAnnotatedCode(Expression expr, string msg, bool ignoreOutermostValue) {
             var splitLine = ExpressionToStringWithValues(expr, ignoreOutermostValue);
 
             var exprWithStalkedValues = new StringBuilder();
