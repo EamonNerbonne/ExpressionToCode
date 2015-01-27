@@ -17,6 +17,7 @@ using NUnit.Framework;
 using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest {
+    [TestFixture]
     public class ExpressionToCodeTest {
         [Test]
         public void AddOperator() {
@@ -262,8 +263,14 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => new int[3, 4].Length == 1));
         }
 
+        public void NewObject(){
+        	    Assert.AreEqual(
+                @"() => new object()",
+                ExpressionToCode.ToCode(() => new Object()));
+        }
+        
         [Test]
-        public void NewObject() {
+        public void NewObjectNotEqualsNewObject() {
             Assert.AreEqual(
                 @"() => new object() != new object()",
                 ExpressionToCode.ToCode(() => new object() != new object()));
