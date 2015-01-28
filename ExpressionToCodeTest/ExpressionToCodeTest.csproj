@@ -50,6 +50,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnnotatedToCodeTest.cs" />
     <Compile Include="EnumTests.cs" />
     <Compile Include="EqualityComparingTest.cs" />
     <Compile Include="ExceptionsSerialization.cs" />
