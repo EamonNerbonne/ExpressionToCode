@@ -1,6 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
+# SharpDevelop 5.1
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCodeLib", "ExpressionToCodeLib\ExpressionToCodeLib.csproj", "{2472FFFC-E2F9-4043-8CA6-EB65D4059A0F}"
@@ -22,6 +23,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3FA226
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCode.Roslyn", "ExpressionToCode.Roslyn\ExpressionToCode.Roslyn.csproj", "{50D9B94F-D634-4696-B169-21EC5E9476D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCode.Roslyn.Tests", "ExpressionToCode.Roslyn.Tests\ExpressionToCode.Roslyn.Tests.csproj", "{AA0D5B9B-DEDB-4632-B2C6-3020933DD750}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +41,14 @@ Global
 		{404475DF-91DC-40B2-A933-1C4A3C9B7710}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{404475DF-91DC-40B2-A933-1C4A3C9B7710}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{404475DF-91DC-40B2-A933-1C4A3C9B7710}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50D9B94F-D634-4696-B169-21EC5E9476D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50D9B94F-D634-4696-B169-21EC5E9476D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50D9B94F-D634-4696-B169-21EC5E9476D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50D9B94F-D634-4696-B169-21EC5E9476D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA0D5B9B-DEDB-4632-B2C6-3020933DD750}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA0D5B9B-DEDB-4632-B2C6-3020933DD750}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA0D5B9B-DEDB-4632-B2C6-3020933DD750}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA0D5B9B-DEDB-4632-B2C6-3020933DD750}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
