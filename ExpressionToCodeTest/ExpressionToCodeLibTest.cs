@@ -460,11 +460,62 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
-        public void LambdaInvocation_CustomDelegate()
-        {
+        public void LambdaInvocation_CustomDelegate() {
             Assert.AreEqual(
                 "() => new CustomDelegate(n => n + 1)(1)",
                 ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
+        }
+
+        [Test]
+        public void ThisPropertyAccess() {
+            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => TheProperty);
+            Assert.AreEqual("() => TheProperty", code);
+        }
+
+        [Test]
+        public void ThisMethodCall() {
+            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => ReturnZero());
+            Assert.AreEqual("() => ReturnZero()", code);
+        }
+
+        [Test]
+        public void ThisStaticMethodCall() {
+            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => StaticReturnZero());
+
+            Assert.AreEqual("() => ExpressionToCodeTest.StaticReturnZero()", code);
+        }
+
+        [Test]
+        public void ThisIndexedProperty()
+        {
+            var actual = ExpressionToCode.ToCode(() => this[1]);
+            Assert.AreEqual("() => this[1]", actual);
+        }
+
+        public string this[int index]
+        {
+            get
+            {
+                return "TheIndexedValue";
+            }
+        }
+
+        public string TheProperty
+        {
+            get
+            {
+                return "TheValue";
+            }
+        }    
+
+        public int ReturnZero()
+        {
+            return 0;
+        }
+
+        public static int StaticReturnZero()
+        {
+            return 0;
         }
     }
 
@@ -476,6 +527,8 @@ namespace ExpressionToCodeTest {
         public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut) {
             return alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
         }
+
+        
     }
 
     class ClassA {
@@ -504,4 +557,6 @@ namespace ExpressionToCodeTest {
         int C() { return x + 5; }
         bool MyEquals(ClassA other) { return other != null && x == other.x; }
     }
+
+
 }
