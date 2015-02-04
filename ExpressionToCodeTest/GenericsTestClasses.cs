@@ -189,7 +189,19 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => GenericClass<int>.IsFunc2OfType((int x) => x))
                 );
         }
+
+        [Test]
+        public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments()
+        {
+            Assert.AreEqual(
+                "() => MakeMe<Cake, string>(() => new Cake())",
+                ExpressionToCode.With(rules => rules.WithExplicitMethodTypeArgs()).ToCode(() => MakeMe<Cake, string>(() => new Cake())));
+        }
+
+        T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }
     }
+
+    internal class Cake { }
 
     class GenericClass<T> {
         T val;

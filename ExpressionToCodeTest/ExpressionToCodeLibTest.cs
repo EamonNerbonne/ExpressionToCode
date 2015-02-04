@@ -466,6 +466,14 @@ namespace ExpressionToCodeTest {
                 "() => new CustomDelegate(n => n + 1)(1)",
                 ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
         }
+
+        [Test]
+        public void FullTypeName_IfCorrespondingRuleSpecified()
+        {
+            Assert.AreEqual(
+                "() => new ExpressionToCodeTest.ClassA()",
+                ExpressionToCode.With(rules => rules.WithFullTypeNames()).ToCode(() => new ClassA()));
+        }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
