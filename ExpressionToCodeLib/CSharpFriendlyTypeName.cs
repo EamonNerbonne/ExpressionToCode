@@ -5,7 +5,9 @@ using System.Text;
 
 namespace ExpressionToCodeLib {
     static class CSharpFriendlyTypeName {
-        public static string Get(Type type) { return GenericTypeName(type) ?? ArrayTypeName(type) ?? AliasName(type) ?? NormalName(type); }
+        public static string Get(Type type, bool fullName = false) {
+            return GenericTypeName(type, fullName) ?? ArrayTypeName(type) ?? AliasName(type) ?? NormalName(type, fullName);
+        }
 
         static string AliasName(Type type) {
             if (type == typeof(bool)) {
@@ -43,9 +45,12 @@ namespace ExpressionToCodeLib {
             }
         }
 
-        static string NormalName(Type type) { return (type.DeclaringType == null || type.IsGenericParameter ? "" : Get(type.DeclaringType) + ".") + type.Name; }
+        static string NormalName(Type type, bool fullName = false) {
+            return (type.DeclaringType == null || type.IsGenericParameter ? "" : Get(type.DeclaringType) + ".")
+                + (fullName ? type.FullName ?? type.Name : type.Name);
+        }
 
-        static string GenericTypeName(Type type) {
+        static string GenericTypeName(Type type, bool fullName = false) {
             if (!type.IsGenericType) {
                 return null;
             }
@@ -60,7 +65,7 @@ namespace ExpressionToCodeLib {
             var revNestedTypeNames = new List<string>();
 
             while (type != null) {
-                var name = type.Name;
+                var name = fullName ? type.FullName ?? type.Name : type.Name;
                 var backtickIdx = name.IndexOf('`');
                 if (backtickIdx < 0) {
                     revNestedTypeNames.Add(name);
