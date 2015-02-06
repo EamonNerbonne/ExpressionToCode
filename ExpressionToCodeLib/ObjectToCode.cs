@@ -39,9 +39,10 @@ namespace ExpressionToCodeLib {
 
         public static string PlainObjectToCode(object val) { return PlainObjectToCode(val, val == null ? null : val.GetType()); }
 
-        public static string PlainObjectToCode(object val, Type type) {
+        public static string PlainObjectToCode(object val, Type type, bool fullTypeNames = false) {
+            Func<Type, string> getName = t => CSharpFriendlyTypeName.Get(t, fullTypeNames);
             if (val == null) {
-                return type == null || type == typeof(object) ? "null" : "default(" + CSharpFriendlyTypeName.Get(type) + ")";
+                return type == null || type == typeof(object) ? "null" : "default(" + getName(type) + ")";
             } else if (val is string) {
                 bool useLiteralSyntax = ((string)val).Any(c => c < 32 || c == '\\')
                     && ((string)val).All(c => c != '\n' && c != '\r' && c != '\t');
@@ -67,33 +68,31 @@ namespace ExpressionToCodeLib {
                 return "false";
             } else if (val is Enum) {
                 if (Enum.IsDefined(val.GetType(), val)) {
-                    return val.GetType().Name + "." + val;
+                    return getName(val.GetType()) + "." + val;
                 } else {
                     long longVal = ((IConvertible)val).ToInt64(null);
                     var toString = ((IConvertible)val).ToString(CultureInfo.InvariantCulture);
                     if (toString == longVal.ToString(CultureInfo.InvariantCulture)) {
-                        return "((" + val.GetType().Name + ")" + longVal + ")";
+                        return "((" + getName(val.GetType()) + ")" + longVal + ")";
                     } else {
                         var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
                         return components.Length == 0
-                            ? "default(" + val.GetType().Name + ")"
+                            ? "default(" + getName(val.GetType()) + ")"
                             : components.Length == 1
-                                ? val.GetType().Name + "." + components[0]
-                                : "(" + string.Join(" | ", components.Select(s => val.GetType().Name + "." + s)) + ")";
+                                ? getName(val.GetType()) + "." + components[0]
+                                : "(" + string.Join(" | ", components.Select(s => getName(val.GetType()) + "." + s)) + ")";
                     }
                 }
             } else if (val.GetType().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
-                return "default(" + CSharpFriendlyTypeName.Get(val.GetType()) + ")";
+                return "default(" + getName(val.GetType()) + ")";
             } else if (val is Type) {
-                return "typeof(" + CSharpFriendlyTypeName.Get((Type)val) + ")";
+                return "typeof(" + getName((Type)val) + ")";
             } else if (val is MethodInfo) {
-                return CSharpFriendlyTypeName.Get(((MethodInfo)val).DeclaringType) + "." + ((MethodInfo)val).Name;
+                return getName(((MethodInfo)val).DeclaringType) + "." + ((MethodInfo)val).Name;
             } else {
                 return null;
             }
         }
-
-        public static string GetCSharpFriendlyTypeName(Type type) { return CSharpFriendlyTypeName.Get(type); }
 
         static string EscapeCharForString(char c) {
             if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) {

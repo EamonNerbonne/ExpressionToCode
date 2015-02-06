@@ -474,6 +474,16 @@ namespace ExpressionToCodeTest {
                 "() => new ExpressionToCodeTest.ClassA()",
                 ExpressionToCode.With(rules => rules.WithFullTypeNames()).ToCode(() => new ClassA()));
         }
+
+        [Test]
+        public void FullTypeName_ForNestedType()
+        {
+            Assert.AreEqual(
+                "() => new ExpressionToCodeTest.ExpressionToCodeTest.B()",
+                ExpressionToCode.With(rules => rules.WithFullTypeNames()).ToCode(() => new B()));
+        }
+
+        class B { }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);

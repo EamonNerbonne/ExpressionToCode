@@ -10,16 +10,19 @@ namespace ExpressionToCodeLib {
         #region General Helpers
         readonly Rules rules;
         readonly Action<ExprTextPart, int> sink;
-        readonly Func<Type, string> GetCSharpFriendlyTypeName = type => CSharpFriendlyTypeName.Get(type);
+        readonly Func<Type, string> GetCSharpFriendlyTypeName;
         int Depth;
+        
         //TODO: refactor IExpressionTypeDispatch into an input/output model to avoid this tricky side-effect approach.
         internal ExpressionToCodeImpl(Rules rules, Action<ExprTextPart, int> sink) {
             rules = rules ?? Rules.Default;
-            if (rules.FullTypeNames) GetCSharpFriendlyTypeName = type => CSharpFriendlyTypeName.Get(type, true);
+            GetCSharpFriendlyTypeName = t => CSharpFriendlyTypeName.Get(t, rules.FullTypeNames);
             this.rules = rules;
             this.sink = sink;
         }
+        
         internal ExpressionToCodeImpl(Action<ExprTextPart, int> sink) : this(Rules.Default, sink) { }
+
         void Sink(string text) { sink(ExprTextPart.TextOnly(text), Depth); }
         void Sink(string text, Expression value) { sink(ExprTextPart.TextAndExpr(text, value), Depth); }
 
@@ -289,7 +292,7 @@ namespace ExpressionToCodeLib {
 
         public void DispatchConstant(Expression e) {
             var const_Val = ((ConstantExpression)e).Value;
-            string codeRepresentation = ObjectToCode.PlainObjectToCode(const_Val, e.Type);
+            string codeRepresentation = ObjectToCode.PlainObjectToCode(const_Val, e.Type, rules.FullTypeNames);
             //e.Type.IsVisible
             if (codeRepresentation == null) {
                 var typeclass = e.Type.GuessTypeClass();
