@@ -92,6 +92,14 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
+        public void ArrayOfFuncInitializer_FullNames()
+        {
+            Assert.AreEqual(
+                @"() => new System.Func<int>[] { () => 1, () => 2 }",
+                ExpressionToCode.With(r => r.WithFullTypeNames()).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+        }
+
+        [Test]
         public void ListInitializer() {
             Assert.AreEqual(
                 @"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",
@@ -466,6 +474,24 @@ namespace ExpressionToCodeTest {
                 "() => new CustomDelegate(n => n + 1)(1)",
                 ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
         }
+
+        [Test]
+        public void FullTypeName_IfCorrespondingRuleSpecified()
+        {
+            Assert.AreEqual(
+                "() => new ExpressionToCodeTest.ClassA()",
+                ExpressionToCode.With(rules => rules.WithFullTypeNames()).ToCode(() => new ClassA()));
+        }
+
+        [Test]
+        public void FullTypeName_ForNestedType()
+        {
+            Assert.AreEqual(
+                "() => new ExpressionToCodeTest.ExpressionToCodeTest.B()",
+                ExpressionToCode.With(rules => rules.WithFullTypeNames()).ToCode(() => new B()));
+        }
+
+        class B { }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
