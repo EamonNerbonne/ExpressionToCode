@@ -92,6 +92,14 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
+        public void ArrayOfFuncInitializer_FullNames()
+        {
+            Assert.AreEqual(
+                @"() => new System.Func<int>[] { () => 1, () => 2 }",
+                ExpressionToCode.With(r => r.WithFullTypeNames()).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+        }
+
+        [Test]
         public void ListInitializer() {
             Assert.AreEqual(
                 @"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",

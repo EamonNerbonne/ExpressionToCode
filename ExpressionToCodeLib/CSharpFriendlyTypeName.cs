@@ -72,10 +72,12 @@ namespace ExpressionToCodeLib {
             while (type != null) {
                 var name = useFullType ? type.FullName ?? type.Name : type.Name;
                 var backtickIdx = name.IndexOf('`');
-                if (backtickIdx < 0) {
+                if (backtickIdx == -1) {
                     revNestedTypeNames.Add(name);
                 } else {
-                    var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1));
+                    var afterArgCountIdx = name.IndexOf('[', backtickIdx + 1);
+                    if (afterArgCountIdx == -1) afterArgCountIdx = name.Length;
+                    var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1, afterArgCountIdx - backtickIdx - 1));
                     var argsNames = new List<string>();
                     for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
                         argsNames.Add(Get(typeArgs[i], useFullType));
