@@ -40,8 +40,8 @@ namespace ExpressionToCode.Roslyn.Tests
             var actual = ExpressionsConverter.ToCompilationUnit(() => new Object());
             var stream = new MemoryStream();
             var result = actual.Emit(stream);
-            Assert.AreEqual(0,result.Diagnostics.Count());
             
+            Assert.IsEmpty(result.Diagnostics);
         }
     }
 }
