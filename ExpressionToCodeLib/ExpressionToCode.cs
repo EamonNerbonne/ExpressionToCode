@@ -52,7 +52,7 @@ namespace ExpressionToCodeLib {
 
             var name = ToFullName(expression);
 
-            return string.Format("{0} = {1}", name, retValue);
+            return name + " = " + retValue;
         }
 
         internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue) {
@@ -161,10 +161,9 @@ namespace ExpressionToCodeLib {
             var methodCallExpression = expression.Body as MethodCallExpression;
             if (methodCallExpression != null) {
                 // tries transform method and return value in human readable C#-style representation
-                var typePrefix = string.Empty;
 
                 // add declaring type if it is not a module
-                var arguments = String.Join(
+                var arguments = string.Join(
                     ", ",
                     methodCallExpression.Arguments.Select(x => x.ToString()).ToArray() // converting to string to work for .NET 3.5 if backported
                     );
@@ -176,17 +175,15 @@ namespace ExpressionToCodeLib {
                         method.GetGenericArguments().Select(x => x.Name).ToArray()) // converting to string to work for .NET 3.5 if backported
                         + ">";
                 }
-                if (methodName == "get_Item" && methodCallExpression.Arguments.Count > 0) //indexed property
-                {
-                    if (methodCallExpression.Object != null) {
-                        typePrefix = methodCallExpression.Object.Type.Name;
-                    }
-                    name = String.Format("{0}[{1}]", typePrefix, arguments);
+                if (methodName == "get_Item" && methodCallExpression.Arguments.Count > 0) { //indexed property
+                    string typeName = methodCallExpression.Object != null ? methodCallExpression.Object.Type.Name : "";
+                    name = typeName + "[" + arguments + "]";
                 } else {
+                    var typePrefix = "";
                     if (method.IsStatic) {
-                        typePrefix = method.DeclaringType.Name;
+                        typePrefix = method.DeclaringType.Name + ".";
                     }
-                    name = String.Format("{0}{1}{2}({3})", typePrefix, string.IsNullOrEmpty(typePrefix) ? "" : ".", methodName, arguments);
+                    name = typePrefix + methodName + "(" + arguments + ")";
                 }
             }
             if (name == null) {
