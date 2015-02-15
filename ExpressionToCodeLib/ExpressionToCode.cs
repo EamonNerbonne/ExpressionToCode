@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+// ReSharper disable UnusedMember.Global
 namespace ExpressionToCodeLib {
     public static class ExpressionToCode {
         public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToCode((Expression)e); }
@@ -17,8 +18,8 @@ namespace ExpressionToCodeLib {
         public static string AnnotatedToCode<T>(Expression<Func<T>> e) { return AnnotatedToCode((Expression)e); }
 
         public static string ToCode(Expression e) {
-            StringBuilder sb = new StringBuilder();
-            bool ignoreInitialSpace = true;
+            var sb = new StringBuilder();
+            var ignoreInitialSpace = true;
             new ExpressionToCodeImpl(
                 (etp, depth) => {
                     sb.Append(ignoreInitialSpace ? etp.Text.TrimStart() : etp.Text);
@@ -91,7 +92,7 @@ namespace ExpressionToCodeLib {
 
         static SplitExpressionLine ExpressionToStringWithValues(Expression e, bool ignoreOutermostValue) {
             var nodeInfos = new List<SubExpressionInfo>();
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             bool ignoreInitialSpace = true;
             new ExpressionToCodeImpl(
                 (etp, depth) => {
