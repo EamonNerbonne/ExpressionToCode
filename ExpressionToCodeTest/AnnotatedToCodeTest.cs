@@ -13,10 +13,15 @@ namespace ExpressionToCodeTest
             var b = a + 1;
             
             var code = ExpressionToCodeLib.ExpressionToCode.AnnotatedToCode(()=> a + b);
-            
+
+            StringAssert.Contains("a", code);
+            StringAssert.Contains("+", code);
+            StringAssert.Contains("b", code);
             StringAssert.Contains("1",code);
             StringAssert.Contains("2",code);
             StringAssert.Contains("3",code);
         }
     }
+
+
 }
