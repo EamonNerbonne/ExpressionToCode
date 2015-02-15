@@ -1,4 +1,5 @@
-﻿// ReSharper disable RedundantEnumerableCastCall
+﻿using ExpressionToCodeTest.Unstable_v2_Api;
+// ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantLogicalConditionalExpressionOperand
@@ -27,7 +28,7 @@ namespace ExpressionToCodeTest
         public void ToValuedCode_ofNull_fails()
         {
             ExpressionToCodeTest obj = null;
-            var actual = ExpressionToCode.ToValuedCode(() => obj.TheProperty);
+            var actual = ExpressionWithValue.ToValuedCode(() => obj.TheProperty);
         }
 
 
@@ -35,14 +36,14 @@ namespace ExpressionToCodeTest
         public void ArrayLength()
         {
             var arr = new int[] { 1 };
-            var actual = ExpressionToCode.ToValuedCode(() => arr.Length);
+            var actual = ExpressionWithValue.ToValuedCode(() => arr.Length);
             Assert.AreEqual("arr.Length = 1",actual);
         }
 
         [Test]
         public void ThePropertyAccess()
         {
-            var actual = ExpressionToCode.ToValuedCode(() => TheProperty);
+            var actual = ExpressionWithValue.ToValuedCode(() => TheProperty);
             Assert.AreEqual("TheProperty = TheValue", actual);
         }
 
@@ -52,7 +53,7 @@ namespace ExpressionToCodeTest
         public void TheStringVariable()
         {
             var theVariable = "theValue";
-            var actual = ExpressionToCode.ToValuedCode(() => theVariable);
+            var actual = ExpressionWithValue.ToValuedCode(() => theVariable);
             Assert.AreEqual("theVariable = theValue", actual);
         }
 
@@ -60,7 +61,7 @@ namespace ExpressionToCodeTest
         public void TheMethod()
         {
             Expression<Func<string>> theMethod = () => TheMethod(1, "2");  //can be invoked later
-            var actual = ExpressionToCode.ToValuedCode(theMethod);
+            var actual = ExpressionWithValue.ToValuedCode(theMethod);
             Assert.AreEqual("TheMethod(1, \"2\") = TheMethod 1 2", actual);
         }
 
@@ -68,14 +69,14 @@ namespace ExpressionToCodeTest
         public void TheGenericMethod()
         {
             Expression<Func<string>> theGenericMethod = () => TheGenericMethod<int>(2);
-            var actual = ExpressionToCode.ToValuedCode(theGenericMethod);
+            var actual = ExpressionWithValue.ToValuedCode(theGenericMethod);
             Assert.AreEqual("TheGenericMethod<Int32>(2) = Return value is 4", actual);
         }
 
         [Test]
         public void ThisIndexedProperty()
         {
-            var actual = ExpressionToCode.ToValuedCode(() => this[1]);
+            var actual = ExpressionWithValue.ToValuedCode(() => this[1]);
             Assert.AreEqual("ToValuedCodeTest[1] = TheIndexedValue", actual);
         }
 
@@ -83,7 +84,7 @@ namespace ExpressionToCodeTest
         [Test]
         public void ThisMethodCall()
         {
-            var code = ExpressionToCodeLib.ExpressionToCode.ToValuedCode(() => ReturnZero());
+            var code = ExpressionWithValue.ToValuedCode(() => ReturnZero());
 
             Assert.AreEqual("ReturnZero() = 0", code);
         }
@@ -91,7 +92,7 @@ namespace ExpressionToCodeTest
         [Test]
         public void ThisStaticMethodCall()
         {
-            var code = ExpressionToCodeLib.ExpressionToCode.ToValuedCode(() => StaticReturnZero());
+            var code = ExpressionWithValue.ToValuedCode(() => StaticReturnZero());
 
             Assert.AreEqual("ToValuedCodeTest.StaticReturnZero() = 0", code);
         }
@@ -132,7 +133,4 @@ namespace ExpressionToCodeTest
             return 0;
         }
     }
-
-  
-
 }
