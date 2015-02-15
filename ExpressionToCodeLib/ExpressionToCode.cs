@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 
 // ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace ExpressionToCodeLib {
     public static class ExpressionToCode {
         public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToCode((Expression)e); }
