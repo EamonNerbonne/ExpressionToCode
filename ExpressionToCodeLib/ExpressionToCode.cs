@@ -7,7 +7,6 @@ using System.Text;
 
 namespace ExpressionToCodeLib {
     public static class ExpressionToCode {
-
         public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToCode((Expression)e); }
         public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToCode((Expression)e); }
         public static string ToCode<T, T1>(Expression<Func<T, T1>> e) { return ToCode((Expression)e); }
@@ -30,7 +29,6 @@ namespace ExpressionToCodeLib {
 
         public static string AnnotatedToCode(Expression expr) { return AnnotatedToCode(expr, null, false); }
 
-
         ///<summary>
         /// Converts expression to variable/property/method C# like representation adding it's string value.
         ///</summary>
@@ -41,15 +39,11 @@ namespace ExpressionToCodeLib {
         /// <remarks>
         /// Unlike <see cref="ToCode"/>(which targets compilable output), this method is geared towards dumping simple objects into text, so may skip some C# issues for sake of readability.
         /// </remarks>
-        public static string ToValuedCode<TResult>(this Expression<Func<TResult>> expression)
-        {
+        public static string ToValuedCode<TResult>(this Expression<Func<TResult>> expression) {
             TResult retValue;
-            try
-            {
+            try {
                 retValue = expression.Compile().Invoke();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 throw new InvalidOperationException("Cannon get return value of expression when it throws error", ex);
             }
 
@@ -148,56 +142,53 @@ namespace ExpressionToCodeLib {
         }
 
         //NOTE: should use recursive visitor as in other method when new failed test case added
-        private static string ToFullName<T>(this Expression<T> expression)
-        {
+        static string ToFullName<T>(this Expression<T> expression) {
             string name = null;
             var unaryExpression = expression.Body as UnaryExpression;
-            if (unaryExpression != null)
-            {
+            if (unaryExpression != null) {
                 name = unaryExpression.Operand.ToString().Split('.').Last();
-                if (unaryExpression.NodeType == ExpressionType.ArrayLength)
-                {
+                if (unaryExpression.NodeType == ExpressionType.ArrayLength) {
                     name += ".Length";
                 }
             }
             var memberExpression = expression.Body as MemberExpression;
-            if (memberExpression != null)
-            {
+            if (memberExpression != null) {
                 name = memberExpression.Member.Name;
             }
             var methodCallExpression = expression.Body as MethodCallExpression;
-            if (methodCallExpression != null)
-            {
+            if (methodCallExpression != null) {
                 // tries transform method and return value in human readable C#-style representation
                 var typePrefix = string.Empty;
 
                 // add declaring type if it is not a module
-                var arguments = String.Join(", ",
+                var arguments = String.Join(
+                    ", ",
                     methodCallExpression.Arguments.Select(x => x.ToString()).ToArray() // converting to string to work for .NET 3.5 if backported
-                   );
+                    );
                 var method = methodCallExpression.Method;
                 var methodName = method.Name;
-                if (method.IsGenericMethod)
-                {
-                    methodName += "<" + String.Join(", ",
+                if (method.IsGenericMethod) {
+                    methodName += "<" + String.Join(
+                        ", ",
                         method.GetGenericArguments().Select(x => x.Name).ToArray()) // converting to string to work for .NET 3.5 if backported
                         + ">";
                 }
-                if (methodName == "get_Item" && methodCallExpression.Arguments.Count > 0)//indexed property
+                if (methodName == "get_Item" && methodCallExpression.Arguments.Count > 0) //indexed property
                 {
-                    if (methodCallExpression.Object != null)
+                    if (methodCallExpression.Object != null) {
                         typePrefix = methodCallExpression.Object.Type.Name;
+                    }
                     name = String.Format("{0}[{1}]", typePrefix, arguments);
-                }
-                else
-                {
-                    if (method.IsStatic)
+                } else {
+                    if (method.IsStatic) {
                         typePrefix = method.DeclaringType.Name;
+                    }
                     name = String.Format("{0}{1}{2}({3})", typePrefix, string.IsNullOrEmpty(typePrefix) ? "" : ".", methodName, arguments);
                 }
             }
-            if (name == null)
+            if (name == null) {
                 throw new ArgumentException("expression", "Failed to translate expression to its valued representation");
+            }
             return name;
         }
     }
