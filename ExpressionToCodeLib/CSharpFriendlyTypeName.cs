@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ExpressionToCodeLib {
-    public static class CSharpFriendlyTypeName {
+    static class CSharpFriendlyTypeName {
         public static string Get(Type type, bool useFullName = false) {
             return GenericTypeName(type, useFullName)
                 ?? ArrayTypeName(type, useFullName) 
@@ -55,14 +54,14 @@ namespace ExpressionToCodeLib {
                 : useFullName ? type.FullName : type.Name;
         }
 
-        static string GenericTypeName(Type type, bool useFullType = false) {
+        static string GenericTypeName(Type type, bool useFullName = false) {
             if (!type.IsGenericType) {
                 return null;
             }
 
             Type typedef = type.GetGenericTypeDefinition();
             if (typedef == typeof(Nullable<>)) {
-                return Get(type.GetGenericArguments().Single(), useFullType) + "?";
+                return Get(type.GetGenericArguments().Single(), useFullName) + "?";
             }
 
             var typeArgs = type.GetGenericArguments();
@@ -70,7 +69,7 @@ namespace ExpressionToCodeLib {
             var revNestedTypeNames = new List<string>();
 
             while (type != null) {
-                var name = useFullType ? type.FullName ?? type.Name : type.Name;
+                var name = useFullName ? type.FullName ?? type.Name : type.Name;
                 var backtickIdx = name.IndexOf('`');
                 if (backtickIdx == -1) {
                     revNestedTypeNames.Add(name);
@@ -80,7 +79,7 @@ namespace ExpressionToCodeLib {
                     var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1, afterArgCountIdx - backtickIdx - 1));
                     var argsNames = new List<string>();
                     for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
-                        argsNames.Add(Get(typeArgs[i], useFullType));
+                        argsNames.Add(Get(typeArgs[i], useFullName));
                     }
                     typeArgIdx -= thisTypeArgCount;
                     revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + string.Join(", ", argsNames) + ">");

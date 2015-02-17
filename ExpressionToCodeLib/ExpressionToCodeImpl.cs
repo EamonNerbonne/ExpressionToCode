@@ -8,20 +8,19 @@ using System.Reflection;
 namespace ExpressionToCodeLib {
     class ExpressionToCodeImpl : IExpressionTypeDispatch {
         #region General Helpers
-        readonly Rules rules;
+        readonly IObjectToCode objectToCode;
+        readonly bool explicitMethodTypeArgs;
         readonly Action<ExprTextPart, int> sink;
-        readonly Func<Type, string> GetCSharpFriendlyTypeName;
         int Depth;
-        
+
         //TODO: refactor IExpressionTypeDispatch into an input/output model to avoid this tricky side-effect approach.
-        internal ExpressionToCodeImpl(Rules rules, Action<ExprTextPart, int> sink) {
-            rules = rules ?? Rules.Default;
-            GetCSharpFriendlyTypeName = t => CSharpFriendlyTypeName.Get(t, rules.FullTypeNames);
-            this.rules = rules;
+        internal ExpressionToCodeImpl(IObjectToCode objectToCode, bool explicitMethodTypeArgs, Action<ExprTextPart, int> sink) {
+            this.objectToCode = objectToCode;
+            this.explicitMethodTypeArgs = explicitMethodTypeArgs;
             this.sink = sink;
         }
         
-        internal ExpressionToCodeImpl(Action<ExprTextPart, int> sink) : this(Rules.Default, sink) { }
+        internal ExpressionToCodeImpl(Action<ExprTextPart, int> sink) : this(ObjectToCode.Default, false, sink) { }
 
         void Sink(string text) { sink(ExprTextPart.TextOnly(text), Depth); }
         void Sink(string text, Expression value) { sink(ExprTextPart.TextAndExpr(text, value), Depth); }
@@ -148,9 +147,9 @@ namespace ExpressionToCodeLib {
             var ue = (UnaryExpression)e;
             if (e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
             {
-                Sink("(" + GetCSharpFriendlyTypeName(e.Type) + ")");
+                Sink("(" + objectToCode.TypeNameToCode(e.Type) + ")");
             } else {
-                Sink("(" + GetCSharpFriendlyTypeName(e.Type) + ")", e);
+                Sink("(" + objectToCode.TypeNameToCode(e.Type) + ")", e);
             }
             NestExpression(ue.NodeType, ue.Operand);
         }
@@ -164,7 +163,7 @@ namespace ExpressionToCodeLib {
         void TypeOpDispatch(string op, Expression e) {
             NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression);
             Sink(" " + op + " ", e);
-            Sink(GetCSharpFriendlyTypeName(((TypeBinaryExpression)e).TypeOperand));
+            Sink(objectToCode.TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
         }
         #endregion
 
@@ -200,7 +199,7 @@ namespace ExpressionToCodeLib {
                 NestExpression(e.NodeType, memberOfExpr);
                 Sink(".");
             } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
-                Sink(GetCSharpFriendlyTypeName(me.Member.ReflectedType) + ".");
+                Sink(objectToCode.TypeNameToCode(me.Member.ReflectedType) + ".");
             }
 
             Sink(me.Member.Name, e);
@@ -258,11 +257,11 @@ namespace ExpressionToCodeLib {
                     Sink(".");
                 }
             } else if (method.IsStatic) {
-                Sink(GetCSharpFriendlyTypeName(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
+                Sink(objectToCode.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
             }
             var methodName = method.Name;
-            if (rules.ExplicitMethodTypeArgs && method.IsGenericMethod) {
-                var methodTypeArgs = method.GetGenericArguments().Select(GetCSharpFriendlyTypeName).ToArray();
+            if (explicitMethodTypeArgs && method.IsGenericMethod) {
+                var methodTypeArgs = method.GetGenericArguments().Select(type => objectToCode.TypeNameToCode(type)).ToArray();
                 methodName += string.Concat("<", string.Join(", ", methodTypeArgs), ">");
             }
             Sink(methodName, mce);
@@ -282,7 +281,7 @@ namespace ExpressionToCodeLib {
         public void DispatchInvoke(Expression e) {
             var ie = (InvocationExpression)e;
             if (ie.Expression.NodeType == ExpressionType.Lambda) {
-                Sink("new " + GetCSharpFriendlyTypeName(ie.Expression.Type));
+                Sink("new " + objectToCode.TypeNameToCode(ie.Expression.Type));
             }
             NestExpression(ie.NodeType, ie.Expression);
             var invokeMethod = ie.Expression.Type.GetMethod("Invoke");
@@ -292,7 +291,7 @@ namespace ExpressionToCodeLib {
 
         public void DispatchConstant(Expression e) {
             var const_Val = ((ConstantExpression)e).Value;
-            string codeRepresentation = ObjectToCode.PlainObjectToCode(const_Val, e.Type, rules.FullTypeNames);
+            string codeRepresentation = objectToCode.PlainObjectToCode(const_Val, e.Type);
             //e.Type.IsVisible
             if (codeRepresentation == null) {
                 var typeclass = e.Type.GuessTypeClass();
@@ -322,7 +321,7 @@ namespace ExpressionToCodeLib {
         public void DispatchListInit(Expression e) {
             var lie = (ListInitExpression)e;
             Sink("new ", lie);
-            Sink(GetCSharpFriendlyTypeName(lie.NewExpression.Constructor.ReflectedType));
+            Sink(objectToCode.TypeNameToCode(lie.NewExpression.Constructor.ReflectedType));
             if (lie.NewExpression.Arguments.Any()) {
                 ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments));
             }
@@ -362,7 +361,7 @@ namespace ExpressionToCodeLib {
         public void DispatchMemberInit(Expression e) {
             var mie = (MemberInitExpression)e;
             Sink("new ", mie);
-            Sink(GetCSharpFriendlyTypeName(mie.NewExpression.Constructor.ReflectedType));
+            Sink(objectToCode.TypeNameToCode(mie.NewExpression.Constructor.ReflectedType));
             if (mie.NewExpression.Arguments.Any()) {
                 ArgListDispatch(GetArgumentsForMethod(mie.NewExpression.Constructor, mie.NewExpression.Arguments));
             }
@@ -397,7 +396,7 @@ namespace ExpressionToCodeLib {
                 }
                 Sink(" }");
             } else {
-                Sink("new " + GetCSharpFriendlyTypeName(ne.Type), ne);
+                Sink("new " + objectToCode.TypeNameToCode(ne.Type), ne);
                 ArgListDispatch(GetArgumentsForMethod(ne.Constructor, ne.Arguments));
             }
             //TODO: deal with anonymous types.
@@ -409,14 +408,14 @@ namespace ExpressionToCodeLib {
             bool isDelegate = typeof(Delegate).IsAssignableFrom(arrayElemType);
             bool implicitTypeOK = !isDelegate && nae.Expressions.Any()
                 && nae.Expressions.All(expr => expr.Type == arrayElemType);
-            Sink("new" + (implicitTypeOK ? "" : " " + GetCSharpFriendlyTypeName(arrayElemType)) + "[] ", nae);
+            Sink("new" + (implicitTypeOK ? "" : " " + objectToCode.TypeNameToCode(arrayElemType)) + "[] ", nae);
             ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "{ ", " }");
         }
 
         public void DispatchNewArrayBounds(Expression e) {
             var nae = (NewArrayExpression)e;
             Type arrayElemType = nae.Type.GetElementType();
-            Sink("new " + GetCSharpFriendlyTypeName(arrayElemType), nae);
+            Sink("new " + objectToCode.TypeNameToCode(arrayElemType), nae);
             ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]");
         }
         #endregion
@@ -478,7 +477,7 @@ namespace ExpressionToCodeLib {
         public void DispatchRightShift(Expression e) { BinaryDispatch(">>", e); }
         public void DispatchSubtract(Expression e) { BinaryDispatch("-", e); }
         public void DispatchSubtractChecked(Expression e) { BinaryDispatch("-", e); }
-        public void DispatchTypeAs(Expression e) { UnaryPostfixDispatch(" as " + GetCSharpFriendlyTypeName(e.Type), e); }
+        public void DispatchTypeAs(Expression e) { UnaryPostfixDispatch(" as " + objectToCode.TypeNameToCode(e.Type), e); }
         public void DispatchTypeIs(Expression e) { TypeOpDispatch("is", e); }
         public void DispatchAssign(Expression e) { BinaryDispatch("=", e); }
         public void DispatchDecrement(Expression e) { UnaryPostfixDispatch(" - 1", e); }
@@ -512,7 +511,7 @@ namespace ExpressionToCodeLib {
         public void DispatchDefault(Expression e) {
             var defExpr = (DefaultExpression)e;
 
-            Sink("default(" + GetCSharpFriendlyTypeName(defExpr.Type) + ")");
+            Sink("default(" + objectToCode.TypeNameToCode(defExpr.Type) + ")");
         }
 
         public void DispatchExtension(Expression e) { throw new NotImplementedException(); }

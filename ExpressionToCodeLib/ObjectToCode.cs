@@ -8,6 +8,17 @@ using System.Reflection;
 using System.Text;
 
 namespace ExpressionToCodeLib {
+    public interface IObjectToCode {
+        string PlainObjectToCode(object val, Type type);
+        string TypeNameToCode(Type type);
+    }
+
+    public static class ObjectToCodeExt {
+        public static string PlainObjectToCode(this IObjectToCode it, object val) {
+            return it.PlainObjectToCode(val, val == null ? null : val.GetType());
+        }
+    }
+
     public static class ObjectToCode {
         public static string ComplexObjectToPseudoCode(object val, int indent = 0) {
             string retval = PlainObjectToCode(val);
@@ -37,61 +48,80 @@ namespace ExpressionToCodeLib {
             }
         }
 
-        public static string PlainObjectToCode(object val) { return PlainObjectToCode(val, val == null ? null : val.GetType()); }
+        public static readonly IObjectToCode Default = new DefaultImpl();
+        public static readonly IObjectToCode WithFullTypeNames = new DefaultImpl(fullTypeNames: true);
 
-        public static string PlainObjectToCode(object val, Type type, bool fullTypeNames = false) {
-            Func<Type, string> getName = t => CSharpFriendlyTypeName.Get(t, fullTypeNames);
-            if (val == null) {
-                return type == null || type == typeof(object) ? "null" : "default(" + getName(type) + ")";
-            } else if (val is string) {
-                bool useLiteralSyntax = ((string)val).Any(c => c < 32 || c == '\\')
-                    && ((string)val).All(c => c != '\n' && c != '\r' && c != '\t');
-                if (useLiteralSyntax) {
-                    return "@\"" + ((string)val).Replace("\"", "\"\"") + "\"";
-                } else {
-                    return "\"" + EscapeStringChars((string)val) + "\"";
-                }
-            } else if (val is char) {
-                return "'" + EscapeStringChars(val.ToString()) + "'";
-            } else if (val is decimal) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "m";
-            } else if (val is float) {
-                return FloatToCode((float)val);
-            } else if (val is double) {
-                return DoubleToCode((double)val);
-            } else if (val is byte || val is sbyte || val is short || val is ushort || val is int || val is uint || val is long
-                || val is ulong) {
-                return (Convert.ToString(val, CultureInfo.InvariantCulture)); //TODO: get numeric suffixes right - is this OK?
-            } else if (val is bool && val.Equals(true)) {
-                return "true";
-            } else if (val is bool && val.Equals(false)) {
-                return "false";
-            } else if (val is Enum) {
-                if (Enum.IsDefined(val.GetType(), val)) {
-                    return getName(val.GetType()) + "." + val;
-                } else {
-                    long longVal = ((IConvertible)val).ToInt64(null);
-                    var toString = ((IConvertible)val).ToString(CultureInfo.InvariantCulture);
-                    if (toString == longVal.ToString(CultureInfo.InvariantCulture)) {
-                        return "((" + getName(val.GetType()) + ")" + longVal + ")";
-                    } else {
-                        var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
-                        return components.Length == 0
-                            ? "default(" + getName(val.GetType()) + ")"
-                            : components.Length == 1
-                                ? getName(val.GetType()) + "." + components[0]
-                                : "(" + string.Join(" | ", components.Select(s => getName(val.GetType()) + "." + s)) + ")";
-                    }
-                }
-            } else if (val.GetType().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
-                return "default(" + getName(val.GetType()) + ")";
-            } else if (val is Type) {
-                return "typeof(" + getName((Type)val) + ")";
-            } else if (val is MethodInfo) {
-                return getName(((MethodInfo)val).DeclaringType) + "." + ((MethodInfo)val).Name;
-            } else {
-                return null;
+        class DefaultImpl : IObjectToCode
+        {
+            readonly bool fullTypeNames;
+            public DefaultImpl(bool fullTypeNames = false) {
+                this.fullTypeNames = fullTypeNames;
             }
+
+            public string TypeNameToCode(Type type) { return CSharpFriendlyTypeName.Get(type, fullTypeNames); }
+
+            string IObjectToCode.PlainObjectToCode(object val, Type type) {
+                if (val == null) {
+                    return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
+                } else if (val is string) {
+                    bool useLiteralSyntax = ((string)val).Any(c => c < 32 || c == '\\')
+                        && ((string)val).All(c => c != '\n' && c != '\r' && c != '\t');
+                    if (useLiteralSyntax) {
+                        return "@\"" + ((string)val).Replace("\"", "\"\"") + "\"";
+                    } else {
+                        return "\"" + EscapeStringChars((string)val) + "\"";
+                    }
+                } else if (val is char) {
+                    return "'" + EscapeStringChars(val.ToString()) + "'";
+                } else if (val is decimal) {
+                    return Convert.ToString(val, CultureInfo.InvariantCulture) + "m";
+                } else if (val is float) {
+                    return FloatToCode((float)val);
+                } else if (val is double) {
+                    return DoubleToCode((double)val);
+                } else if (val is byte || val is sbyte || val is short || val is ushort || val is int || val is uint || val is long
+                    || val is ulong) {
+                    return (Convert.ToString(val, CultureInfo.InvariantCulture)); //TODO: get numeric suffixes right - is this OK?
+                } else if (val is bool && val.Equals(true)) {
+                    return "true";
+                } else if (val is bool && val.Equals(false)) {
+                    return "false";
+                } else if (val is Enum) {
+                    if (Enum.IsDefined(val.GetType(), val)) {
+                        return TypeNameToCode(val.GetType()) + "." + val;
+                    } else {
+                        long longVal = ((IConvertible)val).ToInt64(null);
+                        var toString = ((IConvertible)val).ToString(CultureInfo.InvariantCulture);
+                        if (toString == longVal.ToString(CultureInfo.InvariantCulture)) {
+                            return "((" + TypeNameToCode(val.GetType()) + ")" + longVal + ")";
+                        } else {
+                            var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                            return components.Length == 0
+                                ? "default(" + TypeNameToCode(val.GetType()) + ")"
+                                : components.Length == 1
+                                    ? TypeNameToCode(val.GetType()) + "." + components[0]
+                                    : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
+                        }
+                    }
+                } else if (val.GetType().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
+                    return "default(" + TypeNameToCode(val.GetType()) + ")";
+                } else if (val is Type) {
+                    return "typeof(" + TypeNameToCode((Type)val) + ")";
+                } else if (val is MethodInfo) {
+                    return TypeNameToCode(((MethodInfo)val).DeclaringType) + "." + ((MethodInfo)val).Name;
+                } else {
+                    return null;
+                }
+
+            }
+        }
+
+        public static string PlainObjectToCode(object val) {
+            return PlainObjectToCode(val, val == null ? null : val.GetType());
+        }
+
+        public static string PlainObjectToCode(object val, Type type) {
+            return Default.PlainObjectToCode(val, type);
         }
 
         static string EscapeCharForString(char c) {

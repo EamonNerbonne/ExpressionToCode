@@ -5,6 +5,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
+
 namespace ExpressionToCodeLib {
    
     public interface IExpressionToCode {
@@ -18,22 +21,6 @@ namespace ExpressionToCodeLib {
         public static string ToCode<T>(this IExpressionToCode it, Expression<Func<T>> e) { return it.ToCode(e); }
     }
 
-    public sealed class Rules {
-        public static readonly Rules Default = new Rules();
-
-        public bool ExplicitMethodTypeArgs { get; private set; }
-        public Rules WithExplicitMethodTypeArgs() { return new Rules(this) { ExplicitMethodTypeArgs = true }; }
-
-        public bool FullTypeNames { get; private set; }
-        public Rules WithFullTypeNames() { return new Rules(this) { FullTypeNames = true }; }
-
-        Rules() { }
-        Rules(Rules original) {
-            ExplicitMethodTypeArgs = original.ExplicitMethodTypeArgs;
-            FullTypeNames = original.FullTypeNames;
-        }
-    }
-
     public sealed class ExpressionToCode : IExpressionToCode {
         public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToCode((Expression)e); }
         public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToCode((Expression)e); }
@@ -44,19 +31,23 @@ namespace ExpressionToCodeLib {
         public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) { return AnnotatedToCode((Expression)e); }
         public static string AnnotatedToCode<T>(Expression<Func<T>> e) { return AnnotatedToCode((Expression)e); }
 
-        public static readonly IExpressionToCode Default = new ExpressionToCode(Rules.Default);
+        public static readonly IExpressionToCode Default = new ExpressionToCode(ObjectToCode.Default, false);
+        
+        public static IExpressionToCode With(bool fullTypeNames = false, bool explicitMethodTypeArgs = false) {
+            return new ExpressionToCode(fullTypeNames ? ObjectToCode.WithFullTypeNames : ObjectToCode.Default, explicitMethodTypeArgs);
+        }
 
-        readonly Rules rules;
-        private ExpressionToCode(Rules rules) { this.rules = rules; }
-
-        public static IExpressionToCode With(Func<Rules, Rules> configure) {
-            return new ExpressionToCode(configure(Rules.Default));
+        readonly IObjectToCode objectToCode;
+        readonly bool explicitMethodTypeArgs;
+        private ExpressionToCode(IObjectToCode objectToCode, bool explicitMethodTypeArgs) {
+            this.objectToCode = objectToCode;
+            this.explicitMethodTypeArgs = explicitMethodTypeArgs;
         }
 
         string IExpressionToCode.ToCode(Expression e) {
-            StringBuilder sb = new StringBuilder();
-            bool ignoreInitialSpace = true;
-            new ExpressionToCodeImpl(rules,
+            var sb = new StringBuilder();
+            var ignoreInitialSpace = true;
+            new ExpressionToCodeImpl(objectToCode, explicitMethodTypeArgs,
                 (etp, depth) => {
                     sb.Append(ignoreInitialSpace ? etp.Text.TrimStart() : etp.Text);
                     ignoreInitialSpace = etp.Text.Any() && ShouldIgnoreSpaceAfter(etp.Text[etp.Text.Length - 1]);
@@ -107,7 +98,7 @@ namespace ExpressionToCodeLib {
 
         static SplitExpressionLine ExpressionToStringWithValues(Expression e, bool ignoreOutermostValue) {
             var nodeInfos = new List<SubExpressionInfo>();
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             bool ignoreInitialSpace = true;
             new ExpressionToCodeImpl(
                 (etp, depth) => {

@@ -195,7 +195,7 @@ namespace ExpressionToCodeTest {
         {
             Assert.AreEqual(
                 "() => MakeMe<Cake, string>(() => new Cake())",
-                ExpressionToCode.With(rules => rules.WithExplicitMethodTypeArgs()).ToCode(() => MakeMe<Cake, string>(() => new Cake())));
+                ExpressionToCode.With(explicitMethodTypeArgs: true).ToCode(() => MakeMe<Cake, string>(() => new Cake())));
         }
 
         T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }

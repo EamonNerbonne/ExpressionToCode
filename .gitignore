@@ -1,5 +1,8 @@
+
 packages
 bin
 obj
 Debug
 Release
+
+*.suo

@@ -96,7 +96,7 @@ namespace ExpressionToCodeTest {
         {
             Assert.AreEqual(
                 @"() => new System.Func<int>[] { () => 1, () => 2 }",
-                ExpressionToCode.With(r => r.WithFullTypeNames()).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
         }
 
         [Test]
@@ -468,19 +468,17 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
-        public void LambdaInvocation_CustomDelegate()
-        {
+        public void LambdaInvocation_CustomDelegate() {
             Assert.AreEqual(
                 "() => new CustomDelegate(n => n + 1)(1)",
                 ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
         }
-
         [Test]
         public void FullTypeName_IfCorrespondingRuleSpecified()
         {
             Assert.AreEqual(
                 "() => new ExpressionToCodeTest.ClassA()",
-                ExpressionToCode.With(rules => rules.WithFullTypeNames()).ToCode(() => new ClassA()));
+                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new ClassA()));
         }
 
         [Test]
@@ -488,10 +486,61 @@ namespace ExpressionToCodeTest {
         {
             Assert.AreEqual(
                 "() => new ExpressionToCodeTest.ExpressionToCodeTest.B()",
-                ExpressionToCode.With(rules => rules.WithFullTypeNames()).ToCode(() => new B()));
+                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new B()));
         }
 
         class B { }
+        [Test]
+        public void ThisPropertyAccess() {
+            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => TheProperty);
+            Assert.AreEqual("() => TheProperty", code);
+        }
+
+        [Test]
+        public void ThisMethodCall() {
+            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => ReturnZero());
+            Assert.AreEqual("() => ReturnZero()", code);
+        }
+
+        [Test]
+        public void ThisStaticMethodCall() {
+            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => StaticReturnZero());
+
+            Assert.AreEqual("() => ExpressionToCodeTest.StaticReturnZero()", code);
+        }
+
+        [Test]
+        public void ThisIndexedProperty()
+        {
+            var actual = ExpressionToCode.ToCode(() => this[1]);
+            Assert.AreEqual("() => this[1]", actual);
+        }
+
+        public string this[int index]
+        {
+            get
+            {
+                return "TheIndexedValue";
+            }
+        }
+
+        public string TheProperty
+        {
+            get
+            {
+                return "TheValue";
+            }
+        }    
+
+        public int ReturnZero()
+        {
+            return 0;
+        }
+
+        public static int StaticReturnZero()
+        {
+            return 0;
+        }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
