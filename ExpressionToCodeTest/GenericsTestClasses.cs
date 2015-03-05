@@ -1,5 +1,6 @@
 ﻿// ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantEnumerableCastCall
+// ReSharper disable MemberCanBeMadeStatic.Local
 
 using System;
 using System.Collections.Generic;
@@ -199,6 +200,18 @@ namespace ExpressionToCodeTest {
         }
 
         T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }
+
+        [Test]
+        public void UsesBoundTypeNamesEvenInGenericMethod() {
+            AssertInGenericMethodWithIntArg<int>();
+        }
+
+        void AssertInGenericMethodWithIntArg<T>() {
+            //The expression no longer has any reference to the unbound argument T, so we can't generate the exactly correct code here.
+            Assert.AreEqual(
+                "() => new List<int>()",
+                ExpressionToCode.ToCode(() => new List<T>()));
+        }
     }
 
     internal class Cake { }
