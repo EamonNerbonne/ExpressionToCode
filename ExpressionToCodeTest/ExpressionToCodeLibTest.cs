@@ -92,6 +92,14 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
+        public void ArrayOfFuncInitializer_FullNames()
+        {
+            Assert.AreEqual(
+                @"() => new System.Func<int>[] { () => 1, () => 2 }",
+                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+        }
+
+        [Test]
         public void ListInitializer() {
             Assert.AreEqual(
                 @"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",
@@ -465,7 +473,23 @@ namespace ExpressionToCodeTest {
                 "() => new CustomDelegate(n => n + 1)(1)",
                 ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
         }
+        [Test]
+        public void FullTypeName_IfCorrespondingRuleSpecified()
+        {
+            Assert.AreEqual(
+                "() => new ExpressionToCodeTest.ClassA()",
+                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new ClassA()));
+        }
 
+        [Test]
+        public void FullTypeName_ForNestedType()
+        {
+            Assert.AreEqual(
+                "() => new ExpressionToCodeTest.ExpressionToCodeTest.B()",
+                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new B()));
+        }
+
+        class B { }
         [Test]
         public void ThisPropertyAccess() {
             var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => TheProperty);
@@ -527,8 +551,6 @@ namespace ExpressionToCodeTest {
         public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut) {
             return alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
         }
-
-        
     }
 
     class ClassA {
@@ -557,6 +579,4 @@ namespace ExpressionToCodeTest {
         int C() { return x + 5; }
         bool MyEquals(ClassA other) { return other != null && x == other.x; }
     }
-
-
 }

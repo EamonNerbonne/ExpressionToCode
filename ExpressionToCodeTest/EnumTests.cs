@@ -156,6 +156,32 @@ namespace ExpressionToCodeTest {
                 //but it does here!
                 ExpressionToCode.ToCode(() => (SomeFlagsEnum?)a == b));
         }
+        
+        [Test]
+        public void NullableEnumCornerCases_FullNames()
+        {
+            SomeEnum? a = SomeEnum.A;
+            SomeFlagsEnum? b = SomeFlagsEnum.B;
+
+            var exprToCode = ExpressionToCode.With(fullTypeNames: true);
+
+            Assert.AreEqual(
+                @"() => a == ExpressionToCodeTest.SomeEnum.B",
+                //C# compiler does not preserve this type information.
+                exprToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.A));
+            Assert.AreEqual(
+                @"() => a == ((ExpressionToCodeTest.SomeEnum)4)",
+                //C# compiler does not preserve this type information; requires cast
+                exprToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.C));
+            Assert.AreEqual(
+                @"() => a == (ExpressionToCodeTest.SomeEnum)b",
+                //but it does here!
+                exprToCode.ToCode(() => a == (SomeEnum)b));
+            Assert.AreEqual(
+                @"() => (ExpressionToCodeTest.SomeFlagsEnum?)a == b",
+                //but it does here!
+                exprToCode.ToCode(() => (SomeFlagsEnum?)a == b));
+        }
 
         [Test]
         public void FlagsEnumConstant() {

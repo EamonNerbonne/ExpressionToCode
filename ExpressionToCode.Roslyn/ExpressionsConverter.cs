@@ -22,7 +22,7 @@ namespace ExpressionToCode.Roslyn {
             //TODO: dump with all namespaces to prevent name clash
             var tree = CSharpSyntaxTree.ParseText(ExpressionToCodeLib.ExpressionToCode.ToCode(e));
 
-            //TODO: grap all references from Expression tree
+            //TODO: grab all references from Expression tree
             var ref1 = MetadataReference.CreateFromAssembly(typeof(object).Assembly);
             var ref2 = MetadataReference.CreateFromAssembly(typeof(Func<>).Assembly);
 
