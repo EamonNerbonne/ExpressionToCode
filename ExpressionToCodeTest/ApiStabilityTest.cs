@@ -12,21 +12,27 @@ namespace ExpressionToCodeTest
     public class ApiStabilityTest
     {
         [Test, MethodImpl(MethodImplOptions.NoInlining)]
-        public void ApiHasNotChanged()
+        public void PublicApi()
         {
             var publicTypes = typeof(ExpressionToCode).Assembly.GetTypes()
-                .Where(IsPublic);
+                .Where(IsPublic)
+                .Where(type=>!type.Namespace.Contains("Unstable"));
 
-            var defs = publicTypes
-                .Select(
-                    o =>
-                        PrettyPrintTypeHeader(o) + "\n"
-                            + PrettyPrintTypeContents(o)
-                )
-                ;
-            var totalStr = string.Join("", defs);
-            Approvals.Verify(totalStr);
+            Approvals.Verify(PrettyPrintTypes(publicTypes));
         }
+
+        [Test, MethodImpl(MethodImplOptions.NoInlining)]
+        public void UnstableApi() {
+            var unstableTypes = typeof(ExpressionToCode).Assembly.GetTypes()
+                .Where(IsPublic)
+                .Where(type => type.Namespace.Contains("Unstable"));
+
+            Approvals.Verify(PrettyPrintTypes(unstableTypes));
+        }
+
+
+        static string PrettyPrintTypes(IEnumerable<Type> types) { return string.Join("", types.Select(PrettyPrintTypeDescription)); }
+        static string PrettyPrintTypeDescription(Type o) { return PrettyPrintTypeHeader(o) + "\n" + PrettyPrintTypeContents(o); }
 
         static string PrettyPrintTypeContents(Type type)
         {

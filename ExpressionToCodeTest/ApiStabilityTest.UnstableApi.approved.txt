@@ -1,0 +1,3 @@
+﻿class ExpressionWithValue
+    string TYPE.ToValuedCode<TResult>(Expression<Func<TResult>> expression)
+
