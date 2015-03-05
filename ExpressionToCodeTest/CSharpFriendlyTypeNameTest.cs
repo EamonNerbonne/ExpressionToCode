@@ -55,19 +55,19 @@ namespace ExpressionToCodeTest
             Assert.AreEqual("string[,,]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(string[,,])));
         }
 
-        [Test]
+        [Test]//Has always been broken
         public void MultiDimOfSingleDimArray()
         {
             Assert.AreEqual("object[,][]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(object[,][])));
         }
 
-        [Test]
+        [Test]//Has always been broken
         public void SingleDimOfMultiDimArray()
         {
             Assert.AreEqual("object[][,]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(object[][,])));
         }
 
-        [Test]
+        [Test]//Has always been broken
         public void ConstructedSingleDimOfMultiDimArray()
         {
             // ReSharper disable once SuggestUseVarKeywordEvident
@@ -80,7 +80,7 @@ namespace ExpressionToCodeTest
         [Test]
         public void ArrayGenericsMessyMix()
         {
-            Assert.AreEqual("List<Tuple<int[], string[,]>[][,,]>[]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<Tuple<int[], string[,]>[][,,]>[])));
+            Assert.AreEqual("List<Tuple<int[], string[,]>[][]>[]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<Tuple<int[], string[,]>[][]>[])));
         }
 
         [Test]
@@ -107,13 +107,13 @@ namespace ExpressionToCodeTest
             Assert.AreEqual("List<T>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<>)));
         }
 
-        [Test] //TODO: this never worked.
+        [Test] //TODO: this never worked, but it shouldn't crash
         public void UnboundGenericListInTypeof()
         {
             Assert.AreEqual("() => typeof(List<>)", ExpressionToCode.ToCode(() => typeof(List<>)));
         }
 
-        [Test] //TODO: this never worked.
+        [Test] //TODO: this never worked, but it shouldn't crash
         public void UnboundNestedInTypeof()
         {
             Assert.AreEqual("() => typeof(Outer<,>.Nested<>)", ExpressionToCode.ToCode(() => typeof(Outer<,>.Nested<>)));
