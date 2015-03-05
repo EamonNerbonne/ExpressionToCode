@@ -408,6 +408,7 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => MethodWithRefParam(ref x)));
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         T MethodWithRefParam<T>(ref T input) { return input; }
 
         [Test]
@@ -419,6 +420,7 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => MethodWithOutParam(ref x, out y)));
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         T MethodWithOutParam<T>(ref T input, out T output) { return output = input; }
 
         [Test]
