@@ -1,8 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-# SharpDevelop 5.1
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCodeLib", "ExpressionToCodeLib\ExpressionToCodeLib.csproj", "{2472FFFC-E2F9-4043-8CA6-EB65D4059A0F}"
 EndProject
@@ -19,8 +18,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3FA226A6-D138-487E-96FB-41FFACBD74B8}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCode.Roslyn", "ExpressionToCode.Roslyn\ExpressionToCode.Roslyn.csproj", "{50D9B94F-D634-4696-B169-21EC5E9476D4}"
