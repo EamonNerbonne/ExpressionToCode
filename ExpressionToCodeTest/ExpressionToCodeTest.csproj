@@ -63,6 +63,7 @@
     <Compile Include="ExceptionsSerialization.cs" />
     <Compile Include="ExpressionToCodeLibTest.cs" />
     <Compile Include="GenericsTestClasses.cs" />
+    <Compile Include="CSharpFriendlyTypeNameTest.cs" />
     <Compile Include="ImplicitCastingTest.cs" />
     <Compile Include="MultipleIndexerTest.cs" />
     <Compile Include="NestedClassTest.cs" />
