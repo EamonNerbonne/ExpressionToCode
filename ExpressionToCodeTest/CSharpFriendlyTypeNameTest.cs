@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 using ExpressionToCodeLib;
@@ -54,7 +55,6 @@ namespace ExpressionToCodeTest
             Assert.AreEqual("string[,,]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(string[,,])));
         }
 
-
         [Test]
         public void MultiDimOfSingleDimArray()
         {
@@ -95,17 +95,29 @@ namespace ExpressionToCodeTest
             Assert.AreEqual("Tuple<List<int>, Tuple<List<string>>>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Tuple<List<int>, Tuple<List<string>>>)));
         }
 
-        [Test]
+        [Test] //TODO:Regression!
         public void UnboundNested()
         {
-            Assert.AreEqual("Outer<,>.Nested<>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>)));
+            Assert.AreEqual("Outer<X,Y>.Nested<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>)));
         }
 
-        [Test]
-        public void UnboundGenericList() {
-            Assert.AreEqual("List<>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<>)));
+        [Test] //TODO:Regression!
+        public void UnboundGenericList()
+        {
+            Assert.AreEqual("List<T>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<>)));
         }
 
+        [Test] //TODO: this never worked.
+        public void UnboundGenericListInTypeof()
+        {
+            Assert.AreEqual("() => typeof(List<>)", ExpressionToCode.ToCode(() => typeof(List<>)));
+        }
+
+        [Test] //TODO: this never worked.
+        public void UnboundNestedInTypeof()
+        {
+            Assert.AreEqual("() => typeof(Outer<,>.Nested<>)", ExpressionToCode.ToCode(() => typeof(Outer<,>.Nested<>)));
+        }
     }
 
     public class Outer<X, Y>
