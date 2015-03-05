@@ -48,8 +48,6 @@ namespace ExpressionToCodeLib {
             }
         }
 
-        public static string GetCSharpFriendlyTypeName(Type type) { return CSharpFriendlyTypeName.Get(type); }
-
         public static readonly IObjectToCode Default = new DefaultImpl();
         public static readonly IObjectToCode WithFullTypeNames = new DefaultImpl(fullTypeNames: true);
 
@@ -197,5 +195,7 @@ namespace ExpressionToCodeLib {
                 }
             }
         }
+
+        public static string GetCSharpFriendlyTypeName(Type type) { return CSharpFriendlyTypeName.Get(type); }
     }
 }
