@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ExpressionToCodeLib {
     static class CSharpFriendlyTypeName {
@@ -38,6 +37,8 @@ namespace ExpressionToCodeLib {
                 return "ushort";
             } else if (type == typeof(string)) {
                 return "string";
+            } else if (type == typeof(void)) {
+                return "void";
             } else {
                 return null;
             }

@@ -1,0 +1,136 @@
+﻿enum EqualityExpressionClass
+    int value__
+    const EqualityExpressionClass None = 0
+    const EqualityExpressionClass EqualsOp = 1
+    const EqualityExpressionClass NotEqualsOp = 2
+    const EqualityExpressionClass ObjectEquals = 3
+    const EqualityExpressionClass ObjectEqualsStatic = 4
+    const EqualityExpressionClass ObjectReferenceEquals = 5
+    const EqualityExpressionClass EquatableEquals = 6
+    const EqualityExpressionClass SequenceEqual = 7
+    const EqualityExpressionClass StructuralEquals = 8
+
+class EqualityExpressions
+    EqualityExpressionClass TYPE.CheckForEquality(Expression<Func<bool>> e)
+    Tuple<EqualityExpressionClass, Expression, Expression> TYPE.ExtractEqualityType(Expression<Func<bool>> e)
+    Tuple<EqualityExpressionClass, Expression, Expression> TYPE.ExtractEqualityType(Expression e)
+    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression<Func<bool>> e)
+    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression left, Expression right, bool shouldBeEqual)
+
+class ExpressionToCode
+    string TYPE.ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
+    string TYPE.ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
+    string TYPE.ToCode<T, T1>(Expression<Func<T, T1>> e)
+    string TYPE.ToCode<T>(Expression<Func<T>> e)
+    string TYPE.AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
+    string TYPE.AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
+    string TYPE.AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e)
+    string TYPE.AnnotatedToCode<T>(Expression<Func<T>> e)
+    string TYPE.ToCode(Expression e)
+    string TYPE.AnnotatedToCode(Expression expr)
+
+interface IExpressionTypeDispatch
+    void inst.DispatchAdd(Expression e)
+    void inst.DispatchAddChecked(Expression e)
+    void inst.DispatchAnd(Expression e)
+    void inst.DispatchAndAlso(Expression e)
+    void inst.DispatchArrayLength(Expression e)
+    void inst.DispatchArrayIndex(Expression e)
+    void inst.DispatchCall(Expression e)
+    void inst.DispatchCoalesce(Expression e)
+    void inst.DispatchConditional(Expression e)
+    void inst.DispatchConstant(Expression e)
+    void inst.DispatchConvert(Expression e)
+    void inst.DispatchConvertChecked(Expression e)
+    void inst.DispatchDivide(Expression e)
+    void inst.DispatchEqual(Expression e)
+    void inst.DispatchExclusiveOr(Expression e)
+    void inst.DispatchGreaterThan(Expression e)
+    void inst.DispatchGreaterThanOrEqual(Expression e)
+    void inst.DispatchInvoke(Expression e)
+    void inst.DispatchLambda(Expression e)
+    void inst.DispatchLeftShift(Expression e)
+    void inst.DispatchLessThan(Expression e)
+    void inst.DispatchLessThanOrEqual(Expression e)
+    void inst.DispatchListInit(Expression e)
+    void inst.DispatchMemberAccess(Expression e)
+    void inst.DispatchMemberInit(Expression e)
+    void inst.DispatchModulo(Expression e)
+    void inst.DispatchMultiply(Expression e)
+    void inst.DispatchMultiplyChecked(Expression e)
+    void inst.DispatchNegate(Expression e)
+    void inst.DispatchUnaryPlus(Expression e)
+    void inst.DispatchNegateChecked(Expression e)
+    void inst.DispatchNew(Expression e)
+    void inst.DispatchNewArrayInit(Expression e)
+    void inst.DispatchNewArrayBounds(Expression e)
+    void inst.DispatchNot(Expression e)
+    void inst.DispatchNotEqual(Expression e)
+    void inst.DispatchOr(Expression e)
+    void inst.DispatchOrElse(Expression e)
+    void inst.DispatchParameter(Expression e)
+    void inst.DispatchPower(Expression e)
+    void inst.DispatchQuote(Expression e)
+    void inst.DispatchRightShift(Expression e)
+    void inst.DispatchSubtract(Expression e)
+    void inst.DispatchSubtractChecked(Expression e)
+    void inst.DispatchTypeAs(Expression e)
+    void inst.DispatchTypeIs(Expression e)
+    void inst.DispatchAssign(Expression e)
+    void inst.DispatchBlock(Expression e)
+    void inst.DispatchDebugInfo(Expression e)
+    void inst.DispatchDecrement(Expression e)
+    void inst.DispatchDynamic(Expression e)
+    void inst.DispatchDefault(Expression e)
+    void inst.DispatchExtension(Expression e)
+    void inst.DispatchGoto(Expression e)
+    void inst.DispatchIncrement(Expression e)
+    void inst.DispatchIndex(Expression e)
+    void inst.DispatchLabel(Expression e)
+    void inst.DispatchRuntimeVariables(Expression e)
+    void inst.DispatchLoop(Expression e)
+    void inst.DispatchSwitch(Expression e)
+    void inst.DispatchThrow(Expression e)
+    void inst.DispatchTry(Expression e)
+    void inst.DispatchUnbox(Expression e)
+    void inst.DispatchAddAssign(Expression e)
+    void inst.DispatchAndAssign(Expression e)
+    void inst.DispatchDivideAssign(Expression e)
+    void inst.DispatchExclusiveOrAssign(Expression e)
+    void inst.DispatchLeftShiftAssign(Expression e)
+    void inst.DispatchModuloAssign(Expression e)
+    void inst.DispatchMultiplyAssign(Expression e)
+    void inst.DispatchOrAssign(Expression e)
+    void inst.DispatchPowerAssign(Expression e)
+    void inst.DispatchRightShiftAssign(Expression e)
+    void inst.DispatchSubtractAssign(Expression e)
+    void inst.DispatchAddAssignChecked(Expression e)
+    void inst.DispatchMultiplyAssignChecked(Expression e)
+    void inst.DispatchSubtractAssignChecked(Expression e)
+    void inst.DispatchPreIncrementAssign(Expression e)
+    void inst.DispatchPreDecrementAssign(Expression e)
+    void inst.DispatchPostIncrementAssign(Expression e)
+    void inst.DispatchPostDecrementAssign(Expression e)
+    void inst.DispatchTypeEqual(Expression e)
+    void inst.DispatchOnesComplement(Expression e)
+    void inst.DispatchIsTrue(Expression e)
+    void inst.DispatchIsFalse(Expression e)
+
+class ExpressionTypeDispatcher
+    void TYPE.ExpressionDispatch(IExpressionTypeDispatch dispatcher, Expression e)
+
+class ObjectToCode
+    string TYPE.ComplexObjectToPseudoCode(object val, int indent)
+    string TYPE.PlainObjectToCode(object val)
+    string TYPE.PlainObjectToCode(object val, Type type)
+    string TYPE.GetCSharpFriendlyTypeName(Type type)
+
+class PAssert
+    void TYPE.IsTrue(Expression<Func<bool>> assertion)
+    void TYPE.That(Expression<Func<bool>> assertion, string msg)
+
+class PAssertFailedException : Exception
+
+class UnitTestingInternalsAccess
+    Exception TYPE.CreateException(string msg)
+
