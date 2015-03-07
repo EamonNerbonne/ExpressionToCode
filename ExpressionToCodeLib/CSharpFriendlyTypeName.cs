@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ExpressionToCodeLib {
-    static class CSharpFriendlyTypeName {
-        public static string Get(Type type, bool useFullName = false) {
-            return GenericTypeName(type, useFullName)
-                ?? ArrayTypeName(type, useFullName) 
-                ?? AliasName(type) 
-                ?? NormalName(type, useFullName);
+namespace ExpressionToCodeLib
+{
+    static class CSharpFriendlyTypeName
+    {
+        public static string Get(Type type, bool useFullName = false)
+        {
+            return ArrayTypeName(type, useFullName)
+                ?? GenericTypeName(type, useFullName)
+                    ?? AliasName(type)
+                        ?? NormalName(type, useFullName);
         }
 
-        static string AliasName(Type type) {
+        static string AliasName(Type type)
+        {
             if (type == typeof(bool)) {
                 return "bool";
             } else if (type == typeof(byte)) {
@@ -51,12 +55,15 @@ namespace ExpressionToCodeLib {
 
         static string NormalName(Type type, bool useFullName = false)
         {
-            return type.DeclaringType != null ? Get(type.DeclaringType, useFullName) + "." + type.Name
-                : type.IsGenericParameter ? type.Name
-                : useFullName ? type.FullName : type.Name;
+            return type.DeclaringType != null
+                ? Get(type.DeclaringType, useFullName) + "." + type.Name
+                : type.IsGenericParameter
+                    ? type.Name
+                    : useFullName ? type.FullName : type.Name;
         }
 
-        static string GenericTypeName(Type type, bool useFullName = false) {
+        static string GenericTypeName(Type type, bool useFullName = false)
+        {
             if (!type.IsGenericType) {
                 return null;
             }
@@ -77,7 +84,9 @@ namespace ExpressionToCodeLib {
                     revNestedTypeNames.Add(name);
                 } else {
                     var afterArgCountIdx = name.IndexOf('[', backtickIdx + 1);
-                    if (afterArgCountIdx == -1) afterArgCountIdx = name.Length;
+                    if (afterArgCountIdx == -1) {
+                        afterArgCountIdx = name.Length;
+                    }
                     var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1, afterArgCountIdx - backtickIdx - 1));
                     var argsNames = new List<string>();
                     for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
@@ -92,7 +101,8 @@ namespace ExpressionToCodeLib {
             return string.Join(".", revNestedTypeNames);
         }
 
-        static string ArrayTypeName(Type type, bool useFullName = false) {
+        static string ArrayTypeName(Type type, bool useFullName = false)
+        {
             if (!type.IsArray) {
                 return null;
             }
