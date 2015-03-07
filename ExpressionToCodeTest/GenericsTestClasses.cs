@@ -85,7 +85,7 @@ namespace ExpressionToCodeTest {
                 );
         }
 
-        [Test, Ignore("issue 13")]
+        [Test]
         public void GenericMethodInGenericClass() {
             var x = new GenericClass<string>("42");
             var y = new GenericClass<object>("42");
@@ -146,7 +146,7 @@ namespace ExpressionToCodeTest {
                 );
         }
 
-        [Test, Ignore("issue 14")]
+        [Test]
         public void CanInferTwoArg() {
             Assert.AreEqual(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, 3)",
@@ -154,14 +154,14 @@ namespace ExpressionToCodeTest {
                 );
 
             Assert.AreEqual(
-                @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
+                @"() => StaticTestClass.TwoArgsTwoGeneric((object)3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
                 );
 
             int x = 37;
             double y = 42.0;
             Assert.AreEqual(
-                @"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
+                @"() => StaticTestClass.TwoArgsTwoGeneric((double)x, y)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
                 );
         }

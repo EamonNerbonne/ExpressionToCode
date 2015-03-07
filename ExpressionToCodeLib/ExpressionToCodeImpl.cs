@@ -261,12 +261,51 @@ namespace ExpressionToCodeLib {
                 Sink(objectToCode.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
             }
             var methodName = method.Name;
-            if (explicitMethodTypeArgs && method.IsGenericMethod) {
-                var methodTypeArgs = method.GetGenericArguments().Select(type => objectToCode.TypeNameToCode(type)).ToArray();
-                methodName += string.Concat("<", string.Join(", ", methodTypeArgs), ">");
-            }
+
+            methodName += CreateGenericArgumentsIfNecessary(mce,method);
             Sink(methodName, mce);
         }
+
+        string CreateGenericArgumentsIfNecessary(MethodCallExpression mce, MethodInfo method) {
+            if (!method.IsGenericMethod)
+                return "";
+
+            if (!explicitMethodTypeArgs) {
+                var todo = mce.Arguments.Select(argExpr => argExpr.Type).ToList();
+                var possiblyInferrableTypes = new HashSet<Type>();
+                Type next;
+                while (PopFromList(todo, out next)) {
+                    if (!possiblyInferrableTypes.Add(next))
+                        continue;
+                    todo.AddRange(next.GetInterfaces());
+                    if (next.IsArray)
+                        todo.Add(next.GetElementType());
+                    else if (next.IsGenericType) {
+                        todo.AddRange(next.GetGenericArguments());
+                    }
+                }
+
+                if (possiblyInferrableTypes.IsSupersetOf(method.GetGenericArguments()))
+                    return "";
+            }
+
+
+            var methodTypeArgs = method.GetGenericArguments().Select(type => objectToCode.TypeNameToCode(type)).ToArray();
+            return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
+        }
+
+        static bool PopFromList<T>(List<T> list, out T val) {
+            //O(1)
+            if (list.Count == 0) {
+                val = default(T);
+                return false;
+            }
+            val = list[list.Count - 1];
+            list.RemoveAt(list.Count - 1);
+            return true;
+        }
+            
+
 
         public void DispatchIndex(Expression e) {
             var ie = (IndexExpression)e;
