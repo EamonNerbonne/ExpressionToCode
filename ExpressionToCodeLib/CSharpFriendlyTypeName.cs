@@ -96,9 +96,15 @@ namespace ExpressionToCodeLib {
             if (!type.IsArray) {
                 return null;
             }
-            string basename = Get(type.GetElementType(), useFullName);
-            string rankCommas = new string(',', type.GetArrayRank() - 1);
-            return basename + "[" + rankCommas + "]";
+            string arraySuffix = null;
+            do {
+                var rankCommas = new string(',', type.GetArrayRank() - 1);
+                type = type.GetElementType();
+                arraySuffix = arraySuffix + "[" + rankCommas + "]";
+            }
+            while (type.IsArray);
+            string basename = Get(type, useFullName);
+            return basename + arraySuffix;
         }
     }
 }
