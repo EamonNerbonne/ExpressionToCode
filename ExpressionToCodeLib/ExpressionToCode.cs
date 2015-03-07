@@ -4,23 +4,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using ExpressionToCodeLib.Unstable_v2_Api;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace ExpressionToCodeLib {
-   
-    public interface IExpressionToCode {
-        string ToCode(Expression e);
-    }
-
-    public static class ExpressionToCodeExt {
-        public static string ToCode<T, T1, T2, T3>(this IExpressionToCode it, Expression<Func<T, T1, T2, T3>> e) { return it.ToCode(e); }
-        public static string ToCode<T, T1, T2>(this IExpressionToCode it, Expression<Func<T, T1, T2>> e) { return it.ToCode(e); }
-        public static string ToCode<T, T1>(this IExpressionToCode it, Expression<Func<T, T1>> e) { return it.ToCode(e); }
-        public static string ToCode<T>(this IExpressionToCode it, Expression<Func<T>> e) { return it.ToCode(e); }
-    }
-
     public sealed class ExpressionToCode : IExpressionToCode {
         public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToCode((Expression)e); }
         public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToCode((Expression)e); }

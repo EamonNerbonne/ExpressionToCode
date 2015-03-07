@@ -53,6 +53,7 @@
       <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
     </Compile>
     <Compile Include="ExprTextPart.cs" />
+    <Compile Include="Unstable_v2_Api\IExpressionToCode.cs" />
     <Compile Include="NullabilityHelpers.cs" />
     <Compile Include="ObjectToCode.cs" />
     <Compile Include="PAssert.cs" />
