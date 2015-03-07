@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Text.RegularExpressions;
 using ExpressionToCodeLib;
 using NUnit.Framework;
@@ -98,24 +96,28 @@ namespace ExpressionToCodeTest
         [Test] //TODO:Regression!
         public void UnboundNested()
         {
+            Assert.Fail("Aborting to avoid stackoverflow");
             Assert.AreEqual("Outer<X,Y>.Nested<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>)));
         }
 
         [Test] //TODO:Regression!
         public void UnboundGenericList()
         {
+            Assert.Fail("Aborting to avoid stackoverflow");
             Assert.AreEqual("List<T>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<>)));
         }
 
         [Test] //TODO: this never worked, but it shouldn't crash
         public void UnboundGenericListInTypeof()
         {
+            Assert.Fail("Aborting to avoid stackoverflow");
             Assert.AreEqual("() => typeof(List<>)", ExpressionToCode.ToCode(() => typeof(List<>)));
         }
 
         [Test] //TODO: this never worked, but it shouldn't crash
         public void UnboundNestedInTypeof()
         {
+            Assert.Fail("Aborting to avoid stackoverflow");
             Assert.AreEqual("() => typeof(Outer<,>.Nested<>)", ExpressionToCode.ToCode(() => typeof(Outer<,>.Nested<>)));
         }
     }
