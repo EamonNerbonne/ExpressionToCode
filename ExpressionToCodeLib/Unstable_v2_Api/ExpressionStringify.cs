@@ -6,7 +6,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
 {
     public sealed class ExpressionStringify : IExpressionToCode
     {
-        public static readonly IExpressionToCode Default = new ExpressionStringify(ObjectToCode.Default, false);
+        public static readonly IExpressionToCode Default = new ExpressionStringify(ObjectStringify.Default, false);
         readonly IObjectToCode objectToCode;
         readonly bool explicitMethodTypeArgs;
 
@@ -32,7 +32,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
 
         public static IExpressionToCode With(bool fullTypeNames = false, bool explicitMethodTypeArgs = false)
         {
-            return new ExpressionStringify(fullTypeNames ? ObjectToCode.WithFullTypeNames : ObjectToCode.Default, explicitMethodTypeArgs);
+            return new ExpressionStringify(fullTypeNames ? ObjectStringify.WithFullTypeNames : ObjectStringify.Default, explicitMethodTypeArgs);
         }
     }
 }

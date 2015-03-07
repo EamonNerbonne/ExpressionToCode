@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Reflection;
+using ExpressionToCodeLib.Unstable_v2_Api;
 
 namespace ExpressionToCodeLib {
     class ExpressionToCodeImpl : IExpressionTypeDispatch {
@@ -19,8 +20,8 @@ namespace ExpressionToCodeLib {
             this.explicitMethodTypeArgs = explicitMethodTypeArgs;
             this.sink = sink;
         }
-        
-        internal ExpressionToCodeImpl(Action<ExprTextPart, int> sink) : this(ObjectToCode.Default, false, sink) { }
+
+        internal ExpressionToCodeImpl(Action<ExprTextPart, int> sink) : this(ObjectStringify.Default, false, sink) { }
 
         void Sink(string text) { sink(ExprTextPart.TextOnly(text), Depth); }
         void Sink(string text, Expression value) { sink(ExprTextPart.TextAndExpr(text, value), Depth); }
