@@ -93,6 +93,12 @@ namespace ExpressionToCodeTest
             Assert.AreEqual("Tuple<List<int>, Tuple<List<string>>>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Tuple<List<int>, Tuple<List<string>>>)));
         }
 
+        [Test]
+        public void GenericArgumentTypes()
+        {
+            Assert.AreEqual("Func<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>).GetMethod("Method").GetParameters()[0].ParameterType));
+        }
+
         [Test] //TODO:Regression!
         public void UnboundNested()
         {
@@ -120,6 +126,9 @@ namespace ExpressionToCodeTest
 
     public class Outer<X, Y>
     {
-        public class Nested<Z> { }
+        public class Nested<Z>
+        {
+            public void Method(Func<Z> arg) { }
+        }
     }
 }
