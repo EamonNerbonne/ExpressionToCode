@@ -1,4 +1,5 @@
-﻿// ReSharper disable RedundantEnumerableCastCall
+﻿using ExpressionToCodeLib.Unstable_v2_Api;
+// ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantLogicalConditionalExpressionOperand
@@ -96,7 +97,7 @@ namespace ExpressionToCodeTest {
         {
             Assert.AreEqual(
                 @"() => new System.Func<int>[] { () => 1, () => 2 }",
-                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
         }
 
         [Test]
@@ -480,7 +481,7 @@ namespace ExpressionToCodeTest {
         {
             Assert.AreEqual(
                 "() => new ExpressionToCodeTest.ClassA()",
-                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new ClassA()));
+                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new ClassA()));
         }
 
         [Test]
@@ -488,7 +489,7 @@ namespace ExpressionToCodeTest {
         {
             Assert.AreEqual(
                 "() => new ExpressionToCodeTest.ExpressionToCodeTest.B()",
-                ExpressionToCode.With(fullTypeNames: true).ToCode(() => new B()));
+                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new B()));
         }
 
         class B { }

@@ -1,7 +1,7 @@
-﻿// ReSharper disable ConvertToConstant.Local
+﻿using ExpressionToCodeLib.Unstable_v2_Api;
+// ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable MemberCanBeMadeStatic.Local
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -196,7 +196,7 @@ namespace ExpressionToCodeTest {
         {
             Assert.AreEqual(
                 "() => MakeMe<Cake, string>(() => new Cake())",
-                ExpressionToCode.With(explicitMethodTypeArgs: true).ToCode(() => MakeMe<Cake, string>(() => new Cake())));
+                ExpressionStringify.With(explicitMethodTypeArgs: true).ToCode(() => MakeMe<Cake, string>(() => new Cake())));
         }
 
         T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }

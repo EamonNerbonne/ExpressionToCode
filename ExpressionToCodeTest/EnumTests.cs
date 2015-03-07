@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ExpressionToCodeLib;
+using ExpressionToCodeLib.Unstable_v2_Api;
 using NUnit.Framework;
 
 namespace ExpressionToCodeTest {
@@ -163,7 +164,7 @@ namespace ExpressionToCodeTest {
             SomeEnum? a = SomeEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
 
-            var exprToCode = ExpressionToCode.With(fullTypeNames: true);
+            var exprToCode = ExpressionStringify.With(fullTypeNames: true);
 
             Assert.AreEqual(
                 @"() => a == ExpressionToCodeTest.SomeEnum.B",

@@ -4,24 +4,15 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using ExpressionToCodeLib.Unstable_v2_Api;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace ExpressionToCodeLib {
-   
-    public interface IExpressionToCode {
-        string ToCode(Expression e);
-    }
-
-    public static class ExpressionToCodeExt {
-        public static string ToCode<T, T1, T2, T3>(this IExpressionToCode it, Expression<Func<T, T1, T2, T3>> e) { return it.ToCode(e); }
-        public static string ToCode<T, T1, T2>(this IExpressionToCode it, Expression<Func<T, T1, T2>> e) { return it.ToCode(e); }
-        public static string ToCode<T, T1>(this IExpressionToCode it, Expression<Func<T, T1>> e) { return it.ToCode(e); }
-        public static string ToCode<T>(this IExpressionToCode it, Expression<Func<T>> e) { return it.ToCode(e); }
-    }
-
-    public sealed class ExpressionToCode : IExpressionToCode {
+namespace ExpressionToCodeLib
+{
+    public static class ExpressionToCode
+    {
         public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) { return ToCode((Expression)e); }
         public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return ToCode((Expression)e); }
         public static string ToCode<T, T1>(Expression<Func<T, T1>> e) { return ToCode((Expression)e); }
@@ -30,36 +21,12 @@ namespace ExpressionToCodeLib {
         public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) { return AnnotatedToCode((Expression)e); }
         public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) { return AnnotatedToCode((Expression)e); }
         public static string AnnotatedToCode<T>(Expression<Func<T>> e) { return AnnotatedToCode((Expression)e); }
-
-        public static readonly IExpressionToCode Default = new ExpressionToCode(ObjectToCode.Default, false);
-        
-        public static IExpressionToCode With(bool fullTypeNames = false, bool explicitMethodTypeArgs = false) {
-            return new ExpressionToCode(fullTypeNames ? ObjectToCode.WithFullTypeNames : ObjectToCode.Default, explicitMethodTypeArgs);
-        }
-
-        readonly IObjectToCode objectToCode;
-        readonly bool explicitMethodTypeArgs;
-        private ExpressionToCode(IObjectToCode objectToCode, bool explicitMethodTypeArgs) {
-            this.objectToCode = objectToCode;
-            this.explicitMethodTypeArgs = explicitMethodTypeArgs;
-        }
-
-        string IExpressionToCode.ToCode(Expression e) {
-            var sb = new StringBuilder();
-            var ignoreInitialSpace = true;
-            new ExpressionToCodeImpl(objectToCode, explicitMethodTypeArgs,
-                (etp, depth) => {
-                    sb.Append(ignoreInitialSpace ? etp.Text.TrimStart() : etp.Text);
-                    ignoreInitialSpace = etp.Text.Any() && ShouldIgnoreSpaceAfter(etp.Text[etp.Text.Length - 1]);
-                }).ExpressionDispatch(e);
-            return sb.ToString();
-        }
-
-        public static string ToCode(Expression e) { return Default.ToCode(e); }
-
+        internal static bool ShouldIgnoreSpaceAfter(char c) { return c == ' ' || c == '('; }
+        public static string ToCode(Expression e) { return ExpressionStringify.Default.ToCode(e); }
         public static string AnnotatedToCode(Expression expr) { return AnnotatedToCode(expr, null, false); }
 
-        internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue) {
+        internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue)
+        {
             var splitLine = ExpressionToStringWithValues(expr, ignoreOutermostValue);
 
             var exprWithStalkedValues = new StringBuilder();
@@ -89,14 +56,14 @@ namespace ExpressionToCodeLib {
             return exprWithStalkedValues.ToString();
         }
 
-        static bool IsMultiline(string msg) {
+        static bool IsMultiline(string msg)
+        {
             var idxAfterNewline = msg.IndexOf('\n') + 1;
             return idxAfterNewline > 0 && idxAfterNewline < msg.Length;
         }
 
-        static bool ShouldIgnoreSpaceAfter(char c) { return c == ' ' || c == '('; }
-
-        static SplitExpressionLine ExpressionToStringWithValues(Expression e, bool ignoreOutermostValue) {
+        static SplitExpressionLine ExpressionToStringWithValues(Expression e, bool ignoreOutermostValue)
+        {
             var nodeInfos = new List<SubExpressionInfo>();
             var sb = new StringBuilder();
             bool ignoreInitialSpace = true;
@@ -118,7 +85,8 @@ namespace ExpressionToCodeLib {
             return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };
         }
 
-        static string ExpressionValueAsCode(Expression expression) {
+        static string ExpressionValueAsCode(Expression expression)
+        {
             try {
                 Delegate lambda;
                 try {
@@ -138,12 +106,14 @@ namespace ExpressionToCodeLib {
             }
         }
 
-        struct SplitExpressionLine {
+        struct SplitExpressionLine
+        {
             public string Line;
             public SubExpressionInfo[] Nodes;
         }
 
-        struct SubExpressionInfo {
+        struct SubExpressionInfo
+        {
             public int Location;
             public string Value;
         }
