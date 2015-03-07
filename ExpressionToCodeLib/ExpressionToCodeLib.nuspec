@@ -20,8 +20,8 @@
 			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger
       portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 		</description>
-    <releaseNotes>Generate required explicit types for immediately invoked lambdas; Support out and ref qualifiers in constructor, initializer and lambda invocation expressions.</releaseNotes>
-		<copyright>Copyright 2014 © Eamon Nerbonne</copyright>
+    <releaseNotes>Added experimental API in the Unstable_v2_Api namespace; jagged arrays with varying rank now work correctly; in some simple cases explicit generic type arguments are generated when necessary (issue #13); arrays of delegates now work.</releaseNotes>
+		<copyright>Copyright 2015 © Eamon Nerbonne</copyright>
 		<tags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</tags>
 	</metadata>
 </package>
