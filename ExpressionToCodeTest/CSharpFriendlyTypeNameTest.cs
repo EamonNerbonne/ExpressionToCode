@@ -53,19 +53,19 @@ namespace ExpressionToCodeTest
             Assert.AreEqual("string[,,]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(string[,,])));
         }
 
-        [Test]//Has always been broken
+        [Test] //Has always been broken
         public void MultiDimOfSingleDimArray()
         {
             Assert.AreEqual("object[,][]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(object[,][])));
         }
 
-        [Test]//Has always been broken
+        [Test] //Has always been broken
         public void SingleDimOfMultiDimArray()
         {
             Assert.AreEqual("object[][,]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(object[][,])));
         }
 
-        [Test]//Has always been broken
+        [Test] //Has always been broken
         public void ConstructedSingleDimOfMultiDimArray()
         {
             // ReSharper disable once SuggestUseVarKeywordEvident
@@ -96,28 +96,24 @@ namespace ExpressionToCodeTest
         [Test] //TODO:Regression!
         public void UnboundNested()
         {
-            Assert.Fail("Aborting to avoid stackoverflow");
-            Assert.AreEqual("Outer<X,Y>.Nested<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>)));
+            Assert.AreEqual("Outer<X, Y>.Nested<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>)));
         }
 
         [Test] //TODO:Regression!
         public void UnboundGenericList()
         {
-            Assert.Fail("Aborting to avoid stackoverflow");
             Assert.AreEqual("List<T>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<>)));
         }
 
         [Test] //TODO: this never worked, but it shouldn't crash
         public void UnboundGenericListInTypeof()
         {
-            Assert.Fail("Aborting to avoid stackoverflow");
             Assert.AreEqual("() => typeof(List<>)", ExpressionToCode.ToCode(() => typeof(List<>)));
         }
 
         [Test] //TODO: this never worked, but it shouldn't crash
         public void UnboundNestedInTypeof()
         {
-            Assert.Fail("Aborting to avoid stackoverflow");
             Assert.AreEqual("() => typeof(Outer<,>.Nested<>)", ExpressionToCode.ToCode(() => typeof(Outer<,>.Nested<>)));
         }
     }
