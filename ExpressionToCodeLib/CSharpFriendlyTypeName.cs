@@ -55,10 +55,10 @@ namespace ExpressionToCodeLib
 
         static string NormalName(Type type, bool useFullName = false)
         {
-            return type.DeclaringType != null
-                ? Get(type.DeclaringType, useFullName) + "." + type.Name
-                : type.IsGenericParameter
-                    ? type.Name
+            return type.IsGenericParameter
+                ? type.Name
+                : type.DeclaringType != null
+                    ? Get(type.DeclaringType, useFullName) + "." + type.Name
                     : useFullName ? type.FullName : type.Name;
         }
 
