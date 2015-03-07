@@ -164,7 +164,7 @@ namespace ExpressionToCodeTest {
             SomeEnum? a = SomeEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
 
-            var exprToCode = ExpressionToCode.With(fullTypeNames: true);
+            var exprToCode = ExpressionStringify.With(fullTypeNames: true);
 
             Assert.AreEqual(
                 @"() => a == ExpressionToCodeTest.SomeEnum.B",
