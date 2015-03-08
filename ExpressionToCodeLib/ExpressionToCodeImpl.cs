@@ -41,13 +41,13 @@ namespace ExpressionToCodeLib {
         }
 
         void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor) {
-            int index = 0;
+            bool isFirst = true;
             foreach (var child in children) {
-                if (index != 0) {
+                if (!isFirst) {
                     Sink(joiner);
+                    isFirst = false;
                 }
                 childVisitor(child);
-                ++index;
             }
         }
 
