@@ -6,3 +6,5 @@ glob:*.user
 syntax: glob
 packages/
 ExpressionToCodeLib/*.nupkg
+*.approved.txt.bak
+*.received.txt

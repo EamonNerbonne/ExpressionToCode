@@ -5,18 +5,22 @@ using System.Text;
 using ExpressionToCodeLib;
 using NUnit.Framework;
 
-namespace ExpressionToCodeTest {
+namespace ExpressionToCodeTest
+{
     [TestFixture]
-    public class ImplicitCastingTest {
+    public class ImplicitCastingTest
+    {
         [Test]
-        public void CharNoCast() {
+        public void CharNoCast()
+        {
             Assert.AreEqual(
                 @"() => ""abc""[1] == 'b'",
                 ExpressionToCode.ToCode(() => "abc"[1] == 'b'));
         }
 
         [Test]
-        public void CharComp() {
+        public void CharComp()
+        {
             var c = 'c';
             Assert.AreEqual(
                 @"() => c == 'b'",
@@ -24,7 +28,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Test, Ignore("issue 4")]
-        public void DecimalImplicitCast() {
+        public void DecimalImplicitCast()
+        {
             var i = 1;
             Assert.AreEqual(
                 @"() => (1m + -i > 0 || false)",
@@ -32,7 +37,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Test, Ignore("issue 4")]
-        public void StringImplicitConcat() {
+        public void StringImplicitConcat()
+        {
             var i = 1;
             var x = "X";
             Assert.AreEqual(
@@ -41,11 +47,33 @@ namespace ExpressionToCodeTest {
         }
 
         [Test, Ignore("issue 4")]
-        public void NotImplicitCast() {
+        public void NotImplicitCast()
+        {
             byte z = 42;
             Assert.AreEqual(
                 @"() => ~z == 0",
                 ExpressionToCode.ToCode(() => ~z == 0));
+        }
+
+        [Test, Ignore]
+        public void AvoidsImplicitBoxingWhenTargetTypeIsAGenericArgument()
+        {
+            Assert.AreEqual(
+                @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
+                ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
+                );
+        }
+
+        [Test, Ignore]
+        public void AvoidsImplicitCastWhenTargetTypeIsAGenericArgument()
+        {
+            int x = 37;
+            double y = 42.0;
+
+            Assert.AreEqual(
+                @"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
+                ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
+                );
         }
     }
 }

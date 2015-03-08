@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace ExpressionToCodeLib {
-    static class CSharpFriendlyTypeName {
-        public static string Get(Type type) { return GenericTypeName(type) ?? ArrayTypeName(type) ?? AliasName(type) ?? NormalName(type); }
+namespace ExpressionToCodeLib
+{
+    static class CSharpFriendlyTypeName
+    {
+        public static string Get(Type type, bool useFullName = false)
+        {
+            return ArrayTypeName(type, useFullName)
+                ?? GenericTypeName(type, useFullName)
+                    ?? AliasName(type)
+                        ?? NormalName(type, useFullName);
+        }
 
-        static string AliasName(Type type) {
+        static string AliasName(Type type)
+        {
             if (type == typeof(bool)) {
                 return "bool";
             } else if (type == typeof(byte)) {
@@ -38,21 +46,31 @@ namespace ExpressionToCodeLib {
                 return "ushort";
             } else if (type == typeof(string)) {
                 return "string";
+            } else if (type == typeof(void)) {
+                return "void";
             } else {
                 return null;
             }
         }
 
-        static string NormalName(Type type) { return (type.DeclaringType == null || type.IsGenericParameter ? "" : Get(type.DeclaringType) + ".") + type.Name; }
+        static string NormalName(Type type, bool useFullName = false)
+        {
+            return type.IsGenericParameter
+                ? type.Name
+                : type.DeclaringType != null
+                    ? Get(type.DeclaringType, useFullName) + "." + type.Name
+                    : useFullName ? type.FullName : type.Name;
+        }
 
-        static string GenericTypeName(Type type) {
+        static string GenericTypeName(Type type, bool useFullName = false)
+        {
             if (!type.IsGenericType) {
                 return null;
             }
 
             Type typedef = type.GetGenericTypeDefinition();
             if (typedef == typeof(Nullable<>)) {
-                return Get(type.GetGenericArguments().Single()) + "?";
+                return Get(type.GetGenericArguments().Single(), useFullName) + "?";
             }
 
             var typeArgs = type.GetGenericArguments();
@@ -60,15 +78,19 @@ namespace ExpressionToCodeLib {
             var revNestedTypeNames = new List<string>();
 
             while (type != null) {
-                var name = type.Name;
+                var name = useFullName ? type.FullName ?? type.Name : type.Name;
                 var backtickIdx = name.IndexOf('`');
-                if (backtickIdx < 0) {
+                if (backtickIdx == -1) {
                     revNestedTypeNames.Add(name);
                 } else {
-                    var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1));
+                    var afterArgCountIdx = name.IndexOf('[', backtickIdx + 1);
+                    if (afterArgCountIdx == -1) {
+                        afterArgCountIdx = name.Length;
+                    }
+                    var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1, afterArgCountIdx - backtickIdx - 1));
                     var argsNames = new List<string>();
                     for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
-                        argsNames.Add(Get(typeArgs[i]));
+                        argsNames.Add(Get(typeArgs[i], useFullName));
                     }
                     typeArgIdx -= thisTypeArgCount;
                     revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + string.Join(", ", argsNames) + ">");
@@ -79,13 +101,20 @@ namespace ExpressionToCodeLib {
             return string.Join(".", revNestedTypeNames);
         }
 
-        static string ArrayTypeName(Type type) {
+        static string ArrayTypeName(Type type, bool useFullName = false)
+        {
             if (!type.IsArray) {
                 return null;
             }
-            string basename = Get(type.GetElementType());
-            string rankCommas = new string(',', type.GetArrayRank() - 1);
-            return basename + "[" + rankCommas + "]";
+            string arraySuffix = null;
+            do {
+                var rankCommas = new string(',', type.GetArrayRank() - 1);
+                type = type.GetElementType();
+                arraySuffix = arraySuffix + "[" + rankCommas + "]";
+            }
+            while (type.IsArray);
+            string basename = Get(type, useFullName);
+            return basename + arraySuffix;
         }
     }
 }

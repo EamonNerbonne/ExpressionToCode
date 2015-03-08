@@ -44,6 +44,9 @@
   <ItemGroup>
     <Compile Include="CSharpFriendlyTypeName.cs" />
     <Compile Include="EqualityExpressions.cs" />
+    <Compile Include="Unstable_v2_Api\IObjectToCode.cs" />
+    <Compile Include="Unstable_v2_Api\ObjectStringify.cs" />
+    <Compile Include="Unstable_v2_Api\ExpressionStringify.cs" />
     <Compile Include="ExpressionToCode.cs" />
     <Compile Include="ExpressionToCodeImpl.cs" />
     <Compile Include="ExpressionPrecedence.cs" />
@@ -53,6 +56,7 @@
       <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
     </Compile>
     <Compile Include="ExprTextPart.cs" />
+    <Compile Include="Unstable_v2_Api\IExpressionToCode.cs" />
     <Compile Include="NullabilityHelpers.cs" />
     <Compile Include="ObjectToCode.cs" />
     <Compile Include="PAssert.cs" />
@@ -60,6 +64,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionHelpers.cs" />
     <Compile Include="UnitTestingFailure.cs" />
+    <Compile Include="Unstable_v2_Api\ExpressionWithValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ExpressionToCodeLib.nuspec">
@@ -76,7 +81,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Exec Command="..\.nuget\nuget pack -sym ExpressionToCodeLib.csproj" />
+    <Exec Command="nuget pack -sym ExpressionToCodeLib.csproj" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

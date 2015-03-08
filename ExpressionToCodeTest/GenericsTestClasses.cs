@@ -1,6 +1,7 @@
-﻿// ReSharper disable ConvertToConstant.Local
+﻿using ExpressionToCodeLib.Unstable_v2_Api;
+// ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantEnumerableCastCall
-
+// ReSharper disable MemberCanBeMadeStatic.Local
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,7 +85,7 @@ namespace ExpressionToCodeTest {
                 );
         }
 
-        [Test, Ignore("issue 13")]
+        [Test]
         public void GenericMethodInGenericClass() {
             var x = new GenericClass<string>("42");
             var y = new GenericClass<object>("42");
@@ -145,7 +146,7 @@ namespace ExpressionToCodeTest {
                 );
         }
 
-        [Test, Ignore("issue 14")]
+        [Test]
         public void CanInferTwoArg() {
             Assert.AreEqual(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, 3)",
@@ -153,14 +154,14 @@ namespace ExpressionToCodeTest {
                 );
 
             Assert.AreEqual(
-                @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
+                @"() => StaticTestClass.TwoArgsTwoGeneric((object)3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
                 );
 
             int x = 37;
             double y = 42.0;
             Assert.AreEqual(
-                @"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
+                @"() => StaticTestClass.TwoArgsTwoGeneric((double)x, y)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
                 );
         }
@@ -189,7 +190,31 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => GenericClass<int>.IsFunc2OfType((int x) => x))
                 );
         }
+
+        [Test]
+        public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments()
+        {
+            Assert.AreEqual(
+                "() => MakeMe<Cake, string>(() => new Cake())",
+                ExpressionStringify.With(explicitMethodTypeArgs: true).ToCode(() => MakeMe<Cake, string>(() => new Cake())));
+        }
+
+        T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }
+
+        [Test]
+        public void UsesBoundTypeNamesEvenInGenericMethod() {
+            AssertInGenericMethodWithIntArg<int>();
+        }
+
+        void AssertInGenericMethodWithIntArg<T>() {
+            //The expression no longer has any reference to the unbound argument T, so we can't generate the exactly correct code here.
+            Assert.AreEqual(
+                "() => new List<int>()",
+                ExpressionToCode.ToCode(() => new List<T>()));
+        }
     }
+
+    internal class Cake { }
 
     class GenericClass<T> {
         T val;

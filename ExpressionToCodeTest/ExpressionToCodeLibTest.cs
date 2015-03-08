@@ -1,4 +1,5 @@
-﻿// ReSharper disable RedundantEnumerableCastCall
+﻿using ExpressionToCodeLib.Unstable_v2_Api;
+// ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantLogicalConditionalExpressionOperand
@@ -89,6 +90,14 @@ namespace ExpressionToCodeTest {
             Assert.AreEqual(
                 @"() => new Func<int>[] { () => 1, () => 2 }",
                 ExpressionToCode.ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+        }
+
+        [Test]
+        public void ArrayOfFuncInitializer_FullNames()
+        {
+            Assert.AreEqual(
+                @"() => new System.Func<int>[] { () => 1, () => 2 }",
+                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
         }
 
         [Test]
@@ -400,6 +409,7 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => MethodWithRefParam(ref x)));
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         T MethodWithRefParam<T>(ref T input) { return input; }
 
         [Test]
@@ -411,6 +421,7 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => MethodWithOutParam(ref x, out y)));
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         T MethodWithOutParam<T>(ref T input, out T output) { return output = input; }
 
         [Test]
@@ -465,7 +476,23 @@ namespace ExpressionToCodeTest {
                 "() => new CustomDelegate(n => n + 1)(1)",
                 ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
         }
+        [Test]
+        public void FullTypeName_IfCorrespondingRuleSpecified()
+        {
+            Assert.AreEqual(
+                "() => new ExpressionToCodeTest.ClassA()",
+                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new ClassA()));
+        }
 
+        [Test]
+        public void FullTypeName_ForNestedType()
+        {
+            Assert.AreEqual(
+                "() => new ExpressionToCodeTest.ExpressionToCodeTest.B()",
+                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new B()));
+        }
+
+        class B { }
         [Test]
         public void ThisPropertyAccess() {
             var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => TheProperty);
@@ -527,8 +554,6 @@ namespace ExpressionToCodeTest {
         public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut) {
             return alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
         }
-
-        
     }
 
     class ClassA {
@@ -557,6 +582,4 @@ namespace ExpressionToCodeTest {
         int C() { return x + 5; }
         bool MyEquals(ClassA other) { return other != null && x == other.x; }
     }
-
-
 }

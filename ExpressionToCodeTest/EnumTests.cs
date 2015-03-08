@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ExpressionToCodeLib;
+using ExpressionToCodeLib.Unstable_v2_Api;
 using NUnit.Framework;
 
 namespace ExpressionToCodeTest {
@@ -155,6 +156,32 @@ namespace ExpressionToCodeTest {
                 @"() => (SomeFlagsEnum?)a == b",
                 //but it does here!
                 ExpressionToCode.ToCode(() => (SomeFlagsEnum?)a == b));
+        }
+        
+        [Test]
+        public void NullableEnumCornerCases_FullNames()
+        {
+            SomeEnum? a = SomeEnum.A;
+            SomeFlagsEnum? b = SomeFlagsEnum.B;
+
+            var exprToCode = ExpressionStringify.With(fullTypeNames: true);
+
+            Assert.AreEqual(
+                @"() => a == ExpressionToCodeTest.SomeEnum.B",
+                //C# compiler does not preserve this type information.
+                exprToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.A));
+            Assert.AreEqual(
+                @"() => a == ((ExpressionToCodeTest.SomeEnum)4)",
+                //C# compiler does not preserve this type information; requires cast
+                exprToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.C));
+            Assert.AreEqual(
+                @"() => a == (ExpressionToCodeTest.SomeEnum)b",
+                //but it does here!
+                exprToCode.ToCode(() => a == (SomeEnum)b));
+            Assert.AreEqual(
+                @"() => (ExpressionToCodeTest.SomeFlagsEnum?)a == b",
+                //but it does here!
+                exprToCode.ToCode(() => (SomeFlagsEnum?)a == b));
         }
 
         [Test]
