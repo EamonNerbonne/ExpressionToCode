@@ -55,9 +55,9 @@ namespace ExpressionToCodeLib {
             foreach (var child in children) {
                 if (!isFirst) {
                     Sink(joiner);
-                    isFirst = false;
                 }
                 childVisitor(child);
+                isFirst = false;
             }
         }
 
