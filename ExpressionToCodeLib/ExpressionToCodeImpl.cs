@@ -51,13 +51,13 @@ namespace ExpressionToCodeLib {
         }
 
         void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor) {
-            int index = 0;
+            bool isFirst = true;
             foreach (var child in children) {
-                if (index != 0) {
+                if (!isFirst) {
                     Sink(joiner);
                 }
                 childVisitor(child);
-                ++index;
+                isFirst = false;
             }
         }
 
@@ -165,6 +165,19 @@ namespace ExpressionToCodeLib {
             NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression);
             Sink(" " + op + " ", e);
             Sink(objectToCode.TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
+        }
+
+        void StatementDispatch(Expression e, ExpressionType? parentType = null)
+        {
+            NestExpression(parentType, e);
+            Sink("; ");
+        }
+
+        void StatementDispatch(String prefix, Expression e, ExpressionType? parentType = null)
+        {
+            Sink(prefix);
+            Sink(" ");
+            StatementDispatch(e, parentType);
         }
         #endregion
 
@@ -458,6 +471,29 @@ namespace ExpressionToCodeLib {
             Sink("new " + objectToCode.TypeNameToCode(arrayElemType), nae);
             ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]");
         }
+
+        public void DispatchBlock(Expression e)
+        {
+            var be = (BlockExpression)e;
+            bool hasReturn = (be.Type != typeof(void));
+            var statements = hasReturn ? be.Expressions.Take(be.Expressions.Count - 1) : be.Expressions;
+
+            Sink("{ ");
+            
+            foreach (var v in be.Variables) {
+                StatementDispatch(CSharpFriendlyTypeName.Get(v.Type), v, ExpressionType.Block);
+            }
+            
+            foreach (var child in statements) {
+                StatementDispatch(child, ExpressionType.Block);
+            }
+
+            if (hasReturn) {
+                StatementDispatch("return", be.Result, ExpressionType.Block);
+            }
+
+            Sink("}");
+        }
         #endregion
 
         #region Easy Cases
@@ -544,7 +580,6 @@ namespace ExpressionToCodeLib {
 
         #region Unused by C#'s expression support; or unavailable in the language at all.
         public void DispatchTypeEqual(Expression e) { throw new NotImplementedException(); }
-        public void DispatchBlock(Expression e) { throw new NotImplementedException(); }
         public void DispatchDebugInfo(Expression e) { throw new NotImplementedException(); }
         public void DispatchDynamic(Expression e) { throw new NotImplementedException(); }
 
