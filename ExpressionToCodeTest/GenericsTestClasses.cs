@@ -192,11 +192,18 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
-        public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments()
-        {
+        public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments() {
+            Assert.AreEqual(
+                @"() => StaticTestClass.IsType<int, int>(3)",
+                ExpressionStringify.With(explicitMethodTypeArgs: true).ToCode(() => StaticTestClass.IsType<int, int>(3))
+                );
+        }
+
+        [Test]
+        public void GenericMethodCall_ShouldExplicitlySpecifyTypeArguments() {
             Assert.AreEqual(
                 "() => MakeMe<Cake, string>(() => new Cake())",
-                ExpressionStringify.With(explicitMethodTypeArgs: true).ToCode(() => MakeMe<Cake, string>(() => new Cake())));
+                ExpressionToCode.ToCode(() => MakeMe<Cake, string>(() => new Cake())));
         }
 
         T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }
