@@ -49,7 +49,7 @@ namespace ExpressionToCodeTest {
                 ); //should remove type parameters where they can be inferred.
         }
 
-        [Test, Ignore("issue 13")]
+        [Test]
         public void TypeParameters3() {
             Assert.AreEqual(
                 @"() => new[] { 1, 2, 3 }.Cast<int>()",
@@ -114,7 +114,7 @@ namespace ExpressionToCodeTest {
                 );
         }
 
-        [Test, Ignore("issue 13")]
+        [Test]
         public void CannotInferOneParam() {
             Assert.AreEqual(
                 @"() => StaticTestClass.IsType<int, int>(3)",
@@ -122,7 +122,7 @@ namespace ExpressionToCodeTest {
                 );
         }
 
-        [Test, Ignore("issue 13")]
+        [Test]
         public void CannotInferWithoutTParam() {
             Assert.AreEqual(
                 @"() => StaticTestClass.TEqualsInt<int>(3)",

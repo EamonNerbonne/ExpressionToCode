@@ -284,27 +284,45 @@ namespace ExpressionToCodeLib {
                 return "";
 
             if (!explicitMethodTypeArgs) {
-                var todo = mce.Arguments.Select(argExpr => argExpr.Type).ToList();
-                var possiblyInferrableTypes = new HashSet<Type>();
-                Type next;
-                while (PopFromList(todo, out next)) {
-                    if (!possiblyInferrableTypes.Add(next))
-                        continue;
-                    todo.AddRange(next.GetInterfaces());
-                    if (next.IsArray)
-                        todo.Add(next.GetElementType());
-                    else if (next.IsGenericType) {
-                        todo.AddRange(next.GetGenericArguments());
-                    }
-                }
 
-                if (possiblyInferrableTypes.IsSupersetOf(method.GetGenericArguments()))
+                var genericMethodDefinition = method.GetGenericMethodDefinition();
+                if(genericMethodDefinition.GetGenericArguments().All(typeParameter => 
+                    genericMethodDefinition.GetParameters().Any(parameter => ContainsInferableType(parameter.ParameterType, typeParameter))))
                     return "";
+
+
+                //var todo = mce.Arguments.Select(argExpr => argExpr.Type).ToList();
+                //var possiblyInferrableTypes = new HashSet<Type>();
+                //Type next;
+                //while (PopFromList(todo, out next)) {
+                //    if (!possiblyInferrableTypes.Add(next))
+                //        continue;
+                //    todo.AddRange(next.GetInterfaces());
+                //    if (next.IsArray)
+                //        todo.Add(next.GetElementType());
+                //    else if (next.IsGenericType) {
+                //        todo.AddRange(next.GetGenericArguments());
+                //    }
+                //}
+
+                //if (possiblyInferrableTypes.IsSupersetOf(method.GetGenericArguments()))
+                //    return "";
             }
 
 
             var methodTypeArgs = method.GetGenericArguments().Select(type => objectToCode.TypeNameToCode(type)).ToArray();
             return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
+        }
+
+        static bool ContainsInferableType(Type haystack, Type needle) {
+            if (haystack == needle)
+                return true;
+            else if (haystack.IsArray)
+                return ContainsInferableType(haystack.GetElementType(), needle);
+            else if (haystack.IsGenericType)
+                return haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
+            else
+                return false;
         }
 
         static bool PopFromList<T>(List<T> list, out T val) {
