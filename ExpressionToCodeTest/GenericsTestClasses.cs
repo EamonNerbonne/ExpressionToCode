@@ -11,7 +11,7 @@ using ExpressionToCodeLib;
 namespace ExpressionToCodeTest {
     [TestFixture]
     public class TestGenerics {
-        [Test, Ignore("issue 13")]
+        [Test]
         public void TypeParameters() {
             Assert.AreEqual(1337, StaticTestClass.Consume(12));
             Assert.AreEqual(42, StaticTestClass.Consume<int>(12));
