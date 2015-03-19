@@ -310,15 +310,11 @@ namespace ExpressionToCodeLib {
             return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
         }
 
-        static bool ContainsInferableType(Type haystack, Type needle) {
-            if (haystack == needle)
-                return true;
-            else if (haystack.IsArray || haystack.IsByRef)
-                return ContainsInferableType(haystack.GetElementType(), needle);
-            else if (haystack.IsGenericType)
-                return haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
-            else
-                return false;
+        static bool ContainsInferableType(Type haystack, Type needle)
+        {
+            return haystack == needle 
+                || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
+                || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
         }
 
         public void DispatchIndex(Expression e) {
