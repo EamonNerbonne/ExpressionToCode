@@ -289,24 +289,6 @@ namespace ExpressionToCodeLib {
                 if(genericMethodDefinition.GetGenericArguments().All(typeParameter => 
                     genericMethodDefinition.GetParameters().Any(parameter => ContainsInferableType(parameter.ParameterType, typeParameter))))
                     return "";
-
-
-                //var todo = mce.Arguments.Select(argExpr => argExpr.Type).ToList();
-                //var possiblyInferrableTypes = new HashSet<Type>();
-                //Type next;
-                //while (PopFromList(todo, out next)) {
-                //    if (!possiblyInferrableTypes.Add(next))
-                //        continue;
-                //    todo.AddRange(next.GetInterfaces());
-                //    if (next.IsArray)
-                //        todo.Add(next.GetElementType());
-                //    else if (next.IsGenericType) {
-                //        todo.AddRange(next.GetGenericArguments());
-                //    }
-                //}
-
-                //if (possiblyInferrableTypes.IsSupersetOf(method.GetGenericArguments()))
-                //    return "";
             }
 
 
@@ -324,19 +306,6 @@ namespace ExpressionToCodeLib {
             else
                 return false;
         }
-
-        static bool PopFromList<T>(List<T> list, out T val) {
-            //O(1)
-            if (list.Count == 0) {
-                val = default(T);
-                return false;
-            }
-            val = list[list.Count - 1];
-            list.RemoveAt(list.Count - 1);
-            return true;
-        }
-            
-
 
         public void DispatchIndex(Expression e) {
             var ie = (IndexExpression)e;
