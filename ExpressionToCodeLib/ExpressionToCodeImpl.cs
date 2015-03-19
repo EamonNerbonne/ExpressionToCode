@@ -279,18 +279,32 @@ namespace ExpressionToCodeLib {
             Sink(methodName, mce);
         }
 
-        string CreateGenericArgumentsIfNecessary(MethodCallExpression mce, MethodInfo method) {
-            if (!method.IsGenericMethod)
+        string CreateGenericArgumentsIfNecessary(MethodCallExpression mce, MethodInfo method)
+        {
+            if(!method.IsGenericMethod)
                 return "";
 
-            if (!explicitMethodTypeArgs) {
-
+            if(!explicitMethodTypeArgs) {
                 var genericMethodDefinition = method.GetGenericMethodDefinition();
-                if(genericMethodDefinition.GetGenericArguments().All(typeParameter => 
-                    genericMethodDefinition.GetParameters().Any(parameter => ContainsInferableType(parameter.ParameterType, typeParameter))))
+                var relevantBindingFlagsForOverloads =
+                    BindingFlags.Public
+                        | (!method.IsPublic ? BindingFlags.NonPublic : 0)
+                        | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)
+                    ;
+
+                var confusibleOverloads = method.DeclaringType.GetMethods(relevantBindingFlagsForOverloads)
+                    .Where(
+                        otherMethod =>
+                            otherMethod != genericMethodDefinition
+                                && otherMethod.Name == method.Name
+                                && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
+                    );
+
+                if(!confusibleOverloads.Any()
+                    && genericMethodDefinition.GetGenericArguments()
+                        .All(typeParameter => genericMethodDefinition.GetParameters().Any(parameter => ContainsInferableType(parameter.ParameterType, typeParameter))))
                     return "";
             }
-
 
             var methodTypeArgs = method.GetGenericArguments().Select(type => objectToCode.TypeNameToCode(type)).ToArray();
             return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
