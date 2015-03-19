@@ -3,29 +3,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
-namespace ExpressionToCodeLib {
-    public static class PAssert {
+namespace ExpressionToCodeLib
+{
+    public static class PAssert
+    {
         [Obsolete("Prefer PAssert.That: IsTrue is provided for compatiblity with PowerAssert.NET")]
-        public static void IsTrue(Expression<Func<bool>> assertion) {
+        public static void IsTrue(Expression<Func<bool>> assertion)
+        {
             That(assertion);
         }
 
-        public static void That(Expression<Func<bool>> assertion, string msg = null) {
+        public static void That(Expression<Func<bool>> assertion, string msg = null)
+        {
             var compiled = assertion.Compile();
             bool ok = false;
             try {
                 ok = compiled();
-            } catch (Exception e) {
+            } catch(Exception e) {
                 throw Err(assertion, msg ?? "failed with exception", e);
             }
-            if (!ok) {
+            if(!ok) {
                 throw Err(assertion, msg ?? "failed", null);
             }
         }
 
-        static Exception Err(Expression<Func<bool>> assertion, string msg, Exception innerException) {
+        static Exception Err(Expression<Func<bool>> assertion, string msg, Exception innerException)
+        {
             return UnitTestingFailure.AssertionExceptionFactory(ExpressionToCode.AnnotatedToCode(assertion.Body, msg, true), innerException);
         }
     }

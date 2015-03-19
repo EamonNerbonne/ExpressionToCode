@@ -16,37 +16,37 @@ namespace ExpressionToCodeLib
 
         static string AliasName(Type type)
         {
-            if (type == typeof(bool)) {
+            if(type == typeof(bool)) {
                 return "bool";
-            } else if (type == typeof(byte)) {
+            } else if(type == typeof(byte)) {
                 return "byte";
-            } else if (type == typeof(sbyte)) {
+            } else if(type == typeof(sbyte)) {
                 return "sbyte";
-            } else if (type == typeof(char)) {
+            } else if(type == typeof(char)) {
                 return "char";
-            } else if (type == typeof(decimal)) {
+            } else if(type == typeof(decimal)) {
                 return "decimal";
-            } else if (type == typeof(double)) {
+            } else if(type == typeof(double)) {
                 return "double";
-            } else if (type == typeof(float)) {
+            } else if(type == typeof(float)) {
                 return "float";
-            } else if (type == typeof(int)) {
+            } else if(type == typeof(int)) {
                 return "int";
-            } else if (type == typeof(uint)) {
+            } else if(type == typeof(uint)) {
                 return "uint";
-            } else if (type == typeof(long)) {
+            } else if(type == typeof(long)) {
                 return "long";
-            } else if (type == typeof(ulong)) {
+            } else if(type == typeof(ulong)) {
                 return "ulong";
-            } else if (type == typeof(object)) {
+            } else if(type == typeof(object)) {
                 return "object";
-            } else if (type == typeof(short)) {
+            } else if(type == typeof(short)) {
                 return "short";
-            } else if (type == typeof(ushort)) {
+            } else if(type == typeof(ushort)) {
                 return "ushort";
-            } else if (type == typeof(string)) {
+            } else if(type == typeof(string)) {
                 return "string";
-            } else if (type == typeof(void)) {
+            } else if(type == typeof(void)) {
                 return "void";
             } else {
                 return null;
@@ -64,12 +64,12 @@ namespace ExpressionToCodeLib
 
         static string GenericTypeName(Type type, bool useFullName = false)
         {
-            if (!type.IsGenericType) {
+            if(!type.IsGenericType) {
                 return null;
             }
 
             Type typedef = type.GetGenericTypeDefinition();
-            if (typedef == typeof(Nullable<>)) {
+            if(typedef == typeof(Nullable<>)) {
                 return Get(type.GetGenericArguments().Single(), useFullName) + "?";
             }
 
@@ -77,19 +77,19 @@ namespace ExpressionToCodeLib
             var typeArgIdx = typeArgs.Length;
             var revNestedTypeNames = new List<string>();
 
-            while (type != null) {
+            while(type != null) {
                 var name = useFullName ? type.FullName ?? type.Name : type.Name;
                 var backtickIdx = name.IndexOf('`');
-                if (backtickIdx == -1) {
+                if(backtickIdx == -1) {
                     revNestedTypeNames.Add(name);
                 } else {
                     var afterArgCountIdx = name.IndexOf('[', backtickIdx + 1);
-                    if (afterArgCountIdx == -1) {
+                    if(afterArgCountIdx == -1) {
                         afterArgCountIdx = name.Length;
                     }
                     var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1, afterArgCountIdx - backtickIdx - 1));
                     var argsNames = new List<string>();
-                    for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
+                    for(int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
                         argsNames.Add(Get(typeArgs[i], useFullName));
                     }
                     typeArgIdx -= thisTypeArgCount;
@@ -103,7 +103,7 @@ namespace ExpressionToCodeLib
 
         static string ArrayTypeName(Type type, bool useFullName = false)
         {
-            if (!type.IsArray) {
+            if(!type.IsArray) {
                 return null;
             }
             string arraySuffix = null;
@@ -112,7 +112,7 @@ namespace ExpressionToCodeLib
                 type = type.GetElementType();
                 arraySuffix = arraySuffix + "[" + rankCommas + "]";
             }
-            while (type.IsArray);
+            while(type.IsArray);
             string basename = Get(type, useFullName);
             return basename + arraySuffix;
         }

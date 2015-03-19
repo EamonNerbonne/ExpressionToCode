@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace ExpressionToCodeLib {
-    static class ExpressionPrecedence {
-        static bool UnaryDashSym(ExpressionType et) {
+namespace ExpressionToCodeLib
+{
+    static class ExpressionPrecedence
+    {
+        static bool UnaryDashSym(ExpressionType et)
+        {
             return et == ExpressionType.Negate
                 || et == ExpressionType.NegateChecked
                 || et == ExpressionType.PreDecrementAssign
                 ;
         }
 
-        static bool UnaryPlusSym(ExpressionType et) {
+        static bool UnaryPlusSym(ExpressionType et)
+        {
             return et == ExpressionType.UnaryPlus
                 || et == ExpressionType.PreIncrementAssign
                 ;
@@ -18,8 +22,9 @@ namespace ExpressionToCodeLib {
 
         public static bool TokenizerConfusable(ExpressionType a, ExpressionType b) { return UnaryDashSym(a) && UnaryDashSym(b) || UnaryPlusSym(a) && UnaryPlusSym(b); }
 
-        public static int Rank(ExpressionType exprType) {
-            switch (exprType) {
+        public static int Rank(ExpressionType exprType)
+        {
+            switch(exprType) {
                     //brackets make no sense:
                 case ExpressionType.Block:
                     return -1;
