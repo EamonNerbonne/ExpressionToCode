@@ -5,28 +5,32 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace ExpressionToCodeLib {
-    static class UnitTestingFailure {
+namespace ExpressionToCodeLib
+{
+    static class UnitTestingFailure
+    {
         static Func<T0, TR> F<T0, TR>(Func<T0, TR> f) { return f; }
         static Func<T0, T1, TR> F<T0, T1, TR>(Func<T0, T1, TR> f) { return f; }
         static UnitTestingFailure() { }
         public static readonly Func<string, Exception, Exception> AssertionExceptionFactory = GetAssertionExceptionFactory();
 
-        static Func<string, Exception, Exception> GetAssertionExceptionFactory() {
+        static Func<string, Exception, Exception> GetAssertionExceptionFactory()
+        {
             return GetExceptionFactories().Where(t => t.Item2 != null).OrderByDescending(t => t.Item1).First().Item2;
         }
 
-        static IEnumerable<Tuple<int, Func<string, Exception, Exception>>> GetExceptionFactories() {
+        static IEnumerable<Tuple<int, Func<string, Exception, Exception>>> GetExceptionFactories()
+        {
             var failureMessageArg = Expression.Parameter(typeof(string), "failureMessage");
             var innerExceptionArg = Expression.Parameter(typeof(Exception), "innerException");
             var mkFailFunc = F(
                 (Assembly assembly, string typename) => {
                     var exType = assembly.GetType(typename);
-                    if (exType == null) {
+                    if(exType == null) {
                         return null;
                     }
                     var exConstructor = exType.GetConstructor(new[] { typeof(string), typeof(Exception) });
-                    if (exConstructor == null) {
+                    if(exConstructor == null) {
                         return null;
                     }
                     return
@@ -38,15 +42,15 @@ namespace ExpressionToCodeLib {
                 });
 
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly assembly in assemblies) {
+            foreach(Assembly assembly in assemblies) {
                 string assemblyName = assembly.GetName().Name;
 
-                if (assemblyName == "Microsoft.VisualStudio.QualityTools.UnitTestFramework") {
+                if(assemblyName == "Microsoft.VisualStudio.QualityTools.UnitTestFramework") {
                     yield return
                         Tuple.Create(1, mkFailFunc(assembly, "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException"));
-                } else if (assemblyName == "nunit.framework") {
+                } else if(assemblyName == "nunit.framework") {
                     yield return Tuple.Create(2, mkFailFunc(assembly, "NUnit.Framework.AssertionException"));
-                } else if (assemblyName == "xunit") {
+                } else if(assemblyName == "xunit") {
                     var xUnitExceptionType = assembly.GetType("Xunit.Sdk.AssertException");
                     var xUnitExceptionConstructor =
                         xUnitExceptionType.GetConstructor(

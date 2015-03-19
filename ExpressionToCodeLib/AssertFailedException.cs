@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace ExpressionToCodeLib {
+namespace ExpressionToCodeLib
+{
     [Obsolete(
         "This class is *not* the base class of all assertion violation exceptions - don't rely on it!  It will be removed in version 2."
         ), Serializable]
-    public class PAssertFailedException : Exception {
+    public class PAssertFailedException : Exception
+    {
         public PAssertFailedException(string message)
             : base(message) { }
 
@@ -32,11 +34,13 @@ namespace ExpressionToCodeLib {
             : base(info, context) { }
     }
 
-    namespace Internal {
+    namespace Internal
+    {
         /// <summary>
         /// This class is not part of the public API: it's undocumented and minor version bumps may break compatiblity.
         /// </summary>
-        public static class UnitTestingInternalsAccess {
+        public static class UnitTestingInternalsAccess
+        {
             public static Exception CreateException(string msg) { return new AssertFailedException(msg); }
         }
     }
