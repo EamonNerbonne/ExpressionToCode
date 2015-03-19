@@ -299,7 +299,7 @@ namespace ExpressionToCodeLib {
         static bool ContainsInferableType(Type haystack, Type needle) {
             if (haystack == needle)
                 return true;
-            else if (haystack.IsArray)
+            else if (haystack.IsArray || haystack.IsByRef)
                 return ContainsInferableType(haystack.GetElementType(), needle);
             else if (haystack.IsGenericType)
                 return haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
