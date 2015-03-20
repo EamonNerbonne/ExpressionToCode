@@ -11,7 +11,7 @@ using ExpressionToCodeLib;
 namespace ExpressionToCodeTest {
     [TestFixture]
     public class TestGenerics {
-        [Test, Ignore("issue 13")]
+        [Test]
         public void TypeParameters() {
             Assert.AreEqual(1337, StaticTestClass.Consume(12));
             Assert.AreEqual(42, StaticTestClass.Consume<int>(12));
@@ -49,7 +49,7 @@ namespace ExpressionToCodeTest {
                 ); //should remove type parameters where they can be inferred.
         }
 
-        [Test, Ignore("issue 13")]
+        [Test]
         public void TypeParameters3() {
             Assert.AreEqual(
                 @"() => new[] { 1, 2, 3 }.Cast<int>()",
@@ -114,7 +114,7 @@ namespace ExpressionToCodeTest {
                 );
         }
 
-        [Test, Ignore("issue 13")]
+        [Test]
         public void CannotInferOneParam() {
             Assert.AreEqual(
                 @"() => StaticTestClass.IsType<int, int>(3)",
@@ -122,7 +122,7 @@ namespace ExpressionToCodeTest {
                 );
         }
 
-        [Test, Ignore("issue 13")]
+        [Test]
         public void CannotInferWithoutTParam() {
             Assert.AreEqual(
                 @"() => StaticTestClass.TEqualsInt<int>(3)",
@@ -192,11 +192,18 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
-        public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments()
-        {
+        public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments() {
+            Assert.AreEqual(
+                @"() => StaticTestClass.IsType<int, int>(3)",
+                ExpressionStringify.With(explicitMethodTypeArgs: true).ToCode(() => StaticTestClass.IsType<int, int>(3))
+                );
+        }
+
+        [Test]
+        public void GenericMethodCall_ShouldExplicitlySpecifyTypeArguments() {
             Assert.AreEqual(
                 "() => MakeMe<Cake, string>(() => new Cake())",
-                ExpressionStringify.With(explicitMethodTypeArgs: true).ToCode(() => MakeMe<Cake, string>(() => new Cake())));
+                ExpressionToCode.ToCode(() => MakeMe<Cake, string>(() => new Cake())));
         }
 
         T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }

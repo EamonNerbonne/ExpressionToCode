@@ -309,22 +309,24 @@ namespace ExpressionToCodeLib
             }
 
             if(!explicitMethodTypeArgs) {
-                var todo = mce.Arguments.Select(argExpr => argExpr.Type).ToList();
-                var possiblyInferrableTypes = new HashSet<Type>();
-                Type next;
-                while(PopFromList(todo, out next)) {
-                    if(!possiblyInferrableTypes.Add(next)) {
-                        continue;
-                    }
-                    todo.AddRange(next.GetInterfaces());
-                    if(next.IsArray) {
-                        todo.Add(next.GetElementType());
-                    } else if(next.IsGenericType) {
-                        todo.AddRange(next.GetGenericArguments());
-                    }
-                }
+                var genericMethodDefinition = method.GetGenericMethodDefinition();
+                var relevantBindingFlagsForOverloads =
+                    BindingFlags.Public
+                        | (!method.IsPublic ? BindingFlags.NonPublic : 0)
+                        | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)
+                    ;
 
-                if(possiblyInferrableTypes.IsSupersetOf(method.GetGenericArguments())) {
+                var confusibleOverloads = method.DeclaringType.GetMethods(relevantBindingFlagsForOverloads)
+                    .Where(
+                        otherMethod =>
+                            otherMethod != genericMethodDefinition
+                                && otherMethod.Name == method.Name
+                                && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
+                    );
+
+                if(!confusibleOverloads.Any()
+                    && genericMethodDefinition.GetGenericArguments()
+                        .All(typeParameter => genericMethodDefinition.GetParameters().Any(parameter => ContainsInferableType(parameter.ParameterType, typeParameter)))) {
                     return "";
                 }
             }
@@ -333,16 +335,11 @@ namespace ExpressionToCodeLib
             return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
         }
 
-        static bool PopFromList<T>(List<T> list, out T val)
+        static bool ContainsInferableType(Type haystack, Type needle)
         {
-            //O(1)
-            if(list.Count == 0) {
-                val = default(T);
-                return false;
-            }
-            val = list[list.Count - 1];
-            list.RemoveAt(list.Count - 1);
-            return true;
+            return haystack == needle
+                || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
+                || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
         }
 
         public void DispatchIndex(Expression e)
