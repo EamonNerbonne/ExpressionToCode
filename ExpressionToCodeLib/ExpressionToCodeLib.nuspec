@@ -20,7 +20,7 @@
 			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger
       portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 		</description>
-    <releaseNotes>Added basic support for expressions with blocks such as `x => { x += 3; return x*2; }`</releaseNotes>
+    <releaseNotes>Automatically deduce when generic methods need explicit type parameters</releaseNotes>
 		<copyright>Copyright 2015 © Eamon Nerbonne</copyright>
 		<tags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</tags>
 	</metadata>
