@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="AnnotatedToCodeTest.cs" />
     <Compile Include="ApiStabilityTest.cs" />
+    <Compile Include="ArrayAccessTests.cs" />
     <Compile Include="BlockExpressionTest.cs" />
     <Compile Include="EnumTests.cs" />
     <Compile Include="EqualityComparingTest.cs" />
