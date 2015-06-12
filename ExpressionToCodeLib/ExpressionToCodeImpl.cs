@@ -346,23 +346,16 @@ namespace ExpressionToCodeLib
         {
             var ie = (IndexExpression)e;
             NestExpression(ie.NodeType, ie.Object);
-            IEnumerable<Argument> args;
-            if (ie.Indexer == null)
-            {
-                args = ie.Arguments.Select(a => new Argument
-                {
-                    Expr = a,
-                    PrefixOrNull = null
-                });
-            }
-            else
-            {
-                if (ie.Indexer.Name != "Item")
-                {
-                    Sink("." + ie.Indexer.Name); //TODO: is this OK?
-                }
-                args = GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
-            }
+
+			var args = ie.Indexer == null ?
+							ie.Arguments.Select(a => new Argument
+							{
+								Expr = a,
+								PrefixOrNull = null
+							})
+						: // else {
+							GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
+
             ArgListDispatch(args, ie, "[", "]");
         }
 
