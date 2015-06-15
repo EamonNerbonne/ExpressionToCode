@@ -1,16 +1,9 @@
-﻿interface IObjectToCode
+﻿interface IExpressionToCode
+    string inst.ToCode(Expression e)
+
+interface IObjectToCode
     string inst.PlainObjectToCode(object val, Type type)
     string inst.TypeNameToCode(Type type)
-
-class ObjectToCodeExt
-    string TYPE.PlainObjectToCode(IObjectToCode it, object val)
-
-class ObjectStringify
-    static readonly IObjectToCode Default
-    static readonly IObjectToCode WithFullTypeNames
-
-interface IExpressionToCode
-    string inst.ToCode(Expression e)
 
 class ExpressionStringify : IExpressionToCode
     static readonly IExpressionToCode Default
@@ -21,6 +14,13 @@ class ExpressionToCodeExt
     string TYPE.ToCode<T, T1, T2>(IExpressionToCode it, Expression<Func<T, T1, T2>> e)
     string TYPE.ToCode<T, T1>(IExpressionToCode it, Expression<Func<T, T1>> e)
     string TYPE.ToCode<T>(IExpressionToCode it, Expression<Func<T>> e)
+
+class ObjectStringify
+    static readonly IObjectToCode Default
+    static readonly IObjectToCode WithFullTypeNames
+
+class ObjectToCodeExt
+    string TYPE.PlainObjectToCode(IObjectToCode it, object val)
 
 class ExpressionWithValue
     string TYPE.ToValuedCode<TResult>(Expression<Func<TResult>> expression)

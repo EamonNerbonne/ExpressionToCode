@@ -25,7 +25,10 @@ namespace ExpressionToCodeTest
         public void UnstableApi() {
             var unstableTypes = typeof(ExpressionToCode).Assembly.GetTypes()
                 .Where(IsPublic)
-                .Where(type => type.Namespace.Contains("Unstable"));
+                .Where(type => type.Namespace.Contains("Unstable"))
+                .OrderByDescending(type => type.IsInterface)
+                .ThenBy(type=>type.FullName);
+
 
             Approvals.Verify(PrettyPrintTypes(unstableTypes));
         }
