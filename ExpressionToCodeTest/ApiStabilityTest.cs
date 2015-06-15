@@ -16,7 +16,11 @@ namespace ExpressionToCodeTest
         {
             var publicTypes = typeof(ExpressionToCode).Assembly.GetTypes()
                 .Where(IsPublic)
-                .Where(type=>!type.Namespace.Contains("Unstable"));
+                .Where(type => !type.Namespace.Contains("Unstable"))
+                .OrderByDescending(type => type.IsEnum)
+                .ThenByDescending(type => type.IsInterface)
+                .ThenBy(type => type.FullName);
+
 
             Approvals.Verify(PrettyPrintTypes(publicTypes));
         }
@@ -26,8 +30,9 @@ namespace ExpressionToCodeTest
             var unstableTypes = typeof(ExpressionToCode).Assembly.GetTypes()
                 .Where(IsPublic)
                 .Where(type => type.Namespace.Contains("Unstable"))
-                .OrderByDescending(type => type.IsInterface)
-                .ThenBy(type=>type.FullName);
+                .OrderByDescending(type => type.IsEnum)
+                .ThenByDescending(type => type.IsInterface)
+                .ThenBy(type => type.FullName);
 
 
             Approvals.Verify(PrettyPrintTypes(unstableTypes));

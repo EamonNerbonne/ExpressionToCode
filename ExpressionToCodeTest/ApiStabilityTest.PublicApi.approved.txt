@@ -10,25 +10,6 @@
     const EqualityExpressionClass SequenceEqual = 7
     const EqualityExpressionClass StructuralEquals = 8
 
-class EqualityExpressions
-    EqualityExpressionClass TYPE.CheckForEquality(Expression<Func<bool>> e)
-    Tuple<EqualityExpressionClass, Expression, Expression> TYPE.ExtractEqualityType(Expression<Func<bool>> e)
-    Tuple<EqualityExpressionClass, Expression, Expression> TYPE.ExtractEqualityType(Expression e)
-    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression<Func<bool>> e)
-    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression left, Expression right, bool shouldBeEqual)
-
-class ExpressionToCode
-    string TYPE.ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
-    string TYPE.ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
-    string TYPE.ToCode<T, T1>(Expression<Func<T, T1>> e)
-    string TYPE.ToCode<T>(Expression<Func<T>> e)
-    string TYPE.AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
-    string TYPE.AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
-    string TYPE.AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e)
-    string TYPE.AnnotatedToCode<T>(Expression<Func<T>> e)
-    string TYPE.ToCode(Expression e)
-    string TYPE.AnnotatedToCode(Expression expr)
-
 interface IExpressionTypeDispatch
     void inst.DispatchAdd(Expression e)
     void inst.DispatchAddChecked(Expression e)
@@ -116,8 +97,30 @@ interface IExpressionTypeDispatch
     void inst.DispatchIsTrue(Expression e)
     void inst.DispatchIsFalse(Expression e)
 
+class EqualityExpressions
+    EqualityExpressionClass TYPE.CheckForEquality(Expression<Func<bool>> e)
+    Tuple<EqualityExpressionClass, Expression, Expression> TYPE.ExtractEqualityType(Expression<Func<bool>> e)
+    Tuple<EqualityExpressionClass, Expression, Expression> TYPE.ExtractEqualityType(Expression e)
+    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression<Func<bool>> e)
+    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression left, Expression right, bool shouldBeEqual)
+
+class ExpressionToCode
+    string TYPE.ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
+    string TYPE.ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
+    string TYPE.ToCode<T, T1>(Expression<Func<T, T1>> e)
+    string TYPE.ToCode<T>(Expression<Func<T>> e)
+    string TYPE.AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
+    string TYPE.AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
+    string TYPE.AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e)
+    string TYPE.AnnotatedToCode<T>(Expression<Func<T>> e)
+    string TYPE.ToCode(Expression e)
+    string TYPE.AnnotatedToCode(Expression expr)
+
 class ExpressionTypeDispatcher
     void TYPE.ExpressionDispatch(IExpressionTypeDispatch dispatcher, Expression e)
+
+class UnitTestingInternalsAccess
+    Exception TYPE.CreateException(string msg)
 
 class ObjectToCode
     string TYPE.ComplexObjectToPseudoCode(object val, int indent)
@@ -130,7 +133,4 @@ class PAssert
     void TYPE.That(Expression<Func<bool>> assertion, string msg)
 
 class PAssertFailedException : Exception
-
-class UnitTestingInternalsAccess
-    Exception TYPE.CreateException(string msg)
 
