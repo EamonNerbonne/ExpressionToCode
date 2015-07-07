@@ -43,7 +43,7 @@ namespace ExpressionToCodeTest {
             var a = SomeEnum.A;
             SomeEnum? b = SomeEnum.B;
             Assert.AreEqual(
-                @"() => a == b",
+                @"() => (SomeEnum?)a == b",
                 ExpressionToCode.ToCode(() => a == b));
         }
 
@@ -62,10 +62,10 @@ namespace ExpressionToCodeTest {
         public void NullableEnumVarEqConstant() {
             SomeEnum? a = SomeEnum.A;
             Assert.AreEqual(
-                @"() => a == SomeEnum.B",
+                @"() => a == (SomeEnum?)SomeEnum.B",
                 ExpressionToCode.ToCode(() => a == SomeEnum.B));
             Assert.AreEqual(
-                @"() => SomeEnum.B == a",
+                @"() => (SomeEnum?)SomeEnum.B == a",
                 ExpressionToCode.ToCode(() => SomeEnum.B == a));
         }
 
@@ -84,10 +84,10 @@ namespace ExpressionToCodeTest {
         public void NullableEnumVarNeqConstant() {
             SomeEnum? a = SomeEnum.A;
             Assert.AreEqual(
-                @"() => a != SomeEnum.B",
+                @"() => a != (SomeEnum?)SomeEnum.B",
                 ExpressionToCode.ToCode(() => a != SomeEnum.B));
             Assert.AreEqual(
-                @"() => SomeEnum.B != a",
+                @"() => (SomeEnum?)SomeEnum.B != a",
                 ExpressionToCode.ToCode(() => SomeEnum.B != a));
         }
 
@@ -106,10 +106,10 @@ namespace ExpressionToCodeTest {
         public void NullableEnumVarLtConstant() {
             SomeEnum? a = SomeEnum.A;
             Assert.AreEqual(
-                @"() => a < SomeEnum.B",
+                @"() => a < (SomeEnum?)SomeEnum.B",
                 ExpressionToCode.ToCode(() => a < SomeEnum.B));
             Assert.AreEqual(
-                @"() => SomeEnum.B > a",
+                @"() => (SomeEnum?)SomeEnum.B > a",
                 ExpressionToCode.ToCode(() => SomeEnum.B > a));
         }
 
@@ -141,15 +141,15 @@ namespace ExpressionToCodeTest {
             SomeFlagsEnum? b = SomeFlagsEnum.B;
 
             Assert.AreEqual(
-                @"() => a == SomeEnum.B",
-                //C# compiler does not preserve this type information.
+                @"() => a == (SomeEnum?)SomeEnum.B",
+                //C# 6 compiler does not preserve this type information.
                 ExpressionToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.A));
             Assert.AreEqual(
-                @"() => a == ((SomeEnum)4)",
-                //C# compiler does not preserve this type information; requires cast
+                @"() => a == (SomeEnum?)((SomeEnum)4)",
+                //C# 6 compiler does not preserve this type information; requires cast
                 ExpressionToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.C));
             Assert.AreEqual(
-                @"() => a == (SomeEnum)b",
+                @"() => a == (SomeEnum?)(SomeEnum)b",
                 //but it does here!
                 ExpressionToCode.ToCode(() => a == (SomeEnum)b));
             Assert.AreEqual(
@@ -167,15 +167,15 @@ namespace ExpressionToCodeTest {
             var exprToCode = ExpressionStringify.With(fullTypeNames: true);
 
             Assert.AreEqual(
-                @"() => a == ExpressionToCodeTest.SomeEnum.B",
+                @"() => a == (ExpressionToCodeTest.SomeEnum?)ExpressionToCodeTest.SomeEnum.B",
                 //C# compiler does not preserve this type information.
                 exprToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.A));
             Assert.AreEqual(
-                @"() => a == ((ExpressionToCodeTest.SomeEnum)4)",
+                @"() => a == (ExpressionToCodeTest.SomeEnum?)((ExpressionToCodeTest.SomeEnum)4)",
                 //C# compiler does not preserve this type information; requires cast
                 exprToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.C));
             Assert.AreEqual(
-                @"() => a == (ExpressionToCodeTest.SomeEnum)b",
+                @"() => a == (ExpressionToCodeTest.SomeEnum?)(ExpressionToCodeTest.SomeEnum)b",
                 //but it does here!
                 exprToCode.ToCode(() => a == (SomeEnum)b));
             Assert.AreEqual(
@@ -196,7 +196,7 @@ namespace ExpressionToCodeTest {
         public void NullableFlagsEnumConstant() {
             SomeFlagsEnum? ab = SomeFlagsEnum.A | SomeFlagsEnum.B;
             Assert.AreEqual(
-                @"() => ab == SomeFlagsEnum.AB",
+                @"() => ab == (SomeFlagsEnum?)SomeFlagsEnum.AB",
                 ExpressionToCode.ToCode(() => ab == SomeFlagsEnum.AB));
         }
 
@@ -214,7 +214,7 @@ namespace ExpressionToCodeTest {
             SomeFlagsEnum a = SomeFlagsEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
             Assert.AreEqual(
-                @"() => (SomeFlagsEnum?)(a | b) == SomeFlagsEnum.AB",
+                @"() => (SomeFlagsEnum?)((SomeFlagsEnum?)a | b) == (SomeFlagsEnum?)SomeFlagsEnum.AB",
                 ExpressionToCode.ToCode(() => (a | b) == SomeFlagsEnum.AB));
         }
 
@@ -230,7 +230,7 @@ namespace ExpressionToCodeTest {
         public void NullableFlagsEnumComplexConstant() {
             SomeFlagsEnum? abc = SomeFlagsEnum.A | SomeFlagsEnum.B | SomeFlagsEnum.C;
             Assert.AreEqual(
-                @"() => abc == (SomeFlagsEnum.AB | SomeFlagsEnum.C)",
+                @"() => abc == (SomeFlagsEnum?)(SomeFlagsEnum.AB | SomeFlagsEnum.C)",
                 ExpressionToCode.ToCode(() => abc == (SomeFlagsEnum.AB | SomeFlagsEnum.C)));
         }
     }

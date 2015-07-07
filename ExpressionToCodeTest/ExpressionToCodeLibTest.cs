@@ -52,7 +52,7 @@ namespace ExpressionToCodeTest {
         [Test]
         public void AsOperator() {
             Assert.AreEqual(
-                @"() => new object() as string == null",
+                @"() => new object() as string == default(string)",
                 ExpressionToCode.ToCode(() => new object() as string == null));
         }
 
