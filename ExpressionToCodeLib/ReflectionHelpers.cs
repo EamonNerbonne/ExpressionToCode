@@ -41,7 +41,7 @@ namespace ExpressionToCodeLib
                 return (((MethodInfo)mi).Attributes & MethodAttributes.Static) == MethodAttributes.Static;
             } else if(mi is PropertyInfo) {
                 PropertyInfo pi = (PropertyInfo)mi;
-                return pi.CanRead ? pi.GetGetMethod().IsStatic : pi.GetSetMethod().IsStatic;
+                return (pi.GetGetMethod(true) ?? pi.GetSetMethod(true)).IsStatic;
             } else if(mi.MemberType == MemberTypes.NestedType) {
                 return true;
             } else if(mi is EventInfo) {
