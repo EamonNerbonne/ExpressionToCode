@@ -500,6 +500,20 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
+        public void ThisProtectedPropertyAccess()
+        {
+            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => TheProtectedProperty);
+            Assert.AreEqual("() => TheProtectedProperty", code);
+        }
+
+        [Test]
+        public void ThisPrivateSetterPropertyAccess()
+        {
+            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => ThePrivateSettableProperty);
+            Assert.AreEqual("() => ThePrivateSettableProperty", code);
+        }
+
+        [Test]
         public void ThisMethodCall() {
             var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => ReturnZero());
             Assert.AreEqual("() => ReturnZero()", code);
@@ -533,8 +547,16 @@ namespace ExpressionToCodeTest {
             {
                 return "TheValue";
             }
-        }    
+        }
 
+        protected string TheProtectedProperty
+        {
+            get
+            {
+                return "TheValue";
+            }
+        }
+        protected string ThePrivateSettableProperty { private get; set;}
         public int ReturnZero()
         {
             return 0;
