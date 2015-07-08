@@ -85,4 +85,4 @@ Requires .NET 4.0 (.NET 3.5 could be supported by omitting support for newer exp
 
 If you have any questions, you can contact me via github or mail eamon at nerbonne dot org.
 
-See the documentation below, then download from or [import using NuGet](http://nuget.org/packages/ExpressionToCodeLib/), or just checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
+See the documentation above, then download from or [import using NuGet](http://nuget.org/packages/ExpressionToCodeLib/), or just checkout the source (license: Apache 2.0 or the MIT license, at your option)!  
