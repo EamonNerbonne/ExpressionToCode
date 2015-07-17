@@ -5,13 +5,13 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using ApprovalTests;
 using ExpressionToCodeLib;
-using NUnit.Framework;
+using Xunit;
 
 namespace ExpressionToCodeTest
 {
     public class ApiStabilityTest
     {
-        [Test, MethodImpl(MethodImplOptions.NoInlining)]
+        [Fact, MethodImpl(MethodImplOptions.NoInlining)]
         public void PublicApi()
         {
             var publicTypes = typeof(ExpressionToCode).Assembly.GetTypes()
@@ -25,7 +25,7 @@ namespace ExpressionToCodeTest
             Approvals.Verify(PrettyPrintTypes(publicTypes));
         }
 
-        [Test, MethodImpl(MethodImplOptions.NoInlining)]
+        [Fact, MethodImpl(MethodImplOptions.NoInlining)]
         public void UnstableApi() {
             var unstableTypes = typeof(ExpressionToCode).Assembly.GetTypes()
                 .Where(IsPublic)
@@ -45,6 +45,7 @@ namespace ExpressionToCodeTest
         static string PrettyPrintTypeContents(Type type)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+                .OrderBy(mi=>mi.MetadataToken)
                 .Where(mi => mi.DeclaringType.Assembly != typeof(object).Assembly) //exclude noise
                 ;
 

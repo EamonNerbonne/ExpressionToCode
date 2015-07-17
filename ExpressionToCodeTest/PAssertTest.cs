@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using NUnit.Framework;
 using ExpressionToCodeLib;
+using Xunit;
 
 namespace ExpressionToCodeTest {
-    [TestFixture]
+    static class Assert2
+    { }
+
     public class PAssertTest {
-        [Test]
+        [Fact]
         public void TestBasicStalks() {
             var msgLines = PAssertLines(
                 () =>
@@ -16,19 +16,16 @@ namespace ExpressionToCodeTest {
                         () =>
                             TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
                         ));
-            Assert.That(msgLines[0], Is.EqualTo(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed"));
-            Assert.That(
-                string.Join("\n", msgLines),
-                Is.EqualTo(
-                    @"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed
+            Assert.Equal(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed", msgLines[0]);
+            Assert.Equal(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed
                  │                  │                   │
                  │                  │                   00:01:00
                  │                  -1
                  00:00:00.0100000
-".Replace("\r", "").Trim()));
+".Replace("\r", "").Trim(), string.Join("\n", msgLines));
         }
 
-        [Test]
+        [Fact]
         public void NoValuesForBoringCasts() {
             var msgLines = PAssertLines(
                 () =>
@@ -36,63 +33,63 @@ namespace ExpressionToCodeTest {
                         () =>
                             Equals(3, 4)
                         ));
-            Assert.That(msgLines[0], Contains.Substring("failed"));
-            Assert.That(msgLines[0], Contains.Substring("Equals"));
-            Assert.That(msgLines.Length, Is.EqualTo(1));
+            Assert.Contains("failed", msgLines[0]);
+            Assert.Contains("Equals", msgLines[0]);
+            Assert.Equal(1, msgLines.Length);
         }
 
-        [Test]
+        [Fact]
         public void ValuesForNonBoringCasts() {
             ulong x = ulong.MaxValue;
             var msgLines = PAssertLines(
                 () => PAssert.That(
                     () => 0 == (ulong)(uint)x
                     ));
-            Assert.That(msgLines[0], Is.EqualTo(@"0 == (ulong)(uint)x  :  failed"));
-            Assert.That(msgLines[1].Count(c => c == '│'), Is.EqualTo(3)); //for x, x+cast,x+cast+cast, NOT for ==, NOT for constant 0
+            Assert.Equal((@"0 == (ulong)(uint)x  :  failed"), (object)msgLines[0]);
+            Assert.Equal((3), (object)msgLines[1].Count(c => c == '│'));
         }
 
-        [Test]
+        [Fact]
         public void AppendsFailedOnFailure() {
             var msgLines = PAssertLines(() => PAssert.That(() => false));
-            Assert.That(msgLines[0], Is.EqualTo(@"false  :  failed"));
-            Assert.That(msgLines.Length, Is.EqualTo(1));
+            Assert.Equal((@"false  :  failed"), (object)msgLines[0]);
+            Assert.Equal((1), (object)msgLines.Length);
         }
 
-        [Test]
+        [Fact]
         public void AppendsSingleLineMessageOnFailure() {
             var msgLines = PAssertLines(() => PAssert.That(() => false, "oops"));
-            Assert.That(msgLines[0], Is.EqualTo(@"false  :  oops"));
-            Assert.That(msgLines.Length, Is.EqualTo(1));
+            Assert.Equal((@"false  :  oops"), (object)msgLines[0]);
+            Assert.Equal((1), (object)msgLines.Length);
         }
 
-        [Test]
+        [Fact]
         public void AppendsSingleLineMessageWithNewlineOnFailure() {
             var msgLines = PAssertLines(() => PAssert.That(() => false, "oops\n"));
-            Assert.That(msgLines[0], Is.EqualTo(@"false  :  oops"));
-            Assert.That(msgLines.Length, Is.EqualTo(1));
+            Assert.Equal((@"false  :  oops"), (object)msgLines[0]);
+            Assert.Equal((1), (object)msgLines.Length);
         }
 
-        [Test]
+        [Fact]
         public void AppendsSingleLineMessageBeforeStalks() {
             var x = 0;
             var msgLines = PAssertLines(() => PAssert.That(() => x == 1, "oops\n"));
-            Assert.That(msgLines[0], Is.EqualTo(@"x == 1  :  oops"));
-            Assert.That(msgLines.Length, Is.EqualTo(3)); //expression, empty, NOT x==1, x
+            Assert.Equal((@"x == 1  :  oops"), (object)msgLines[0]);
+            Assert.Equal((3), (object)msgLines.Length);
         }
 
-        [Test]
+        [Fact]
         public void PrependsMultiLineMessage() {
             var x = 0;
             var msgLines = PAssertLines(() => PAssert.That(() => x == 1, "oops\nagain"));
-            Assert.That(msgLines[0], Is.EqualTo(@"oops"));
-            Assert.That(msgLines[1], Is.EqualTo(@"again"));
-            Assert.That(msgLines[2], Is.EqualTo(@"x == 1"));
-            Assert.That(msgLines.Length, Is.EqualTo(5)); //oops,again,expression, empty, NOT x==1, x
+            Assert.Equal((@"oops"), (object)msgLines[0]);
+            Assert.Equal((@"again"), (object)msgLines[1]);
+            Assert.Equal((@"x == 1"), (object)msgLines[2]);
+            Assert.Equal((5), (object)msgLines.Length);
         }
 
-        static string[] PAssertLines(TestDelegate action) {
-            var exc = Assert.Catch(action);
+        static string[] PAssertLines(Action action) {
+            var exc = Assert.ThrowsAny<Exception>(action);
             return exc.Message.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         }
     }

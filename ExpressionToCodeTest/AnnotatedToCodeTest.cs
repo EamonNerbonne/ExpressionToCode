@@ -1,12 +1,11 @@
 ﻿using System;
-using NUnit.Framework;
+using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    [TestFixture]
     public class AnnotatedToCodeTest
     {
-        [Test]
+        [Fact]
         public void A1PlusB2()
         {
             var a = 1;
@@ -14,12 +13,12 @@ namespace ExpressionToCodeTest
             
             var code = ExpressionToCodeLib.ExpressionToCode.AnnotatedToCode(()=> a + b);
 
-            StringAssert.Contains("a", code);
-            StringAssert.Contains("+", code);
-            StringAssert.Contains("b", code);
-            StringAssert.Contains("1",code);
-            StringAssert.Contains("2",code);
-            StringAssert.Contains("3",code);
+            Assert.Contains("a", code);
+            Assert.Contains("+", code);
+            Assert.Contains("b", code);
+            Assert.Contains("1",code);
+            Assert.Contains("2",code);
+            Assert.Contains("3",code);
         }
     }
 

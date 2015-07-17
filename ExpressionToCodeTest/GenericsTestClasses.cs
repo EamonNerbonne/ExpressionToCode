@@ -1,221 +1,222 @@
 ﻿using ExpressionToCodeLib.Unstable_v2_Api;
+using Xunit;
+using Assert = Xunit.Assert;
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable MemberCanBeMadeStatic.Local
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+
 using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest {
-    [TestFixture]
     public class TestGenerics {
-        [Test]
+        [Fact]
         public void TypeParameters() {
-            Assert.AreEqual(1337, StaticTestClass.Consume(12));
-            Assert.AreEqual(42, StaticTestClass.Consume<int>(12));
-            Assert.AreEqual(42, StaticTestClass.Consume('a'));
-            Assert.AreEqual(42, StaticTestClass.IndirectConsume(12));
+            Assert.Equal(1337, StaticTestClass.Consume(12));
+            Assert.Equal(42, StaticTestClass.Consume<int>(12));
+            Assert.Equal(42, StaticTestClass.Consume('a'));
+            Assert.Equal(42, StaticTestClass.IndirectConsume(12));
 
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => 1337 == StaticTestClass.Consume(12)",
                 ExpressionToCode.ToCode(() => 1337 == StaticTestClass.Consume(12))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => 42 == StaticTestClass.Consume('a')",
                 ExpressionToCode.ToCode(() => 42 == StaticTestClass.Consume('a'))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => 42 == StaticTestClass.IndirectConsume(12)",
                 ExpressionToCode.ToCode(() => 42 == StaticTestClass.IndirectConsume(12))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => 42 == StaticTestClass.Consume<int>(12)",
                 ExpressionToCode.ToCode(() => 42 == StaticTestClass.Consume<int>(12))
                 ); //should not remove type parameters where this would cause ambiguity due to overloads!
         }
 
-        [Test]
+        [Fact]
         public void TypeParameters2() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => new[] { 1, 2, 3 }.First()",
                 ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.First())
                 ); //should remove type parameters where they can be inferred.
 
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => new[] { 1, 2, 3 }.Select(x => x.ToString())",
                 ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.Select(x => x.ToString()))
                 ); //should remove type parameters where they can be inferred.
         }
 
-        [Test]
+        [Fact]
         public void TypeParameters3() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => new[] { 1, 2, 3 }.Cast<int>()",
                 ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.Cast<int>())
                 ); //should not remove type parameters where these cannot be inferred!
         }
 
-        [Test]
+        [Fact]
         public void GenericConstructor() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => new GenericClass<int>()",
                 ExpressionToCode.ToCode(() => new GenericClass<int>())
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => new GenericClass<int>(3)",
                 ExpressionToCode.ToCode(() => new GenericClass<int>(3))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => new GenericSubClass<IEnumerable<int>, int>(new[] { 3 })",
                 ExpressionToCode.ToCode(() => new GenericSubClass<IEnumerable<int>, int>(new[] { 3 }))
                 );
         }
 
-        [Test]
+        [Fact]
         public void MethodInGenericClass() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => new GenericClass<int>().IsSet()",
                 ExpressionToCode.ToCode(() => new GenericClass<int>().IsSet())
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => GenericClass<int>.GetDefault()",
                 ExpressionToCode.ToCode(() => GenericClass<int>.GetDefault())
                 );
         }
 
-        [Test]
+        [Fact]
         public void GenericMethodInGenericClass() {
             var x = new GenericClass<string>("42");
             var y = new GenericClass<object>("42");
-            Assert.That(x.IsSubEqual("42"));
-            Assert.That(x.IsSubClass<string>());
-            Assert.That(y.IsSubClass<string>());
-            Assert.AreEqual(
+            Assert.True(x.IsSubEqual("42"));
+            Assert.True(x.IsSubClass<string>());
+            Assert.True(y.IsSubClass<string>());
+            Assert.Equal(
                 @"() => x.IsSubEqual(""42"")",
                 ExpressionToCode.ToCode(() => x.IsSubEqual("42"))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => x.IsSubClass<string>()",
                 ExpressionToCode.ToCode(() => x.IsSubClass<string>())
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => y.IsSubClass<string>()",
                 ExpressionToCode.ToCode(() => y.IsSubClass<string>())
                 );
         }
 
-        [Test]
+        [Fact]
         public void StraightforwardInference() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.Identity(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.Identity(3))
                 );
         }
 
-        [Test]
+        [Fact]
         public void CannotInferOneParam() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.IsType<int, int>(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.IsType<int, int>(3))
                 );
         }
 
-        [Test]
+        [Fact]
         public void CannotInferWithoutTParam() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TEqualsInt<int>(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TEqualsInt<int>(3))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TEqualsInt<string>(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TEqualsInt<string>(3))
                 );
         }
 
-        [Test]
+        [Fact]
         public void CanInferDirect() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TwoArgsOneGeneric(3, 3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsOneGeneric(3, 3))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TwoArgsOneGeneric(3, ""3"")",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsOneGeneric(3, "3"))
                 );
         }
 
-        [Test]
+        [Fact]
         public void CanInferTwoArg() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, 3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, 3))
                 );
 
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric((object)3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
                 );
 
             int x = 37;
             double y = 42.0;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric((double)x, y)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
                 );
         }
 
-        [Test, Ignore("issue 14")]
+        [Fact(Skip = "issue 14")]
         public void CanInferIndirect() {
-            Assert.That(GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 }));
-            Assert.That(GenericClass<int>.IsFuncOfType(() => 3));
-            Assert.That(!GenericClass<int>.IsFuncOfType(() => 3.0));
-            Assert.That(GenericClass<int>.IsFunc2OfType((int x) => x));
+            Assert.True(GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 }));
+            Assert.True(GenericClass<int>.IsFuncOfType(() => 3));
+            Assert.True(!GenericClass<int>.IsFuncOfType(() => 3.0));
+            Assert.True(GenericClass<int>.IsFunc2OfType((int x) => x));
 
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 })",
                 ExpressionToCode.ToCode(() => GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 }))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => GenericClass<int>.IsFuncOfType(() => 3)",
                 ExpressionToCode.ToCode(() => GenericClass<int>.IsFuncOfType(() => 3))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => !GenericClass<int>.IsFuncOfType(() => 3.0)",
                 ExpressionToCode.ToCode(() => !GenericClass<int>.IsFuncOfType(() => 3.0))
                 );
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => GenericClass<int>.IsFunc2OfType((int x) => x)",
                 ExpressionToCode.ToCode(() => GenericClass<int>.IsFunc2OfType((int x) => x))
                 );
         }
 
-        [Test]
+        [Fact]
         public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.IsType<int, int>(3)",
                 ExpressionStringify.With(explicitMethodTypeArgs: true).ToCode(() => StaticTestClass.IsType<int, int>(3))
                 );
         }
 
-        [Test]
+        [Fact]
         public void GenericMethodCall_ShouldExplicitlySpecifyTypeArguments() {
-            Assert.AreEqual(
+            Assert.Equal(
                 "() => MakeMe<Cake, string>(() => new Cake())",
                 ExpressionToCode.ToCode(() => MakeMe<Cake, string>(() => new Cake())));
         }
 
         T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }
 
-        [Test]
+        [Fact]
         public void UsesBoundTypeNamesEvenInGenericMethod() {
             AssertInGenericMethodWithIntArg<int>();
         }
 
         void AssertInGenericMethodWithIntArg<T>() {
             //The expression no longer has any reference to the unbound argument T, so we can't generate the exactly correct code here.
-            Assert.AreEqual(
+            Assert.Equal(
                 "() => new List<int>()",
                 ExpressionToCode.ToCode(() => new List<T>()));
         }

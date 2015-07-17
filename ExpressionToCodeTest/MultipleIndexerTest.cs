@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using ExpressionToCodeLib;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NUnit.Framework;
-using Assert = NUnit.Framework.Assert;
+using Xunit;
 
 namespace ExpressionToCodeTest {
     class HasIndexers {
@@ -15,9 +13,9 @@ namespace ExpressionToCodeTest {
     }
 
     public class MultipleIndexerTest {
-        [Test]
+        [Fact]
         public void CanPrettyPrintVariousIndexers() {
-            Assert.AreEqual(
+            Assert.Equal(
                 "() => new HasIndexers()[3] == new HasIndexers()[\"three\"]",
                 ExpressionToCode.ToCode(() => new HasIndexers()[3] == new HasIndexers()["three"])
                 );

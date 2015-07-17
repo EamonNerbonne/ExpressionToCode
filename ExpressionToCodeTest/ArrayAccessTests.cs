@@ -4,13 +4,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using ExpressionToCodeLib;
-using NUnit.Framework;
+using Xunit;
 
 namespace ExpressionToCodeTest
 {
     class ArrayAccessTests
     {
-        [Test]
+        [Fact]
         public void TestSingleDimensionalArrayIndexExpressionWithLambda()
         {
             var param = Expression.Parameter(typeof(string[]), "a");
@@ -18,12 +18,12 @@ namespace ExpressionToCodeTest
                 Expression.ArrayIndex(param, Expression.Constant(1)),
                 param
             );
-            Assert.AreEqual(
+            Assert.Equal(
 				"a => a[1]",
                 ExpressionToCode.ToCode(expr)
             );
         }
-        [Test]
+        [Fact]
         public void TestSingleDimensionalArrayAccessExpressionWithLambda()
         {
             var param = Expression.Parameter(typeof(string[]), "a");
@@ -31,7 +31,7 @@ namespace ExpressionToCodeTest
                 Expression.ArrayAccess(param, Expression.Constant(1)),
                 param
             );
-            Assert.AreEqual(
+            Assert.Equal(
                 "a => a[1]",
                 ExpressionToCode.ToCode(expr)
             );
