@@ -25,6 +25,8 @@ namespace ExpressionToCodeTest
             Assert.Equal("long", ObjectToCode.GetCSharpFriendlyTypeName(typeof(long)));
             Assert.Equal("ulong", ObjectToCode.GetCSharpFriendlyTypeName(typeof(ulong)));
             Assert.Equal("void", ObjectToCode.GetCSharpFriendlyTypeName(typeof(void)));
+            Assert.Equal("float", ObjectToCode.GetCSharpFriendlyTypeName(typeof(float)));
+            Assert.Equal("decimal", ObjectToCode.GetCSharpFriendlyTypeName(typeof(decimal)));
         }
 
         [Fact]
@@ -39,6 +41,12 @@ namespace ExpressionToCodeTest
         public void IntArray()
         {
             Assert.Equal("int[]", ObjectToCode.GetCSharpFriendlyTypeName(typeof(int[])));
+        }
+
+        [Fact]
+        public void NullableValueType()
+        {
+            Assert.Equal("ConsoleKey?", ObjectToCode.GetCSharpFriendlyTypeName(typeof(ConsoleKey?)));
         }
 
         [Fact]
@@ -88,6 +96,17 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
+        public void NestedNonGenericInGenericClasses()
+        {
+            Assert.Equal("Outer<string, int>.Nested2", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<string, int>.Nested2)));
+        }
+        [Fact]
+        public void NestedGenericInNonGenericClasses()
+        {
+            Assert.Equal("Outer2.Nested3<Action>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer2.Nested3<Action>)));
+        }
+
+        [Fact]
         public void RussianDolls()
         {
             Assert.Equal("Tuple<List<int>, Tuple<List<string>>>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Tuple<List<int>, Tuple<List<string>>>)));
@@ -111,13 +130,13 @@ namespace ExpressionToCodeTest
             Assert.Equal("List<T>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<>)));
         }
 
-        [Fact(Skip= "TODO: this never worked, but it shouldn't crash")]
+        [Fact(Skip = "TODO: this never worked, but it shouldn't crash")]
         public void UnboundGenericListInTypeof()
         {
             Assert.Equal("() => typeof(List<>)", ExpressionToCode.ToCode(() => typeof(List<>)));
         }
 
-        [Fact(Skip= "TODO: this never worked, but it shouldn't crash")]
+        [Fact(Skip = "TODO: this never worked, but it shouldn't crash")]
         public void UnboundNestedInTypeof()
         {
             Assert.Equal("() => typeof(Outer<,>.Nested<>)", ExpressionToCode.ToCode(() => typeof(Outer<,>.Nested<>)));
@@ -127,6 +146,16 @@ namespace ExpressionToCodeTest
     public class Outer<X, Y>
     {
         public class Nested<Z>
+        {
+            public void Method(Func<Z> arg) { }
+        }
+
+        public class Nested2 { }
+    }
+
+    public class Outer2
+    {
+        public class Nested3<Z>
         {
             public void Method(Func<Z> arg) { }
         }
