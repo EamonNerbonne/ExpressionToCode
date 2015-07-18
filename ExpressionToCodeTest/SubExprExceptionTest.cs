@@ -10,7 +10,7 @@ namespace ExpressionToCodeTest {
         public static int SomeFunction() { throw new Exception(); }
     }
 
-    class SubExprExceptionTest {
+    public class SubExprExceptionTest {
         [Fact]
         public void ExceptionDoesntCauseFailure() {
             Assert.Equal(

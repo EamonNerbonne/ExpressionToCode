@@ -17,7 +17,7 @@ namespace ExpressionToCodeTest {
         public class NestedGen<T2> { }
     }
 
-    class NestedClassTest {
+    public class NestedClassTest {
         [Fact]
         public void PlainNested() {
             Assert.Equal("() => null as Parent.Nested",

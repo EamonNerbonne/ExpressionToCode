@@ -21,7 +21,7 @@ namespace ExpressionToCodeTest {
         C = 4,
     }
 
-    class EnumTests {
+    public class EnumTests {
         [Fact]
         public void EnumConstant() {
             Assert.Equal(

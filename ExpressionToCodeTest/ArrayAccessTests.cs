@@ -8,7 +8,7 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    class ArrayAccessTests
+    public class ArrayAccessTests
     {
         [Fact]
         public void TestSingleDimensionalArrayIndexExpressionWithLambda()

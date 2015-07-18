@@ -9,7 +9,7 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    class BlockExpressionTest
+    public class BlockExpressionTest
     {
         [Fact]
         public void SingleStatementBlockTest()
