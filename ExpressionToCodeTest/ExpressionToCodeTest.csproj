@@ -74,6 +74,8 @@
     <Compile Include="ApiStabilityTest.cs" />
     <Compile Include="ArrayAccessTests.cs" />
     <Compile Include="BlockExpressionTest.cs" />
+    <Compile Include="AnonymousObjectFormattingTest.cs" />
+    <Compile Include="EnumerableFormattingTest.cs" />
     <Compile Include="EnumTests.cs" />
     <Compile Include="EqualityComparingTest.cs" />
     <Compile Include="ExceptionsSerialization.cs" />
