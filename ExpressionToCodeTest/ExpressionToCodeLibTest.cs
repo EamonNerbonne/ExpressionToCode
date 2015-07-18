@@ -9,20 +9,27 @@ using Assert = Xunit.Assert;
 // ReSharper disable ConstantNullCoalescingCondition
 // ReSharper disable EqualExpressionComparison
 // ReSharper disable RedundantToStringCall
-
 #pragma warning disable 1720
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Xml;
-
 using ExpressionToCodeLib;
 
-namespace ExpressionToCodeTest {
-    public class ExpressionToCodeTest {
+namespace ExpressionToCodeTest
+{
+    public class ExpressionToCodeTest
+    {
         [Fact]
-        public void AddOperator() {
+        public void ComplexObjectToCodeAlsoSupportsExpressions()
+        {
+            Assert.Equal("() => 42", ObjectToCode.ComplexObjectToPseudoCode((Expression<Func<int>>)(() => 42)));
+        }
+
+        [Fact]
+        public void AddOperator()
+        {
             int x = 0;
             Assert.Equal(
                 @"() => 1 + x + 2 == 4",
@@ -30,49 +37,56 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void AnonymousClasses() {
+        public void AnonymousClasses()
+        {
             Assert.Equal(
                 @"() => new { X = 3, A = ""a"" } == new { X = 3, A = ""a"" }",
                 ExpressionToCode.ToCode(() => new { X = 3, A = "a" } == new { X = 3, A = "a" }));
         }
 
         [Fact]
-        public void ArrayIndex() {
+        public void ArrayIndex()
+        {
             Assert.Equal(
                 @"() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3)] == 3",
                 ExpressionToCode.ToCode(() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3)] == 3));
         }
 
         [Fact]
-        public void ArrayLengthAndDoubles() {
+        public void ArrayLengthAndDoubles()
+        {
             Assert.Equal(
                 @"() => new[] { 1.0, 2.01, 3.5 }.Concat(new[] { 1.0, 2.0 }).ToArray().Length == 0",
                 ExpressionToCode.ToCode(() => new[] { 1.0, 2.01, 3.5 }.Concat(new[] { 1.0, 2.0 }).ToArray().Length == 0));
         }
 
         [Fact]
-        public void AsOperator() {
+        public void AsOperator()
+        {
             Assert.Equal(
                 @"() => new object() as string == default(string)",
                 ExpressionToCode.ToCode(() => new object() as string == null));
         }
 
         [Fact]
-        public void ComplexGenericName() {
+        public void ComplexGenericName()
+        {
             Assert.Equal(
                 @"() => ((Func<int, bool>)(x => x > 0))(0)",
                 ExpressionToCode.ToCode(() => ((Func<int, bool>)(x => x > 0))(0)));
         }
 
         [Fact]
-        public void DefaultValue() {
+        public void DefaultValue()
+        {
             Assert.Equal(
                 @"() => new TimeSpan(1, 2, 3) == default(TimeSpan)",
                 ExpressionToCode.ToCode(() => new TimeSpan(1, 2, 3) == default(TimeSpan)));
         }
 
         [Fact]
-        public void IndexerAccess() {
+        public void IndexerAccess()
+        {
             var dict = Enumerable.Range(1, 20).ToDictionary(n => n.ToString());
             Assert.Equal(
                 @"() => dict[""3""] == 3",
@@ -80,14 +94,16 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void IsOperator() {
+        public void IsOperator()
+        {
             Assert.Equal(
                 @"() => new object() is string",
                 ExpressionToCode.ToCode(() => new object() is string));
         }
 
         [Fact]
-        public void ArrayOfFuncInitializer() {
+        public void ArrayOfFuncInitializer()
+        {
             Assert.Equal(
                 @"() => new Func<int>[] { () => 1, () => 2 }",
                 ExpressionToCode.ToCode(() => new Func<int>[] { () => 1, () => 2 }));
@@ -102,35 +118,40 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void ListInitializer() {
+        public void ListInitializer()
+        {
             Assert.Equal(
                 @"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",
                 ExpressionToCode.ToCode(() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3));
         }
 
         [Fact]
-        public void ListInitializer2() {
+        public void ListInitializer2()
+        {
             Assert.Equal(
                 @"() => new List<int>(50) { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int>(50) { 1, 2, 3 }.Count == 3));
         }
 
         [Fact]
-        public void ListInitializer3() {
+        public void ListInitializer3()
+        {
             Assert.Equal(
                 @"() => new List<int> { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int> { 1, 2, 3 }.Count == 3));
         }
 
         [Fact]
-        public void LiteralCharAndProperty() {
+        public void LiteralCharAndProperty()
+        {
             Assert.Equal(
                 @"() => new string(' ', 3).Length == 1",
                 ExpressionToCode.ToCode(() => new string(' ', 3).Length == 1));
         }
 
         [Fact]
-        public void MembersBuiltin() {
+        public void MembersBuiltin()
+        {
             Assert.Equal(
                 @"() => 1.23m.ToString()",
                 ExpressionToCode.ToCode(() => 1.23m.ToString()));
@@ -146,7 +167,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void MembersDefault() {
+        public void MembersDefault()
+        {
             Assert.Equal(
                 @"() => default(DateTime).Ticks == 0",
                 ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0));
@@ -171,20 +193,25 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void MembersThis() {
+        public void MembersThis()
+        {
             new ClassA().DoAssert();
         }
 
         [Fact]
-        public void MethodGroupAsExtensionMethod() {
+        public void MethodGroupAsExtensionMethod()
+        {
+            var actual = ExpressionToCode.ToCode(() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any);
             Assert.Equal(
                 "() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any"
                 ,
-                ExpressionToCode.ToCode(() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any));
+                actual);
+            Console.WriteLine(actual);
         }
 
         [Fact]
-        public void MethodGroupConstant() {
+        public void MethodGroupConstant()
+        {
             Assert.Equal(
                 @"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)DateTime.IsLeapYear)",
                 ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
@@ -201,21 +228,24 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void MultipleCasts() {
+        public void MultipleCasts()
+        {
             Assert.Equal(
                 @"() => 1 == (int)(object)1",
                 ExpressionToCode.ToCode(() => 1 == (int)(object)1));
         }
 
         [Fact]
-        public void MultipleDots() {
+        public void MultipleDots()
+        {
             Assert.Equal(
                 @"() => 3.ToString().ToString().Length > 0",
                 ExpressionToCode.ToCode(() => 3.ToString().ToString().Length > 0));
         }
 
         [Fact]
-        public void NestedLambda() {
+        public void NestedLambda()
+        {
             Func<Func<int>, int> call = f => f();
             Assert.Equal(
                 @"() => call(() => 42)",
@@ -236,7 +266,8 @@ namespace ExpressionToCodeTest {
         bool Fizz(Func<string, bool> a) { return a("42"); }
 
         [Fact]
-        public void NestedLambda2() {
+        public void NestedLambda2()
+        {
             Assert.Equal(
                 @"() => Fizz(x => x == ""a"")",
                 ExpressionToCode.ToCode(() => Fizz(x => x == "a"))
@@ -248,7 +279,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact(Skip = "issue 14")]
-        public void NestedLambda3() {
+        public void NestedLambda3()
+        {
             Assert.Equal(
                 @"() => Buzz(x => true)",
                 ExpressionToCode.ToCode(() => Buzz(x => true))
@@ -260,34 +292,39 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NewArrayAndExtensionMethod() {
+        public void NewArrayAndExtensionMethod()
+        {
             Assert.Equal(
                 @"() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })",
                 ExpressionToCode.ToCode(() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })));
         }
 
         [Fact]
-        public void NewMultiDimArray() {
+        public void NewMultiDimArray()
+        {
             Assert.Equal(
                 @"() => new int[3, 4].Length == 1",
                 ExpressionToCode.ToCode(() => new int[3, 4].Length == 1));
         }
 
-        public void NewObject(){
-        	    Assert.Equal(
+        public void NewObject()
+        {
+            Assert.Equal(
                 @"() => new object()",
                 ExpressionToCode.ToCode(() => new Object()));
         }
-        
+
         [Fact]
-        public void NewObjectNotEqualsNewObject() {
+        public void NewObjectNotEqualsNewObject()
+        {
             Assert.Equal(
                 @"() => new object() != new object()",
                 ExpressionToCode.ToCode(() => new object() != new object()));
         }
 
         [Fact]
-        public void NotOperator() {
+        public void NotOperator()
+        {
             bool x = true;
             int y = 3;
             byte z = 42;
@@ -303,7 +340,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void ObjectInitializers() {
+        public void ObjectInitializers()
+        {
             var s = new XmlReaderSettings {
                 CloseInput = false,
                 CheckCharacters = false
@@ -315,63 +353,72 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void Quoted() {
+        public void Quoted()
+        {
             Assert.Equal(
                 @"() => (Expression<Func<int, string, string>>)((n, s) => s + n.ToString()) != null",
                 ExpressionToCode.ToCode(() => (Expression<Func<int, string, string>>)((n, s) => s + n.ToString()) != null));
         }
 
         [Fact]
-        public void Quoted2() {
+        public void Quoted2()
+        {
             Assert.Equal(
                 @"() => ExpressionToCode.ToCode(() => true).Length > 5",
                 ExpressionToCode.ToCode(() => ExpressionToCode.ToCode(() => true).Length > 5));
         }
 
         [Fact]
-        public void QuotedWithAnonymous() {
+        public void QuotedWithAnonymous()
+        {
             Assert.Equal(
                 @"() => new[] { new { X = ""a"", Y = ""b"" } }.Select(o => o.X + o.Y).Single()",
                 ExpressionToCode.ToCode(() => new[] { new { X = "a", Y = "b" } }.Select(o => o.X + o.Y).Single()));
         }
 
         [Fact]
-        public void StaticCall() {
+        public void StaticCall()
+        {
             Assert.Equal(
                 @"() => object.Equals((object)3, (object)0)",
                 ExpressionToCode.ToCode(() => Equals(3, 0)));
         }
 
         [Fact]
-        public void ThisCall() {
+        public void ThisCall()
+        {
             Assert.Equal(
                 @"() => !Equals((object)3)",
                 ExpressionToCode.ToCode(() => !Equals(3)));
         }
 
         [Fact]
-        public void ThisExplicit() {
+        public void ThisExplicit()
+        {
             Assert.Equal(
                 @"() => object.Equals(this, (object)3)",
                 ExpressionToCode.ToCode(() => object.Equals(this, 3)));
         }
 
         [Fact]
-        public void TypedConstant() {
+        public void TypedConstant()
+        {
             Assert.Equal(
                 @"() => new[] { typeof(int), typeof(string) }",
                 ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string) }));
         }
 
         [Fact]
-        public void StaticCallImplicitCast() {
+        public void StaticCallImplicitCast()
+        {
             Assert.Equal(
                 @"() => object.Equals((object)3, (object)0)",
                 ExpressionToCode.ToCode(() => Equals(3, 0)));
         }
 
         [Fact]
-        public void StaticMembers() {
+        public void StaticMembers()
+        {
             Assert.Equal(
                 @"() => (DateTime.Now > DateTime.Now + TimeSpan.FromMilliseconds(10.001)).ToString() == ""False""",
                 ExpressionToCode.ToCode(
@@ -379,7 +426,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void Strings2() {
+        public void Strings2()
+        {
             var x = "X";
             const string y = "Y";
             Assert.Equal(
@@ -388,14 +436,16 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void StringAccessor() {
+        public void StringAccessor()
+        {
             Assert.Equal(
                 @"() => ""abc""[1] == 'b'",
                 ExpressionToCode.ToCode(() => "abc"[1] == 'b'));
         }
 
         [Fact]
-        public void StringConcat() {
+        public void StringConcat()
+        {
             var x = "X";
             Assert.Equal(
                 @"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true",
@@ -403,7 +453,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void ArgumentWithRefModifier() {
+        public void ArgumentWithRefModifier()
+        {
             var x = "a";
             Assert.Equal(
                 @"() => MethodWithRefParam(ref x)",
@@ -414,7 +465,8 @@ namespace ExpressionToCodeTest {
         T MethodWithRefParam<T>(ref T input) { return input; }
 
         [Fact]
-        public void ArgumentWithOutModifier() {
+        public void ArgumentWithOutModifier()
+        {
             var x = "a";
             string y;
             Assert.Equal(
@@ -426,7 +478,8 @@ namespace ExpressionToCodeTest {
         T MethodWithOutParam<T>(ref T input, out T output) { return output = input; }
 
         [Fact]
-        public void StaticMethodWithRefAndOutModifiers() {
+        public void StaticMethodWithRefAndOutModifiers()
+        {
             var x = "a";
             object y;
             Assert.Equal(
@@ -435,7 +488,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void ConstructorMethodWithRefAndOutModifiers() {
+        public void ConstructorMethodWithRefAndOutModifiers()
+        {
             int x = 42;
             int y;
             Assert.Equal(
@@ -443,9 +497,9 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => new ClassA(ref x, out y)));
         }
 
-
         [Fact]
-        public void ExtensionMethodWithRefAndOutModifiers() {
+        public void ExtensionMethodWithRefAndOutModifiers()
+        {
             int x = 42;
             long y;
             Assert.Equal(
@@ -453,9 +507,9 @@ namespace ExpressionToCodeTest {
                 ExpressionToCode.ToCode(() => DateTime.Now.AnExtensionMethod(ref x, 5, out y)));
         }
 
-
         [Fact]
-        public void DelegateCallWithRefAndOutModifiers() {
+        public void DelegateCallWithRefAndOutModifiers()
+        {
             int x = 42;
             int y;
             DelegateWithRefAndOut myDelegate = (ref int someVar, out int anotherVar) => anotherVar = someVar;
@@ -465,18 +519,21 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void LambdaInvocation_Func_int() {
+        public void LambdaInvocation_Func_int()
+        {
             Assert.Equal(
                 "() => new Func<int>(() => 1)()",
                 ExpressionToCode.ToCode(() => new Func<int>(() => 1)()));
         }
 
         [Fact]
-        public void LambdaInvocation_CustomDelegate() {
+        public void LambdaInvocation_CustomDelegate()
+        {
             Assert.Equal(
                 "() => new CustomDelegate(n => n + 1)(1)",
                 ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
         }
+
         [Fact]
         public void FullTypeName_IfCorrespondingRuleSpecified()
         {
@@ -494,8 +551,10 @@ namespace ExpressionToCodeTest {
         }
 
         class B { }
+
         [Fact]
-        public void ThisPropertyAccess() {
+        public void ThisPropertyAccess()
+        {
             var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => TheProperty);
             Assert.Equal("() => TheProperty", code);
         }
@@ -515,13 +574,15 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void ThisMethodCall() {
+        public void ThisMethodCall()
+        {
             var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => ReturnZero());
             Assert.Equal("() => ReturnZero()", code);
         }
 
         [Fact]
-        public void ThisStaticMethodCall() {
+        public void ThisStaticMethodCall()
+        {
             var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => StaticReturnZero());
 
             Assert.Equal("() => ExpressionToCodeTest.StaticReturnZero()", code);
@@ -534,53 +595,30 @@ namespace ExpressionToCodeTest {
             Assert.Equal("() => this[1]", actual);
         }
 
-        public string this[int index]
-        {
-            get
-            {
-                return "TheIndexedValue";
-            }
-        }
-
-        public string TheProperty
-        {
-            get
-            {
-                return "TheValue";
-            }
-        }
-
-        protected string TheProtectedProperty
-        {
-            get
-            {
-                return "TheValue";
-            }
-        }
-        protected string ThePrivateSettableProperty { private get; set;}
-        public int ReturnZero()
-        {
-            return 0;
-        }
-
-        public static int StaticReturnZero()
-        {
-            return 0;
-        }
+        public string this[int index] { get { return "TheIndexedValue"; } }
+        public string TheProperty { get { return "TheValue"; } }
+        protected string TheProtectedProperty { get { return "TheValue"; } }
+        protected string ThePrivateSettableProperty { private get; set; }
+        public int ReturnZero() { return 0; }
+        public static int StaticReturnZero() { return 0; }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
 
     public delegate int CustomDelegate(int input);
 
-    static class StaticHelperClass {
-        public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut) {
+    static class StaticHelperClass
+    {
+        public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut)
+        {
             return alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
         }
     }
 
-    class ClassA {
-        public static int MethodWithOutAndRefParam<T>(ref T input, out object output, int x) {
+    class ClassA
+    {
+        public static int MethodWithOutAndRefParam<T>(ref T input, out object output, int x)
+        {
             output = x == 4 ? default(object) : input;
             return x;
         }
@@ -589,7 +627,8 @@ namespace ExpressionToCodeTest {
         public ClassA() { }
         public ClassA(ref int something, out int output) { output = x = something; }
 
-        public void DoAssert() {
+        public void DoAssert()
+        {
             x = 37;
             Assert.Equal(
                 @"() => x != C()",
