@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using ExpressionToCodeLib;
 using ExpressionToCodeLib.Unstable_v2_Api;
-using NUnit.Framework;
+using Xunit;
 
 namespace ExpressionToCodeTest {
     public enum SomeEnum {
@@ -21,144 +21,144 @@ namespace ExpressionToCodeTest {
         C = 4,
     }
 
-    class EnumTests {
-        [Test]
+    public class EnumTests {
+        [Fact]
         public void EnumConstant() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => new object().Equals((object)MidpointRounding.ToEven)",
                 ExpressionToCode.ToCode(() => new object().Equals(MidpointRounding.ToEven)));
         }
 
-        [Test]
+        [Fact]
         public void EnumVariables() {
             var a = SomeEnum.A;
             var b = SomeEnum.B;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == b",
                 ExpressionToCode.ToCode(() => a == b));
         }
 
-        [Test]
+        [Fact]
         public void NullableEnumVariables() {
             var a = SomeEnum.A;
             SomeEnum? b = SomeEnum.B;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (SomeEnum?)a == b",
                 ExpressionToCode.ToCode(() => a == b));
         }
 
-        [Test]
+        [Fact]
         public void EnumVarEqConstant() {
             var a = SomeEnum.A;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == SomeEnum.B",
                 ExpressionToCode.ToCode(() => a == SomeEnum.B));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => SomeEnum.B == a",
                 ExpressionToCode.ToCode(() => SomeEnum.B == a));
         }
 
-        [Test]
+        [Fact]
         public void NullableEnumVarEqConstant() {
             SomeEnum? a = SomeEnum.A;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == (SomeEnum?)SomeEnum.B",
                 ExpressionToCode.ToCode(() => a == SomeEnum.B));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (SomeEnum?)SomeEnum.B == a",
                 ExpressionToCode.ToCode(() => SomeEnum.B == a));
         }
 
-        [Test]
+        [Fact]
         public void EnumVarNeqConstant() {
             var a = SomeEnum.A;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a != SomeEnum.B",
                 ExpressionToCode.ToCode(() => a != SomeEnum.B));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => SomeEnum.B != a",
                 ExpressionToCode.ToCode(() => SomeEnum.B != a));
         }
 
-        [Test]
+        [Fact]
         public void NullableEnumVarNeqConstant() {
             SomeEnum? a = SomeEnum.A;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a != (SomeEnum?)SomeEnum.B",
                 ExpressionToCode.ToCode(() => a != SomeEnum.B));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (SomeEnum?)SomeEnum.B != a",
                 ExpressionToCode.ToCode(() => SomeEnum.B != a));
         }
 
-        [Test]
+        [Fact]
         public void EnumVarLtConstant() {
             var a = SomeEnum.A;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a < SomeEnum.B",
                 ExpressionToCode.ToCode(() => a < SomeEnum.B));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => SomeEnum.B > a",
                 ExpressionToCode.ToCode(() => SomeEnum.B > a));
         }
 
-        [Test]
+        [Fact]
         public void NullableEnumVarLtConstant() {
             SomeEnum? a = SomeEnum.A;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a < (SomeEnum?)SomeEnum.B",
                 ExpressionToCode.ToCode(() => a < SomeEnum.B));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (SomeEnum?)SomeEnum.B > a",
                 ExpressionToCode.ToCode(() => SomeEnum.B > a));
         }
 
-        [Test]
+        [Fact]
         public void EnumCornerCases() {
             var a = SomeEnum.A;
             var b = SomeFlagsEnum.B;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == SomeEnum.B",
                 //C# compiler does not preserve this type information.
                 ExpressionToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.A));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == ((SomeEnum)4)",
                 //C# compiler does not preserve this type information; requires cast
                 ExpressionToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.C));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == (SomeEnum)b",
                 //but it does here!
                 ExpressionToCode.ToCode(() => a == (SomeEnum)b));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (SomeFlagsEnum)a == b",
                 //but it does here!
                 ExpressionToCode.ToCode(() => (SomeFlagsEnum)a == b));
         }
 
-        [Test]
+        [Fact]
         public void NullableEnumCornerCases() {
             SomeEnum? a = SomeEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
 
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == (SomeEnum?)SomeEnum.B",
                 //C# 6 compiler does not preserve this type information.
                 ExpressionToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.A));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == (SomeEnum?)((SomeEnum)4)",
                 //C# 6 compiler does not preserve this type information; requires cast
                 ExpressionToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.C));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == (SomeEnum?)(SomeEnum)b",
                 //but it does here!
                 ExpressionToCode.ToCode(() => a == (SomeEnum)b));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (SomeFlagsEnum?)a == b",
                 //but it does here!
                 ExpressionToCode.ToCode(() => (SomeFlagsEnum?)a == b));
         }
         
-        [Test]
+        [Fact]
         public void NullableEnumCornerCases_FullNames()
         {
             SomeEnum? a = SomeEnum.A;
@@ -166,70 +166,70 @@ namespace ExpressionToCodeTest {
 
             var exprToCode = ExpressionStringify.With(fullTypeNames: true);
 
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == (ExpressionToCodeTest.SomeEnum?)ExpressionToCodeTest.SomeEnum.B",
                 //C# compiler does not preserve this type information.
                 exprToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.A));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == (ExpressionToCodeTest.SomeEnum?)((ExpressionToCodeTest.SomeEnum)4)",
                 //C# compiler does not preserve this type information; requires cast
                 exprToCode.ToCode(() => a == (SomeEnum)SomeFlagsEnum.C));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => a == (ExpressionToCodeTest.SomeEnum?)(ExpressionToCodeTest.SomeEnum)b",
                 //but it does here!
                 exprToCode.ToCode(() => a == (SomeEnum)b));
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (ExpressionToCodeTest.SomeFlagsEnum?)a == b",
                 //but it does here!
                 exprToCode.ToCode(() => (SomeFlagsEnum?)a == b));
         }
 
-        [Test]
+        [Fact]
         public void FlagsEnumConstant() {
             var ab = SomeFlagsEnum.A | SomeFlagsEnum.B;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => ab == SomeFlagsEnum.AB",
                 ExpressionToCode.ToCode(() => ab == SomeFlagsEnum.AB));
         }
 
-        [Test]
+        [Fact]
         public void NullableFlagsEnumConstant() {
             SomeFlagsEnum? ab = SomeFlagsEnum.A | SomeFlagsEnum.B;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => ab == (SomeFlagsEnum?)SomeFlagsEnum.AB",
                 ExpressionToCode.ToCode(() => ab == SomeFlagsEnum.AB));
         }
 
-        [Test]
+        [Fact]
         public void FlagsEnumOr() {
             var a = SomeFlagsEnum.A;
             var b = SomeFlagsEnum.B;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (SomeFlagsEnum)(a | b) == SomeFlagsEnum.AB",
                 ExpressionToCode.ToCode(() => (a | b) == SomeFlagsEnum.AB)); //would be nice if this worked better, but not critical
         }
 
-        [Test]
+        [Fact]
         public void NullableFlagsEnumOr() {
             SomeFlagsEnum a = SomeFlagsEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (SomeFlagsEnum?)((SomeFlagsEnum?)a | b) == (SomeFlagsEnum?)SomeFlagsEnum.AB",
                 ExpressionToCode.ToCode(() => (a | b) == SomeFlagsEnum.AB));
         }
 
-        [Test]
+        [Fact]
         public void FlagsEnumComplexConstant() {
             var abc = SomeFlagsEnum.A | SomeFlagsEnum.B | SomeFlagsEnum.C;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => abc == (SomeFlagsEnum.AB | SomeFlagsEnum.C)",
                 ExpressionToCode.ToCode(() => abc == (SomeFlagsEnum.AB | SomeFlagsEnum.C)));
         }
 
-        [Test]
+        [Fact]
         public void NullableFlagsEnumComplexConstant() {
             SomeFlagsEnum? abc = SomeFlagsEnum.A | SomeFlagsEnum.B | SomeFlagsEnum.C;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => abc == (SomeFlagsEnum?)(SomeFlagsEnum.AB | SomeFlagsEnum.C)",
                 ExpressionToCode.ToCode(() => abc == (SomeFlagsEnum.AB | SomeFlagsEnum.C)));
         }

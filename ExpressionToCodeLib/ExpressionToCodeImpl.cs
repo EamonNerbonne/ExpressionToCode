@@ -243,6 +243,7 @@ namespace ExpressionToCodeLib
             "CreateDelegate",
             new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
 
+
         public void DispatchCall(Expression e)
         {
             var mce = (MethodCallExpression)e;
@@ -256,8 +257,23 @@ namespace ExpressionToCodeLib
                 ArgListDispatch(GetArgumentsForMethod(mce.Method, mce.Arguments), mce, "[", "]");
             } else if(mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
                 && mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof(MethodInfo)) {
+                //.net 4.0
                 //implicitly constructed delegate from method group.
                 var targetMethod = (MethodInfo)((ConstantExpression)mce.Arguments[2]).Value;
+                var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
+                    && ((ConstantExpression)mce.Arguments[1]).Value == null
+                    ? null
+                    : mce.Arguments[1];
+                SinkMethodName(mce, targetMethod, targetExpr);
+            } else if (mce.Method.Name == "CreateDelegate" 
+                && mce.Arguments.Count == 2 
+                && mce.Object.Type == typeof(MethodInfo) 
+                && mce.Object.NodeType == ExpressionType.Constant
+                && mce.Method.GetParameters()[1].ParameterType == typeof(object)
+                ) {
+                //.net 4.5
+                //implicitly constructed delegate from method group.
+                var targetMethod = (MethodInfo)((ConstantExpression)mce.Object).Value;
                 var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
                     ? null

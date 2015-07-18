@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ExpressionToCodeLib;
-using NUnit.Framework;
+using Xunit;
 
 namespace ExpressionToCodeTest {
     public class FailingClass {
         public static int SomeFunction() { throw new Exception(); }
     }
 
-    class SubExprExceptionTest {
-        [Test]
+    public class SubExprExceptionTest {
+        [Fact]
         public void ExceptionDoesntCauseFailure() {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => FailingClass.SomeFunction()
                          │
                          throws System.Exception
