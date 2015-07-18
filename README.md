@@ -12,7 +12,7 @@ ExpressionToCode generates valid, readable C# from an Expression Tree.  For exam
 == "() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })"
 ```
 
-ExpressionToCode also provides a clone of Groovy's [Power Assert](http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/) which includes the code of the failing assertion's expression and the values of its subexpressions.  This functionality is particularly useful in a unit testing framework such as [NUnit](http://www.nunit.org/) or [xUnit.NET](http://xunit.codeplex.com/).  When you execute the following (failing) assertion:
+ExpressionToCode also provides a clone of Groovy's [Power Assert](http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/) which includes the code of the failing assertion's expression and the values of its subexpressions.  This functionality is particularly useful in a unit testing framework such as [NUnit](http://www.nunit.org/) or [xUnit.NET](http://xunit.github.io/).  When you execute the following (failing) assertion:
 
 ```C#
 PAssert.That(()=>Enumerable.Range(0,1000).ToDictionary(i=>"n"+i)["n3"].ToString()==(3.5).ToString());
