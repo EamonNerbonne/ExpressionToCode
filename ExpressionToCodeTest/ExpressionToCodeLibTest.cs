@@ -542,7 +542,7 @@ namespace ExpressionToCodeTest
                 ExpressionStringify.With(true).ToCode(() => new ClassA()));
         }
 
-        [Fact(Skip = "TODONOW")]
+        [Fact]
         public void FullTypeName_WhenRequestedEvenForMessyGenerics()
         {
             Assert.Equal(
