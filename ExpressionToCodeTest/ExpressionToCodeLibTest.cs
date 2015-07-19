@@ -543,6 +543,24 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
+        public void FullTypeName_WhenRequestedEvenForMessyGenerics()
+        {
+            Assert.Equal(
+                "() => typeof(ExpressionToCodeTest.Outer<int,int>.Nested<string>)",
+                ExpressionStringify.With(true).ToCode(() => typeof(Outer<int,int>.Nested<string>)));
+        }
+
+        [Fact]
+        public void PlainTypeName_WhenFullTypeNameRequestedForUnboundTypeArgument()
+        {
+            var unboundListTypeArg = typeof(List<>).GetGenericArguments()[0];
+            Assert.Equal(
+                "T",
+                ObjectStringify.WithFullTypeNames.TypeNameToCode(unboundListTypeArg));
+        }
+
+
+        [Fact]
         public void FullTypeName_ForNestedType()
         {
             Assert.Equal(
