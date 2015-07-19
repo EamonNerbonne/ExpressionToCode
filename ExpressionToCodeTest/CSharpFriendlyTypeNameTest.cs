@@ -118,25 +118,25 @@ namespace ExpressionToCodeTest
             Assert.Equal("Func<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>).GetMethod("Method").GetParameters()[0].ParameterType));
         }
 
-        [Fact] //TODO:Regression!
+        [Fact] 
         public void UnboundNested()
         {
             Assert.Equal("Outer<X, Y>.Nested<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>)));
         }
 
-        [Fact] //TODO:Regression!
+        [Fact] 
         public void UnboundGenericList()
         {
             Assert.Equal("List<T>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<>)));
         }
 
-        [Fact(Skip = "TODO: this never worked, but it shouldn't crash")]
+        [Fact()]
         public void UnboundGenericListInTypeof()
         {
             Assert.Equal("() => typeof(List<>)", ExpressionToCode.ToCode(() => typeof(List<>)));
         }
 
-        [Fact(Skip = "TODO: this never worked, but it shouldn't crash")]
+        [Fact()]
         public void UnboundNestedInTypeof()
         {
             Assert.Equal("() => typeof(Outer<,>.Nested<>)", ExpressionToCode.ToCode(() => typeof(Outer<,>.Nested<>)));
