@@ -100,6 +100,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal("Outer<string, int>.Nested2", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<string, int>.Nested2)));
         }
+
         [Fact]
         public void NestedGenericInNonGenericClasses()
         {
@@ -118,24 +119,25 @@ namespace ExpressionToCodeTest
             Assert.Equal("Func<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>).GetMethod("Method").GetParameters()[0].ParameterType));
         }
 
-        [Fact] 
+        [Fact]
         public void UnboundNested()
         {
             Assert.Equal("Outer<X, Y>.Nested<Z>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>)));
         }
 
-        [Fact] 
+        [Fact]
         public void UnboundGenericList()
         {
             Assert.Equal("List<T>", ObjectToCode.GetCSharpFriendlyTypeName(typeof(List<>)));
         }
 
-        [Fact()]
+        [Fact]
         public void UnboundGenericListInTypeof()
         {
             Assert.Equal("() => typeof(List<>)", ExpressionToCode.ToCode(() => typeof(List<>)));
         }
-        [Fact()]
+
+        [Fact]
         public void UnboundGenericNullableInTypeof()
         {
             Assert.Equal("() => typeof(Nullable<>)", ExpressionToCode.ToCode(() => typeof(Nullable<>)));
