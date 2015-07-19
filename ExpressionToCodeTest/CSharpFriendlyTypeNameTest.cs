@@ -135,6 +135,11 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal("() => typeof(List<>)", ExpressionToCode.ToCode(() => typeof(List<>)));
         }
+        [Fact()]
+        public void UnboundGenericNullableInTypeof()
+        {
+            Assert.Equal("() => typeof(Nullable<>)", ExpressionToCode.ToCode(() => typeof(Nullable<>)));
+        }
 
         [Fact()]
         public void UnboundNestedInTypeof()
