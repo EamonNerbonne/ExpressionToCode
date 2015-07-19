@@ -244,21 +244,33 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
-        public void NestedLambda()
+        public void NestedLambda_NoParameters()
         {
             Func<Func<int>, int> call = f => f();
             Assert.Equal(
                 @"() => call(() => 42)",
                 ExpressionToCode.ToCode(() => call(() => 42))
                 ); //no params
+        }
+        [Fact]
+        public void NestedLambda_OneParameter()
+        {
             Assert.Equal(
                 @"() => new[] { 37, 42 }.Select(x => x * 2)",
                 ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select(x => x * 2))
-                ); //one param
+                ); 
+            Assert.Equal(
+                @"() => Buzz(x => true)",
+                ExpressionToCode.ToCode(() => Buzz(x => true))
+                );
+        }
+        [Fact]
+        public void NestedLambda_TwoParameters()
+        {
             Assert.Equal(
                 @"() => new[] { 37, 42 }.Select((x, i) => x * 2)",
                 ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select((x, i) => x * 2))
-                ); //two params
+                ); 
         }
 
         bool Fizz(Func<int, bool> a) { return a(42); }
@@ -266,7 +278,7 @@ namespace ExpressionToCodeTest
         bool Fizz(Func<string, bool> a) { return a("42"); }
 
         [Fact]
-        public void NestedLambda2()
+        public void NestedLambda_MultipleOverloads()
         {
             Assert.Equal(
                 @"() => Fizz(x => x == ""a"")",
@@ -279,12 +291,8 @@ namespace ExpressionToCodeTest
         }
 
         [Fact(Skip = "issue 14")]
-        public void NestedLambda3()
+        public void NestedLambda_UncertainOverload()
         {
-            Assert.Equal(
-                @"() => Buzz(x => true)",
-                ExpressionToCode.ToCode(() => Buzz(x => true))
-                ); //easier case...
             Assert.Equal(
                 @"() => Fizz((int x) => true)",
                 ExpressionToCode.ToCode(() => Fizz((int x) => true))
@@ -549,6 +557,7 @@ namespace ExpressionToCodeTest
                 "() => typeof(ExpressionToCodeTest.Outer<int, int>.Nested<string>)",
                 ExpressionStringify.With(true).ToCode(() => typeof(Outer<int, int>.Nested<string>)));
         }
+
         [Fact]
         public void PlainTypeName_WhenRequestedEvenForMessyGenerics()
         {
