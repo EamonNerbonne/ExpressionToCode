@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Unstable_v2_Api
 {
-    public sealed class ObjectStringify
+    public static class ObjectStringify
     {
         public static readonly IObjectToCode Default = new DefaultImpl();
         public static readonly IObjectToCode WithFullTypeNames = new DefaultImpl(true);
