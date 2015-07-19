@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ExpressionToCodeLib
 {
@@ -73,6 +74,7 @@ namespace ExpressionToCodeLib
                 return Get(type.GetGenericArguments().Single(), useFullName) + "?";
             }
 
+            var isGenericTypeDefinition = type.IsGenericTypeDefinition;
             var typeArgs = type.GetGenericArguments();
             var typeArgIdx = typeArgs.Length;
             var revNestedTypeNames = new List<string>();
@@ -88,17 +90,39 @@ namespace ExpressionToCodeLib
                         afterArgCountIdx = name.Length;
                     }
                     var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1, afterArgCountIdx - backtickIdx - 1));
-                    var argsNames = new List<string>();
-                    for(int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
-                        argsNames.Add(Get(typeArgs[i], useFullName));
+                    if (isGenericTypeDefinition) {
+                        typeArgIdx -= thisTypeArgCount;
+                        revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + new string (',', thisTypeArgCount-1)+ ">");
+                    } else {
+                        var argNames = new List<string>();
+                        for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
+                            argNames.Add(Get(typeArgs[i], useFullName));
+                        }
+                        typeArgIdx -= thisTypeArgCount;
+                        revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + JoinTypeArgumentList(argNames) + ">");
                     }
-                    typeArgIdx -= thisTypeArgCount;
-                    revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + string.Join(", ", argsNames) + ">");
                 }
                 type = type.DeclaringType;
             }
             revNestedTypeNames.Reverse();
             return string.Join(".", revNestedTypeNames);
+        }
+
+        static string JoinTypeArgumentList(List<string> argNames) {
+            if (argNames.Count == 1)
+                return argNames[0];
+
+            var sb = new StringBuilder(argNames[0]);
+            for (int i = 1; i < argNames.Count; i++) {
+                var argName = argNames[i];
+                if (argName == "")
+                    sb.Append(",");
+                else {
+                    sb.Append(", ");
+                    sb.Append(argName);
+                }
+            }
+            return sb.ToString();                
         }
 
         static string ArrayTypeName(Type type, bool useFullName = false)
