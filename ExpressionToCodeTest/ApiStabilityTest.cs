@@ -62,7 +62,7 @@ namespace ExpressionToCodeTest
 
         static string PrettyPrintTypeHeader(Type type)
         {
-            var prefix = type.IsEnum ? "enum" : type.IsValueType ? "struct" : type.IsInterface ? "interface" : "class";
+            var prefix = TypePrefix(type);
 
             var baseType = type.BaseType == typeof(object) ? null : type.BaseType;
             var allInterfaces = type.GetInterfaces();
@@ -73,6 +73,19 @@ namespace ExpressionToCodeTest
             var name = ObjectToCode.GetCSharpFriendlyTypeName(type);
 
             return prefix + " " + name + suffix;
+        }
+
+        static string TypePrefix(Type type)
+        {
+            if (type.IsEnum) {
+                return "enum";
+            } else if (type.IsValueType) {
+                return "struct";
+            } else if (type.IsInterface) {
+                return "interface";
+            } else {
+                return "class";
+            }
         }
 
         static string PrettyPrintMethod(MethodInfo mi)
