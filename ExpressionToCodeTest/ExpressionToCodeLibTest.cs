@@ -539,7 +539,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 "() => new ExpressionToCodeTest.ClassA()",
-                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new ClassA()));
+                ExpressionStringify.With(true).ToCode(() => new ClassA()));
         }
 
         [Fact]
@@ -547,7 +547,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 "() => new ExpressionToCodeTest.ExpressionToCodeTest.B()",
-                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new B()));
+                ExpressionStringify.With(true).ToCode(() => new B()));
         }
 
         class B { }
