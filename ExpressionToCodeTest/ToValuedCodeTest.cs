@@ -11,7 +11,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void ToValuedCode_ofNull_fails()
         {
-            ExpressionToCodeTest obj = null;
+            ExpressionToCodeLibTest obj = null;
             
             Assert.ThrowsAny<InvalidOperationException>(
                 () =>

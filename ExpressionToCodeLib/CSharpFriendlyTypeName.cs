@@ -9,16 +9,17 @@ namespace ExpressionToCodeLib
     {
         public bool UseFullName;
         public bool IncludeGenericTypeArgumentNames;
+        public string GetTypeName(Type type) { return AliasName(type) ?? GetUnaliasedTypeName(type); }
 
-        public string GetTypeName(Type type)
+        string GetUnaliasedTypeName(Type type)
         {
-            return ArrayTypeName(type)
-                ?? GenericTypeName(type)
-                    ?? AliasName(type)
-                        ?? NormalName(type);
+            var typeNameWithoutNamespace =
+                GenericTypeName(type)
+                    ?? NormalName(type);
+            return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
         }
 
-        static string AliasName(Type type)
+        string AliasName(Type type)
         {
             if (type == typeof(bool)) {
                 return "bool";
@@ -52,8 +53,10 @@ namespace ExpressionToCodeLib
                 return "string";
             } else if (type == typeof(void)) {
                 return "void";
+            } else if (type.IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+                return GetTypeName(type.GetGenericArguments().Single()) + "?";
             } else {
-                return null;
+                return ArrayTypeName(type);
             }
         }
 
@@ -63,7 +66,7 @@ namespace ExpressionToCodeLib
                 ? type.Name
                 : type.DeclaringType != null
                     ? GetTypeName(type.DeclaringType) + "." + type.Name
-                    : UseFullName ? type.FullName : type.Name;
+                    : type.Name;
         }
 
         string GenericTypeName(Type type)
@@ -73,16 +76,13 @@ namespace ExpressionToCodeLib
             }
 
             var renderAsGenericTypeDefinition = !IncludeGenericTypeArgumentNames && type.IsGenericTypeDefinition;
-            if (type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
-                return GetTypeName(type.GetGenericArguments().Single()) + "?";
-            }
 
             var typeArgs = type.GetGenericArguments();
             var typeArgIdx = typeArgs.Length;
             var revNestedTypeNames = new List<string>();
 
             while (type != null) {
-                var name = UseFullName ? type.FullName ?? type.Name : type.Name;
+                var name = type.Name;
                 var backtickIdx = name.IndexOf('`');
                 if (backtickIdx == -1) {
                     revNestedTypeNames.Add(name);

@@ -19,7 +19,7 @@ using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest
 {
-    public class ExpressionToCodeTest
+    public class ExpressionToCodeLibTest
     {
         [Fact]
         public void ComplexObjectToCodeAlsoSupportsExpressions()
@@ -549,6 +549,13 @@ namespace ExpressionToCodeTest
                 "() => typeof(ExpressionToCodeTest.Outer<int, int>.Nested<string>)",
                 ExpressionStringify.With(true).ToCode(() => typeof(Outer<int, int>.Nested<string>)));
         }
+        [Fact]
+        public void PlainTypeName_WhenRequestedEvenForMessyGenerics()
+        {
+            Assert.Equal(
+                "() => typeof(Outer<int, int>.Nested<string>)",
+                ExpressionStringify.With().ToCode(() => typeof(Outer<int, int>.Nested<string>)));
+        }
 
         [Fact]
         public void PlainTypeName_WhenFullTypeNameRequestedForUnboundTypeArgument()
@@ -563,8 +570,8 @@ namespace ExpressionToCodeTest
         public void FullTypeName_ForNestedType()
         {
             Assert.Equal(
-                "() => new ExpressionToCodeTest.ExpressionToCodeTest.B()",
-                ExpressionStringify.With(true).ToCode(() => new B()));
+                "() => new ExpressionToCodeTest.B()",
+                ExpressionStringify.With(true).ToCode(() => new ExpressionToCodeLibTest.B()));
         }
 
         class B { }
