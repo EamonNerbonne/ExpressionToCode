@@ -15,7 +15,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
         {
             readonly bool fullTypeNames;
             public DefaultImpl(bool fullTypeNames = false) { this.fullTypeNames = fullTypeNames; }
-            public string TypeNameToCode(Type type) { return CSharpFriendlyTypeName.Get(type, fullTypeNames); }
+            public string TypeNameToCode(Type type) { return new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type); }
 
             string IObjectToCode.PlainObjectToCode(object val, Type type)
             {

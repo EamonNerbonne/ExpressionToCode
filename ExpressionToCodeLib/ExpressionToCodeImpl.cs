@@ -535,7 +535,7 @@ namespace ExpressionToCodeLib
             Sink("{ ");
 
             foreach(var v in be.Variables) {
-                StatementDispatch(CSharpFriendlyTypeName.Get(v.Type), v, ExpressionType.Block);
+                StatementDispatch(objectToCode.TypeNameToCode(v.Type), v, ExpressionType.Block);
             }
 
             foreach(var child in statements) {

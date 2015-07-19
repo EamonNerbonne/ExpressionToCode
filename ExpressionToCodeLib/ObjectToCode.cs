@@ -59,6 +59,6 @@ namespace ExpressionToCodeLib {
         }
 
 
-        public static string GetCSharpFriendlyTypeName(Type type) { return CSharpFriendlyTypeName.Get(type); }
+        public static string GetCSharpFriendlyTypeName(Type type) { return new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true }.GetTypeName(type); }
     }
 }

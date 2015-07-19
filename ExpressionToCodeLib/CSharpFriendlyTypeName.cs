@@ -5,14 +5,17 @@ using System.Text;
 
 namespace ExpressionToCodeLib
 {
-    static class CSharpFriendlyTypeName
+    struct CSharpFriendlyTypeName
     {
-        public static string Get(Type type, bool useFullName = false)
+        public bool UseFullName;
+        public bool IncludeGenericTypeArgumentNames;
+
+        public string GetTypeName(Type type)
         {
-            return ArrayTypeName(type, useFullName)
-                ?? GenericTypeName(type, useFullName)
+            return ArrayTypeName(type)
+                ?? GenericTypeName(type)
                     ?? AliasName(type)
-                        ?? NormalName(type, useFullName);
+                        ?? NormalName(type);
         }
 
         static string AliasName(Type type)
@@ -54,16 +57,16 @@ namespace ExpressionToCodeLib
             }
         }
 
-        static string NormalName(Type type, bool useFullName = false)
+         string NormalName(Type type)
         {
             return type.IsGenericParameter
                 ? type.Name
                 : type.DeclaringType != null
-                    ? Get(type.DeclaringType, useFullName) + "." + type.Name
-                    : useFullName ? type.FullName : type.Name;
+                    ? GetTypeName(type.DeclaringType) + "." + type.Name
+                    : UseFullName ? type.FullName : type.Name;
         }
 
-        static string GenericTypeName(Type type, bool useFullName = false)
+        string GenericTypeName(Type type)
         {
             if(!type.IsGenericType) {
                 return null;
@@ -71,7 +74,7 @@ namespace ExpressionToCodeLib
 
             Type typedef = type.GetGenericTypeDefinition();
             if(typedef == typeof(Nullable<>)) {
-                return Get(type.GetGenericArguments().Single(), useFullName) + "?";
+                return GetTypeName(type.GetGenericArguments().Single()) + "?";
             }
 
             var isGenericTypeDefinition = type.IsGenericTypeDefinition;
@@ -80,7 +83,7 @@ namespace ExpressionToCodeLib
             var revNestedTypeNames = new List<string>();
 
             while(type != null) {
-                var name = useFullName ? type.FullName ?? type.Name : type.Name;
+                var name = UseFullName? type.FullName ?? type.Name : type.Name;
                 var backtickIdx = name.IndexOf('`');
                 if(backtickIdx == -1) {
                     revNestedTypeNames.Add(name);
@@ -96,7 +99,7 @@ namespace ExpressionToCodeLib
                     } else {
                         var argNames = new List<string>();
                         for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
-                            argNames.Add(Get(typeArgs[i], useFullName));
+                            argNames.Add(GetTypeName(typeArgs[i]));
                         }
                         typeArgIdx -= thisTypeArgCount;
                         revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + JoinTypeArgumentList(argNames) + ">");
@@ -125,7 +128,7 @@ namespace ExpressionToCodeLib
             return sb.ToString();                
         }
 
-        static string ArrayTypeName(Type type, bool useFullName = false)
+        string ArrayTypeName(Type type)
         {
             if(!type.IsArray) {
                 return null;
@@ -137,7 +140,7 @@ namespace ExpressionToCodeLib
                 arraySuffix = arraySuffix + "[" + rankCommas + "]";
             }
             while(type.IsArray);
-            string basename = Get(type, useFullName);
+            string basename = GetTypeName(type);
             return basename + arraySuffix;
         }
     }
