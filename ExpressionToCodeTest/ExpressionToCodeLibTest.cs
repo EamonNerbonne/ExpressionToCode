@@ -608,7 +608,7 @@ namespace ExpressionToCodeTest
         public void ThePrivateStaticPropertyAccess()
         {
             var code = ExpressionToCode.ToCode(() => ThePrivateStaticProperty);
-            Assert.Equal("() => ExpressionToCodeTest.ThePrivateStaticProperty", code);
+            Assert.Equal("() => ExpressionToCodeLibTest.ThePrivateStaticProperty", code);
         }
 
         [Fact]
@@ -622,7 +622,7 @@ namespace ExpressionToCodeTest
         public void ThisStaticMethodCall()
         {
             var code = ExpressionToCode.ToCode(() => StaticReturnZero());
-            Assert.Equal("() => ExpressionToCodeTest.StaticReturnZero()", code);
+            Assert.Equal("() => ExpressionToCodeLibTest.StaticReturnZero()", code);
         }
         public int ReturnZero() => 0;
 
