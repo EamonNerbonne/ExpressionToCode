@@ -588,7 +588,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void ThisPropertyAccess()
         {
-            Assert.Equal("() => TheProperty", code);
+            Assert.Equal("() => TheProperty", ExpressionToCode.ToCode(() => TheProperty));
         }
 
         [Fact]
@@ -602,28 +602,32 @@ namespace ExpressionToCodeTest
         public void ThisProtectedWithPrivateSetterPropertyAccess()
         {
             var code = ExpressionToCode.ToCode(() => TheProtectedWithPrivateSetterProperty);
-            Assert.Equal("() => ThePrivateSettableProperty", code);
+            Assert.Equal("() => TheProtectedWithPrivateSetterProperty", code);
         }
 
-        [Test]
+        [Fact]
         public void ThePrivateStaticPropertyAccess()
         {
             var code = ExpressionToCode.ToCode(() => ThePrivateStaticProperty);
-            Assert.AreEqual("() => ExpressionToCodeTest.ThePrivateStaticProperty", code);
+            Assert.Equal("() => ExpressionToCodeTest.ThePrivateStaticProperty", code);
         }
 
         [Fact]
         public void ThisMethodCall()
         {
+            var code = ExpressionToCode.ToCode(() => ReturnZero());
             Assert.Equal("() => ReturnZero()", code);
         }
 
         [Fact]
         public void ThisStaticMethodCall()
         {
-
+            var code = ExpressionToCode.ToCode(() => StaticReturnZero());
             Assert.Equal("() => ExpressionToCodeTest.StaticReturnZero()", code);
         }
+        public int ReturnZero() => 0;
+
+        public static int StaticReturnZero() => 0;
 
         [Fact]
         public void ThisIndexedProperty()
@@ -632,10 +636,9 @@ namespace ExpressionToCodeTest
             Assert.Equal("() => this[1]", actual);
         }
 
-        public string this[int index] { get { return "TheIndexedValue"; } }
-        public string TheProperty { get { return "TheValue"; } }
-        protected string TheProtectedProperty { get { return "TheValue"; } }
-
+        public string this[int index] => "TheIndexedValue";
+        public string TheProperty => "TheValue";
+        protected string TheProtectedProperty => "TheValue";
         static string ThePrivateStaticProperty => "TheValue";
         protected string TheProtectedWithPrivateSetterProperty { private get; set;}
     }
