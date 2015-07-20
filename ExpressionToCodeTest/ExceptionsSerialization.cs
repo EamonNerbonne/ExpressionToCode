@@ -7,7 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using ExpressionToCodeLib;
 using ExpressionToCodeLib.Internal;
-using NUnit.Framework;
+using Xunit;
 
 namespace ExpressionToCodeTest {
     public class ExceptionsSerialization {
@@ -17,21 +17,21 @@ namespace ExpressionToCodeTest {
         [MethodImpl(MethodImplOptions.NoInlining)]
         static void IntentionallyFailingMethod2() { throw UnitTestingInternalsAccess.CreateException("Hello World!"); }
 
-        [Test]
+        [Fact]
         public void NUnitExceptionIsSerializable() { AssertMethodFailsWithSerializableException(IntentionallyFailingMethod); }
 
-        [Test]
+        [Fact]
         public void PAssertExceptionIsSerializable() { AssertMethodFailsWithSerializableException(IntentionallyFailingMethod2); }
 
-        static void AssertMethodFailsWithSerializableException(TestDelegate intentionallyFailingMethod) {
-            var original = Assert.Catch<Exception>(intentionallyFailingMethod);
+        static void AssertMethodFailsWithSerializableException(Action intentionallyFailingMethod) {
+            var original = Assert.ThrowsAny<Exception>(intentionallyFailingMethod);
 
             var formatter = new BinaryFormatter();
             var ms = new MemoryStream();
             formatter.Serialize(ms, original);
             object deserialized = formatter.Deserialize(new MemoryStream(ms.ToArray()));
 
-            Assert.AreEqual(original.ToString(), deserialized.ToString());
+            Assert.Equal(original.ToString(), deserialized.ToString());
         }
     }
 }

@@ -3,74 +3,73 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ExpressionToCodeLib;
-using NUnit.Framework;
+using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    [TestFixture]
     public class ImplicitCastingTest
     {
-        [Test]
+        [Fact]
         public void CharNoCast()
         {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => ""abc""[1] == 'b'",
                 ExpressionToCode.ToCode(() => "abc"[1] == 'b'));
         }
 
-        [Test]
+        [Fact]
         public void CharComp()
         {
             var c = 'c';
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => c == 'b'",
                 ExpressionToCode.ToCode(() => c == 'b'));
         }
 
-        [Test, Ignore("issue 4")]
+        [Fact(Skip = "issue 4")]
         public void DecimalImplicitCast()
         {
             var i = 1;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => (1m + -i > 0 || false)",
                 ExpressionToCode.ToCode(() => (1m + -i > 0 || false)));
         }
 
-        [Test, Ignore("issue 4")]
+        [Fact(Skip = "issue 4")]
         public void StringImplicitConcat()
         {
             var i = 1;
             var x = "X";
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => 1m + x + ""!!"" + i)",
                 ExpressionToCode.ToCode(() => 1m + x + "!!" + i));
         }
 
-        [Test, Ignore("issue 4")]
+        [Fact(Skip = "issue 4")]
         public void NotImplicitCast()
         {
             byte z = 42;
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => ~z == 0",
                 ExpressionToCode.ToCode(() => ~z == 0));
         }
 
-        [Test, Ignore]
+        [Fact(Skip = "Not yet implemented")]
         public void AvoidsImplicitBoxingWhenTargetTypeIsAGenericArgument()
         {
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
                 );
         }
 
-        [Test, Ignore]
+        [Fact(Skip = "Not yet implemented")]
         public void AvoidsImplicitCastWhenTargetTypeIsAGenericArgument()
         {
             int x = 37;
             double y = 42.0;
 
-            Assert.AreEqual(
+            Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
                 );

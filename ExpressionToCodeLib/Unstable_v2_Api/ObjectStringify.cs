@@ -6,16 +6,16 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Unstable_v2_Api
 {
-    public sealed class ObjectStringify
+    public static class ObjectStringify
     {
         public static readonly IObjectToCode Default = new DefaultImpl();
-        public static readonly IObjectToCode WithFullTypeNames = new DefaultImpl(fullTypeNames: true);
+        public static readonly IObjectToCode WithFullTypeNames = new DefaultImpl(true);
 
         class DefaultImpl : IObjectToCode
         {
             readonly bool fullTypeNames;
             public DefaultImpl(bool fullTypeNames = false) { this.fullTypeNames = fullTypeNames; }
-            public string TypeNameToCode(Type type) { return CSharpFriendlyTypeName.Get(type, fullTypeNames); }
+            public string TypeNameToCode(Type type) { return new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type); }
 
             string IObjectToCode.PlainObjectToCode(object val, Type type)
             {
