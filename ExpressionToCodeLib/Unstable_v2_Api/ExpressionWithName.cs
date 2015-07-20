@@ -17,40 +17,40 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
 		/// var example = "some text";
 		/// var name = toName( () => example);  // "example"
 		/// </example>
-		public static string ToName<TResult>(this Expression<Func<TResult>> expression)
+		public static string ToNameOf<TResult>(this Expression<Func<TResult>> expression)
 		{
-			string value = ToName(expression);
+			string value = ToNameOf(expression);
 			return value;
 		}
 
-		public static string ToName<T1, T2, TResult>(this Expression<Func<T1, T2, TResult>> expression)
+		public static string ToNameOf<T1, T2, TResult>(this Expression<Func<T1, T2, TResult>> expression)
 		{
-			string value = ToName(expression);
+			string value = ToNameOf(expression);
 			return value;
 		}
 
-		public static string ToName<T1, TResult>(this Expression<Func<T1, TResult>> expression)
+		public static string ToNameOf<T1, TResult>(this Expression<Func<T1, TResult>> expression)
 		{
-			string value = ToName(expression);
+			string value = ToNameOf(expression);
 			return value;
 		}
 
-		public static string ToName<T>(this Expression<Action<T>> expression)
+		public static string ToNameOf<T>(this Expression<Action<T>> expression)
 		{
-			string value = ToName(expression);
-			return value;
-		}
-
-
-		public static string ToName(this Expression<Action> expression)
-		{
-			string value = ToName(expression);
+			string value = ToNameOf(expression);
 			return value;
 		}
 
 
+		public static string ToNameOf(this Expression<Action> expression)
+		{
+			string value = ToNameOf(expression);
+			return value;
+		}
 
-		public static string ToName<T>(Expression<T> expression)
+
+
+		public static string ToNameOf<T>(Expression<T> expression)
 		{
 			string value = null;
 			var unaryExpression = expression.Body as UnaryExpression;
@@ -75,7 +75,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
 		}
 
 		//NOTE: should use recursive visitor as in other method when new failed test case added
-		public static string ToFullName<T>(this Expression<T> expression)
+		public static string ToFullNameOf<T>(this Expression<T> expression)
 		{
 			string name = null;
 			var unaryExpression = expression.Body as UnaryExpression;

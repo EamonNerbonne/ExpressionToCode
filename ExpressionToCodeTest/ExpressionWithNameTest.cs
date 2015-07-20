@@ -9,47 +9,47 @@ namespace ExpressionToCodeTest
 	public class ExpressionWithNameTest
 	{
 		[Fact]
-		public void TheVariable_ToName()
+		public void TheVariable_ToNameOf()
 		{
 			var theVariable = "theValue";
-			var actual = ExpressionWithName.ToName(() => theVariable);
+			var actual = ExpressionWithName.ToNameOf(() => theVariable);
 			Assert.Equal("theVariable",actual);
 		}
 
 
 
 		[Fact]
-		public void TheMethod_ToName()
+		public void TheMethod_ToNameOf()
 		{
-			Expression<Func<int, string, string>> theMethod = (x, y) => ExpressionWithNameTest.TheMethod(x, y);
-			var actual = ExpressionWithName.ToName(theMethod);
+			Expression<Func<int, string, string>> theMethod = (x, y) => TheMethod(x, y);
+			var actual = ExpressionWithName.ToNameOf(theMethod);
 			Assert.Equal("TheMethod",actual);
 		}
 
 		[Fact]
-		public void TheMethod_ToFullName()
+		public void TheMethod_ToFullNameOf()
 		{
 			Expression<Func<int, string, string>> theMethod = (x, y) => ExpressionWithNameTest.TheMethod(x, y);
-			var actual = ExpressionWithName.ToFullName(theMethod);
+			var actual = ExpressionWithName.ToFullNameOf(theMethod);
 			Assert.Equal("ExpressionWithNameTest.TheMethod(x, y)",actual);
 		}
 
 
 		[Fact]
-		public void TheGenericMethod_ToName()
+		public void TheGenericMethod_ToNameOf()
 		{
-			Expression<Func<string>> theGenericMethod = () => ExpressionWithNameTest.TheGenericMethod<int>(2);
-			var actual = ExpressionWithName.ToName(theGenericMethod);
+			Expression<Func<string>> theGenericMethod = () => TheGenericMethod<int>(2);
+			var actual = ExpressionWithName.ToNameOf(theGenericMethod);
 			Assert.Equal("TheGenericMethod",actual);
 		}
 
 
 
 		[Fact]
-		public void TheSimpleMethod_ToName()
+		public void TheSimpleMethod_ToNameOf()
 		{
 			Expression<Action> theSimpleMethod = () => TheSimpleMethod(); 
-			var actual = theSimpleMethod.ToName();
+			var actual = theSimpleMethod.ToNameOf();
 			Assert.Equal("TheSimpleMethod",actual);
 		}
 
