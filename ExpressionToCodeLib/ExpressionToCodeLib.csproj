@@ -44,9 +44,6 @@
   <ItemGroup>
     <Compile Include="CSharpFriendlyTypeName.cs" />
     <Compile Include="EqualityExpressions.cs" />
-    <Compile Include="Unstable_v2_Api\IObjectToCode.cs" />
-    <Compile Include="Unstable_v2_Api\ObjectStringify.cs" />
-    <Compile Include="Unstable_v2_Api\ExpressionStringify.cs" />
     <Compile Include="ExpressionToCode.cs" />
     <Compile Include="ExpressionToCodeImpl.cs" />
     <Compile Include="ExpressionPrecedence.cs" />
@@ -56,7 +53,6 @@
       <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
     </Compile>
     <Compile Include="ExprTextPart.cs" />
-    <Compile Include="Unstable_v2_Api\IExpressionToCode.cs" />
     <Compile Include="NullabilityHelpers.cs" />
     <Compile Include="ObjectToCode.cs" />
     <Compile Include="PAssert.cs" />
@@ -64,7 +60,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionHelpers.cs" />
     <Compile Include="UnitTestingFailure.cs" />
-    <Compile Include="Unstable_v2_Api\ExpressionWithValue.cs" />
+    <Compile Include="Unstable\IObjectToCode.cs" />
+    <Compile Include="Unstable\ObjectStringify.cs" />
+    <Compile Include="Unstable\ExpressionStringify.cs" />
+    <Compile Include="Unstable\IExpressionToCode.cs" />
+    <Compile Include="Unstable\ExpressionWithValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ExpressionToCodeLib.nuspec">
