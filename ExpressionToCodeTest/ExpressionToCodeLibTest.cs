@@ -507,10 +507,17 @@ namespace ExpressionToCodeTest {
         }
 
         [Test]
-        public void ThisPrivateSetterPropertyAccess()
+        public void ThisProtectedWithPrivateSetterPropertyAccess()
         {
-            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => ThePrivateSettableProperty);
-            Assert.AreEqual("() => ThePrivateSettableProperty", code);
+            var code = ExpressionToCode.ToCode(() => TheProtectedWithPrivateSetterProperty);
+            Assert.AreEqual("() => TheProtectedWithPrivateSetterProperty", code);
+        }
+
+        [Test]
+        public void ThePrivateStaticPropertyAccess()
+        {
+            var code = ExpressionToCode.ToCode(() => ThePrivateStaticProperty);
+            Assert.AreEqual("() => ExpressionToCodeTest.ThePrivateStaticProperty", code);
         }
 
         [Test]
