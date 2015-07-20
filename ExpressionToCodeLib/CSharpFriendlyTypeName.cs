@@ -55,6 +55,8 @@ namespace ExpressionToCodeLib
                 return "void";
             } else if (type.IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
                 return GetTypeName(type.GetGenericArguments().Single()) + "?";
+            } else if(type.IsGenericParameter) {
+                return type.Name;
             } else {
                 return ArrayTypeName(type);
             }
@@ -62,9 +64,7 @@ namespace ExpressionToCodeLib
 
         string NormalName(Type type)
         {
-            return type.IsGenericParameter
-                ? type.Name
-                : type.DeclaringType != null
+            return type.DeclaringType != null
                     ? GetTypeName(type.DeclaringType) + "." + type.Name
                     : type.Name;
         }
