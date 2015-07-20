@@ -495,14 +495,14 @@ namespace ExpressionToCodeTest {
         class B { }
         [Test]
         public void ThisPropertyAccess() {
-            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => TheProperty);
+            var code = ExpressionToCode.ToCode(() => TheProperty);
             Assert.AreEqual("() => TheProperty", code);
         }
 
         [Test]
         public void ThisProtectedPropertyAccess()
         {
-            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => TheProtectedProperty);
+            var code = ExpressionToCode.ToCode(() => TheProtectedProperty);
             Assert.AreEqual("() => TheProtectedProperty", code);
         }
 
@@ -515,13 +515,13 @@ namespace ExpressionToCodeTest {
 
         [Test]
         public void ThisMethodCall() {
-            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => ReturnZero());
+            var code = ExpressionToCode.ToCode(() => ReturnZero());
             Assert.AreEqual("() => ReturnZero()", code);
         }
 
         [Test]
         public void ThisStaticMethodCall() {
-            var code = ExpressionToCodeLib.ExpressionToCode.ToCode(() => StaticReturnZero());
+            var code = ExpressionToCode.ToCode(() => StaticReturnZero());
 
             Assert.AreEqual("() => ExpressionToCodeTest.StaticReturnZero()", code);
         }
@@ -556,7 +556,9 @@ namespace ExpressionToCodeTest {
                 return "TheValue";
             }
         }
-        protected string ThePrivateSettableProperty { private get; set;}
+
+        static string ThePrivateStaticProperty => "TheValue";
+        protected string TheProtectedWithPrivateSetterProperty { private get; set;}
         public int ReturnZero()
         {
             return 0;
