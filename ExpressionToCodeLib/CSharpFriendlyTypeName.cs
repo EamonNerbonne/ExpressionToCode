@@ -64,9 +64,14 @@ namespace ExpressionToCodeLib
 
         string NormalName(Type type)
         {
-            return type.DeclaringType != null
-                    ? GetTypeName(type.DeclaringType) + "." + type.Name
-                    : type.Name;
+            if(type.DeclaringType != null) {
+                var settingsWithoutUseFullname = this;
+                settingsWithoutUseFullname.UseFullName = false;
+
+                return settingsWithoutUseFullname.GetTypeName(type.DeclaringType) + "." + type.Name;
+            } else {
+                return type.Name;
+            }
         }
 
         string GenericTypeName(Type type)
