@@ -578,9 +578,8 @@ namespace ExpressionToCodeTest
         [Fact]
         public void FullTypeName_ForNestedType()
         {
-            Assert.Equal(
-                "() => new ExpressionToCodeTest.B()",
-                ExpressionStringify.With(true).ToCode(() => new ExpressionToCodeLibTest.B()));
+            var code = ExpressionStringify.With(true).ToCode(() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B());
+            Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()",code);
         }
 
         class B { }
