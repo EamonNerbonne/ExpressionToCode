@@ -17,60 +17,40 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
 		/// var example = "some text";
 		/// var name = toName( () => example);  // "example"
 		/// </example>
-		public static string ToNameOf<TResult>(this Expression<Func<TResult>> expression)
-		{
-			string value = ToNameOf(expression);
-			return value;
-		}
+		public static string ToNameOf<TResult>(this Expression<Func<TResult>> expression) => ToNameOfInternal(expression);
 
-		public static string ToNameOf<T1, T2, TResult>(this Expression<Func<T1, T2, TResult>> expression)
-		{
-			string value = ToNameOf(expression);
-			return value;
-		}
+		public static string ToNameOf<T1, T2, TResult>(this Expression<Func<T1, T2, TResult>> expression) => ToNameOfInternal(expression);
 
-		public static string ToNameOf<T1, TResult>(this Expression<Func<T1, TResult>> expression)
-		{
-			string value = ToNameOf(expression);
-			return value;
-		}
+		public static string ToNameOf<T1, TResult>(this Expression<Func<T1, TResult>> expression) => ToNameOfInternal(expression);
 
-		public static string ToNameOf<T>(this Expression<Action<T>> expression)
-		{
-			string value = ToNameOf(expression);
-			return value;
-		}
+		public static string ToNameOf<T1, T2,T3, TResult>(this Expression<Func<T1, T2,T3, TResult>> expression) => ToNameOfInternal(expression);
+		
+		public static string ToNameOf<T>(this Expression<Action<T>> expression) => ToNameOfInternal(expression);
 
+		public static string ToNameOf<T1,T2>(this Expression<Action<T1,T2>> expression) => ToNameOfInternal(expression);
 
-		public static string ToNameOf(this Expression<Action> expression)
-		{
-			string value = ToNameOf(expression);
-			return value;
-		}
+		public static string ToNameOf(this Expression<Action> expression) => ToNameOfInternal(expression);
 
+		public static string ToNameOf<T>(this Expression<T> expression) => ToNameOfInternal(expression);
 
-
-		public static string ToNameOf<T>(Expression<T> expression)
+		private static string ToNameOfInternal<T>(Expression<T> expression)
 		{
 			string value = null;
+
 			var unaryExpression = expression.Body as UnaryExpression;
 			if (unaryExpression != null)
-			{
 				value = unaryExpression.Operand.ToString().Split('.').Last();
-			}
+
 			var memberExpression = expression.Body as MemberExpression;
 			if (memberExpression != null)
-			{
 				value = memberExpression.Member.Name;
-			}
+
 			var methodCallExpression = expression.Body as MethodCallExpression;
 			if (methodCallExpression != null)
-			{
-				var methodName = methodCallExpression.Method.Name;
-				value = methodName;
-			}
+				value = methodCallExpression.Method.Name;
+
 			if (value == null)
-				throw new ArgumentException("expression", "Unknown expression");
+				throw new ArgumentException("expression", "Unsupported or unknown or complex expression to get `name` of it");
 			return value;
 		}
 
@@ -97,6 +77,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
 				var arguments = string.Join(
 					", ",
 					methodCallExpression.Arguments.Select(x => x.ToString()).ToArray() // converting to string to work for .NET 3.5 if backported
+                    //methodCallExpression.Method.GetParameters().Select(x => x.Name).ToArray() // converting to string to work for .NET 3.5 if backported
 				);
 				var method = methodCallExpression.Method;
 				var methodName = method.Name;

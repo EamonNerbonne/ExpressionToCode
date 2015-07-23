@@ -16,40 +16,63 @@ namespace ExpressionToCodeTest
 			Assert.Equal("theVariable",actual);
 		}
 
-
-
 		[Fact]
 		public void TheMethod_ToNameOf()
 		{
-			Expression<Func<int, string, string>> theMethod = (x, y) => TheMethod(x, y);
-			var actual = ExpressionWithName.ToNameOf(theMethod);
-			Assert.Equal("TheMethod",actual);
+			var x = 1;
+			var y = "";
+			var actual = ExpressionWithName.ToNameOf(() => TheComplexMethod(x, y));
+			Assert.Equal("TheComplexMethod", actual);
 		}
 
 		[Fact]
-		public void TheMethod_ToFullNameOf()
+		public void TheMethod_ToNameOf_asVariable()
 		{
-			Expression<Func<int, string, string>> theMethod = (x, y) => ExpressionWithNameTest.TheMethod(x, y);
-			var actual = ExpressionWithName.ToFullNameOf(theMethod);
-			Assert.Equal("ExpressionWithNameTest.TheMethod(x, y)",actual);
+			Expression<Func<int, string, string>> theComplexMethod = (x, y) => TheComplexMethod(x, y);
+			var actual = ExpressionWithName.ToNameOf(theComplexMethod);
+	        Assert.Equal("TheComplexMethod", actual);
+
+			var full = ExpressionToCodeLib.ExpressionToCode.ToCode(theComplexMethod.Body);
+            Assert.NotEqual(full,actual);
 		}
+
+		[Fact]
+		public void TheMethod_ToNameOf_withValues()
+		{
+			var actual = ExpressionWithName.ToNameOf(()=> TheComplexMethod(1, "2"));
+			Assert.Equal("TheComplexMethod", actual);
+		}
+
+		//[Fact]
+		//public void TheComplexMethod_ToFullNameOf()
+		//{
+		//	Expression<Func<int, string, string>> theComplexMethod = (x, y) => ExpressionWithNameTest.TheComplexMethod(1, "");
+		//	var actual = ExpressionWithName.ToFullNameOf(theComplexMethod);
+		//	Assert.Equal("ExpressionWithNameTest.TheComplexMethod(parameter1, parameter2)", actual);
+
+		//	var full = ExpressionToCodeLib.ExpressionToCode.ToCode(theComplexMethod.Body);
+		//	Assert.NotEqual(full, actual);
+		//}
 
 
 		[Fact]
 		public void TheGenericMethod_ToNameOf()
 		{
-			Expression<Func<string>> theGenericMethod = () => TheGenericMethod<int>(2);
-			var actual = ExpressionWithName.ToNameOf(theGenericMethod);
+			var actual = ExpressionWithName.ToNameOf(() => TheGenericMethod<int>(2));
 			Assert.Equal("TheGenericMethod",actual);
 		}
 
-
+		[Fact]
+		public void TheProperty_ToNameOf()
+		{
+			var actual = ExpressionWithName.ToNameOf(()=> TheProperty);
+			Assert.Equal("TheProperty", actual);
+		}
 
 		[Fact]
 		public void TheSimpleMethod_ToNameOf()
 		{
-			Expression<Action> theSimpleMethod = () => TheSimpleMethod(); 
-			var actual = theSimpleMethod.ToNameOf();
+			var actual = ExpressionWithName.ToNameOf(() => TheSimpleMethod());
 			Assert.Equal("TheSimpleMethod",actual);
 		}
 
@@ -61,7 +84,7 @@ namespace ExpressionToCodeTest
 		string this[int index] { get { return "TheIndexedValue"; } }
 		static int StaticReturnZero() { return 0; }
 		// ReSharper disable MemberCanBeMadeStatic.Local
-		static string TheMethod(int parameter1, string parameter2) { return "TheMethod " + parameter1 + " " + parameter2; }
+		static string TheComplexMethod(int parameter1, string parameter2) { return "TheMethod " + parameter1 + " " + parameter2; }
 		// ReSharper disable once UnusedTypeParameter
 		static string TheGenericMethod<T>(int two) { return "Return value is " + two * two; }
 		int ReturnZero() { return 0; }

@@ -29,12 +29,7 @@ namespace ExpressionToCodeTest.Unstable_v2_Api
             } catch(Exception ex) {
                 throw new InvalidOperationException("Cannon get return value of expression when it throws error", ex);
             }
-
-			var name = ExpressionToCodeLib.Unstable_v2_Api.ExpressionWithName.ToFullNameOf(expression);
-
-            return name + " = " + retValue;
+            return ExpressionToCodeLib.Unstable_v2_Api.ExpressionWithName.ToFullNameOf(expression) + " = " + retValue;
         }
-
-
     }
 }
