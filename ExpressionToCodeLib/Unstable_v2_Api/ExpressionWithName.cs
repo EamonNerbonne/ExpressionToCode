@@ -29,30 +29,28 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
 
 		public static string ToNameOf<T1,T2>(this Expression<Action<T1,T2>> expression) => ToNameOfInternal(expression);
 
+		public static string ToNameOf<T1, T2, T3>(this Expression<Action<T1, T2, T3>> expression) => ToNameOfInternal(expression);
+
 		public static string ToNameOf(this Expression<Action> expression) => ToNameOfInternal(expression);
 
 		public static string ToNameOf<T>(this Expression<T> expression) => ToNameOfInternal(expression);
 
 		private static string ToNameOfInternal<T>(Expression<T> expression)
 		{
-			string value = null;
-
-			var unaryExpression = expression.Body as UnaryExpression;
-			if (unaryExpression != null)
-				value = unaryExpression.Operand.ToString().Split('.').Last();
-
-			var memberExpression = expression.Body as MemberExpression;
-			if (memberExpression != null)
-				value = memberExpression.Member.Name;
-
-			var methodCallExpression = expression.Body as MethodCallExpression;
-			if (methodCallExpression != null)
-				value = methodCallExpression.Method.Name;
-
+			var value = FromUnary(expression)??FromCall(expression)??FromMember(expression);
 			if (value == null)
-				throw new ArgumentException("expression", "Unsupported or unknown or complex expression to get `name` of it");
-			return value;
+				throw new ArgumentException("Unsupported or unknown or complex expression to get `name` of it", "expression");
+			return value;           
 		}
+
+		private static string FromCall<T>(Expression<T> expression)
+           => (expression.Body as MethodCallExpression)?.Method.Name ?? null;
+
+		private static string FromMember<T>(Expression<T> expression)
+	       => (expression.Body as MemberExpression)?.Member.Name ?? null;
+
+		private static string FromUnary<T>(Expression<T> expression)
+			=>  (expression.Body as UnaryExpression)?.Operand.ToString().Split('.').Last() ?? null;
 
 		//NOTE: should use recursive visitor as in other method when new failed test case added
 		public static string ToFullNameOf<T>(this Expression<T> expression)
