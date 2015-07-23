@@ -80,6 +80,7 @@
     <Compile Include="EqualityComparingTest.cs" />
     <Compile Include="ExceptionsSerialization.cs" />
     <Compile Include="ExpressionToCodeLibTest.cs" />
+    <Compile Include="ExpressionWithNameTest.cs" />
     <Compile Include="GenericsTestClasses.cs" />
     <Compile Include="CSharpFriendlyTypeNameTest.cs" />
     <Compile Include="ImplicitCastingTest.cs" />
