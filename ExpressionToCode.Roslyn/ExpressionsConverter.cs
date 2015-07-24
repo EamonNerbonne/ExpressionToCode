@@ -23,8 +23,8 @@ namespace ExpressionToCode.Roslyn {
             var tree = CSharpSyntaxTree.ParseText(ExpressionToCodeLib.ExpressionToCode.ToCode(e));
 
             //TODO: grab all references from Expression tree
-            var ref1 = MetadataReference.CreateFromAssembly(typeof(object).Assembly);
-            var ref2 = MetadataReference.CreateFromAssembly(typeof(Func<>).Assembly);
+            var ref1 = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+            var ref2 = MetadataReference.CreateFromFile(typeof(Func<>).Assembly.Location);
 
             var compilation = CSharpCompilation.Create("ExpressionsConverter.ToCompilationUnit", new List<SyntaxTree> { tree }, new List<MetadataReference> { ref1, ref2 });
             return compilation;
