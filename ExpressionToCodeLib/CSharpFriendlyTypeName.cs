@@ -106,32 +106,13 @@ namespace ExpressionToCodeLib
                             argNames.Add(GetTypeName(typeArgs[i]));
                         }
                         typeArgIdx -= thisTypeArgCount;
-                        revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + JoinTypeArgumentList(argNames) + ">");
+                        revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + string.Join(", ", argNames) + ">");
                     }
                 }
                 type = type.DeclaringType;
             }
             revNestedTypeNames.Reverse();
             return string.Join(".", revNestedTypeNames);
-        }
-
-        static string JoinTypeArgumentList(List<string> argNames)
-        {
-            if(argNames.Count == 1) {
-                return argNames[0];
-            }
-
-            var sb = new StringBuilder(argNames[0]);
-            for(int i = 1; i < argNames.Count; i++) {
-                var argName = argNames[i];
-                if(argName == "") {
-                    sb.Append(",");
-                } else {
-                    sb.Append(", ");
-                    sb.Append(argName);
-                }
-            }
-            return sb.ToString();
         }
 
         string ArrayTypeName(Type type)
