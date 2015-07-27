@@ -15,6 +15,18 @@ class ExpressionToCodeExt
     string TYPE.ToCode<T, T1>(IExpressionToCode it, Expression<Func<T, T1>> e)
     string TYPE.ToCode<T>(IExpressionToCode it, Expression<Func<T>> e)
 
+class ExpressionWithName
+    string TYPE.ToNameOf<TResult>(Expression<Func<TResult>> expression)
+    string TYPE.ToNameOf<T1, T2, TResult>(Expression<Func<T1, T2, TResult>> expression)
+    string TYPE.ToNameOf<T1, TResult>(Expression<Func<T1, TResult>> expression)
+    string TYPE.ToNameOf<T1, T2, T3, TResult>(Expression<Func<T1, T2, T3, TResult>> expression)
+    string TYPE.ToNameOf<T>(Expression<Action<T>> expression)
+    string TYPE.ToNameOf<T1, T2>(Expression<Action<T1, T2>> expression)
+    string TYPE.ToNameOf<T1, T2, T3>(Expression<Action<T1, T2, T3>> expression)
+    string TYPE.ToNameOf(Expression<Action> expression)
+    string TYPE.ToNameOf<T>(Expression<T> expression)
+    string TYPE.ToFullNameOf<T>(Expression<T> expression)
+
 class ObjectStringify
     static readonly IObjectToCode Default
     static readonly IObjectToCode WithFullTypeNames
