@@ -44,14 +44,8 @@ namespace ExpressionToCodeLib
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (Assembly assembly in assemblies) {
                 string assemblyName = assembly.GetName().Name;
-
-                if(assemblyName == "Microsoft.VisualStudio.QualityTools.UnitTestFramework") {
-                    yield return
-                        Tuple.Create(1, mkFailFunc(assembly, "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException"));
-                } else if(assemblyName == "nunit.framework") {
-                    yield return Tuple.Create(2, mkFailFunc(assembly, "NUnit.Framework.AssertionException"));
-                } else if(assemblyName == "xunit") {
-                    var xUnitExceptionType = assembly.GetType("Xunit.Sdk.AssertException");
+                if (assemblyName == "xunit" || assemblyName == "xunit.assert") {
+                    var xUnitExceptionType = assembly.GetType("Xunit.Sdk.XunitException") ?? assembly.GetType("Xunit.Sdk.AssertException");
                     var xUnitExceptionConstructor =
                         xUnitExceptionType.GetConstructor(
                             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
@@ -86,10 +80,18 @@ namespace ExpressionToCodeLib
                         Tuple.Create(
                             3,
                             Expression.Lambda<Func<string, Exception, Exception>>(
-                                Expression.New(exConstructor, failureMessageArg, innerExceptionArg),
+                                Expression.New(
+                                    exConstructor,
+                                    Expression.Add(Expression.Constant("\r\n"), failureMessageArg, ((Func<string, string, string>)string.Concat).Method),
+                                    innerExceptionArg),
                                 failureMessageArg,
                                 innerExceptionArg)
                                 .Compile());
+                } else if (assemblyName == "nunit.framework") {
+                    yield return Tuple.Create(2, mkFailFunc(assembly, "NUnit.Framework.AssertionException"));
+                } else if (assemblyName == "Microsoft.VisualStudio.QualityTools.UnitTestFramework") {
+                    yield return
+                        Tuple.Create(1, mkFailFunc(assembly, "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException"));
                 }
             }
             yield return Tuple.Create(0, F((string s, Exception e) => (Exception)new AssertFailedException(s, e)));
