@@ -26,11 +26,11 @@ namespace ExpressionToCodeLib
             var mkFailFunc = F(
                 (Assembly assembly, string typename) => {
                     var exType = assembly.GetType(typename);
-                    if(exType == null) {
+                    if (exType == null) {
                         return null;
                     }
                     var exConstructor = exType.GetConstructor(new[] { typeof(string), typeof(Exception) });
-                    if(exConstructor == null) {
+                    if (exConstructor == null) {
                         return null;
                     }
                     return
@@ -42,7 +42,7 @@ namespace ExpressionToCodeLib
                 });
 
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach(Assembly assembly in assemblies) {
+            foreach (Assembly assembly in assemblies) {
                 string assemblyName = assembly.GetName().Name;
 
                 if(assemblyName == "Microsoft.VisualStudio.QualityTools.UnitTestFramework") {

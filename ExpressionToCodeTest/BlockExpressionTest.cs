@@ -86,7 +86,7 @@ namespace ExpressionToCodeTest
             ParameterExpression p = Expression.Parameter(typeof(int), "p");
             ParameterExpression x = Expression.Parameter(typeof(int), "x");
             Expression assignment = Expression.Assign(p, x);
-            Assert.Equal(@"{ int p; int x; p = x; }", ExpressionToCode.ToCode(Expression.Block(typeof(void), new ParameterExpression[] { p, x }, assignment)));
+            Assert.Equal(@"{ int p; int x; p = x; }", ExpressionToCode.ToCode(Expression.Block(typeof(void), new[] { p, x }, assignment)));
         }
 
         [Fact]
@@ -101,7 +101,7 @@ namespace ExpressionToCodeTest
             ParameterExpression p = Expression.Parameter(typeof(int), "p");
             Expression assignment = Expression.Assign(p, Expression.Constant(1));
             Expression addAssignment = Expression.AddAssign(p, Expression.Constant(5));
-            Assert.Equal(@"{ int p; p = 1; p += 5; }", ExpressionToCode.ToCode(Expression.Block(typeof(void), new ParameterExpression[] { p }, assignment, addAssignment)));
+            Assert.Equal(@"{ int p; p = 1; p += 5; }", ExpressionToCode.ToCode(Expression.Block(typeof(void), new[] { p }, assignment, addAssignment)));
         }
 
         [Fact]
