@@ -6,10 +6,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("ExpressionToCodeLib")]
-[assembly:
-    AssemblyDescription(
-        @"Create readable C# assertions (or other code) from an expression tree; can annotate subexpressions with their runtime value.  Integrates with xUnit.NET, NUnit and MSTest."
-        )]
+[assembly: AssemblyDescription(@"Create readable C# assertions (or other code) from an expression tree; can annotate subexpressions with their runtime value.  Integrates with xUnit.NET, NUnit and MSTest.")]
 [assembly: AssemblyProduct("ExpressionToCodeLib")]
 [assembly: AssemblyCompany("Eamon Nerbonne")]
 [assembly: AssemblyCopyright("Copyright © Eamon Nerbonne")]
