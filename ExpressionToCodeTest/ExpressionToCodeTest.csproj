@@ -92,6 +92,7 @@
     <Compile Include="ExpressionWithNameTest.cs" />
     <Compile Include="GenericsTestClasses.cs" />
     <Compile Include="CSharpFriendlyTypeNameTest.cs" />
+    <Compile Include="StringInterpolationTest.cs" />
     <Compile Include="ImplicitCastingTest.cs" />
     <Compile Include="MultipleIndexerTest.cs" />
     <Compile Include="NestedClassTest.cs" />
