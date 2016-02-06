@@ -279,6 +279,18 @@ namespace ExpressionToCodeLib
                     ? null
                     : mce.Arguments[1];
                 SinkMethodName(mce, targetMethod, targetExpr);
+            } else if (mce.Object == null
+                && mce.Type.FullName == "System.FormattableString"
+                && mce.Method.DeclaringType.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
+                && mce.Method.Name == "Create"
+                && mce.Arguments.Count == 2
+                && mce.Arguments[0].NodeType ==  ExpressionType.Constant
+                && mce.Arguments[1].NodeType == ExpressionType.NewArrayInit
+                ) {
+                //.net 4.6
+                //string-interpolations are compiled into FormattableStringFactory.Create
+                var codeRepresentation = "$" + objectToCode.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
+                Sink(codeRepresentation);
             } else {
                 bool isExtensionMethod = mce.Method.IsStatic
                     && mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any()
