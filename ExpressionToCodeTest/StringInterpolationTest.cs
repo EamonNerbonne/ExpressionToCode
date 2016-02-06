@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using ExpressionToCodeLib;
 using Xunit;
@@ -24,5 +25,98 @@ namespace ExpressionToCodeTest
             Assert.Equal(@"() => Interpolation($""abc"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc")));
         }
+
+        [Fact]
+        public void FormattableStringFactory_IsRenderedAsInterpolation()
+        {
+            Assert.Equal(@"() => Interpolation($""abc"")",
+                ExpressionToCode.ToCode(
+                    () => Interpolation(FormattableStringFactory.Create("abc", new object[] { }))
+                ));
+        }
+
+        [Fact]
+        public void FormattableStringFactory_NonConstantStringIsNoInterpolation()
+        {
+            var s = "abc";
+            Assert.Equal(@"() => Interpolation(FormattableStringFactory.Create(s, new object[] { }))",
+                ExpressionToCode.ToCode(
+                    () => Interpolation(FormattableStringFactory.Create(s, new object[] { }))
+                ));
+        }
+
+        [Fact]
+        public void FormattableStringFactory_NonInlineArrayIsNoInterpolation()
+        {
+            var arr = new object[0];
+            ;
+            Assert.Equal(@"() => Interpolation(FormattableStringFactory.Create(""abc"", arr))",
+                ExpressionToCode.ToCode(
+                    () => Interpolation(FormattableStringFactory.Create("abc", arr))
+                ));
+        }
+
+
+        [Fact]
+        public void ForcedInterpolationWithOneArg()
+        {
+            Assert.Equal(@"() => Interpolation($""abc {3f}"")",
+                ExpressionToCode.ToCode(() => Interpolation($"abc {3f}")));
+        }
+
+        [Fact]
+        public void ForcedInterpolationWithNestedString()
+        {
+            Assert.Equal(@"() => Interpolation($""abc {""def""}"")",
+                ExpressionToCode.ToCode(() => Interpolation($"abc {"def"}")));
+        }
+
+        [Fact]
+        public void ForcedInterpolationWithNestedInterpolation()
+        {
+            Assert.Equal(@"() => Interpolation($""abc {Interpolation($""abc {""def""}"")}""))",
+                ExpressionToCode.ToCode(
+                    () => Interpolation($"abc {Interpolation($"abc {"def"}")}"))
+                    );
+        }
+
+        [Fact]
+        public void ForcedInterpolationWithTwoArguments()
+        {
+            Assert.Equal(@"() => Interpolation($""abc {3f} X {'a'} Y"")",
+                ExpressionToCode.ToCode(() => Interpolation($"abc {3f} X {'a'} Y")));
+        }
+
+        [Fact]
+        public void ForcedInterpolationWithAdditionInArgument()
+        {
+            Assert.Equal(@"() => Interpolation($""abc {3f + Math.PI} Z"")",
+                ExpressionToCode.ToCode(() => Interpolation($"abc {3f + Math.PI} Z")));
+        }
+
+        [Fact]
+        public void ForcedInterpolationWithTernaryArgumentNeedsParens()
+        {
+            var aBoolean = true;
+
+            Assert.Equal(@"() => Interpolation($""abc {(aBoolean ? 1 : 2)} Z"")",
+                ExpressionToCode.ToCode(() => Interpolation($"abc {(aBoolean ? 1 : 2)} Z")));
+        }
+
+
+        [Fact]
+        public void ForcedInterpolationWithFormatSpecifier()
+        {
+            Assert.Equal(@"() => Interpolation($""abc {DateTime.Now:somespecifier, yep!} Z"")",
+                ExpressionToCode.ToCode(() => Interpolation($"abc {DateTime.Now:somespecifier: yep!} Z")));
+        }
+
+        [Fact]
+        public void ForcedInterpolationWithCurlyBraces()
+        {
+            Assert.Equal(@"() => Interpolation($""abc {{!}}"")",
+                ExpressionToCode.ToCode(() => Interpolation($"abc {{!}}")));
+        }
+
     }
 }
