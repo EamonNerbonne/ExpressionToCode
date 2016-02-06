@@ -9,11 +9,20 @@ namespace ExpressionToCodeTest
 {
     public class StringInterpolationTest
     {
+        FormattableString Interpolation(FormattableString str) => str;
+
         [Fact]
-        public void BasicStringInterpolation()
+        public void InterpolationWithArgumentsIsJustAString()
         {
-            Assert.Equal(@"() => $""abc""",
+            Assert.Equal(@"() => ""abc""",
                 ExpressionToCode.ToCode(() => $"abc"));
+        }
+
+        [Fact]
+        public void ForcedInterpolationWorks()
+        {
+            Assert.Equal(@"() => ""abc""",
+                ExpressionToCode.ToCode(() => Interpolation($"abc")));
         }
     }
 }
