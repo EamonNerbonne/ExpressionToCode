@@ -21,7 +21,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void ForcedInterpolationWorks()
         {
-            Assert.Equal(@"() => ""abc""",
+            Assert.Equal(@"() => Interpolation($""abc"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc")));
         }
     }
