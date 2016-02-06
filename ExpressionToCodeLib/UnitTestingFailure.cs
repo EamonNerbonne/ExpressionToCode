@@ -16,10 +16,10 @@ namespace ExpressionToCodeLib
 
         static Func<string, Exception, Exception> GetAssertionExceptionFactory()
         {
-            return GetExceptionFactories().Where(t => t.Item2 != null).OrderByDescending(t => t.Item1).First().Item2;
+            return GetExceptionFactories().Where(t => t.CreateException != null).OrderByDescending(t => t.Priority).First().CreateException;
         }
 
-        static IEnumerable<Tuple<int, Func<string, Exception, Exception>>> GetExceptionFactories()
+        static IEnumerable<ExceptionFactory> GetExceptionFactories()
         {
             var failureMessageArg = Expression.Parameter(typeof(string), "failureMessage");
             var innerExceptionArg = Expression.Parameter(typeof(Exception), "innerException");
@@ -77,8 +77,9 @@ namespace ExpressionToCodeLib
                     var exConstructor = exType.GetConstructor(new[] { typeof(string), typeof(Exception) });
 
                     yield return
-                        Tuple.Create(
-                            3,
+                        new ExceptionFactory {
+                            Priority = 3,
+                            CreateException =
                             Expression.Lambda<Func<string, Exception, Exception>>(
                                 Expression.New(
                                     exConstructor,
@@ -86,15 +87,22 @@ namespace ExpressionToCodeLib
                                     innerExceptionArg),
                                 failureMessageArg,
                                 innerExceptionArg)
-                                .Compile());
+                                .Compile(),
+                                };
                 } else if (assemblyName == "nunit.framework") {
-                    yield return Tuple.Create(2, mkFailFunc(assembly, "NUnit.Framework.AssertionException"));
+                    yield return new ExceptionFactory { Priority = 2, CreateException = mkFailFunc(assembly, "NUnit.Framework.AssertionException") };
                 } else if (assemblyName == "Microsoft.VisualStudio.QualityTools.UnitTestFramework") {
                     yield return
-                        Tuple.Create(1, mkFailFunc(assembly, "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException"));
+                        new ExceptionFactory { Priority = 1, CreateException = mkFailFunc(assembly, "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException") };
                 }
             }
-            yield return Tuple.Create(0, F((string s, Exception e) => (Exception)new AssertFailedException(s, e)));
+            yield return new ExceptionFactory { Priority = 0, CreateException = F((string s, Exception e) => (Exception)new AssertFailedException(s, e)) };
+        }
+
+        struct ExceptionFactory
+        {
+            public int Priority;
+            public Func<string, Exception, Exception> CreateException;
         }
     }
 }
