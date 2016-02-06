@@ -286,6 +286,7 @@ namespace ExpressionToCodeLib
                 && mce.Arguments.Count == 2
                 && mce.Arguments[0].NodeType ==  ExpressionType.Constant
                 && mce.Arguments[1].NodeType == ExpressionType.NewArrayInit
+                && ((NewArrayExpression)mce.Arguments[1]).Expressions.Count == 0
                 ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
