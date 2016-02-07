@@ -73,14 +73,14 @@ namespace ExpressionToCodeLib
             return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };
         }
 
-        static void AppendTo(StringBuilder sb, List<SubExpressionInfo> nodeInfos, StringifiedExpression node, ref bool ignoreOutermostValue_andIsOutermost, bool ignoreOutermostValue)
+        static void AppendTo(StringBuilder sb, List<SubExpressionInfo> nodeInfos, StringifiedExpression node, ref bool ignoreInitialSpace, bool ignoreOutermostValue_andIsOutermost)
         {
             if (node.Text != null) {
-                var trimmedText = ignoreOutermostValue_andIsOutermost ? node.Text.TrimStart() : node.Text;
+                var trimmedText = ignoreInitialSpace ? node.Text.TrimStart() : node.Text;
                 var pos0 = sb.Length;
                 sb.Append(trimmedText);
-                ignoreOutermostValue_andIsOutermost = node.Text.Any() && ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
-                if (ignoreOutermostValue) {
+                ignoreInitialSpace = node.Text.Any() && ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
+                if (ignoreOutermostValue_andIsOutermost) {
                     return;
                 }
                 string valueString = node.OptionalValue == null ? null : ExpressionValueAsCode(node.OptionalValue);
@@ -89,7 +89,7 @@ namespace ExpressionToCodeLib
                 }
             } else {
                 foreach (var kid in node.Children)
-                    AppendTo(sb, nodeInfos, kid, ref ignoreOutermostValue_andIsOutermost, false);
+                    AppendTo(sb, nodeInfos, kid, ref ignoreInitialSpace, false);
             }
         }
 
