@@ -52,7 +52,7 @@ namespace ExpressionToCodeLib
             if (child.PrefixOrNull != null) {
                 yield return StringifiedExpression.TextOnly(child.PrefixOrNull);
             }
-            yield return this.ExpressionDispatch(child.Expr);
+            yield return this.ExpressionDispatch(child.Expr).MarkAsConceptualChild();
         }
 
         [Pure]
@@ -78,7 +78,7 @@ namespace ExpressionToCodeLib
             public Expression Expr;
             public string PrefixOrNull;
         }
-
+        
         [Pure]
         IEnumerable<StringifiedExpression> ArgListDispatch(
             IEnumerable<Argument> arguments,
