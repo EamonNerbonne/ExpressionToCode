@@ -26,12 +26,6 @@ namespace ExpressionToCodeLib
             : this(ObjectStringify.Default, false) { }
 
         [Pure]
-        static StringifiedExpression Sink(string text) => StringifiedExpression.TextOnly(text);
-
-        [Pure]
-        static StringifiedExpression Sink(string text, Expression value) => StringifiedExpression.TextAndExpr(text, value);
-
-        [Pure]
         IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
         {
             int parentRank = parentType == null ? 0 : ExpressionPrecedence.Rank(parentType.Value);
@@ -56,18 +50,18 @@ namespace ExpressionToCodeLib
         IEnumerable<StringifiedExpression> RawChildDispatch(Argument child)
         {
             if (child.PrefixOrNull != null) {
-                yield return Sink(child.PrefixOrNull);
+                yield return StringifiedExpression.TextOnly(child.PrefixOrNull);
             }
             yield return this.ExpressionDispatch(child.Expr);
         }
 
         [Pure]
-        IEnumerable<StringifiedExpression> JoinDispatch<T>(IEnumerable<T> children, string joiner, Func<T, IEnumerable<StringifiedExpression>> childVisitor)
+        static IEnumerable<StringifiedExpression> JoinDispatch<T>(IEnumerable<T> children, string joiner, Func<T, IEnumerable<StringifiedExpression>> childVisitor)
         {
             bool isFirst = true;
             foreach (var child in children) {
                 if (!isFirst) {
-                    yield return Sink(joiner);
+                    yield return StringifiedExpression.TextOnly(joiner);
                 }
                 foreach (var grandchild in childVisitor(child)) {
                     yield return grandchild;
@@ -94,14 +88,14 @@ namespace ExpressionToCodeLib
             string joiner = ", ")
         {
             if (value != null) {
-                yield return Sink(open, value);
+                yield return StringifiedExpression.TextAndExpr(open, value);
             } else {
-                yield return Sink(open);
+                yield return StringifiedExpression.TextOnly(open);
             }
             foreach (var o in JoinDispatch(arguments, joiner)) {
                 yield return o;
             }
-            yield return Sink(close);
+            yield return StringifiedExpression.TextOnly(close);
         }
 
         struct KidsBuilder
@@ -862,7 +856,7 @@ namespace ExpressionToCodeLib
         {
             var parameterExpression = ((ParameterExpression)e);
             // ReSharper disable once ConstantNullCoalescingCondition
-            return Sink(parameterExpression.Name ?? parameterExpression.Type.Name + parameterExpression.GetHashCode(), e);
+            return StringifiedExpression.TextAndExpr(parameterExpression.Name ?? parameterExpression.Type.Name + parameterExpression.GetHashCode(), e);
         }
 
         [Pure]
@@ -1052,7 +1046,7 @@ namespace ExpressionToCodeLib
         {
             var defExpr = (DefaultExpression)e;
 
-            return Sink("default(" + objectToCode.TypeNameToCode(defExpr.Type) + ")");
+            return StringifiedExpression.TextOnly("default(" + objectToCode.TypeNameToCode(defExpr.Type) + ")");
         }
 
         [Pure]
