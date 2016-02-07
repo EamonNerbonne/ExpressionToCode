@@ -109,6 +109,7 @@ namespace ExpressionToCodeLib
             readonly List<StringifiedExpression> kids;
             KidsBuilder(List<StringifiedExpression> init) { kids = init; }
 
+            [Pure]
             public static KidsBuilder Create() => new KidsBuilder(new List<StringifiedExpression>());
 
             public void Add(StringifiedExpression node) { kids.Add(node); }
