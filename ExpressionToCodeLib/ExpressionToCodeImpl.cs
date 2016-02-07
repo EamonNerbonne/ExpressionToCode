@@ -14,7 +14,6 @@ namespace ExpressionToCodeLib
         #region General Helpers
         readonly IObjectToCode objectToCode;
         readonly bool explicitMethodTypeArgs;
-        int Depth;
 
         //TODO: refactor IExpressionTypeDispatch into an input/output model to avoid this tricky side-effect approach.
         internal ExpressionToCodeImpl(IObjectToCode objectToCode, bool explicitMethodTypeArgs)
@@ -27,10 +26,10 @@ namespace ExpressionToCodeLib
             : this(ObjectStringify.Default, false) { }
 
         [Pure]
-        StringifiedExpression Sink(string text) => StringifiedExpression.TextOnly(text, Depth);
+        static StringifiedExpression Sink(string text) => StringifiedExpression.TextOnly(text);
 
         [Pure]
-        StringifiedExpression Sink(string text, Expression value) => StringifiedExpression.TextAndExpr(text, value, Depth);
+        static StringifiedExpression Sink(string text, Expression value) => StringifiedExpression.TextAndExpr(text, value);
 
         [Pure]
         IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
@@ -40,13 +39,13 @@ namespace ExpressionToCodeLib
                 && (parensIfEqualRank ? parentRank - 1 : parentRank) < ExpressionPrecedence.Rank(child.NodeType);
 
             if (needsParens) {
-                yield return StringifiedExpression.TextOnly("(", Depth);
+                yield return StringifiedExpression.TextOnly("(");
             }
             foreach (var grandchild in RawChildDispatch(child)) {
                 yield return grandchild;
             }
             if (needsParens) {
-                yield return StringifiedExpression.TextOnly(")", Depth);
+                yield return StringifiedExpression.TextOnly(")");
             }
         }
 
@@ -56,12 +55,10 @@ namespace ExpressionToCodeLib
         [Pure]
         IEnumerable<StringifiedExpression> RawChildDispatch(Argument child)
         {
-            Depth++;
             if (child.PrefixOrNull != null) {
                 yield return Sink(child.PrefixOrNull);
             }
             yield return this.ExpressionDispatch(child.Expr);
-            Depth--;
         }
 
         [Pure]
@@ -109,25 +106,21 @@ namespace ExpressionToCodeLib
 
         struct KidsBuilder
         {
-            readonly int depth;
             readonly List<StringifiedExpression> kids;
+            KidsBuilder(List<StringifiedExpression> init) { kids = init; }
 
-            public KidsBuilder(int depth)
-            {
-                this.depth = depth;
-                kids = new List<StringifiedExpression>();
-            }
+            public static KidsBuilder Create() => new KidsBuilder(new List<StringifiedExpression>());
 
             public void Add(StringifiedExpression node) { kids.Add(node); }
             public void Add(IEnumerable<StringifiedExpression> nodes) { kids.AddRange(nodes); }
-            public void Add(string text, Expression value) { kids.Add(StringifiedExpression.TextAndExpr(text, value, depth)); }
-            public StringifiedExpression Finish() { return StringifiedExpression.WithChildren(kids.ToArray(), depth); }
+            public void Add(string text, Expression value) { kids.Add(StringifiedExpression.TextAndExpr(text, value)); }
+            public StringifiedExpression Finish() { return StringifiedExpression.WithChildren(kids.ToArray()); }
         }
 
         [Pure]
         StringifiedExpression BinaryDispatch(string op, Expression e)
         {
-            var kids = new KidsBuilder(Depth);
+            var kids = KidsBuilder.Create();
             var be = (BinaryExpression)e;
             Expression left, right;
             kids.Add(UnwrapEnumOp(be, out left, out right));

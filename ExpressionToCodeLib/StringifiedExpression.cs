@@ -5,7 +5,6 @@ namespace ExpressionToCodeLib
 {
     struct StringifiedExpression
     {
-        public readonly int Depth;
         //a node cannot have children and text.  If it has neither, it is considered empty.
         public readonly string Text;
         readonly StringifiedExpression[] children;
@@ -14,25 +13,23 @@ namespace ExpressionToCodeLib
         //can only have a value it it has text.
         public readonly Expression OptionalValue;
 
-        StringifiedExpression(int depth, string text, StringifiedExpression[] children, Expression optionalValue)
+        StringifiedExpression(string text, StringifiedExpression[] children, Expression optionalValue)
         {
             Text = text;
             this.children = children;
             OptionalValue = optionalValue;
-            Depth = depth;
         }
 
-        public static StringifiedExpression TextOnly(string text, int depth) => new StringifiedExpression(depth, text, null, null);
+        public static StringifiedExpression TextOnly(string text) => new StringifiedExpression(text, null, null);
 
-        public static StringifiedExpression TextAndExpr(string text, Expression expr, int depth)
+        public static StringifiedExpression TextAndExpr(string text, Expression expr)
         {
             if (expr == null) {
                 throw new ArgumentNullException(nameof(expr));
             }
-            return new StringifiedExpression(depth, text, null, expr);
+            return new StringifiedExpression(text, null, expr);
         }
 
-        public static StringifiedExpression WithChildren(StringifiedExpression[] children, int depth) => new StringifiedExpression(depth, null, children, null);
+        public static StringifiedExpression WithChildren(StringifiedExpression[] children) => new StringifiedExpression(null, children, null);
     }
-
 }
