@@ -57,21 +57,21 @@ namespace ExpressionToCodeTest
         }
 
 
-        [Fact]
+        [Fact(Skip = "Not yet implemented")]
         public void ForcedInterpolationWithOneArg()
         {
             Assert.Equal(@"() => Interpolation($""abc {3f}"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {3f}")));
         }
 
-        [Fact]
+        [Fact(Skip = "Not yet implemented")]
         public void ForcedInterpolationWithNestedString()
         {
             Assert.Equal(@"() => Interpolation($""abc {""def""}"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {"def"}")));
         }
 
-        [Fact]
+        [Fact(Skip = "Not yet implemented")]
         public void ForcedInterpolationWithNestedInterpolation()
         {
             Assert.Equal(@"() => Interpolation($""abc {Interpolation($""abc {""def""}"")}""))",
@@ -80,21 +80,21 @@ namespace ExpressionToCodeTest
                     );
         }
 
-        [Fact]
+        [Fact(Skip = "Not yet implemented")]
         public void ForcedInterpolationWithTwoArguments()
         {
             Assert.Equal(@"() => Interpolation($""abc {3f} X {'a'} Y"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {3f} X {'a'} Y")));
         }
 
-        [Fact]
+        [Fact( Skip = "Not yet implemented")]
         public void ForcedInterpolationWithAdditionInArgument()
         {
             Assert.Equal(@"() => Interpolation($""abc {3f + Math.PI} Z"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {3f + Math.PI} Z")));
         }
 
-        [Fact]
+        [Fact(Skip = "Not yet implemented")]
         public void ForcedInterpolationWithTernaryArgumentNeedsParens()
         {
             var aBoolean = true;
@@ -104,7 +104,7 @@ namespace ExpressionToCodeTest
         }
 
 
-        [Fact]
+        [Fact(Skip = "Not yet implemented")]
         public void ForcedInterpolationWithFormatSpecifier()
         {
             Assert.Equal(@"() => Interpolation($""abc {DateTime.Now:somespecifier, yep!} Z"")",
