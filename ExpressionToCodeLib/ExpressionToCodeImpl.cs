@@ -649,7 +649,7 @@ namespace ExpressionToCodeLib
             var kids = KidsBuilder.Create();
 
             var be = (BlockExpression)e;
-            bool hasReturn = (be.Type != typeof(StringifiedExpression));
+            bool hasReturn = (be.Type != typeof(void));
             var statements = hasReturn ? be.Expressions.Take(be.Expressions.Count - 1) : be.Expressions;
 
             kids.Add("{ ");
