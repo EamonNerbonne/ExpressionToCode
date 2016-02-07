@@ -87,8 +87,6 @@ namespace ExpressionToCodeLib
                 if (valueString != null) {
                     nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
                 }
-                sb.Append(ignoreOutermostValue_andIsOutermost ? node.Text.TrimStart() : node.Text);
-                ignoreOutermostValue_andIsOutermost = node.Text.Any() && ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
             } else {
                 foreach (var kid in node.Children)
                     AppendTo(sb, nodeInfos, kid, ref ignoreOutermostValue_andIsOutermost, false);
