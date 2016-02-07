@@ -31,5 +31,6 @@ namespace ExpressionToCodeLib
         }
 
         public static StringifiedExpression WithChildren(StringifiedExpression[] children) => new StringifiedExpression(null, children, null);
+        public override string ToString() => Text ?? string.Join("", children);
     }
 }
