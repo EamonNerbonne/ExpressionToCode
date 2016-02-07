@@ -847,7 +847,7 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchQuote(Expression e)
         {
-            return KidsBuilder.Finish(NestExpression(e.NodeType, ((UnaryExpression)e).Operand));
+            return StringifiedExpression.WithChildren(NestExpression(e.NodeType, ((UnaryExpression)e).Operand).ToArray());
         }
 
         [Pure]
