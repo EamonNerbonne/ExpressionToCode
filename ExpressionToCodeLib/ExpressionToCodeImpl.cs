@@ -184,13 +184,16 @@ namespace ExpressionToCodeLib
         {
             var ue = (UnaryExpression)e;
             bool needsSpace = ExpressionPrecedence.TokenizerConfusable(ue.NodeType, ue.Operand.NodeType);
-            Sink(op + (needsSpace ? " " : ""), e);
-            NestExpression(ue.NodeType, ue.Operand);
+            var kids = KidsBuilder.Create();
+            kids.Add(op + (needsSpace ? " " : ""), e);
+            kids.Add(NestExpression(ue.NodeType, ue.Operand));
+            return kids.Finish();
         }
 
         [Pure]
         StringifiedExpression UnaryDispatchConvert(Expression e)
         {
+            var kids = KidsBuilder.Create();
             var ue = (UnaryExpression)e;
             if (e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
             {
@@ -204,6 +207,7 @@ namespace ExpressionToCodeLib
         [Pure]
         StringifiedExpression UnaryPostfixDispatch(string op, Expression e)
         {
+            var kids = KidsBuilder.Create();
             var ue = (UnaryExpression)e;
             NestExpression(ue.NodeType, ue.Operand);
             Sink(op, e);
@@ -212,6 +216,7 @@ namespace ExpressionToCodeLib
         [Pure]
         StringifiedExpression TypeOpDispatch(string op, Expression e)
         {
+            var kids = KidsBuilder.Create();
             NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression);
             Sink(" " + op + " ", e);
             Sink(objectToCode.TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
@@ -220,6 +225,7 @@ namespace ExpressionToCodeLib
         [Pure]
         StringifiedExpression StatementDispatch(Expression e, ExpressionType? parentType = null)
         {
+            var kids = KidsBuilder.Create();
             NestExpression(parentType, e);
             Sink("; ");
         }
@@ -227,6 +233,7 @@ namespace ExpressionToCodeLib
         [Pure]
         StringifiedExpression StatementDispatch(String prefix, Expression e, ExpressionType? parentType = null)
         {
+            var kids = KidsBuilder.Create();
             Sink(prefix);
             Sink(" ");
             StatementDispatch(e, parentType);
@@ -237,6 +244,7 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchLambda(Expression e)
         {
+            var kids = KidsBuilder.Create();
             var le = (LambdaExpression)e;
             if (le.Parameters.Count == 1) {
                 NestExpression(e.NodeType, le.Parameters.Single());
@@ -265,6 +273,7 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchMemberAccess(Expression e)
         {
+            var kids = KidsBuilder.Create();
             var me = (MemberExpression)e;
             Expression memberOfExpr = me.Expression;
             if (memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr)) {
@@ -284,6 +293,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchCall(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var mce = (MethodCallExpression)e;
 
             var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
@@ -356,6 +367,8 @@ namespace ExpressionToCodeLib
         [Pure]
         StringifiedExpression SinkMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr)
         {
+            var kids = KidsBuilder.Create();
+
             if (objExpr != null) {
                 if (!(isThisRef(objExpr) || isClosureRef(objExpr))) {
                     NestExpression(mce.NodeType, objExpr);
@@ -413,6 +426,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchIndex(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var ie = (IndexExpression)e;
             NestExpression(ie.NodeType, ie.Object);
 
@@ -431,6 +446,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchInvoke(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var ie = (InvocationExpression)e;
             if (ie.Expression.NodeType == ExpressionType.Lambda) {
                 Sink("new " + objectToCode.TypeNameToCode(ie.Expression.Type));
@@ -444,6 +461,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchConstant(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var const_Val = ((ConstantExpression)e).Value;
             string codeRepresentation = objectToCode.PlainObjectToCode(const_Val, e.Type);
             //e.Type.IsVisible
@@ -466,6 +485,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchConditional(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var ce = (ConditionalExpression)e;
             NestExpression(ce.NodeType, ce.Test);
             Sink(" ? ", e);
@@ -477,6 +498,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchListInit(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var lie = (ListInitExpression)e;
             Sink("new ", lie);
             Sink(objectToCode.TypeNameToCode(lie.NewExpression.Constructor.ReflectedType));
@@ -492,6 +515,8 @@ namespace ExpressionToCodeLib
         [Pure]
         StringifiedExpression DispatchElementInit(ElementInit elemInit)
         {
+            var kids = KidsBuilder.Create();
+
             if (elemInit.Arguments.Count != 1) {
                 ArgListDispatch(elemInit.Arguments.Select(ae => new Argument { Expr = ae }), null, "{ ", " }"); //??
             } else {
@@ -502,6 +527,8 @@ namespace ExpressionToCodeLib
         [Pure]
         StringifiedExpression DispatchMemberBinding(MemberBinding mb)
         {
+            var kids = KidsBuilder.Create();
+
             Sink(mb.Member.Name + " = ");
             if (mb is MemberMemberBinding) {
                 var mmb = (MemberMemberBinding)mb;
@@ -523,6 +550,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchMemberInit(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var mie = (MemberInitExpression)e;
             Sink("new ", mie);
             Sink(objectToCode.TypeNameToCode(mie.NewExpression.Constructor.ReflectedType));
@@ -538,6 +567,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchNew(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var ne = (NewExpression)e;
             if (ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
                 var parms = ne.Type.GetConstructors().Single().GetParameters();
@@ -571,6 +602,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchNewArrayInit(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var nae = (NewArrayExpression)e;
             Type arrayElemType = nae.Type.GetElementType();
             bool isDelegate = typeof(Delegate).IsAssignableFrom(arrayElemType);
@@ -583,6 +616,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchNewArrayBounds(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var nae = (NewArrayExpression)e;
             Type arrayElemType = nae.Type.GetElementType();
             Sink("new " + objectToCode.TypeNameToCode(arrayElemType), nae);
@@ -592,6 +627,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchBlock(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var be = (BlockExpression)e;
             bool hasReturn = (be.Type != typeof(StringifiedExpression));
             var statements = hasReturn ? be.Expressions.Take(be.Expressions.Count - 1) : be.Expressions;
@@ -618,6 +655,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchPower(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             Sink("Math.Pow", e);
             var binaryExpression = (BinaryExpression)e;
             ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(e1 => new Argument { Expr = e1 }));
@@ -626,30 +665,32 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchAdd(Expression e)
         {
-            BinaryDispatch("+", e);
+            return BinaryDispatch("+", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchAddChecked(Expression e)
         {
-            BinaryDispatch("+", e);
+            return BinaryDispatch("+", e);
         } //TODO: checked
 
         [Pure]
         public StringifiedExpression DispatchAnd(Expression e)
         {
-            BinaryDispatch("&", e);
+            return BinaryDispatch("&", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchAndAlso(Expression e)
         {
-            BinaryDispatch("&&", e);
+            return BinaryDispatch("&&", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchArrayLength(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             NestExpression(e.NodeType, ((UnaryExpression)e).Operand);
             Sink(".Length", e);
         }
@@ -657,6 +698,8 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchArrayIndex(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var binaryExpression = (BinaryExpression)e;
             NestExpression(e.NodeType, binaryExpression.Left);
             Sink("[", e);
@@ -667,297 +710,299 @@ namespace ExpressionToCodeLib
         [Pure]
         public StringifiedExpression DispatchCoalesce(Expression e)
         {
-            BinaryDispatch("??", e);
+            return BinaryDispatch("??", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchConvert(Expression e)
         {
-            UnaryDispatchConvert(e);
+            return UnaryDispatchConvert(e);
         }
 
         [Pure]
         public StringifiedExpression DispatchConvertChecked(Expression e)
         {
-            UnaryDispatchConvert(e);
+            return UnaryDispatchConvert(e);
         }
 
         //TODO: get explicit and implicit conversion operators right.
         [Pure]
         public StringifiedExpression DispatchDivide(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             BinaryDispatch("/", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchEqual(Expression e)
         {
-            BinaryDispatch("==", e);
+            return BinaryDispatch("==", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchExclusiveOr(Expression e)
         {
-            BinaryDispatch("^", e);
+            return BinaryDispatch("^", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchGreaterThan(Expression e)
         {
-            BinaryDispatch(">", e);
+            return BinaryDispatch(">", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchGreaterThanOrEqual(Expression e)
         {
-            BinaryDispatch(">=", e);
+            return BinaryDispatch(">=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchLeftShift(Expression e)
         {
-            BinaryDispatch("<<", e);
+            return BinaryDispatch("<<", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchLessThan(Expression e)
         {
-            BinaryDispatch("<", e);
+            return BinaryDispatch("<", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchLessThanOrEqual(Expression e)
         {
-            BinaryDispatch("<=", e);
+            return BinaryDispatch("<=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchModulo(Expression e)
         {
-            BinaryDispatch("%", e);
+            return BinaryDispatch("%", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchMultiply(Expression e)
         {
-            BinaryDispatch("*", e);
+            return BinaryDispatch("*", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchMultiplyChecked(Expression e)
         {
-            BinaryDispatch("*", e);
+            return BinaryDispatch("*", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchNegate(Expression e)
         {
-            UnaryDispatch("-", e);
+            return UnaryDispatch("-", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchUnaryPlus(Expression e)
         {
-            UnaryDispatch("+", e);
+            return UnaryDispatch("+", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchNegateChecked(Expression e)
         {
-            UnaryDispatch("-", e);
+            return UnaryDispatch("-", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchNot(Expression e)
         {
-            UnaryDispatch(e.Type == typeof(bool) || e.Type == typeof(bool?) ? "!" : "~", e);
+            return UnaryDispatch(e.Type == typeof(bool) || e.Type == typeof(bool?) ? "!" : "~", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchNotEqual(Expression e)
         {
-            BinaryDispatch("!=", e);
+            return BinaryDispatch("!=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchOr(Expression e)
         {
-            BinaryDispatch("|", e);
+            return BinaryDispatch("|", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchOrElse(Expression e)
         {
-            BinaryDispatch("||", e);
+            return BinaryDispatch("||", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchParameter(Expression e)
         {
             var parameterExpression = ((ParameterExpression)e);
-            Sink(parameterExpression.Name ?? (parameterExpression.Type.Name + parameterExpression.GetHashCode()), e);
+            return Sink(parameterExpression.Name ?? (parameterExpression.Type.Name + parameterExpression.GetHashCode()), e);
         }
 
         [Pure]
         public StringifiedExpression DispatchQuote(Expression e)
         {
-            NestExpression(e.NodeType, ((UnaryExpression)e).Operand);
+            return KidsBuilder.Finish(NestExpression(e.NodeType, ((UnaryExpression)e).Operand));
         }
 
         [Pure]
         public StringifiedExpression DispatchRightShift(Expression e)
         {
-            BinaryDispatch(">>", e);
+            return BinaryDispatch(">>", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchSubtract(Expression e)
         {
-            BinaryDispatch("-", e);
+            return BinaryDispatch("-", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchSubtractChecked(Expression e)
         {
-            BinaryDispatch("-", e);
+            return BinaryDispatch("-", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchTypeAs(Expression e)
         {
-            UnaryPostfixDispatch(" as " + objectToCode.TypeNameToCode(e.Type), e);
+            return UnaryPostfixDispatch(" as " + objectToCode.TypeNameToCode(e.Type), e);
         }
 
         [Pure]
         public StringifiedExpression DispatchTypeIs(Expression e)
         {
-            TypeOpDispatch("is", e);
+            return TypeOpDispatch("is", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchAssign(Expression e)
         {
-            BinaryDispatch("=", e);
+            return BinaryDispatch("=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchDecrement(Expression e)
         {
-            UnaryPostfixDispatch(" - 1", e);
+            return UnaryPostfixDispatch(" - 1", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchIncrement(Expression e)
         {
-            UnaryPostfixDispatch(" + 1", e);
+            return UnaryPostfixDispatch(" + 1", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchAddAssign(Expression e)
         {
-            BinaryDispatch("+=", e);
+            return BinaryDispatch("+=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchAndAssign(Expression e)
         {
-            BinaryDispatch("&=", e);
+            return BinaryDispatch("&=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchDivideAssign(Expression e)
         {
-            BinaryDispatch("/=", e);
+            return BinaryDispatch("/=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchExclusiveOrAssign(Expression e)
         {
-            BinaryDispatch("^=", e);
+            return BinaryDispatch("^=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchLeftShiftAssign(Expression e)
         {
-            BinaryDispatch("<<=", e);
+            return BinaryDispatch("<<=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchModuloAssign(Expression e)
         {
-            BinaryDispatch("%=", e);
+            return BinaryDispatch("%=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchMultiplyAssign(Expression e)
         {
-            BinaryDispatch("*=", e);
+            return BinaryDispatch("*=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchOrAssign(Expression e)
         {
-            BinaryDispatch("|=", e);
+            return BinaryDispatch("|=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchRightShiftAssign(Expression e)
         {
-            BinaryDispatch(">>=", e);
+            return BinaryDispatch(">>=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchSubtractAssign(Expression e)
         {
-            BinaryDispatch("-=", e);
+            return BinaryDispatch("-=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchAddAssignChecked(Expression e)
         {
-            BinaryDispatch("+=", e);
+            return BinaryDispatch("+=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchMultiplyAssignChecked(Expression e)
         {
-            BinaryDispatch("*=", e);
+            return BinaryDispatch("*=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchSubtractAssignChecked(Expression e)
         {
-            BinaryDispatch("-=", e);
+            return BinaryDispatch("-=", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchPreIncrementAssign(Expression e)
         {
-            UnaryDispatch("++", e);
+            return UnaryDispatch("++", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchPreDecrementAssign(Expression e)
         {
-            UnaryDispatch("--", e);
+            return UnaryDispatch("--", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchPostIncrementAssign(Expression e)
         {
-            UnaryPostfixDispatch("++", e);
+            return UnaryPostfixDispatch("++", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchPostDecrementAssign(Expression e)
         {
-            UnaryPostfixDispatch("--", e);
+            return UnaryPostfixDispatch("--", e);
         }
 
         [Pure]
         public StringifiedExpression DispatchOnesComplement(Expression e)
         {
-            UnaryDispatch("~", e);
+            return UnaryDispatch("~", e);
         }
         #endregion
 
@@ -985,7 +1030,7 @@ namespace ExpressionToCodeLib
         {
             var defExpr = (DefaultExpression)e;
 
-            Sink("default(" + objectToCode.TypeNameToCode(defExpr.Type) + ")");
+            return Sink("default(" + objectToCode.TypeNameToCode(defExpr.Type) + ")");
         }
 
         [Pure]
