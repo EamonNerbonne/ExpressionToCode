@@ -68,19 +68,19 @@ namespace ExpressionToCodeLib
             var sb = new StringBuilder();
             bool ignoreInitialSpace = true;
             var node = new ExpressionToCodeImpl().ExpressionDispatch(e);
-            AppendTo(sb, nodeInfos, node, ref ignoreInitialSpace, ignoreOutermostValue);
+            AppendTo(sb, nodeInfos, node, ref ignoreInitialSpace, ignoreOutermostValue ? 2 : 0);
             nodeInfos.Add(new SubExpressionInfo { Location = sb.Length, Value = null });
             return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };
         }
 
-        static void AppendTo(StringBuilder sb, List<SubExpressionInfo> nodeInfos, StringifiedExpression node, ref bool ignoreInitialSpace, bool ignoreOutermostValue_andIsOutermost)
+        static void AppendTo(StringBuilder sb, List<SubExpressionInfo> nodeInfos, StringifiedExpression node, ref bool ignoreInitialSpace, int ignoreValuesUptoDepth)
         {
             if (node.Text != null) {
                 var trimmedText = ignoreInitialSpace ? node.Text.TrimStart() : node.Text;
                 var pos0 = sb.Length;
                 sb.Append(trimmedText);
                 ignoreInitialSpace = node.Text.Any() && ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
-                if (ignoreOutermostValue_andIsOutermost) {
+                if (ignoreValuesUptoDepth >0) {
                     return;
                 }
                 string valueString = node.OptionalValue == null ? null : ExpressionValueAsCode(node.OptionalValue);
@@ -88,8 +88,9 @@ namespace ExpressionToCodeLib
                     nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
                 }
             } else {
-                foreach (var kid in node.Children)
-                    AppendTo(sb, nodeInfos, kid, ref ignoreInitialSpace, false);
+                foreach (var kid in node.Children) {
+                    AppendTo(sb, nodeInfos, kid, ref ignoreInitialSpace, ignoreValuesUptoDepth - 1);
+                }
             }
         }
 
