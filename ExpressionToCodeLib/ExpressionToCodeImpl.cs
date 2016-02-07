@@ -123,7 +123,7 @@ namespace ExpressionToCodeLib
             var kids = KidsBuilder.Create();
             var be = (BinaryExpression)e;
             Expression left, right;
-            kids.Add(UnwrapEnumOp(be, out left, out right));
+            UnwrapEnumOp(be, out left, out right);
             kids.Add(NestExpression(be.NodeType, left));
             kids.Add(" " + op + " ", e);
             kids.Add(NestExpression(be.NodeType, right, true));
@@ -131,7 +131,7 @@ namespace ExpressionToCodeLib
         }
 
         [Pure]
-        static IEnumerable<StringifiedExpression> UnwrapEnumOp(BinaryExpression be, out Expression left, out Expression right)
+        static void UnwrapEnumOp(BinaryExpression be, out Expression left, out Expression right)
         {
             left = be.Left;
             right = be.Right;
@@ -144,17 +144,17 @@ namespace ExpressionToCodeLib
                         right = uright;
                     }
                 } else {
-                    yield return UnwrapEnumBinOp(uleft, ref left, ref right);
+                    UnwrapEnumBinOp(uleft, ref left, ref right);
                 }
             } else
             //uleft != null
                 if (uright != null) {
-                    yield return UnwrapEnumBinOp(uright, ref right, ref left);
+                    UnwrapEnumBinOp(uright, ref right, ref left);
                 }
         }
 
         [Pure]
-        static StringifiedExpression UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2)
+        static void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2)
         {
             Type expr1nonnullableType = expr1uncast.Type.AvoidNullability();
             Type expr2nonnullableType = expr2.Type.AvoidNullability();
