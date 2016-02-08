@@ -164,10 +164,9 @@ namespace ExpressionToCodeLib
                         nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
                     }
                 }
-            } else {
-                foreach (var kid in node.Children) {
-                    AppendTo(sb, nodeInfos, kid, ref ignoreInitialSpace, showTopExpressionValue || kid.IsConceptualChild);
-                }
+            }
+            foreach (var kid in node.Children) {
+                AppendTo(sb, nodeInfos, kid, ref ignoreInitialSpace, showTopExpressionValue || kid.IsConceptualChild);
             }
         }
 
