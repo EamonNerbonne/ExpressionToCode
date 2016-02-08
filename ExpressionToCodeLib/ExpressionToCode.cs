@@ -30,24 +30,24 @@ namespace ExpressionToCodeLib
             var splitLine = ExpressionToStringWithValues(expr, ignoreOutermostValue);
 
             var exprWithStalkedValues = new StringBuilder();
-            if(msg == null) {
+            if (msg == null) {
                 exprWithStalkedValues.AppendLine(splitLine.Line);
-            } else if(IsMultiline(msg)) {
+            } else if (IsMultiline(msg)) {
                 exprWithStalkedValues.AppendLine(msg);
                 exprWithStalkedValues.AppendLine(splitLine.Line);
             } else {
                 exprWithStalkedValues.AppendLine(splitLine.Line + "  :  " + msg);
             }
 
-            for(int nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
+            for (int nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
                 char[] stalkLine = new string('\u2007', splitLine.Nodes[nodeI].Location).ToCharArray(); //figure-spaces.
-                for(int i = 0; i < stalkLine.Length; i++) {
-                    if(splitLine.Line[i] == ' ') {
+                for (int i = 0; i < stalkLine.Length; i++) {
+                    if (splitLine.Line[i] == ' ') {
                         stalkLine[i] = ' '; //use normal spaces where the expr used normal spaces for more natural spacing.
                     }
                 }
 
-                for(int prevI = 0; prevI < nodeI; prevI++) {
+                for (int prevI = 0; prevI < nodeI; prevI++) {
                     stalkLine[splitLine.Nodes[prevI].Location] = '\u2502'; //light vertical lines
                 }
                 exprWithStalkedValues.AppendLine((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
@@ -73,11 +73,11 @@ namespace ExpressionToCodeLib
                     var pos0 = sb.Length;
                     sb.Append(trimmedText);
                     ignoreInitialSpace = etp.Text.Any() && ShouldIgnoreSpaceAfter(etp.Text[etp.Text.Length - 1]);
-                    if(depth == 0 && ignoreOutermostValue) {
+                    if (depth == 0 && ignoreOutermostValue) {
                         return;
                     }
                     string valueString = etp.OptionalValue == null ? null : ExpressionValueAsCode(etp.OptionalValue);
-                    if(valueString != null) {
+                    if (valueString != null) {
                         nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
                     }
                 }).ExpressionDispatch(e);
@@ -91,17 +91,17 @@ namespace ExpressionToCodeLib
                 Delegate lambda;
                 try {
                     lambda = Expression.Lambda(expression).Compile();
-                } catch(InvalidOperationException) {
+                } catch (InvalidOperationException) {
                     return null;
                 }
 
                 var val = lambda.DynamicInvoke();
                 try {
                     return ObjectToCode.ComplexObjectToPseudoCode(val);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     return "stringification throws " + e.GetType().FullName;
                 }
-            } catch(TargetInvocationException tie) {
+            } catch (TargetInvocationException tie) {
                 return "throws " + tie.InnerException.GetType().FullName;
             }
         }

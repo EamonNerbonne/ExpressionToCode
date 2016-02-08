@@ -35,11 +35,11 @@ namespace ExpressionToCodeLib
             int parentRank = parentType == null ? 0 : ExpressionPrecedence.Rank(parentType.Value);
             bool needsParens = parentRank > 0
                 && (parensIfEqualRank ? parentRank - 1 : parentRank) < ExpressionPrecedence.Rank(child.NodeType);
-            if(needsParens) {
+            if (needsParens) {
                 sink(ExprTextPart.TextOnly("("), Depth);
             }
             RawChildDispatch(child);
-            if(needsParens) {
+            if (needsParens) {
                 sink(ExprTextPart.TextOnly(")"), Depth);
             }
         }
@@ -49,7 +49,7 @@ namespace ExpressionToCodeLib
         void RawChildDispatch(Argument child)
         {
             Depth++;
-            if(child.PrefixOrNull != null) {
+            if (child.PrefixOrNull != null) {
                 Sink(child.PrefixOrNull);
             }
             this.ExpressionDispatch(child.Expr);
@@ -59,8 +59,8 @@ namespace ExpressionToCodeLib
         void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor)
         {
             bool isFirst = true;
-            foreach(var child in children) {
-                if(!isFirst) {
+            foreach (var child in children) {
+                if (!isFirst) {
                     Sink(joiner);
                 }
                 childVisitor(child);
@@ -83,7 +83,7 @@ namespace ExpressionToCodeLib
             string close = ")",
             string joiner = ", ")
         {
-            if(value != null) {
+            if (value != null) {
                 Sink(open, value);
             } else {
                 Sink(open);
@@ -108,9 +108,9 @@ namespace ExpressionToCodeLib
             right = be.Right;
             var uleft = left.NodeType == ExpressionType.Convert ? ((UnaryExpression)left).Operand : null;
             var uright = right.NodeType == ExpressionType.Convert ? ((UnaryExpression)right).Operand : null;
-            if(uleft != null) {
-                if(uright != null) {
-                    if(uright.Type.EnusureNullability() == uleft.Type.EnusureNullability()) {
+            if (uleft != null) {
+                if (uright != null) {
+                    if (uright.Type.EnusureNullability() == uleft.Type.EnusureNullability()) {
                         left = uleft;
                         right = uright;
                     }
@@ -118,8 +118,8 @@ namespace ExpressionToCodeLib
                     UnwrapEnumBinOp(uleft, ref left, ref right);
                 }
             } else
-                //uleft != null
-                if(uright != null) {
+            //uleft != null
+                if (uright != null) {
                     UnwrapEnumBinOp(uright, ref right, ref left);
                 }
         }
@@ -128,17 +128,17 @@ namespace ExpressionToCodeLib
         {
             Type expr1nonnullableType = expr1uncast.Type.AvoidNullability();
             Type expr2nonnullableType = expr2.Type.AvoidNullability();
-            if(expr1nonnullableType.IsEnum
+            if (expr1nonnullableType.IsEnum
                 && expr1nonnullableType.GetEnumUnderlyingType() == expr2nonnullableType
                 || expr1nonnullableType == typeof(char) && expr2nonnullableType == typeof(int)
                 ) {
                 expr1 = expr1uncast;
 
-                if(expr2.NodeType == ExpressionType.Constant) {
+                if (expr2.NodeType == ExpressionType.Constant) {
                     object value = ((ConstantExpression)expr2).Value;
-                    if(value == null) {
+                    if (value == null) {
                         expr2 = Expression.Default(expr1uncast.Type.EnusureNullability());
-                    } else if(expr1nonnullableType == typeof(char)) {
+                    } else if (expr1nonnullableType == typeof(char)) {
                         expr2 = Expression.Constant((char)(int)value);
                     } else {
                         expr2 = Expression.Constant(Enum.ToObject(expr1nonnullableType, value));
@@ -160,7 +160,7 @@ namespace ExpressionToCodeLib
         void UnaryDispatchConvert(Expression e)
         {
             var ue = (UnaryExpression)e;
-            if(e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
+            if (e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
             {
                 Sink("(" + objectToCode.TypeNameToCode(e.Type) + ")");
             } else {
@@ -201,7 +201,7 @@ namespace ExpressionToCodeLib
         public void DispatchLambda(Expression e)
         {
             var le = (LambdaExpression)e;
-            if(le.Parameters.Count == 1) {
+            if (le.Parameters.Count == 1) {
                 NestExpression(e.NodeType, le.Parameters.Single());
             } else {
                 //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
@@ -229,10 +229,10 @@ namespace ExpressionToCodeLib
         {
             var me = (MemberExpression)e;
             Expression memberOfExpr = me.Expression;
-            if(memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr)) {
+            if (memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr)) {
                 NestExpression(e.NodeType, memberOfExpr);
                 Sink(".");
-            } else if(ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
+            } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
                 Sink(objectToCode.TypeNameToCode(me.Member.ReflectedType) + ".");
             }
 
@@ -243,19 +243,18 @@ namespace ExpressionToCodeLib
             "CreateDelegate",
             new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
 
-
         public void DispatchCall(Expression e)
         {
             var mce = (MethodCallExpression)e;
 
             var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
-            if(optPropertyInfo != null
+            if (optPropertyInfo != null
                 && (optPropertyInfo.Name == "Item"
                     || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
                 NestExpression(mce.NodeType, mce.Object);
                 //indexers don't support ref/out; so we can use unprefixed arguments
                 ArgListDispatch(GetArgumentsForMethod(mce.Method, mce.Arguments), mce, "[", "]");
-            } else if(mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
+            } else if (mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
                 && mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof(MethodInfo)) {
                 //.net 4.0
                 //implicitly constructed delegate from method group.
@@ -265,9 +264,9 @@ namespace ExpressionToCodeLib
                     ? null
                     : mce.Arguments[1];
                 SinkMethodName(mce, targetMethod, targetExpr);
-            } else if (mce.Method.Name == "CreateDelegate" 
-                && mce.Arguments.Count == 2 
-                && mce.Object.Type == typeof(MethodInfo) 
+            } else if (mce.Method.Name == "CreateDelegate"
+                && mce.Arguments.Count == 2
+                && mce.Object.Type == typeof(MethodInfo)
                 && mce.Object.NodeType == ExpressionType.Constant
                 && mce.Method.GetParameters()[1].ParameterType == typeof(object)
                 ) {
@@ -284,7 +283,7 @@ namespace ExpressionToCodeLib
                 && mce.Method.DeclaringType.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
                 && mce.Method.Name == "Create"
                 && mce.Arguments.Count == 2
-                && mce.Arguments[0].NodeType ==  ExpressionType.Constant
+                && mce.Arguments[0].NodeType == ExpressionType.Constant
                 && mce.Arguments[1].NodeType == ExpressionType.NewArrayInit
                 && ((NewArrayExpression)mce.Arguments[1]).Expressions.Count == 0
                 ) {
@@ -317,12 +316,12 @@ namespace ExpressionToCodeLib
 
         void SinkMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr)
         {
-            if(objExpr != null) {
-                if(!(isThisRef(objExpr) || isClosureRef(objExpr))) {
+            if (objExpr != null) {
+                if (!(isThisRef(objExpr) || isClosureRef(objExpr))) {
                     NestExpression(mce.NodeType, objExpr);
                     Sink(".");
                 }
-            } else if(method.IsStatic) {
+            } else if (method.IsStatic) {
                 Sink(objectToCode.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
             }
             var methodName = method.Name;
@@ -333,11 +332,11 @@ namespace ExpressionToCodeLib
 
         string CreateGenericArgumentsIfNecessary(MethodCallExpression mce, MethodInfo method)
         {
-            if(!method.IsGenericMethod) {
+            if (!method.IsGenericMethod) {
                 return "";
             }
 
-            if(!explicitMethodTypeArgs) {
+            if (!explicitMethodTypeArgs) {
                 var genericMethodDefinition = method.GetGenericMethodDefinition();
                 var relevantBindingFlagsForOverloads =
                     BindingFlags.Public
@@ -353,7 +352,7 @@ namespace ExpressionToCodeLib
                                 && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
                     );
 
-                if(!confusibleOverloads.Any()
+                if (!confusibleOverloads.Any()
                     && genericMethodDefinition.GetGenericArguments()
                         .All(typeParameter => genericMethodDefinition.GetParameters().Any(parameter => ContainsInferableType(parameter.ParameterType, typeParameter)))) {
                     return "";
@@ -376,14 +375,14 @@ namespace ExpressionToCodeLib
             var ie = (IndexExpression)e;
             NestExpression(ie.NodeType, ie.Object);
 
-			var args = ie.Indexer == null ?
-							ie.Arguments.Select(a => new Argument
-							{
-								Expr = a,
-								PrefixOrNull = null
-							})
-						: // else {
-							GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
+            var args = ie.Indexer == null
+                ? ie.Arguments.Select(
+                    a => new Argument {
+                        Expr = a,
+                        PrefixOrNull = null
+                    })
+                : // else {
+                GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
 
             ArgListDispatch(args, ie, "[", "]");
         }
@@ -391,7 +390,7 @@ namespace ExpressionToCodeLib
         public void DispatchInvoke(Expression e)
         {
             var ie = (InvocationExpression)e;
-            if(ie.Expression.NodeType == ExpressionType.Lambda) {
+            if (ie.Expression.NodeType == ExpressionType.Lambda) {
                 Sink("new " + objectToCode.TypeNameToCode(ie.Expression.Type));
             }
             NestExpression(ie.NodeType, ie.Expression);
@@ -405,9 +404,9 @@ namespace ExpressionToCodeLib
             var const_Val = ((ConstantExpression)e).Value;
             string codeRepresentation = objectToCode.PlainObjectToCode(const_Val, e.Type);
             //e.Type.IsVisible
-            if(codeRepresentation == null) {
+            if (codeRepresentation == null) {
                 var typeclass = e.Type.GuessTypeClass();
-                if(typeclass == ReflectionHelpers.TypeClass.NormalType) // probably this!
+                if (typeclass == ReflectionHelpers.TypeClass.NormalType) // probably this!
                 {
                     Sink("this"); //TODO:verify that all this references refer to the same object!
                 } else {
@@ -436,7 +435,7 @@ namespace ExpressionToCodeLib
             var lie = (ListInitExpression)e;
             Sink("new ", lie);
             Sink(objectToCode.TypeNameToCode(lie.NewExpression.Constructor.ReflectedType));
-            if(lie.NewExpression.Arguments.Any()) {
+            if (lie.NewExpression.Arguments.Any()) {
                 ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments));
             }
 
@@ -447,7 +446,7 @@ namespace ExpressionToCodeLib
 
         void DispatchElementInit(ElementInit elemInit)
         {
-            if(elemInit.Arguments.Count != 1) {
+            if (elemInit.Arguments.Count != 1) {
                 ArgListDispatch(elemInit.Arguments.Select(ae => new Argument { Expr = ae }), null, "{ ", " }"); //??
             } else {
                 RawChildDispatch(elemInit.Arguments.Single());
@@ -457,17 +456,17 @@ namespace ExpressionToCodeLib
         void DispatchMemberBinding(MemberBinding mb)
         {
             Sink(mb.Member.Name + " = ");
-            if(mb is MemberMemberBinding) {
+            if (mb is MemberMemberBinding) {
                 var mmb = (MemberMemberBinding)mb;
                 Sink("{ ");
                 JoinDispatch(mmb.Bindings, ", ", DispatchMemberBinding);
                 Sink(" }");
-            } else if(mb is MemberListBinding) {
+            } else if (mb is MemberListBinding) {
                 var mlb = (MemberListBinding)mb;
                 Sink("{ ");
                 JoinDispatch(mlb.Initializers, ", ", DispatchElementInit);
                 Sink(" }");
-            } else if(mb is MemberAssignment) {
+            } else if (mb is MemberAssignment) {
                 RawChildDispatch(((MemberAssignment)mb).Expression);
             } else {
                 throw new NotImplementedException("Member binding of unknown type: " + mb.GetType());
@@ -479,7 +478,7 @@ namespace ExpressionToCodeLib
             var mie = (MemberInitExpression)e;
             Sink("new ", mie);
             Sink(objectToCode.TypeNameToCode(mie.NewExpression.Constructor.ReflectedType));
-            if(mie.NewExpression.Arguments.Any()) {
+            if (mie.NewExpression.Arguments.Any()) {
                 ArgListDispatch(GetArgumentsForMethod(mie.NewExpression.Constructor, mie.NewExpression.Arguments));
             }
 
@@ -491,24 +490,24 @@ namespace ExpressionToCodeLib
         public void DispatchNew(Expression e)
         {
             var ne = (NewExpression)e;
-            if(ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
+            if (ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
                 var parms = ne.Type.GetConstructors().Single().GetParameters();
                 var props = ne.Type.GetProperties();
-                if(
+                if (
                     !parms.Select(p => new { p.Name, Type = p.ParameterType })
                         .SequenceEqual(props.Select(p => new { p.Name, Type = p.PropertyType }))) {
                     throw new InvalidOperationException(
                         "Constructor params for anonymous type don't match it's properties!");
                 }
-                if(!parms.Select(p => p.ParameterType).SequenceEqual(ne.Arguments.Select(argE => argE.Type))) {
+                if (!parms.Select(p => p.ParameterType).SequenceEqual(ne.Arguments.Select(argE => argE.Type))) {
                     throw new InvalidOperationException(
                         "Constructor Arguments for anonymous type don't match it's type signature!");
                 }
                 Sink("new { ");
-                for(int i = 0; i < props.Length; i++) {
+                for (int i = 0; i < props.Length; i++) {
                     Sink(props[i].Name + " = ");
                     RawChildDispatch(ne.Arguments[i]);
-                    if(i + 1 < props.Length) {
+                    if (i + 1 < props.Length) {
                         Sink(", ");
                     }
                 }
@@ -547,15 +546,15 @@ namespace ExpressionToCodeLib
 
             Sink("{ ");
 
-            foreach(var v in be.Variables) {
+            foreach (var v in be.Variables) {
                 StatementDispatch(objectToCode.TypeNameToCode(v.Type), v, ExpressionType.Block);
             }
 
-            foreach(var child in statements) {
+            foreach (var child in statements) {
                 StatementDispatch(child, ExpressionType.Block);
             }
 
-            if(hasReturn) {
+            if (hasReturn) {
                 StatementDispatch("return", be.Result, ExpressionType.Block);
             }
 
