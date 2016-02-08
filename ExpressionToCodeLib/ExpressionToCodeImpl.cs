@@ -78,7 +78,7 @@ namespace ExpressionToCodeLib
             public Expression Expr;
             public string PrefixOrNull;
         }
-        
+
         [Pure]
         IEnumerable<StringifiedExpression> ArgListDispatch(
             IEnumerable<Argument> arguments,
@@ -142,11 +142,10 @@ namespace ExpressionToCodeLib
                 } else {
                     UnwrapEnumBinOp(uleft, ref left, ref right);
                 }
-            } else
-            //uleft != null
-                if (uright != null) {
-                    UnwrapEnumBinOp(uright, ref right, ref left);
-                }
+            } else if (uright != null) {
+                //implies uleft == null
+                UnwrapEnumBinOp(uright, ref right, ref left);
+            }
         }
 
         [Pure]
@@ -442,8 +441,7 @@ namespace ExpressionToCodeLib
                         Expr = a,
                         PrefixOrNull = null
                     })
-                : // else {
-                GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
+                : GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
 
             kids.Add(ArgListDispatch(args, ie, "[", "]"));
             return kids.Finish();
