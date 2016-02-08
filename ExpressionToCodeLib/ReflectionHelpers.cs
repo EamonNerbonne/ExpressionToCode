@@ -54,47 +54,33 @@ namespace ExpressionToCodeLib
             }
         }
 
-        public static bool HasBuiltinConversion(Type from, Type to)
-        {
-            return
-                from == typeof(sbyte)
-                    && (to == typeof(short) || to == typeof(int) || to == typeof(long) || to == typeof(float)
-                        || to == typeof(double) || to == typeof(decimal))
-                    || from == typeof(byte)
-                        && (to == typeof(short) || to == typeof(ushort) || to == typeof(int) || to == typeof(uint)
-                            || to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double)
-                            || to == typeof(decimal))
-                    || from == typeof(short)
-                        && (to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double)
-                            || to == typeof(decimal))
-                    || from == typeof(ushort)
-                        && (to == typeof(int) || to == typeof(uint) || to == typeof(long) || to == typeof(ulong)
-                            || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
-                    || from == typeof(int)
-                        && (to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
-                    || from == typeof(uint)
-                        && (to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double)
-                            || to == typeof(decimal))
-                    || from == typeof(long) && (to == typeof(float) || to == typeof(double) || to == typeof(decimal))
-                    || from == typeof(char)
-                        && (to == typeof(ushort) || to == typeof(int) || to == typeof(uint) || to == typeof(long)
-                            || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
-                    || from == typeof(float) && (to == typeof(double))
-                    || from == typeof(ulong) && (to == typeof(float) || to == typeof(double) || to == typeof(decimal))
-                ;
-        }
+        public static bool HasBuiltinConversion(Type from, Type to) => from == typeof(sbyte)
+        && (to == typeof(short) || to == typeof(int) || to == typeof(long) || to == typeof(float)
+            || to == typeof(double) || to == typeof(decimal))
+        || from == typeof(byte)
+            && (to == typeof(short) || to == typeof(ushort) || to == typeof(int) || to == typeof(uint)
+                || to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double)
+                || to == typeof(decimal))
+        || from == typeof(short)
+            && (to == typeof(int) || to == typeof(long) || to == typeof(float) || to == typeof(double)
+                || to == typeof(decimal))
+        || from == typeof(ushort)
+            && (to == typeof(int) || to == typeof(uint) || to == typeof(long) || to == typeof(ulong)
+                || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+        || from == typeof(int)
+            && (to == typeof(long) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+        || from == typeof(uint)
+            && (to == typeof(long) || to == typeof(ulong) || to == typeof(float) || to == typeof(double)
+                || to == typeof(decimal))
+        || from == typeof(long) && (to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+        || from == typeof(char)
+            && (to == typeof(ushort) || to == typeof(int) || to == typeof(uint) || to == typeof(long)
+                || to == typeof(ulong) || to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+        || from == typeof(float) && (to == typeof(double))
+        || from == typeof(ulong) && (to == typeof(float) || to == typeof(double) || to == typeof(decimal))
+    ;
 
-        public static bool CanImplicitlyCast(Type from, Type to)
-        {
-            return to.IsAssignableFrom(from) || HasBuiltinConversion(from, to);
-
-            //TODO: extend with op_Implicit support.
-            //Use this to test if a conversion is required.
-            //That means expressions checking if a child is a conversion, 
-            //and if so checking if the conversion can be implicit,
-            //and if so checking if the code compiles without conversion
-            //if it does NOT compile, and IS implicit, then we can omit it since the compiler will add it.
-        }
+        public static bool CanImplicitlyCast(Type from, Type to) => to.IsAssignableFrom(from) || HasBuiltinConversion(from, to);
 
         public enum TypeClass
         {

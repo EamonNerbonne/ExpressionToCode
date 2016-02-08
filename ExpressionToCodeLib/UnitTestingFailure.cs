@@ -9,15 +9,12 @@ namespace ExpressionToCodeLib
 {
     static class UnitTestingFailure
     {
-        static Func<T0, TR> F<T0, TR>(Func<T0, TR> f) { return f; }
-        static Func<T0, T1, TR> F<T0, T1, TR>(Func<T0, T1, TR> f) { return f; }
+        static Func<T0, TR> F<T0, TR>(Func<T0, TR> f) => f;
+        static Func<T0, T1, TR> F<T0, T1, TR>(Func<T0, T1, TR> f) => f;
         static UnitTestingFailure() { }
         public static readonly Func<string, Exception, Exception> AssertionExceptionFactory = GetAssertionExceptionFactory();
 
-        static Func<string, Exception, Exception> GetAssertionExceptionFactory()
-        {
-            return GetExceptionFactories().Where(t => t.CreateException != null).OrderByDescending(t => t.Priority).First().CreateException;
-        }
+        static Func<string, Exception, Exception> GetAssertionExceptionFactory() => GetExceptionFactories().Where(t => t.CreateException != null).OrderByDescending(t => t.Priority).First().CreateException;
 
         static IEnumerable<ExceptionFactory> GetExceptionFactories()
         {

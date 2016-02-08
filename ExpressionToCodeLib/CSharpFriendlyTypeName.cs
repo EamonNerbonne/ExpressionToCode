@@ -9,7 +9,7 @@ namespace ExpressionToCodeLib
     {
         public bool UseFullName;
         public bool IncludeGenericTypeArgumentNames;
-        public string GetTypeName(Type type) { return AliasName(type) ?? GetUnaliasedTypeName(type); }
+        public string GetTypeName(Type type) => AliasName(type) ?? GetUnaliasedTypeName(type);
 
         string GetUnaliasedTypeName(Type type)
         {
