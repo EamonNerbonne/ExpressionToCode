@@ -5,22 +5,16 @@ namespace ExpressionToCodeLib
 {
     static class ExpressionPrecedence
     {
-        static bool UnaryDashSym(ExpressionType et)
-        {
-            return et == ExpressionType.Negate
-                || et == ExpressionType.NegateChecked
-                || et == ExpressionType.PreDecrementAssign
-                ;
-        }
+        static bool UnaryDashSym(ExpressionType et) => et == ExpressionType.Negate
+    || et == ExpressionType.NegateChecked
+    || et == ExpressionType.PreDecrementAssign
+    ;
 
-        static bool UnaryPlusSym(ExpressionType et)
-        {
-            return et == ExpressionType.UnaryPlus
-                || et == ExpressionType.PreIncrementAssign
-                ;
-        }
+        static bool UnaryPlusSym(ExpressionType et) => et == ExpressionType.UnaryPlus
+    || et == ExpressionType.PreIncrementAssign
+    ;
 
-        public static bool TokenizerConfusable(ExpressionType a, ExpressionType b) { return UnaryDashSym(a) && UnaryDashSym(b) || UnaryPlusSym(a) && UnaryPlusSym(b); }
+        public static bool TokenizerConfusable(ExpressionType a, ExpressionType b) => UnaryDashSym(a) && UnaryDashSym(b) || UnaryPlusSym(a) && UnaryPlusSym(b);
 
         public static int Rank(ExpressionType exprType)
         {

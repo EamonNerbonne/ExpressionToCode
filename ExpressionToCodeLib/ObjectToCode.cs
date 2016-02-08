@@ -35,7 +35,7 @@ namespace ExpressionToCodeLib {
             }
         }
 
-        static string FormatEnumerable(IEnumerable list) { return "{" + String.Join(", ", ExtractFirst10(list).ToArray()) + "}"; }
+        static string FormatEnumerable(IEnumerable list) => "{" + String.Join(", ", ExtractFirst10(list).ToArray()) + "}";
 
         static IEnumerable<string> ExtractFirst10(IEnumerable list) {
             int count = 0;
@@ -50,15 +50,11 @@ namespace ExpressionToCodeLib {
             }
         }
 
-        public static string PlainObjectToCode(object val) {
-            return PlainObjectToCode(val, val == null ? null : val.GetType());
-        }
+        public static string PlainObjectToCode(object val) => PlainObjectToCode(val, val == null ? null : val.GetType());
 
-        public static string PlainObjectToCode(object val, Type type) {
-            return ObjectStringify.Default.PlainObjectToCode(val, type);
-        }
+        public static string PlainObjectToCode(object val, Type type) => ObjectStringify.Default.PlainObjectToCode(val, type);
 
 
-        public static string GetCSharpFriendlyTypeName(Type type) { return new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true }.GetTypeName(type); }
+        public static string GetCSharpFriendlyTypeName(Type type) => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true }.GetTypeName(type);
     }
 }

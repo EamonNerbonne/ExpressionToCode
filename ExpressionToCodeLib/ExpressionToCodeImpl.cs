@@ -110,7 +110,7 @@ namespace ExpressionToCodeLib
             public void Add(IEnumerable<StringifiedExpression> nodes) { kids.AddRange(nodes); }
             public void Add(string text, Expression value) { kids.Add(StringifiedExpression.TextAndExpr(text, value)); }
             public void Add(string text) { kids.Add(StringifiedExpression.TextOnly(text)); }
-            public StringifiedExpression Finish() { return StringifiedExpression.WithChildren(kids.ToArray()); }
+            public StringifiedExpression Finish() => StringifiedExpression.WithChildren(kids.ToArray());
         }
 
         [Pure]
@@ -257,19 +257,11 @@ namespace ExpressionToCodeLib
             return kids.Finish();
         }
 
-        static bool isThisRef(Expression e)
-        {
-            return
-                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-                    && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
-        }
+        static bool isThisRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+        && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 
-        static bool isClosureRef(Expression e)
-        {
-            return
-                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-                    && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
-        }
+        static bool isClosureRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+        && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
 
         [Pure]
         public StringifiedExpression DispatchMemberAccess(Expression e)
@@ -356,10 +348,7 @@ namespace ExpressionToCodeLib
             return kids.Finish();
         }
 
-        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs)
-        {
-            return GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
-        }
+        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs) => GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
 
         static IEnumerable<Argument> GetArgumentsForMethod(ParameterInfo[] parameters, IEnumerable<Expression> argValueExprs)
         {
@@ -420,12 +409,9 @@ namespace ExpressionToCodeLib
             return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
         }
 
-        static bool ContainsInferableType(Type haystack, Type needle)
-        {
-            return haystack == needle
-                || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
-                || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
-        }
+        static bool ContainsInferableType(Type haystack, Type needle) => haystack == needle
+    || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
+    || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
         [Pure]
         public StringifiedExpression DispatchIndex(Expression e)
@@ -676,28 +662,16 @@ namespace ExpressionToCodeLib
         }
 
         [Pure]
-        public StringifiedExpression DispatchAdd(Expression e)
-        {
-            return BinaryDispatch("+", e);
-        }
+        public StringifiedExpression DispatchAdd(Expression e) => BinaryDispatch("+", e);
 
         [Pure]
-        public StringifiedExpression DispatchAddChecked(Expression e)
-        {
-            return BinaryDispatch("+", e);
-        } //TODO: checked
+        public StringifiedExpression DispatchAddChecked(Expression e) => BinaryDispatch("+", e); //TODO: checked
 
         [Pure]
-        public StringifiedExpression DispatchAnd(Expression e)
-        {
-            return BinaryDispatch("&", e);
-        }
+        public StringifiedExpression DispatchAnd(Expression e) => BinaryDispatch("&", e);
 
         [Pure]
-        public StringifiedExpression DispatchAndAlso(Expression e)
-        {
-            return BinaryDispatch("&&", e);
-        }
+        public StringifiedExpression DispatchAndAlso(Expression e) => BinaryDispatch("&&", e);
 
         [Pure]
         public StringifiedExpression DispatchArrayLength(Expression e)
@@ -723,131 +697,68 @@ namespace ExpressionToCodeLib
         }
 
         [Pure]
-        public StringifiedExpression DispatchCoalesce(Expression e)
-        {
-            return BinaryDispatch("??", e);
-        }
+        public StringifiedExpression DispatchCoalesce(Expression e) => BinaryDispatch("??", e);
 
         [Pure]
-        public StringifiedExpression DispatchConvert(Expression e)
-        {
-            return UnaryDispatchConvert(e);
-        }
+        public StringifiedExpression DispatchConvert(Expression e) => UnaryDispatchConvert(e);
 
         [Pure]
-        public StringifiedExpression DispatchConvertChecked(Expression e)
-        {
-            return UnaryDispatchConvert(e);
-        }
+        public StringifiedExpression DispatchConvertChecked(Expression e) => UnaryDispatchConvert(e);
 
         //TODO: get explicit and implicit conversion operators right.
         [Pure]
-        public StringifiedExpression DispatchDivide(Expression e)
-        {
-            return BinaryDispatch("/", e);
-        }
+        public StringifiedExpression DispatchDivide(Expression e) => BinaryDispatch("/", e);
 
         [Pure]
-        public StringifiedExpression DispatchEqual(Expression e)
-        {
-            return BinaryDispatch("==", e);
-        }
+        public StringifiedExpression DispatchEqual(Expression e) => BinaryDispatch("==", e);
 
         [Pure]
-        public StringifiedExpression DispatchExclusiveOr(Expression e)
-        {
-            return BinaryDispatch("^", e);
-        }
+        public StringifiedExpression DispatchExclusiveOr(Expression e) => BinaryDispatch("^", e);
 
         [Pure]
-        public StringifiedExpression DispatchGreaterThan(Expression e)
-        {
-            return BinaryDispatch(">", e);
-        }
+        public StringifiedExpression DispatchGreaterThan(Expression e) => BinaryDispatch(">", e);
 
         [Pure]
-        public StringifiedExpression DispatchGreaterThanOrEqual(Expression e)
-        {
-            return BinaryDispatch(">=", e);
-        }
+        public StringifiedExpression DispatchGreaterThanOrEqual(Expression e) => BinaryDispatch(">=", e);
 
         [Pure]
-        public StringifiedExpression DispatchLeftShift(Expression e)
-        {
-            return BinaryDispatch("<<", e);
-        }
+        public StringifiedExpression DispatchLeftShift(Expression e) => BinaryDispatch("<<", e);
 
         [Pure]
-        public StringifiedExpression DispatchLessThan(Expression e)
-        {
-            return BinaryDispatch("<", e);
-        }
+        public StringifiedExpression DispatchLessThan(Expression e) => BinaryDispatch("<", e);
 
         [Pure]
-        public StringifiedExpression DispatchLessThanOrEqual(Expression e)
-        {
-            return BinaryDispatch("<=", e);
-        }
+        public StringifiedExpression DispatchLessThanOrEqual(Expression e) => BinaryDispatch("<=", e);
 
         [Pure]
-        public StringifiedExpression DispatchModulo(Expression e)
-        {
-            return BinaryDispatch("%", e);
-        }
+        public StringifiedExpression DispatchModulo(Expression e) => BinaryDispatch("%", e);
 
         [Pure]
-        public StringifiedExpression DispatchMultiply(Expression e)
-        {
-            return BinaryDispatch("*", e);
-        }
+        public StringifiedExpression DispatchMultiply(Expression e) => BinaryDispatch("*", e);
 
         [Pure]
-        public StringifiedExpression DispatchMultiplyChecked(Expression e)
-        {
-            return BinaryDispatch("*", e);
-        }
+        public StringifiedExpression DispatchMultiplyChecked(Expression e) => BinaryDispatch("*", e);
 
         [Pure]
-        public StringifiedExpression DispatchNegate(Expression e)
-        {
-            return UnaryDispatch("-", e);
-        }
+        public StringifiedExpression DispatchNegate(Expression e) => UnaryDispatch("-", e);
 
         [Pure]
-        public StringifiedExpression DispatchUnaryPlus(Expression e)
-        {
-            return UnaryDispatch("+", e);
-        }
+        public StringifiedExpression DispatchUnaryPlus(Expression e) => UnaryDispatch("+", e);
 
         [Pure]
-        public StringifiedExpression DispatchNegateChecked(Expression e)
-        {
-            return UnaryDispatch("-", e);
-        }
+        public StringifiedExpression DispatchNegateChecked(Expression e) => UnaryDispatch("-", e);
 
         [Pure]
-        public StringifiedExpression DispatchNot(Expression e)
-        {
-            return UnaryDispatch(e.Type == typeof(bool) || e.Type == typeof(bool?) ? "!" : "~", e);
-        }
+        public StringifiedExpression DispatchNot(Expression e) => UnaryDispatch(e.Type == typeof(bool) || e.Type == typeof(bool?) ? "!" : "~", e);
 
         [Pure]
-        public StringifiedExpression DispatchNotEqual(Expression e)
-        {
-            return BinaryDispatch("!=", e);
-        }
+        public StringifiedExpression DispatchNotEqual(Expression e) => BinaryDispatch("!=", e);
 
         [Pure]
-        public StringifiedExpression DispatchOr(Expression e)
-        {
-            return BinaryDispatch("|", e);
-        }
+        public StringifiedExpression DispatchOr(Expression e) => BinaryDispatch("|", e);
 
         [Pure]
-        public StringifiedExpression DispatchOrElse(Expression e)
-        {
-            return BinaryDispatch("||", e);
-        }
+        public StringifiedExpression DispatchOrElse(Expression e) => BinaryDispatch("||", e);
 
         [Pure]
         public StringifiedExpression DispatchParameter(Expression e)
@@ -858,166 +769,85 @@ namespace ExpressionToCodeLib
         }
 
         [Pure]
-        public StringifiedExpression DispatchQuote(Expression e)
-        {
-            return StringifiedExpression.WithChildren(NestExpression(e.NodeType, ((UnaryExpression)e).Operand).ToArray());
-        }
+        public StringifiedExpression DispatchQuote(Expression e) => StringifiedExpression.WithChildren(NestExpression(e.NodeType, ((UnaryExpression)e).Operand).ToArray());
 
         [Pure]
-        public StringifiedExpression DispatchRightShift(Expression e)
-        {
-            return BinaryDispatch(">>", e);
-        }
+        public StringifiedExpression DispatchRightShift(Expression e) => BinaryDispatch(">>", e);
 
         [Pure]
-        public StringifiedExpression DispatchSubtract(Expression e)
-        {
-            return BinaryDispatch("-", e);
-        }
+        public StringifiedExpression DispatchSubtract(Expression e) => BinaryDispatch("-", e);
 
         [Pure]
-        public StringifiedExpression DispatchSubtractChecked(Expression e)
-        {
-            return BinaryDispatch("-", e);
-        }
+        public StringifiedExpression DispatchSubtractChecked(Expression e) => BinaryDispatch("-", e);
 
         [Pure]
-        public StringifiedExpression DispatchTypeAs(Expression e)
-        {
-            return UnaryPostfixDispatch(" as " + objectToCode.TypeNameToCode(e.Type), e);
-        }
+        public StringifiedExpression DispatchTypeAs(Expression e) => UnaryPostfixDispatch(" as " + objectToCode.TypeNameToCode(e.Type), e);
 
         [Pure]
-        public StringifiedExpression DispatchTypeIs(Expression e)
-        {
-            return TypeOpDispatch("is", e);
-        }
+        public StringifiedExpression DispatchTypeIs(Expression e) => TypeOpDispatch("is", e);
 
         [Pure]
-        public StringifiedExpression DispatchAssign(Expression e)
-        {
-            return BinaryDispatch("=", e);
-        }
+        public StringifiedExpression DispatchAssign(Expression e) => BinaryDispatch("=", e);
 
         [Pure]
-        public StringifiedExpression DispatchDecrement(Expression e)
-        {
-            return UnaryPostfixDispatch(" - 1", e);
-        }
+        public StringifiedExpression DispatchDecrement(Expression e) => UnaryPostfixDispatch(" - 1", e);
 
         [Pure]
-        public StringifiedExpression DispatchIncrement(Expression e)
-        {
-            return UnaryPostfixDispatch(" + 1", e);
-        }
+        public StringifiedExpression DispatchIncrement(Expression e) => UnaryPostfixDispatch(" + 1", e);
 
         [Pure]
-        public StringifiedExpression DispatchAddAssign(Expression e)
-        {
-            return BinaryDispatch("+=", e);
-        }
+        public StringifiedExpression DispatchAddAssign(Expression e) => BinaryDispatch("+=", e);
 
         [Pure]
-        public StringifiedExpression DispatchAndAssign(Expression e)
-        {
-            return BinaryDispatch("&=", e);
-        }
+        public StringifiedExpression DispatchAndAssign(Expression e) => BinaryDispatch("&=", e);
 
         [Pure]
-        public StringifiedExpression DispatchDivideAssign(Expression e)
-        {
-            return BinaryDispatch("/=", e);
-        }
+        public StringifiedExpression DispatchDivideAssign(Expression e) => BinaryDispatch("/=", e);
 
         [Pure]
-        public StringifiedExpression DispatchExclusiveOrAssign(Expression e)
-        {
-            return BinaryDispatch("^=", e);
-        }
+        public StringifiedExpression DispatchExclusiveOrAssign(Expression e) => BinaryDispatch("^=", e);
 
         [Pure]
-        public StringifiedExpression DispatchLeftShiftAssign(Expression e)
-        {
-            return BinaryDispatch("<<=", e);
-        }
+        public StringifiedExpression DispatchLeftShiftAssign(Expression e) => BinaryDispatch("<<=", e);
 
         [Pure]
-        public StringifiedExpression DispatchModuloAssign(Expression e)
-        {
-            return BinaryDispatch("%=", e);
-        }
+        public StringifiedExpression DispatchModuloAssign(Expression e) => BinaryDispatch("%=", e);
 
         [Pure]
-        public StringifiedExpression DispatchMultiplyAssign(Expression e)
-        {
-            return BinaryDispatch("*=", e);
-        }
+        public StringifiedExpression DispatchMultiplyAssign(Expression e) => BinaryDispatch("*=", e);
 
         [Pure]
-        public StringifiedExpression DispatchOrAssign(Expression e)
-        {
-            return BinaryDispatch("|=", e);
-        }
+        public StringifiedExpression DispatchOrAssign(Expression e) => BinaryDispatch("|=", e);
 
         [Pure]
-        public StringifiedExpression DispatchRightShiftAssign(Expression e)
-        {
-            return BinaryDispatch(">>=", e);
-        }
+        public StringifiedExpression DispatchRightShiftAssign(Expression e) => BinaryDispatch(">>=", e);
 
         [Pure]
-        public StringifiedExpression DispatchSubtractAssign(Expression e)
-        {
-            return BinaryDispatch("-=", e);
-        }
+        public StringifiedExpression DispatchSubtractAssign(Expression e) => BinaryDispatch("-=", e);
 
         [Pure]
-        public StringifiedExpression DispatchAddAssignChecked(Expression e)
-        {
-            return BinaryDispatch("+=", e);
-        }
+        public StringifiedExpression DispatchAddAssignChecked(Expression e) => BinaryDispatch("+=", e);
 
         [Pure]
-        public StringifiedExpression DispatchMultiplyAssignChecked(Expression e)
-        {
-            return BinaryDispatch("*=", e);
-        }
+        public StringifiedExpression DispatchMultiplyAssignChecked(Expression e) => BinaryDispatch("*=", e);
 
         [Pure]
-        public StringifiedExpression DispatchSubtractAssignChecked(Expression e)
-        {
-            return BinaryDispatch("-=", e);
-        }
+        public StringifiedExpression DispatchSubtractAssignChecked(Expression e) => BinaryDispatch("-=", e);
 
         [Pure]
-        public StringifiedExpression DispatchPreIncrementAssign(Expression e)
-        {
-            return UnaryDispatch("++", e);
-        }
+        public StringifiedExpression DispatchPreIncrementAssign(Expression e) => UnaryDispatch("++", e);
 
         [Pure]
-        public StringifiedExpression DispatchPreDecrementAssign(Expression e)
-        {
-            return UnaryDispatch("--", e);
-        }
+        public StringifiedExpression DispatchPreDecrementAssign(Expression e) => UnaryDispatch("--", e);
 
         [Pure]
-        public StringifiedExpression DispatchPostIncrementAssign(Expression e)
-        {
-            return UnaryPostfixDispatch("++", e);
-        }
+        public StringifiedExpression DispatchPostIncrementAssign(Expression e) => UnaryPostfixDispatch("++", e);
 
         [Pure]
-        public StringifiedExpression DispatchPostDecrementAssign(Expression e)
-        {
-            return UnaryPostfixDispatch("--", e);
-        }
+        public StringifiedExpression DispatchPostDecrementAssign(Expression e) => UnaryPostfixDispatch("--", e);
 
         [Pure]
-        public StringifiedExpression DispatchOnesComplement(Expression e)
-        {
-            return UnaryDispatch("~", e);
-        }
+        public StringifiedExpression DispatchOnesComplement(Expression e) => UnaryDispatch("~", e);
         #endregion
 
         #region Unused by C#'s expression support; or unavailable in the language at all.
