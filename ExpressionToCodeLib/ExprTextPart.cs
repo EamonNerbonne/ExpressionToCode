@@ -17,7 +17,7 @@ namespace ExpressionToCodeLib
             OptionalValue = val;
         }
 
-        public static ExprTextPart TextOnly(string text) { return new ExprTextPart(text, null); }
+        public static ExprTextPart TextOnly(string text) => new ExprTextPart(text, null);
 
         public static ExprTextPart TextAndExpr(string text, Expression expr)
         {

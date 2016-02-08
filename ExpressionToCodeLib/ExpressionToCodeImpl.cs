@@ -211,19 +211,11 @@ namespace ExpressionToCodeLib
             NestExpression(le.NodeType, le.Body);
         }
 
-        static bool isThisRef(Expression e)
-        {
-            return
-                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-                    && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
-        }
+        static bool isThisRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+        && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 
-        static bool isClosureRef(Expression e)
-        {
-            return
-                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-                    && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
-        }
+        static bool isClosureRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+        && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
 
         public void DispatchMemberAccess(Expression e)
         {
@@ -303,10 +295,7 @@ namespace ExpressionToCodeLib
             }
         }
 
-        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs)
-        {
-            return GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
-        }
+        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs) => GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
 
         static IEnumerable<Argument> GetArgumentsForMethod(ParameterInfo[] parameters, IEnumerable<Expression> argValueExprs)
         {
@@ -363,12 +352,9 @@ namespace ExpressionToCodeLib
             return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
         }
 
-        static bool ContainsInferableType(Type haystack, Type needle)
-        {
-            return haystack == needle
-                || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
-                || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
-        }
+        static bool ContainsInferableType(Type haystack, Type needle) => haystack == needle
+    || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
+    || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
         public void DispatchIndex(Expression e)
         {
