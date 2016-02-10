@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -8,67 +9,69 @@ using ExpressionToCodeLib.Unstable_v2_Api;
 
 namespace ExpressionToCodeLib
 {
-    class ExpressionToCodeImpl : IExpressionTypeDispatch
+    class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {
         #region General Helpers
         readonly IObjectToCode objectToCode;
         readonly bool explicitMethodTypeArgs;
-        readonly Action<ExprTextPart, int> sink;
-        int Depth;
 
         //TODO: refactor IExpressionTypeDispatch into an input/output model to avoid this tricky side-effect approach.
-        internal ExpressionToCodeImpl(IObjectToCode objectToCode, bool explicitMethodTypeArgs, Action<ExprTextPart, int> sink)
+        internal ExpressionToCodeImpl(IObjectToCode objectToCode, bool explicitMethodTypeArgs)
         {
             this.objectToCode = objectToCode;
             this.explicitMethodTypeArgs = explicitMethodTypeArgs;
-            this.sink = sink;
         }
 
-        internal ExpressionToCodeImpl(Action<ExprTextPart, int> sink)
-            : this(ObjectStringify.Default, false, sink) { }
+        internal ExpressionToCodeImpl()
+            : this(ObjectStringify.Default, false) { }
 
-        void Sink(string text) { sink(ExprTextPart.TextOnly(text), Depth); }
-        void Sink(string text, Expression value) { sink(ExprTextPart.TextAndExpr(text, value), Depth); }
-
-        void NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
+        [Pure]
+        IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
         {
             int parentRank = parentType == null ? 0 : ExpressionPrecedence.Rank(parentType.Value);
             bool needsParens = parentRank > 0
                 && (parensIfEqualRank ? parentRank - 1 : parentRank) < ExpressionPrecedence.Rank(child.NodeType);
+
             if (needsParens) {
-                sink(ExprTextPart.TextOnly("("), Depth);
+                yield return StringifiedExpression.TextOnly("(");
             }
-            RawChildDispatch(child);
+            foreach (var grandchild in RawChildDispatch(child)) {
+                yield return grandchild;
+            }
             if (needsParens) {
-                sink(ExprTextPart.TextOnly(")"), Depth);
+                yield return StringifiedExpression.TextOnly(")");
             }
         }
 
-        void RawChildDispatch(Expression child) { RawChildDispatch(new Argument { Expr = child }); }
+        [Pure]
+        IEnumerable<StringifiedExpression> RawChildDispatch(Expression child) => RawChildDispatch(new Argument { Expr = child });
 
-        void RawChildDispatch(Argument child)
+        [Pure]
+        IEnumerable<StringifiedExpression> RawChildDispatch(Argument child)
         {
-            Depth++;
             if (child.PrefixOrNull != null) {
-                Sink(child.PrefixOrNull);
+                yield return StringifiedExpression.TextOnly(child.PrefixOrNull);
             }
-            this.ExpressionDispatch(child.Expr);
-            Depth--;
+            yield return this.ExpressionDispatch(child.Expr).MarkAsConceptualChild();
         }
 
-        void JoinDispatch<T>(IEnumerable<T> children, string joiner, Action<T> childVisitor)
+        [Pure]
+        static IEnumerable<StringifiedExpression> JoinDispatch<T>(IEnumerable<T> children, string joiner, Func<T, IEnumerable<StringifiedExpression>> childVisitor)
         {
             bool isFirst = true;
             foreach (var child in children) {
                 if (!isFirst) {
-                    Sink(joiner);
+                    yield return StringifiedExpression.TextOnly(joiner);
                 }
-                childVisitor(child);
+                foreach (var grandchild in childVisitor(child)) {
+                    yield return grandchild;
+                }
                 isFirst = false;
             }
         }
 
-        void JoinDispatch(IEnumerable<Argument> children, string joiner) { JoinDispatch(children, joiner, RawChildDispatch); }
+        [Pure]
+        IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<Argument> children, string joiner) => JoinDispatch(children, joiner, RawChildDispatch);
 
         struct Argument
         {
@@ -76,7 +79,8 @@ namespace ExpressionToCodeLib
             public string PrefixOrNull;
         }
 
-        void ArgListDispatch(
+        [Pure]
+        IEnumerable<StringifiedExpression> ArgListDispatch(
             IEnumerable<Argument> arguments,
             Expression value = null,
             string open = "(",
@@ -84,24 +88,45 @@ namespace ExpressionToCodeLib
             string joiner = ", ")
         {
             if (value != null) {
-                Sink(open, value);
+                yield return StringifiedExpression.TextAndExpr(open, value);
             } else {
-                Sink(open);
+                yield return StringifiedExpression.TextOnly(open);
             }
-            JoinDispatch(arguments, joiner);
-            Sink(close);
+            foreach (var o in JoinDispatch(arguments, joiner)) {
+                yield return o;
+            }
+            yield return StringifiedExpression.TextOnly(close);
         }
 
-        void BinaryDispatch(string op, Expression e)
+        struct KidsBuilder
         {
+            readonly List<StringifiedExpression> kids;
+            KidsBuilder(List<StringifiedExpression> init) { kids = init; }
+
+            [Pure]
+            public static KidsBuilder Create() => new KidsBuilder(new List<StringifiedExpression>());
+
+            public void Add(StringifiedExpression node) { kids.Add(node); }
+            public void Add(IEnumerable<StringifiedExpression> nodes) { kids.AddRange(nodes); }
+            public void Add(string text, Expression value) { kids.Add(StringifiedExpression.TextAndExpr(text, value)); }
+            public void Add(string text) { kids.Add(StringifiedExpression.TextOnly(text)); }
+            public StringifiedExpression Finish() => StringifiedExpression.WithChildren(kids.ToArray());
+        }
+
+        [Pure]
+        StringifiedExpression BinaryDispatch(string op, Expression e)
+        {
+            var kids = KidsBuilder.Create();
             var be = (BinaryExpression)e;
             Expression left, right;
             UnwrapEnumOp(be, out left, out right);
-            NestExpression(be.NodeType, left);
-            Sink(" " + op + " ", e);
-            NestExpression(be.NodeType, right, true);
+            kids.Add(NestExpression(be.NodeType, left));
+            kids.Add(" " + op + " ", e);
+            kids.Add(NestExpression(be.NodeType, right, true));
+            return kids.Finish();
         }
 
+        [Pure]
         static void UnwrapEnumOp(BinaryExpression be, out Expression left, out Expression right)
         {
             left = be.Left;
@@ -117,13 +142,13 @@ namespace ExpressionToCodeLib
                 } else {
                     UnwrapEnumBinOp(uleft, ref left, ref right);
                 }
-            } else
-            //uleft != null
-                if (uright != null) {
-                    UnwrapEnumBinOp(uright, ref right, ref left);
-                }
+            } else if (uright != null) {
+                //implies uleft == null
+                UnwrapEnumBinOp(uright, ref right, ref left);
+            }
         }
 
+        [Pure]
         static void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2)
         {
             Type expr1nonnullableType = expr1uncast.Type.AvoidNullability();
@@ -149,66 +174,87 @@ namespace ExpressionToCodeLib
             }
         }
 
-        void UnaryDispatch(string op, Expression e)
+        [Pure]
+        StringifiedExpression UnaryDispatch(string op, Expression e)
         {
             var ue = (UnaryExpression)e;
             bool needsSpace = ExpressionPrecedence.TokenizerConfusable(ue.NodeType, ue.Operand.NodeType);
-            Sink(op + (needsSpace ? " " : ""), e);
-            NestExpression(ue.NodeType, ue.Operand);
+            var kids = KidsBuilder.Create();
+            kids.Add(op + (needsSpace ? " " : ""), e);
+            kids.Add(NestExpression(ue.NodeType, ue.Operand));
+            return kids.Finish();
         }
 
-        void UnaryDispatchConvert(Expression e)
+        [Pure]
+        StringifiedExpression UnaryDispatchConvert(Expression e)
         {
+            var kids = KidsBuilder.Create();
             var ue = (UnaryExpression)e;
             if (e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
             {
-                Sink("(" + objectToCode.TypeNameToCode(e.Type) + ")");
+                kids.Add("(" + objectToCode.TypeNameToCode(e.Type) + ")");
             } else {
-                Sink("(" + objectToCode.TypeNameToCode(e.Type) + ")", e);
+                kids.Add("(" + objectToCode.TypeNameToCode(e.Type) + ")", e);
             }
-            NestExpression(ue.NodeType, ue.Operand);
+            kids.Add(NestExpression(ue.NodeType, ue.Operand));
+            return kids.Finish();
         }
 
-        void UnaryPostfixDispatch(string op, Expression e)
+        [Pure]
+        StringifiedExpression UnaryPostfixDispatch(string op, Expression e)
         {
+            var kids = KidsBuilder.Create();
             var ue = (UnaryExpression)e;
-            NestExpression(ue.NodeType, ue.Operand);
-            Sink(op, e);
+            kids.Add(NestExpression(ue.NodeType, ue.Operand));
+            kids.Add(op, e);
+            return kids.Finish();
         }
 
-        void TypeOpDispatch(string op, Expression e)
+        [Pure]
+        StringifiedExpression TypeOpDispatch(string op, Expression e)
         {
-            NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression);
-            Sink(" " + op + " ", e);
-            Sink(objectToCode.TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
+            var kids = KidsBuilder.Create();
+            kids.Add(NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression));
+            kids.Add(" " + op + " ", e);
+            kids.Add(objectToCode.TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
+            return kids.Finish();
         }
 
-        void StatementDispatch(Expression e, ExpressionType? parentType = null)
+        [Pure]
+        StringifiedExpression StatementDispatch(Expression e, ExpressionType? parentType = null)
         {
-            NestExpression(parentType, e);
-            Sink("; ");
+            var kids = KidsBuilder.Create();
+            kids.Add(NestExpression(parentType, e));
+            kids.Add("; ");
+            return kids.Finish();
         }
 
-        void StatementDispatch(String prefix, Expression e, ExpressionType? parentType = null)
+        [Pure]
+        StringifiedExpression StatementDispatch(String prefix, Expression e, ExpressionType? parentType = null)
         {
-            Sink(prefix);
-            Sink(" ");
-            StatementDispatch(e, parentType);
+            var kids = KidsBuilder.Create();
+            kids.Add(prefix);
+            kids.Add(" ");
+            kids.Add(StatementDispatch(e, parentType));
+            return kids.Finish();
         }
         #endregion
 
         #region Hard Cases
-        public void DispatchLambda(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchLambda(Expression e)
         {
+            var kids = KidsBuilder.Create();
             var le = (LambdaExpression)e;
             if (le.Parameters.Count == 1) {
-                NestExpression(e.NodeType, le.Parameters.Single());
+                kids.Add(NestExpression(e.NodeType, le.Parameters.Single()));
             } else {
                 //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
-                ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe }));
+                kids.Add(ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe })));
             }
-            Sink(" => ");
-            NestExpression(le.NodeType, le.Body);
+            kids.Add(" => ");
+            kids.Add(NestExpression(le.NodeType, le.Body));
+            return kids.Finish();
         }
 
         static bool isThisRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
@@ -217,35 +263,41 @@ namespace ExpressionToCodeLib
         static bool isClosureRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
         && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
 
-        public void DispatchMemberAccess(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchMemberAccess(Expression e)
         {
+            var kids = KidsBuilder.Create();
             var me = (MemberExpression)e;
             Expression memberOfExpr = me.Expression;
             if (memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr)) {
-                NestExpression(e.NodeType, memberOfExpr);
-                Sink(".");
+                kids.Add(NestExpression(e.NodeType, memberOfExpr));
+                kids.Add(".");
             } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
-                Sink(objectToCode.TypeNameToCode(me.Member.ReflectedType) + ".");
+                kids.Add(objectToCode.TypeNameToCode(me.Member.ReflectedType) + ".");
             }
 
-            Sink(me.Member.Name, e);
+            kids.Add(me.Member.Name, e);
+            return kids.Finish();
         }
 
         static readonly MethodInfo createDelegate = typeof(Delegate).GetMethod(
             "CreateDelegate",
             new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
 
-        public void DispatchCall(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchCall(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var mce = (MethodCallExpression)e;
 
             var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
             if (optPropertyInfo != null
                 && (optPropertyInfo.Name == "Item"
                     || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
-                NestExpression(mce.NodeType, mce.Object);
+                kids.Add(NestExpression(mce.NodeType, mce.Object));
                 //indexers don't support ref/out; so we can use unprefixed arguments
-                ArgListDispatch(GetArgumentsForMethod(mce.Method, mce.Arguments), mce, "[", "]");
+                kids.Add(ArgListDispatch(GetArgumentsForMethod(mce.Method, mce.Arguments), mce, "[", "]"));
             } else if (mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
                 && mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof(MethodInfo)) {
                 //.net 4.0
@@ -255,7 +307,7 @@ namespace ExpressionToCodeLib
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
                     ? null
                     : mce.Arguments[1];
-                SinkMethodName(mce, targetMethod, targetExpr);
+                kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Method.Name == "CreateDelegate"
                 && mce.Arguments.Count == 2
                 && mce.Object.Type == typeof(MethodInfo)
@@ -269,7 +321,7 @@ namespace ExpressionToCodeLib
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
                     ? null
                     : mce.Arguments[1];
-                SinkMethodName(mce, targetMethod, targetExpr);
+                kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Object == null
                 && mce.Type.FullName == "System.FormattableString"
                 && mce.Method.DeclaringType.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
@@ -282,17 +334,18 @@ namespace ExpressionToCodeLib
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
                 var codeRepresentation = "$" + objectToCode.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
-                Sink(codeRepresentation);
+                kids.Add(codeRepresentation);
             } else {
                 bool isExtensionMethod = mce.Method.IsStatic
                     && mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any()
                     && mce.Object == null;
                 Expression objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
-                SinkMethodName(mce, mce.Method, objectExpr);
+                kids.Add(SinkMethodName(mce, mce.Method, objectExpr));
                 var args = GetArgumentsForMethod(mce.Method, mce.Arguments);
 
-                ArgListDispatch(isExtensionMethod ? args.Skip(1) : args);
+                kids.Add(ArgListDispatch(isExtensionMethod ? args.Skip(1) : args));
             }
+            return kids.Finish();
         }
 
         static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs) => GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
@@ -303,20 +356,24 @@ namespace ExpressionToCodeLib
             return argValueExprs.Zip(argPrefixes, (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
         }
 
-        void SinkMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr)
+        [Pure]
+        StringifiedExpression SinkMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr)
         {
+            var kids = KidsBuilder.Create();
+
             if (objExpr != null) {
                 if (!(isThisRef(objExpr) || isClosureRef(objExpr))) {
-                    NestExpression(mce.NodeType, objExpr);
-                    Sink(".");
+                    kids.Add(NestExpression(mce.NodeType, objExpr));
+                    kids.Add(".");
                 }
             } else if (method.IsStatic) {
-                Sink(objectToCode.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
+                kids.Add(objectToCode.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
             }
             var methodName = method.Name;
 
             methodName += CreateGenericArgumentsIfNecessary(mce, method);
-            Sink(methodName, mce);
+            kids.Add(methodName, mce);
+            return kids.Finish();
         }
 
         string CreateGenericArgumentsIfNecessary(MethodCallExpression mce, MethodInfo method)
@@ -356,10 +413,13 @@ namespace ExpressionToCodeLib
     || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
     || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
-        public void DispatchIndex(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchIndex(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var ie = (IndexExpression)e;
-            NestExpression(ie.NodeType, ie.Object);
+            kids.Add(NestExpression(ie.NodeType, ie.Object));
 
             var args = ie.Indexer == null
                 ? ie.Arguments.Select(
@@ -367,26 +427,33 @@ namespace ExpressionToCodeLib
                         Expr = a,
                         PrefixOrNull = null
                     })
-                : // else {
-                GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
+                : GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
 
-            ArgListDispatch(args, ie, "[", "]");
+            kids.Add(ArgListDispatch(args, ie, "[", "]"));
+            return kids.Finish();
         }
 
-        public void DispatchInvoke(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchInvoke(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var ie = (InvocationExpression)e;
             if (ie.Expression.NodeType == ExpressionType.Lambda) {
-                Sink("new " + objectToCode.TypeNameToCode(ie.Expression.Type));
+                kids.Add("new " + objectToCode.TypeNameToCode(ie.Expression.Type));
             }
-            NestExpression(ie.NodeType, ie.Expression);
+            kids.Add(NestExpression(ie.NodeType, ie.Expression));
             var invokeMethod = ie.Expression.Type.GetMethod("Invoke");
             var args = GetArgumentsForMethod(invokeMethod, ie.Arguments);
-            ArgListDispatch(args, ie);
+            kids.Add(ArgListDispatch(args, ie));
+            return kids.Finish();
         }
 
-        public void DispatchConstant(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchConstant(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var const_Val = ((ConstantExpression)e).Value;
             string codeRepresentation = objectToCode.PlainObjectToCode(const_Val, e.Type);
             //e.Type.IsVisible
@@ -394,7 +461,7 @@ namespace ExpressionToCodeLib
                 var typeclass = e.Type.GuessTypeClass();
                 if (typeclass == ReflectionHelpers.TypeClass.NormalType) // probably this!
                 {
-                    Sink("this"); //TODO:verify that all this references refer to the same object!
+                    kids.Add("this"); //TODO:verify that all this references refer to the same object!
                 } else {
                     throw new ArgumentOutOfRangeException(
                         "e",
@@ -402,79 +469,100 @@ namespace ExpressionToCodeLib
                             + " in expr of type " + e.Type);
                 }
             } else {
-                Sink(codeRepresentation);
+                kids.Add(codeRepresentation);
             }
+            return kids.Finish();
         }
 
-        public void DispatchConditional(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchConditional(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var ce = (ConditionalExpression)e;
-            NestExpression(ce.NodeType, ce.Test);
-            Sink(" ? ", e);
-            NestExpression(ce.NodeType, ce.IfTrue);
-            Sink(" : ");
-            NestExpression(ce.NodeType, ce.IfFalse);
+            kids.Add(NestExpression(ce.NodeType, ce.Test));
+            kids.Add(" ? ", e);
+            kids.Add(NestExpression(ce.NodeType, ce.IfTrue));
+            kids.Add(" : ");
+            kids.Add(NestExpression(ce.NodeType, ce.IfFalse));
+            return kids.Finish();
         }
 
-        public void DispatchListInit(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchListInit(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var lie = (ListInitExpression)e;
-            Sink("new ", lie);
-            Sink(objectToCode.TypeNameToCode(lie.NewExpression.Constructor.ReflectedType));
+            kids.Add("new ", lie);
+            kids.Add(objectToCode.TypeNameToCode(lie.NewExpression.Constructor.ReflectedType));
             if (lie.NewExpression.Arguments.Any()) {
-                ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments));
+                kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments)));
             }
 
-            Sink(" { ");
-            JoinDispatch(lie.Initializers, ", ", DispatchElementInit);
-            Sink(" }");
+            kids.Add(" { ");
+            kids.Add(JoinDispatch(lie.Initializers, ", ", DispatchElementInit));
+            kids.Add(" }");
+            return kids.Finish();
         }
 
-        void DispatchElementInit(ElementInit elemInit)
+        [Pure]
+        IEnumerable<StringifiedExpression> DispatchElementInit(ElementInit elemInit)
         {
             if (elemInit.Arguments.Count != 1) {
-                ArgListDispatch(elemInit.Arguments.Select(ae => new Argument { Expr = ae }), null, "{ ", " }"); //??
+                return ArgListDispatch(elemInit.Arguments.Select(ae => new Argument { Expr = ae }), null, "{ ", " }"); //??
             } else {
-                RawChildDispatch(elemInit.Arguments.Single());
+                return RawChildDispatch(elemInit.Arguments.Single());
             }
         }
 
-        void DispatchMemberBinding(MemberBinding mb)
+        [Pure]
+        IEnumerable<StringifiedExpression> DispatchMemberBinding(MemberBinding mb)
         {
-            Sink(mb.Member.Name + " = ");
+            var kids = KidsBuilder.Create();
+
+            kids.Add(mb.Member.Name + " = ");
             if (mb is MemberMemberBinding) {
                 var mmb = (MemberMemberBinding)mb;
-                Sink("{ ");
-                JoinDispatch(mmb.Bindings, ", ", DispatchMemberBinding);
-                Sink(" }");
+                kids.Add("{ ");
+                kids.Add(JoinDispatch(mmb.Bindings, ", ", DispatchMemberBinding));
+                kids.Add(" }");
             } else if (mb is MemberListBinding) {
                 var mlb = (MemberListBinding)mb;
-                Sink("{ ");
-                JoinDispatch(mlb.Initializers, ", ", DispatchElementInit);
-                Sink(" }");
+                kids.Add("{ ");
+                kids.Add(JoinDispatch(mlb.Initializers, ", ", DispatchElementInit));
+                kids.Add(" }");
             } else if (mb is MemberAssignment) {
-                RawChildDispatch(((MemberAssignment)mb).Expression);
+                kids.Add(RawChildDispatch(((MemberAssignment)mb).Expression));
             } else {
                 throw new NotImplementedException("Member binding of unknown type: " + mb.GetType());
             }
+            return new[] { kids.Finish() };
         }
 
-        public void DispatchMemberInit(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchMemberInit(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var mie = (MemberInitExpression)e;
-            Sink("new ", mie);
-            Sink(objectToCode.TypeNameToCode(mie.NewExpression.Constructor.ReflectedType));
+            kids.Add("new ", mie);
+            kids.Add(objectToCode.TypeNameToCode(mie.NewExpression.Constructor.ReflectedType));
             if (mie.NewExpression.Arguments.Any()) {
-                ArgListDispatch(GetArgumentsForMethod(mie.NewExpression.Constructor, mie.NewExpression.Arguments));
+                kids.Add(ArgListDispatch(GetArgumentsForMethod(mie.NewExpression.Constructor, mie.NewExpression.Arguments)));
             }
 
-            Sink(" { ");
-            JoinDispatch(mie.Bindings, ", ", DispatchMemberBinding);
-            Sink(" }");
+            kids.Add(" { ");
+            kids.Add(JoinDispatch(mie.Bindings, ", ", DispatchMemberBinding));
+            kids.Add(" }");
+            return kids.Finish();
         }
 
-        public void DispatchNew(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchNew(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var ne = (NewExpression)e;
             if (ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
                 var parms = ne.Type.GetConstructors().Single().GetParameters();
@@ -489,175 +577,377 @@ namespace ExpressionToCodeLib
                     throw new InvalidOperationException(
                         "Constructor Arguments for anonymous type don't match it's type signature!");
                 }
-                Sink("new { ");
+                kids.Add("new { ");
                 for (int i = 0; i < props.Length; i++) {
-                    Sink(props[i].Name + " = ");
-                    RawChildDispatch(ne.Arguments[i]);
+                    kids.Add(props[i].Name + " = ");
+                    kids.Add(RawChildDispatch(ne.Arguments[i]));
                     if (i + 1 < props.Length) {
-                        Sink(", ");
+                        kids.Add(", ");
                     }
                 }
-                Sink(" }");
+                kids.Add(" }");
             } else {
-                Sink("new " + objectToCode.TypeNameToCode(ne.Type), ne);
-                ArgListDispatch(GetArgumentsForMethod(ne.Constructor, ne.Arguments));
+                kids.Add("new " + objectToCode.TypeNameToCode(ne.Type), ne);
+                kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor, ne.Arguments)));
             }
             //TODO: deal with anonymous types.
+            return kids.Finish();
         }
 
-        public void DispatchNewArrayInit(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchNewArrayInit(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var nae = (NewArrayExpression)e;
             Type arrayElemType = nae.Type.GetElementType();
             bool isDelegate = typeof(Delegate).IsAssignableFrom(arrayElemType);
             bool implicitTypeOK = !isDelegate && nae.Expressions.Any()
                 && nae.Expressions.All(expr => expr.Type == arrayElemType);
-            Sink("new" + (implicitTypeOK ? "" : " " + objectToCode.TypeNameToCode(arrayElemType)) + "[] ", nae);
-            ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "{ ", " }");
+            kids.Add("new" + (implicitTypeOK ? "" : " " + objectToCode.TypeNameToCode(arrayElemType)) + "[] ", nae);
+            kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "{ ", " }"));
+            return kids.Finish();
         }
 
-        public void DispatchNewArrayBounds(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchNewArrayBounds(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var nae = (NewArrayExpression)e;
             Type arrayElemType = nae.Type.GetElementType();
-            Sink("new " + objectToCode.TypeNameToCode(arrayElemType), nae);
-            ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]");
+            kids.Add("new " + objectToCode.TypeNameToCode(arrayElemType), nae);
+            kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]"));
+            return kids.Finish();
         }
 
-        public void DispatchBlock(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchBlock(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var be = (BlockExpression)e;
             bool hasReturn = (be.Type != typeof(void));
             var statements = hasReturn ? be.Expressions.Take(be.Expressions.Count - 1) : be.Expressions;
 
-            Sink("{ ");
+            kids.Add("{ ");
 
             foreach (var v in be.Variables) {
-                StatementDispatch(objectToCode.TypeNameToCode(v.Type), v, ExpressionType.Block);
+                kids.Add(StatementDispatch(objectToCode.TypeNameToCode(v.Type), v, ExpressionType.Block));
             }
 
             foreach (var child in statements) {
-                StatementDispatch(child, ExpressionType.Block);
+                kids.Add(StatementDispatch(child, ExpressionType.Block));
             }
 
             if (hasReturn) {
-                StatementDispatch("return", be.Result, ExpressionType.Block);
+                kids.Add(StatementDispatch("return", be.Result, ExpressionType.Block));
             }
 
-            Sink("}");
+            kids.Add("}");
+            return kids.Finish();
         }
         #endregion
 
         #region Easy Cases
-        public void DispatchPower(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchPower(Expression e)
         {
-            Sink("Math.Pow", e);
+            var kids = KidsBuilder.Create();
+
+            kids.Add("Math.Pow", e);
             var binaryExpression = (BinaryExpression)e;
-            ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(e1 => new Argument { Expr = e1 }));
+            kids.Add(ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(e1 => new Argument { Expr = e1 })));
+            return kids.Finish();
         }
 
-        public void DispatchAdd(Expression e) { BinaryDispatch("+", e); }
-        public void DispatchAddChecked(Expression e) { BinaryDispatch("+", e); } //TODO: checked
-        public void DispatchAnd(Expression e) { BinaryDispatch("&", e); }
-        public void DispatchAndAlso(Expression e) { BinaryDispatch("&&", e); }
+        [Pure]
+        public StringifiedExpression DispatchAdd(Expression e) => BinaryDispatch("+", e);
 
-        public void DispatchArrayLength(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchAddChecked(Expression e) => BinaryDispatch("+", e); //TODO: checked
+
+        [Pure]
+        public StringifiedExpression DispatchAnd(Expression e) => BinaryDispatch("&", e);
+
+        [Pure]
+        public StringifiedExpression DispatchAndAlso(Expression e) => BinaryDispatch("&&", e);
+
+        [Pure]
+        public StringifiedExpression DispatchArrayLength(Expression e)
         {
-            NestExpression(e.NodeType, ((UnaryExpression)e).Operand);
-            Sink(".Length", e);
+            var kids = KidsBuilder.Create();
+
+            kids.Add(NestExpression(e.NodeType, ((UnaryExpression)e).Operand));
+            kids.Add(".Length", e);
+            return kids.Finish();
         }
 
-        public void DispatchArrayIndex(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchArrayIndex(Expression e)
         {
+            var kids = KidsBuilder.Create();
+
             var binaryExpression = (BinaryExpression)e;
-            NestExpression(e.NodeType, binaryExpression.Left);
-            Sink("[", e);
-            NestExpression(null, binaryExpression.Right);
-            Sink("]");
+            kids.Add(NestExpression(e.NodeType, binaryExpression.Left));
+            kids.Add("[", e);
+            kids.Add(NestExpression(null, binaryExpression.Right));
+            kids.Add("]");
+            return kids.Finish();
         }
 
-        public void DispatchCoalesce(Expression e) { BinaryDispatch("??", e); }
-        public void DispatchConvert(Expression e) { UnaryDispatchConvert(e); }
-        public void DispatchConvertChecked(Expression e) { UnaryDispatchConvert(e); }
+        [Pure]
+        public StringifiedExpression DispatchCoalesce(Expression e) => BinaryDispatch("??", e);
+
+        [Pure]
+        public StringifiedExpression DispatchConvert(Expression e) => UnaryDispatchConvert(e);
+
+        [Pure]
+        public StringifiedExpression DispatchConvertChecked(Expression e) => UnaryDispatchConvert(e);
+
         //TODO: get explicit and implicit conversion operators right.
-        public void DispatchDivide(Expression e) { BinaryDispatch("/", e); }
-        public void DispatchEqual(Expression e) { BinaryDispatch("==", e); }
-        public void DispatchExclusiveOr(Expression e) { BinaryDispatch("^", e); }
-        public void DispatchGreaterThan(Expression e) { BinaryDispatch(">", e); }
-        public void DispatchGreaterThanOrEqual(Expression e) { BinaryDispatch(">=", e); }
-        public void DispatchLeftShift(Expression e) { BinaryDispatch("<<", e); }
-        public void DispatchLessThan(Expression e) { BinaryDispatch("<", e); }
-        public void DispatchLessThanOrEqual(Expression e) { BinaryDispatch("<=", e); }
-        public void DispatchModulo(Expression e) { BinaryDispatch("%", e); }
-        public void DispatchMultiply(Expression e) { BinaryDispatch("*", e); }
-        public void DispatchMultiplyChecked(Expression e) { BinaryDispatch("*", e); }
-        public void DispatchNegate(Expression e) { UnaryDispatch("-", e); }
-        public void DispatchUnaryPlus(Expression e) { UnaryDispatch("+", e); }
-        public void DispatchNegateChecked(Expression e) { UnaryDispatch("-", e); }
-        public void DispatchNot(Expression e) { UnaryDispatch(e.Type == typeof(bool) || e.Type == typeof(bool?) ? "!" : "~", e); }
-        public void DispatchNotEqual(Expression e) { BinaryDispatch("!=", e); }
-        public void DispatchOr(Expression e) { BinaryDispatch("|", e); }
-        public void DispatchOrElse(Expression e) { BinaryDispatch("||", e); }
+        [Pure]
+        public StringifiedExpression DispatchDivide(Expression e) => BinaryDispatch("/", e);
 
-        public void DispatchParameter(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchEqual(Expression e) => BinaryDispatch("==", e);
+
+        [Pure]
+        public StringifiedExpression DispatchExclusiveOr(Expression e) => BinaryDispatch("^", e);
+
+        [Pure]
+        public StringifiedExpression DispatchGreaterThan(Expression e) => BinaryDispatch(">", e);
+
+        [Pure]
+        public StringifiedExpression DispatchGreaterThanOrEqual(Expression e) => BinaryDispatch(">=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchLeftShift(Expression e) => BinaryDispatch("<<", e);
+
+        [Pure]
+        public StringifiedExpression DispatchLessThan(Expression e) => BinaryDispatch("<", e);
+
+        [Pure]
+        public StringifiedExpression DispatchLessThanOrEqual(Expression e) => BinaryDispatch("<=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchModulo(Expression e) => BinaryDispatch("%", e);
+
+        [Pure]
+        public StringifiedExpression DispatchMultiply(Expression e) => BinaryDispatch("*", e);
+
+        [Pure]
+        public StringifiedExpression DispatchMultiplyChecked(Expression e) => BinaryDispatch("*", e);
+
+        [Pure]
+        public StringifiedExpression DispatchNegate(Expression e) => UnaryDispatch("-", e);
+
+        [Pure]
+        public StringifiedExpression DispatchUnaryPlus(Expression e) => UnaryDispatch("+", e);
+
+        [Pure]
+        public StringifiedExpression DispatchNegateChecked(Expression e) => UnaryDispatch("-", e);
+
+        [Pure]
+        public StringifiedExpression DispatchNot(Expression e) => UnaryDispatch(e.Type == typeof(bool) || e.Type == typeof(bool?) ? "!" : "~", e);
+
+        [Pure]
+        public StringifiedExpression DispatchNotEqual(Expression e) => BinaryDispatch("!=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchOr(Expression e) => BinaryDispatch("|", e);
+
+        [Pure]
+        public StringifiedExpression DispatchOrElse(Expression e) => BinaryDispatch("||", e);
+
+        [Pure]
+        public StringifiedExpression DispatchParameter(Expression e)
         {
             var parameterExpression = ((ParameterExpression)e);
-            Sink(parameterExpression.Name ?? (parameterExpression.Type.Name + parameterExpression.GetHashCode()), e);
+            // ReSharper disable once ConstantNullCoalescingCondition
+            return StringifiedExpression.TextAndExpr(parameterExpression.Name ?? parameterExpression.Type.Name + parameterExpression.GetHashCode(), e);
         }
 
-        public void DispatchQuote(Expression e) { NestExpression(e.NodeType, ((UnaryExpression)e).Operand); }
-        public void DispatchRightShift(Expression e) { BinaryDispatch(">>", e); }
-        public void DispatchSubtract(Expression e) { BinaryDispatch("-", e); }
-        public void DispatchSubtractChecked(Expression e) { BinaryDispatch("-", e); }
-        public void DispatchTypeAs(Expression e) { UnaryPostfixDispatch(" as " + objectToCode.TypeNameToCode(e.Type), e); }
-        public void DispatchTypeIs(Expression e) { TypeOpDispatch("is", e); }
-        public void DispatchAssign(Expression e) { BinaryDispatch("=", e); }
-        public void DispatchDecrement(Expression e) { UnaryPostfixDispatch(" - 1", e); }
-        public void DispatchIncrement(Expression e) { UnaryPostfixDispatch(" + 1", e); }
-        public void DispatchAddAssign(Expression e) { BinaryDispatch("+=", e); }
-        public void DispatchAndAssign(Expression e) { BinaryDispatch("&=", e); }
-        public void DispatchDivideAssign(Expression e) { BinaryDispatch("/=", e); }
-        public void DispatchExclusiveOrAssign(Expression e) { BinaryDispatch("^=", e); }
-        public void DispatchLeftShiftAssign(Expression e) { BinaryDispatch("<<=", e); }
-        public void DispatchModuloAssign(Expression e) { BinaryDispatch("%=", e); }
-        public void DispatchMultiplyAssign(Expression e) { BinaryDispatch("*=", e); }
-        public void DispatchOrAssign(Expression e) { BinaryDispatch("|=", e); }
-        public void DispatchRightShiftAssign(Expression e) { BinaryDispatch(">>=", e); }
-        public void DispatchSubtractAssign(Expression e) { BinaryDispatch("-=", e); }
-        public void DispatchAddAssignChecked(Expression e) { BinaryDispatch("+=", e); }
-        public void DispatchMultiplyAssignChecked(Expression e) { BinaryDispatch("*=", e); }
-        public void DispatchSubtractAssignChecked(Expression e) { BinaryDispatch("-=", e); }
-        public void DispatchPreIncrementAssign(Expression e) { UnaryDispatch("++", e); }
-        public void DispatchPreDecrementAssign(Expression e) { UnaryDispatch("--", e); }
-        public void DispatchPostIncrementAssign(Expression e) { UnaryPostfixDispatch("++", e); }
-        public void DispatchPostDecrementAssign(Expression e) { UnaryPostfixDispatch("--", e); }
-        public void DispatchOnesComplement(Expression e) { UnaryDispatch("~", e); }
+        [Pure]
+        public StringifiedExpression DispatchQuote(Expression e) => StringifiedExpression.WithChildren(NestExpression(e.NodeType, ((UnaryExpression)e).Operand).ToArray());
+
+        [Pure]
+        public StringifiedExpression DispatchRightShift(Expression e) => BinaryDispatch(">>", e);
+
+        [Pure]
+        public StringifiedExpression DispatchSubtract(Expression e) => BinaryDispatch("-", e);
+
+        [Pure]
+        public StringifiedExpression DispatchSubtractChecked(Expression e) => BinaryDispatch("-", e);
+
+        [Pure]
+        public StringifiedExpression DispatchTypeAs(Expression e) => UnaryPostfixDispatch(" as " + objectToCode.TypeNameToCode(e.Type), e);
+
+        [Pure]
+        public StringifiedExpression DispatchTypeIs(Expression e) => TypeOpDispatch("is", e);
+
+        [Pure]
+        public StringifiedExpression DispatchAssign(Expression e) => BinaryDispatch("=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchDecrement(Expression e) => UnaryPostfixDispatch(" - 1", e);
+
+        [Pure]
+        public StringifiedExpression DispatchIncrement(Expression e) => UnaryPostfixDispatch(" + 1", e);
+
+        [Pure]
+        public StringifiedExpression DispatchAddAssign(Expression e) => BinaryDispatch("+=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchAndAssign(Expression e) => BinaryDispatch("&=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchDivideAssign(Expression e) => BinaryDispatch("/=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchExclusiveOrAssign(Expression e) => BinaryDispatch("^=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchLeftShiftAssign(Expression e) => BinaryDispatch("<<=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchModuloAssign(Expression e) => BinaryDispatch("%=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchMultiplyAssign(Expression e) => BinaryDispatch("*=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchOrAssign(Expression e) => BinaryDispatch("|=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchRightShiftAssign(Expression e) => BinaryDispatch(">>=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchSubtractAssign(Expression e) => BinaryDispatch("-=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchAddAssignChecked(Expression e) => BinaryDispatch("+=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchMultiplyAssignChecked(Expression e) => BinaryDispatch("*=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchSubtractAssignChecked(Expression e) => BinaryDispatch("-=", e);
+
+        [Pure]
+        public StringifiedExpression DispatchPreIncrementAssign(Expression e) => UnaryDispatch("++", e);
+
+        [Pure]
+        public StringifiedExpression DispatchPreDecrementAssign(Expression e) => UnaryDispatch("--", e);
+
+        [Pure]
+        public StringifiedExpression DispatchPostIncrementAssign(Expression e) => UnaryPostfixDispatch("++", e);
+
+        [Pure]
+        public StringifiedExpression DispatchPostDecrementAssign(Expression e) => UnaryPostfixDispatch("--", e);
+
+        [Pure]
+        public StringifiedExpression DispatchOnesComplement(Expression e) => UnaryDispatch("~", e);
         #endregion
 
         #region Unused by C#'s expression support; or unavailable in the language at all.
-        public void DispatchTypeEqual(Expression e) { throw new NotImplementedException(); }
-        public void DispatchDebugInfo(Expression e) { throw new NotImplementedException(); }
-        public void DispatchDynamic(Expression e) { throw new NotImplementedException(); }
+        [Pure]
+        public StringifiedExpression DispatchTypeEqual(Expression e)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void DispatchDefault(Expression e)
+        [Pure]
+        public StringifiedExpression DispatchDebugInfo(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchDynamic(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchDefault(Expression e)
         {
             var defExpr = (DefaultExpression)e;
 
-            Sink("default(" + objectToCode.TypeNameToCode(defExpr.Type) + ")");
+            return StringifiedExpression.TextOnly("default(" + objectToCode.TypeNameToCode(defExpr.Type) + ")");
         }
 
-        public void DispatchExtension(Expression e) { throw new NotImplementedException(); }
-        public void DispatchGoto(Expression e) { throw new NotImplementedException(); }
-        public void DispatchLabel(Expression e) { throw new NotImplementedException(); }
-        public void DispatchRuntimeVariables(Expression e) { throw new NotImplementedException(); }
-        public void DispatchLoop(Expression e) { throw new NotImplementedException(); }
-        public void DispatchSwitch(Expression e) { throw new NotImplementedException(); }
-        public void DispatchThrow(Expression e) { throw new NotImplementedException(); }
-        public void DispatchTry(Expression e) { throw new NotImplementedException(); }
-        public void DispatchUnbox(Expression e) { throw new NotImplementedException(); }
-        public void DispatchPowerAssign(Expression e) { throw new NotImplementedException(); }
-        public void DispatchIsTrue(Expression e) { throw new NotImplementedException(); }
-        public void DispatchIsFalse(Expression e) { throw new NotImplementedException(); }
+        [Pure]
+        public StringifiedExpression DispatchExtension(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchGoto(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchLabel(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchRuntimeVariables(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchLoop(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchSwitch(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchThrow(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchTry(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchUnbox(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchPowerAssign(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchIsTrue(Expression e)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Pure]
+        public StringifiedExpression DispatchIsFalse(Expression e)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

@@ -17,12 +17,14 @@ namespace ExpressionToCodeTest {
                             TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
                         ));
             Assert.Equal(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed", msgLines[0]);
-            Assert.Equal(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed
+            var expectedMessage = @"
+TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed
                  │                  │                   │
                  │                  │                   00:01:00
                  │                  -1
                  00:00:00.0100000
-".Replace("\r", "").Trim(), string.Join("\n", msgLines));
+";
+            Assert.Equal(expectedMessage.Replace("\r", "").Trim(), string.Join("\n", msgLines));
         }
 
         [Fact]

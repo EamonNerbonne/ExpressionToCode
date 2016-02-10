@@ -20,14 +20,21 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
         {
             var sb = new StringBuilder();
             var ignoreInitialSpace = true;
-            new ExpressionToCodeImpl(
+            var stringifiedExpr= new ExpressionToCodeImpl(
                 objectToCode,
-                explicitMethodTypeArgs,
-                (etp, depth) => {
-                    sb.Append(ignoreInitialSpace ? etp.Text.TrimStart() : etp.Text);
-                    ignoreInitialSpace = etp.Text.Any() && ExpressionToCode.ShouldIgnoreSpaceAfter(etp.Text[etp.Text.Length - 1]);
-                }).ExpressionDispatch(e);
+                explicitMethodTypeArgs).ExpressionDispatch(e);
+            AppendTo(sb, ref ignoreInitialSpace, stringifiedExpr);
             return sb.ToString();
+        }
+
+        static void AppendTo(StringBuilder sb, ref bool ignoreInitialSpace, StringifiedExpression node) {
+            if (node.Text != null) {
+                sb.Append(ignoreInitialSpace ? node.Text.TrimStart() : node.Text);
+                ignoreInitialSpace = node.Text.Any() && ExpressionToCode.ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
+            } else {
+                foreach (var kid in node.Children)
+                    AppendTo(sb, ref ignoreInitialSpace, kid);
+            }
         }
 
         public static IExpressionToCode With(bool fullTypeNames = false, bool explicitMethodTypeArgs = false) => new ExpressionStringify(fullTypeNames ? ObjectStringify.WithFullTypeNames : ObjectStringify.Default, explicitMethodTypeArgs);
