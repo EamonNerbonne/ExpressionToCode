@@ -22,7 +22,7 @@ namespace ExpressionToCodeLib
                 : new DynamicMethod(string.Empty, typeof(T), new[] { closure.GetType() }, closure.GetType());
 
             var il = method.GetILGenerator();
-            var emitted = EmittingVisitor.TryEmit(expression.Body, il);
+            var emitted = EmittingVisitor.TryEmit(expression.Body, il, closure != null);
 
             if (emitted) {
                 il.Emit(OpCodes.Ret);
@@ -71,60 +71,60 @@ namespace ExpressionToCodeLib
         /// so the compilation may fallback to usual/slow Expression.Compile.</summary>
         private static class EmittingVisitor
         {
-            public static bool TryEmit(Expression expr, ILGenerator il)
+            public static bool TryEmit(Expression expr, ILGenerator il, bool withClosure)
             {
                 switch (expr.NodeType) {
                     case ExpressionType.Convert:
-                        return VisitConvert((UnaryExpression)expr, il);
+                        return VisitConvert((UnaryExpression)expr, il, withClosure);
                     case ExpressionType.ArrayIndex:
-                        return VisitArrayIndex((BinaryExpression)expr, il);
+                        return VisitArrayIndex((BinaryExpression)expr, il, withClosure);
                     case ExpressionType.Constant:
-                        return VisitConstant((ConstantExpression)expr, il);
+                        return VisitConstant((ConstantExpression)expr, il, withClosure);
                     case ExpressionType.New:
-                        return VisitNew((NewExpression)expr, il);
+                        return VisitNew((NewExpression)expr, il, withClosure);
                     case ExpressionType.NewArrayInit:
-                        return VisitNewArray((NewArrayExpression)expr, il);
+                        return VisitNewArray((NewArrayExpression)expr, il, withClosure);
                     case ExpressionType.MemberInit:
-                        return VisitMemberInit((MemberInitExpression)expr, il);
+                        return VisitMemberInit((MemberInitExpression)expr, il, withClosure);
                     case ExpressionType.Call:
-                        return VisitMethodCall((MethodCallExpression)expr, il);
+                        return VisitMethodCall((MethodCallExpression)expr, il, withClosure);
                     case ExpressionType.MemberAccess:
-                        return VisitMemberAccess((MemberExpression)expr, il);
+                        return VisitMemberAccess((MemberExpression)expr, il, withClosure);
                     case ExpressionType.GreaterThan:
                     case ExpressionType.GreaterThanOrEqual:
                     case ExpressionType.LessThan:
                     case ExpressionType.LessThanOrEqual:
                     case ExpressionType.Equal:
                     case ExpressionType.NotEqual:
-                        return VisitComparison((BinaryExpression)expr, il);
+                        return VisitComparison((BinaryExpression)expr, il, withClosure);
                     default:
                         // todo: add support for the rest of node types
                         return false;
                 }
             }
 
-            private static bool VisitBinary(BinaryExpression b, ILGenerator il)
+            private static bool VisitBinary(BinaryExpression b, ILGenerator il, bool withClosure)
             {
-                var ok = TryEmit(b.Left, il);
+                var ok = TryEmit(b.Left, il, withClosure);
                 if (ok) {
-                    ok = TryEmit(b.Right, il);
+                    ok = TryEmit(b.Right, il, withClosure);
                 }
                 // skips TryVisit(b.Conversion) for NodeType.Coalesce (?? operation)
                 return ok;
             }
 
-            private static bool VisitExpressionList(IList<Expression> eList, ILGenerator state)
+            private static bool VisitExpressionList(IList<Expression> eList, ILGenerator state, bool withClosure)
             {
                 var ok = true;
                 for (int i = 0, n = eList.Count; i < n && ok; i++) {
-                    ok = TryEmit(eList[i], state);
+                    ok = TryEmit(eList[i], state, withClosure);
                 }
                 return ok;
             }
 
-            private static bool VisitConvert(UnaryExpression node, ILGenerator il)
+            private static bool VisitConvert(UnaryExpression node, ILGenerator il, bool withClosure)
             {
-                var ok = TryEmit(node.Operand, il);
+                var ok = TryEmit(node.Operand, il, withClosure);
                 if (ok) {
                     var convertTargetType = node.Type;
                     // not supported, probably required for converting ValueType
@@ -136,7 +136,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitConstant(ConstantExpression node, ILGenerator il)
+            private static bool VisitConstant(ConstantExpression node, ILGenerator il, bool withClosure)
             {
                 var value = node.Value;
                 if (value == null) {
@@ -149,7 +149,7 @@ namespace ExpressionToCodeLib
                     il.Emit((bool)value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
                 } else if (value is string) {
                     il.Emit(OpCodes.Ldstr, (string)value);
-                } else if (value.GetType().IsClosureType()) {
+                } else if (withClosure && value.GetType().IsClosureType()) {
                     il.Emit(OpCodes.Ldarg_0);
                 } else {
                     return false;
@@ -157,16 +157,16 @@ namespace ExpressionToCodeLib
                 return true;
             }
 
-            private static bool VisitNew(NewExpression node, ILGenerator il)
+            private static bool VisitNew(NewExpression node, ILGenerator il, bool withClosure)
             {
-                var ok = VisitExpressionList(node.Arguments, il);
+                var ok = VisitExpressionList(node.Arguments, il, withClosure);
                 if (ok) {
                     il.Emit(OpCodes.Newobj, node.Constructor);
                 }
                 return ok;
             }
 
-            private static bool VisitNewArray(NewArrayExpression node, ILGenerator il)
+            private static bool VisitNewArray(NewArrayExpression node, ILGenerator il, bool withClosure)
             {
                 var elems = node.Expressions;
                 var arrType = node.Type;
@@ -189,7 +189,7 @@ namespace ExpressionToCodeLib
                         il.Emit(OpCodes.Ldelema, elemType);
                     }
 
-                    ok = TryEmit(elems[i], il);
+                    ok = TryEmit(elems[i], il, withClosure);
                     if (ok) {
                         if (isElemOfValueType) {
                             il.Emit(OpCodes.Stobj, elemType); // store element of value type by array element address
@@ -203,18 +203,18 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitArrayIndex(BinaryExpression node, ILGenerator il)
+            private static bool VisitArrayIndex(BinaryExpression node, ILGenerator il, bool withClosure)
             {
-                var ok = VisitBinary(node, il);
+                var ok = VisitBinary(node, il, withClosure);
                 if (ok) {
                     il.Emit(OpCodes.Ldelem_Ref);
                 }
                 return ok;
             }
 
-            private static bool VisitMemberInit(MemberInitExpression mi, ILGenerator il)
+            private static bool VisitMemberInit(MemberInitExpression mi, ILGenerator il, bool withClosure)
             {
-                var ok = VisitNew(mi.NewExpression, il);
+                var ok = VisitNew(mi.NewExpression, il, withClosure);
                 if (!ok) {
                     return false;
                 }
@@ -230,7 +230,7 @@ namespace ExpressionToCodeLib
                     }
                     il.Emit(OpCodes.Ldloc, obj);
 
-                    ok = TryEmit(((MemberAssignment)binding).Expression, il);
+                    ok = TryEmit(((MemberAssignment)binding).Expression, il, withClosure);
                     if (!ok) {
                         return false;
                     }
@@ -255,11 +255,11 @@ namespace ExpressionToCodeLib
                 return true;
             }
 
-            private static bool VisitMethodCall(MethodCallExpression expr, ILGenerator il)
+            private static bool VisitMethodCall(MethodCallExpression expr, ILGenerator il, bool withClosure)
             {
                 var ok = true;
                 if (expr.Object != null) {
-                    ok = TryEmit(expr.Object, il);
+                    ok = TryEmit(expr.Object, il, withClosure);
                     if (ok && expr.Object.Type.IsValueType) {
                         // for instance methods store and load instance variable
                         var objectVar = il.DeclareLocal(expr.Object.Type);
@@ -269,7 +269,7 @@ namespace ExpressionToCodeLib
                 }
 
                 if (ok && expr.Arguments.Count != 0) {
-                    ok = VisitExpressionList(expr.Arguments, il);
+                    ok = VisitExpressionList(expr.Arguments, il, withClosure);
                 }
 
                 if (ok) {
@@ -279,10 +279,10 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitMemberAccess(MemberExpression expr, ILGenerator il)
+            private static bool VisitMemberAccess(MemberExpression expr, ILGenerator il, bool withClosure)
             {
                 if (expr.Expression != null) {
-                    var ok = TryEmit(expr.Expression, il);
+                    var ok = TryEmit(expr.Expression, il, withClosure);
                     if (!ok) {
                         return false;
                     }
@@ -306,9 +306,9 @@ namespace ExpressionToCodeLib
                 return true;
             }
 
-            private static bool VisitComparison(BinaryExpression comparison, ILGenerator il)
+            private static bool VisitComparison(BinaryExpression comparison, ILGenerator il, bool withClosure)
             {
-                var ok = VisitBinary(comparison, il);
+                var ok = VisitBinary(comparison, il, withClosure);
                 if (ok) {
                     switch (comparison.NodeType) {
                         case ExpressionType.Equal:
@@ -340,7 +340,10 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static void EmitMethodCall(MethodInfo method, ILGenerator il) { il.Emit(method.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, method); }
+            private static void EmitMethodCall(MethodInfo method, ILGenerator il)
+            {
+                il.Emit(method.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, method);
+            }
 
             private static void EmitLoadConstantInt(ILGenerator il, int i)
             {
