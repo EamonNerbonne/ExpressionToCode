@@ -8,15 +8,15 @@ namespace ExpressionToCodeLib
 {
     public static class PAssert
     {
-        [Obsolete("Prefer PAssert.That: IsTrue is provided for compatiblity with PowerAssert.NET")]
+        [Obsolete("Prefer PAssert.That: IsTrue is provided for compatibility with PowerAssert.NET")]
         public static void IsTrue(Expression<Func<bool>> assertion)
         {
             That(assertion);
         }
 
-        public static void That(Expression<Func<bool>> assertion, string msg = null)
+        public static void That(Expression<Func<bool>> assertion, string msg = null, bool emit = false)
         {
-            var compiled = assertion.Compile();
+            var compiled = emit ? ExpressionCompiler.Compile(assertion) : assertion.Compile();
             bool ok = false;
             try {
                 ok = compiled();

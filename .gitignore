@@ -6,3 +6,6 @@ Debug
 Release
 
 *.suo
+
+# NCrunch
+*[_.][Nn][Cc]runch*
