@@ -28,11 +28,11 @@ namespace ExpressionToCodeLib
                 });
 
         public static ExpressionToCodeConfiguration CurrentConfiguration = DefaultConfiguration;
-
         public readonly ExpressionToCodeConfigurationValue Value;
         public ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value) { Value = value; }
 
         delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
+
         ExpressionToCodeConfiguration With(WithDelegate edit)
         {
             var configCopy = Value;
@@ -40,11 +40,14 @@ namespace ExpressionToCodeLib
             return new ExpressionToCodeConfiguration(configCopy);
         }
 
-
         public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler) => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
         public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator) => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
-        public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier) => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
-        public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments) => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
+
+        public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier)
+            => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
+
+        public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments)
+            => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
 
         public IExpressionToCode GetExpressionToCode() => new ExpressionStringify(this);
     }
