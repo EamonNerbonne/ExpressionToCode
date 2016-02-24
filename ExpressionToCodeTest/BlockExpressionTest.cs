@@ -47,7 +47,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void PostDecrementAssign()
         {
-            int x = 1, y = 4, z=8;
+            int x = 1, y = 4, z = 8;
             var expr = Expression.PostDecrementAssign(Expression.Variable(typeof(int), "x"));
             Assert.Equal("x--", ExpressionToCode.ToCode(expr));
         }

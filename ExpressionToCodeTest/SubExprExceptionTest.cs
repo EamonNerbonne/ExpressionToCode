@@ -5,14 +5,18 @@ using System.Text;
 using ExpressionToCodeLib;
 using Xunit;
 
-namespace ExpressionToCodeTest {
-    public class FailingClass {
+namespace ExpressionToCodeTest
+{
+    public class FailingClass
+    {
         public static int SomeFunction() { throw new Exception(); }
     }
 
-    public class SubExprExceptionTest {
+    public class SubExprExceptionTest
+    {
         [Fact]
-        public void ExceptionDoesntCauseFailure() {
+        public void ExceptionDoesntCauseFailure()
+        {
             Assert.Equal(
                 @"() => FailingClass.SomeFunction()
                          │

@@ -7,13 +7,15 @@ using Assert = Xunit.Assert;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using ExpressionToCodeLib;
 
-namespace ExpressionToCodeTest {
-    public class TestGenerics {
+namespace ExpressionToCodeTest
+{
+    public class TestGenerics
+    {
         [Fact]
-        public void TypeParameters() {
+        public void TypeParameters()
+        {
             Assert.Equal(1337, StaticTestClass.Consume(12));
             Assert.Equal(42, StaticTestClass.Consume<int>(12));
             Assert.Equal(42, StaticTestClass.Consume('a'));
@@ -38,7 +40,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void TypeParameters2() {
+        public void TypeParameters2()
+        {
             Assert.Equal(
                 @"() => new[] { 1, 2, 3 }.First()",
                 ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.First())
@@ -51,7 +54,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void TypeParameters3() {
+        public void TypeParameters3()
+        {
             Assert.Equal(
                 @"() => new[] { 1, 2, 3 }.Cast<int>()",
                 ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.Cast<int>())
@@ -59,7 +63,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void GenericConstructor() {
+        public void GenericConstructor()
+        {
             Assert.Equal(
                 @"() => new GenericClass<int>()",
                 ExpressionToCode.ToCode(() => new GenericClass<int>())
@@ -75,7 +80,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void MethodInGenericClass() {
+        public void MethodInGenericClass()
+        {
             Assert.Equal(
                 @"() => new GenericClass<int>().IsSet()",
                 ExpressionToCode.ToCode(() => new GenericClass<int>().IsSet())
@@ -87,7 +93,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void GenericMethodInGenericClass() {
+        public void GenericMethodInGenericClass()
+        {
             var x = new GenericClass<string>("42");
             var y = new GenericClass<object>("42");
             Assert.True(x.IsSubEqual("42"));
@@ -108,7 +115,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void StraightforwardInference() {
+        public void StraightforwardInference()
+        {
             Assert.Equal(
                 @"() => StaticTestClass.Identity(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.Identity(3))
@@ -116,7 +124,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void CannotInferOneParam() {
+        public void CannotInferOneParam()
+        {
             Assert.Equal(
                 @"() => StaticTestClass.IsType<int, int>(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.IsType<int, int>(3))
@@ -124,7 +133,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void CannotInferWithoutTParam() {
+        public void CannotInferWithoutTParam()
+        {
             Assert.Equal(
                 @"() => StaticTestClass.TEqualsInt<int>(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TEqualsInt<int>(3))
@@ -136,7 +146,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void CanInferDirect() {
+        public void CanInferDirect()
+        {
             Assert.Equal(
                 @"() => StaticTestClass.TwoArgsOneGeneric(3, 3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsOneGeneric(3, 3))
@@ -148,7 +159,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void CanInferTwoArg() {
+        public void CanInferTwoArg()
+        {
             Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, 3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, 3))
@@ -168,7 +180,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact(Skip = "issue 14")]
-        public void CanInferIndirect() {
+        public void CanInferIndirect()
+        {
             Assert.True(GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 }));
             Assert.True(GenericClass<int>.IsFuncOfType(() => 3));
             Assert.True(!GenericClass<int>.IsFuncOfType(() => 3.0));
@@ -193,7 +206,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments() {
+        public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments()
+        {
             Assert.Equal(
                 @"() => StaticTestClass.IsType<int, int>(3)",
                 ExpressionStringify.With(explicitMethodTypeArgs: true).ToCode(() => StaticTestClass.IsType<int, int>(3))
@@ -201,7 +215,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void GenericMethodCall_ShouldExplicitlySpecifyTypeArguments() {
+        public void GenericMethodCall_ShouldExplicitlySpecifyTypeArguments()
+        {
             Assert.Equal(
                 "() => MakeMe<Cake, string>(() => new Cake())",
                 ExpressionToCode.ToCode(() => MakeMe<Cake, string>(() => new Cake())));
@@ -210,11 +225,10 @@ namespace ExpressionToCodeTest {
         T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) { return maker(); }
 
         [Fact]
-        public void UsesBoundTypeNamesEvenInGenericMethod() {
-            AssertInGenericMethodWithIntArg<int>();
-        }
+        public void UsesBoundTypeNamesEvenInGenericMethod() { AssertInGenericMethodWithIntArg<int>(); }
 
-        void AssertInGenericMethodWithIntArg<T>() {
+        void AssertInGenericMethodWithIntArg<T>()
+        {
             //The expression no longer has any reference to the unbound argument T, so we can't generate the exactly correct code here.
             Assert.Equal(
                 "() => new List<int>()",
@@ -224,7 +238,8 @@ namespace ExpressionToCodeTest {
 
     internal class Cake { }
 
-    class GenericClass<T> {
+    class GenericClass<T>
+    {
         T val;
         public GenericClass(T pVal) { val = pVal; }
         public GenericClass() { val = default(T); }
@@ -241,14 +256,16 @@ namespace ExpressionToCodeTest {
     }
 
     class GenericSubClass<T, U> : GenericClass<T>
-        where T : IEnumerable<U> {
+        where T : IEnumerable<U>
+    {
         public GenericSubClass(T val)
             : base(val) { }
 
         public bool IsEmpty { get { return !Value.Any(); } }
     }
 
-    public static class StaticTestClass {
+    public static class StaticTestClass
+    {
         public static T Identity<T>(T val) { return val; }
         public static bool IsType<T, U>(T val) { return val is U; }
         public static bool TEqualsInt<T>(int val) { return val is T; }

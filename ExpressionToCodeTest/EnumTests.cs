@@ -6,14 +6,17 @@ using ExpressionToCodeLib;
 using ExpressionToCodeLib.Unstable_v2_Api;
 using Xunit;
 
-namespace ExpressionToCodeTest {
-    public enum SomeEnum {
+namespace ExpressionToCodeTest
+{
+    public enum SomeEnum
+    {
         A,
         B
     }
 
     [Flags]
-    public enum SomeFlagsEnum {
+    public enum SomeFlagsEnum
+    {
         None = 0,
         A = 1,
         B = 2,
@@ -21,16 +24,19 @@ namespace ExpressionToCodeTest {
         C = 4,
     }
 
-    public class EnumTests {
+    public class EnumTests
+    {
         [Fact]
-        public void EnumConstant() {
+        public void EnumConstant()
+        {
             Assert.Equal(
                 @"() => new object().Equals((object)MidpointRounding.ToEven)",
                 ExpressionToCode.ToCode(() => new object().Equals(MidpointRounding.ToEven)));
         }
 
         [Fact]
-        public void EnumVariables() {
+        public void EnumVariables()
+        {
             var a = SomeEnum.A;
             var b = SomeEnum.B;
             Assert.Equal(
@@ -39,7 +45,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NullableEnumVariables() {
+        public void NullableEnumVariables()
+        {
             var a = SomeEnum.A;
             SomeEnum? b = SomeEnum.B;
             Assert.Equal(
@@ -48,7 +55,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void EnumVarEqConstant() {
+        public void EnumVarEqConstant()
+        {
             var a = SomeEnum.A;
             Assert.Equal(
                 @"() => a == SomeEnum.B",
@@ -59,7 +67,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NullableEnumVarEqConstant() {
+        public void NullableEnumVarEqConstant()
+        {
             SomeEnum? a = SomeEnum.A;
             Assert.Equal(
                 @"() => a == SomeEnum.B",
@@ -70,7 +79,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void EnumVarNeqConstant() {
+        public void EnumVarNeqConstant()
+        {
             var a = SomeEnum.A;
             Assert.Equal(
                 @"() => a != SomeEnum.B",
@@ -81,7 +91,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NullableEnumVarNeqConstant() {
+        public void NullableEnumVarNeqConstant()
+        {
             SomeEnum? a = SomeEnum.A;
             Assert.Equal(
                 @"() => a != SomeEnum.B",
@@ -92,7 +103,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void EnumVarLtConstant() {
+        public void EnumVarLtConstant()
+        {
             var a = SomeEnum.A;
             Assert.Equal(
                 @"() => a < SomeEnum.B",
@@ -103,7 +115,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NullableEnumVarLtConstant() {
+        public void NullableEnumVarLtConstant()
+        {
             SomeEnum? a = SomeEnum.A;
             Assert.Equal(
                 @"() => a < SomeEnum.B",
@@ -114,7 +127,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void EnumCornerCases() {
+        public void EnumCornerCases()
+        {
             var a = SomeEnum.A;
             var b = SomeFlagsEnum.B;
             Assert.Equal(
@@ -136,7 +150,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NullableEnumCornerCases() {
+        public void NullableEnumCornerCases()
+        {
             SomeEnum? a = SomeEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
 
@@ -157,7 +172,7 @@ namespace ExpressionToCodeTest {
                 //but it does here!
                 ExpressionToCode.ToCode(() => (SomeFlagsEnum?)a == b));
         }
-        
+
         [Fact]
         public void NullableEnumCornerCases_FullNames()
         {
@@ -185,7 +200,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void FlagsEnumConstant() {
+        public void FlagsEnumConstant()
+        {
             var ab = SomeFlagsEnum.A | SomeFlagsEnum.B;
             Assert.Equal(
                 @"() => ab == SomeFlagsEnum.AB",
@@ -193,7 +209,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NullableFlagsEnumConstant() {
+        public void NullableFlagsEnumConstant()
+        {
             SomeFlagsEnum? ab = SomeFlagsEnum.A | SomeFlagsEnum.B;
             Assert.Equal(
                 @"() => ab == SomeFlagsEnum.AB",
@@ -201,7 +218,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void FlagsEnumOr() {
+        public void FlagsEnumOr()
+        {
             var a = SomeFlagsEnum.A;
             var b = SomeFlagsEnum.B;
             Assert.Equal(
@@ -210,7 +228,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NullableFlagsEnumOr() {
+        public void NullableFlagsEnumOr()
+        {
             SomeFlagsEnum a = SomeFlagsEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
             Assert.Equal(
@@ -219,7 +238,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void FlagsEnumComplexConstant() {
+        public void FlagsEnumComplexConstant()
+        {
             var abc = SomeFlagsEnum.A | SomeFlagsEnum.B | SomeFlagsEnum.C;
             Assert.Equal(
                 @"() => abc == (SomeFlagsEnum.AB | SomeFlagsEnum.C)",
@@ -227,7 +247,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void NullableFlagsEnumComplexConstant() {
+        public void NullableFlagsEnumComplexConstant()
+        {
             SomeFlagsEnum? abc = SomeFlagsEnum.A | SomeFlagsEnum.B | SomeFlagsEnum.C;
             Assert.Equal(
                 @"() => abc == (SomeFlagsEnum.AB | SomeFlagsEnum.C)",

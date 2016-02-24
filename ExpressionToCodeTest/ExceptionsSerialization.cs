@@ -9,8 +9,10 @@ using ExpressionToCodeLib;
 using ExpressionToCodeLib.Internal;
 using Xunit;
 
-namespace ExpressionToCodeTest {
-    public class ExceptionsSerialization {
+namespace ExpressionToCodeTest
+{
+    public class ExceptionsSerialization
+    {
         [MethodImpl(MethodImplOptions.NoInlining)]
         static void IntentionallyFailingMethod() { PAssert.That(() => false); }
 
@@ -23,7 +25,8 @@ namespace ExpressionToCodeTest {
         [Fact]
         public void PAssertExceptionIsSerializable() { AssertMethodFailsWithSerializableException(IntentionallyFailingMethod2); }
 
-        static void AssertMethodFailsWithSerializableException(Action intentionallyFailingMethod) {
+        static void AssertMethodFailsWithSerializableException(Action intentionallyFailingMethod)
+        {
             var original = Assert.ThrowsAny<Exception>(intentionallyFailingMethod);
 
             var formatter = new BinaryFormatter();

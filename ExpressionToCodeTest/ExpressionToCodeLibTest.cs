@@ -252,25 +252,27 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => call(() => 42))
                 ); //no params
         }
+
         [Fact]
         public void NestedLambda_OneParameter()
         {
             Assert.Equal(
                 @"() => new[] { 37, 42 }.Select(x => x * 2)",
                 ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select(x => x * 2))
-                ); 
+                );
             Assert.Equal(
                 @"() => Buzz(x => true)",
                 ExpressionToCode.ToCode(() => Buzz(x => true))
                 );
         }
+
         [Fact]
         public void NestedLambda_TwoParameters()
         {
             Assert.Equal(
                 @"() => new[] { 37, 42 }.Select((x, i) => x * 2)",
                 ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select((x, i) => x * 2))
-                ); 
+                );
         }
 
         bool Fizz(Func<int, bool> a) { return a(42); }
@@ -579,7 +581,7 @@ namespace ExpressionToCodeTest
         public void FullTypeName_ForNestedType()
         {
             var code = ExpressionStringify.With(true).ToCode(() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B());
-            Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()",code);
+            Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()", code);
         }
 
         class B { }
@@ -624,8 +626,8 @@ namespace ExpressionToCodeTest
             var code = ExpressionToCode.ToCode(() => StaticReturnZero());
             Assert.Equal("() => ExpressionToCodeLibTest.StaticReturnZero()", code);
         }
-        public int ReturnZero() => 0;
 
+        public int ReturnZero() => 0;
         public static int StaticReturnZero() => 0;
 
         [Fact]
@@ -639,7 +641,7 @@ namespace ExpressionToCodeTest
         public string TheProperty => "TheValue";
         protected string TheProtectedProperty => "TheValue";
         static string ThePrivateStaticProperty => "TheValue";
-        protected string TheProtectedWithPrivateSetterProperty { private get; set;}
+        protected string TheProtectedWithPrivateSetterProperty { private get; set; }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);

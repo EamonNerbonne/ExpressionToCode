@@ -21,12 +21,12 @@ namespace ExpressionToCodeTest
                 .ThenByDescending(type => type.IsInterface)
                 .ThenBy(type => type.FullName);
 
-
             Approvals.Verify(PrettyPrintTypes(publicTypes));
         }
 
         [Fact, MethodImpl(MethodImplOptions.NoInlining)]
-        public void UnstableApi() {
+        public void UnstableApi()
+        {
             var unstableTypes = typeof(ExpressionToCode).Assembly.GetTypes()
                 .Where(IsPublic)
                 .Where(type => type.Namespace.Contains("Unstable"))
@@ -34,10 +34,8 @@ namespace ExpressionToCodeTest
                 .ThenByDescending(type => type.IsInterface)
                 .ThenBy(type => type.FullName);
 
-
             Approvals.Verify(PrettyPrintTypes(unstableTypes));
         }
-
 
         static string PrettyPrintTypes(IEnumerable<Type> types) { return string.Join("", types.Select(PrettyPrintTypeDescription)); }
         static string PrettyPrintTypeDescription(Type o) { return PrettyPrintTypeHeader(o) + "\n" + PrettyPrintTypeContents(o); }
@@ -45,7 +43,7 @@ namespace ExpressionToCodeTest
         static string PrettyPrintTypeContents(Type type)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                .OrderBy(mi=>mi.MetadataToken)
+                .OrderBy(mi => mi.MetadataToken)
                 .Where(mi => mi.DeclaringType.Assembly != typeof(object).Assembly) //exclude noise
                 ;
 

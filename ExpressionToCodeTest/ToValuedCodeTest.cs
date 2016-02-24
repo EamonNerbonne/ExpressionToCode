@@ -12,7 +12,7 @@ namespace ExpressionToCodeTest
         public void ToValuedCode_ofNull_fails()
         {
             ExpressionToCodeLibTest obj = null;
-            
+
             Assert.ThrowsAny<InvalidOperationException>(
                 () =>
                     ExpressionWithValue.ToValuedCode(() => obj.TheProperty));

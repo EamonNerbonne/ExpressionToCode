@@ -17,12 +17,13 @@ namespace ExpressionToCodeTest
             var expr = Expression.Lambda(
                 Expression.ArrayIndex(param, Expression.Constant(1)),
                 param
-            );
+                );
             Assert.Equal(
-				"a => a[1]",
+                "a => a[1]",
                 ExpressionToCode.ToCode(expr)
-            );
+                );
         }
+
         [Fact]
         public void TestSingleDimensionalArrayAccessExpressionWithLambda()
         {
@@ -30,11 +31,11 @@ namespace ExpressionToCodeTest
             var expr = Expression.Lambda(
                 Expression.ArrayAccess(param, Expression.Constant(1)),
                 param
-            );
+                );
             Assert.Equal(
                 "a => a[1]",
                 ExpressionToCode.ToCode(expr)
-            );
+                );
         }
     }
 }
