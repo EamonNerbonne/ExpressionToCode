@@ -48,7 +48,7 @@ namespace ExpressionToCodeLib
         public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments)
             => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
 
-        public IExpressionToCode GetExpressionToCode() => new ExpressionStringify(this);
+        public IExpressionToCode GetExpressionToCode() => new ExpressionToCodeWrapper(this);
         public IAnnotatedToCode GetAnnotatedToCode() => new AnnotatedToCodeWrapper(this);
 
         class AnnotatedToCodeWrapper : IAnnotatedToCode
@@ -58,6 +58,13 @@ namespace ExpressionToCodeLib
 
             public string AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
                 => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, hideOutermostValue);
+        }
+
+        sealed class ExpressionToCodeWrapper : IExpressionToCode
+        {
+            readonly ExpressionToCodeConfiguration config;
+            public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config) { this.config = config; }
+            public string ToCode(Expression e) => ExpressionToCodeString.ToCodeString(config, e);
         }
     }
 

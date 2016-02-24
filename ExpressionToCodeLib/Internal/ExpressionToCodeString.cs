@@ -4,20 +4,10 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal sealed class ExpressionStringify : IExpressionToCode
+    internal sealed class ExpressionToCodeString 
     {
-        readonly ExpressionToCodeConfiguration config;
 
-        public ExpressionStringify(ExpressionToCodeConfiguration config)
-        {
-            this.config = config;
-        }
-
-        public string ToCode(Expression e) {
-            return ToCodeImpl(config, e);
-        }
-
-        public static string ToCodeImpl(ExpressionToCodeConfiguration config, Expression e)
+        public static string ToCodeString(ExpressionToCodeConfiguration config, Expression e)
         {
             var sb = new StringBuilder();
             var ignoreInitialSpace = true;
