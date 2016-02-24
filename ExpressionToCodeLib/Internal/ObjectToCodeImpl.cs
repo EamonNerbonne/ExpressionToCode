@@ -20,7 +20,7 @@ namespace ExpressionToCodeLib.Internal
             } else if (val is IEnumerable) {
                 return FormatEnumerable(config, (IEnumerable)val);
             } else if (val is Expression) {
-                return new ExpressionStringify(config).ToCode((Expression)val);
+                return config.GetExpressionToCode().ToCode((Expression)val);
             } else if (val.GetType().GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
                 var type = val.GetType();
                 return "\n" + new string(' ', indent * 2) +
