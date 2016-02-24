@@ -14,7 +14,6 @@ namespace ExpressionToCode.Benchmarks
         {
             BenchmarkRunner.Run<BenchmarkCompile>();
             BenchmarkRunner.Run<BenchmarkPAssert>();
-            Console.ReadKey();
         }
     }
 
