@@ -7,7 +7,12 @@ using System.Reflection.Emit;
 
 namespace ExpressionToCodeLib
 {
-    public static class ExpressionCompiler
+
+    /// <summary>
+    /// This expression tree compiler should have the same semantics as the .net built-in Expression.Compile method, but it's faster.
+    /// It only supports a subset of parameterless lambdas.  Unsupported expressions fall-back to the builtin Expression.Compile methods.
+    /// </summary>
+    public static class OptimizedExpressionCompiler
     {
         public static Func<T> Compile<T>(Expression<Func<T>> expression) { return TryCompile(expression) ?? expression.Compile(); }
 
@@ -15,7 +20,7 @@ namespace ExpressionToCodeLib
         {
             var closure = TryGetClosure(expression.Body);
             var method = closure == null
-                ? new DynamicMethod(string.Empty, typeof(T), Type.EmptyTypes, typeof(ExpressionCompiler).Module)
+                ? new DynamicMethod(string.Empty, typeof(T), Type.EmptyTypes, typeof(OptimizedExpressionCompiler).Module)
                 : new DynamicMethod(string.Empty, typeof(T), new[] { closure.GetType() }, closure.GetType());
 
             var il = method.GetILGenerator();

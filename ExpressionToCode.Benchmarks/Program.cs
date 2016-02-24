@@ -37,7 +37,7 @@ namespace ExpressionToCode.Benchmarks
         [Benchmark]
         public void Emit()
         {
-            ExpressionCompiler.Compile(testExpr);
+            OptimizedExpressionCompiler.Compile(testExpr);
         }
     }
 
