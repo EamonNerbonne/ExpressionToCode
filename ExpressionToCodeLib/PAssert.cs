@@ -11,25 +11,12 @@ namespace ExpressionToCodeLib
             That(assertion);
         }
 
-        public static void That(Expression<Func<bool>> assertion, string msg = null, bool emit = false)
+        public static void That(Expression<Func<bool>> assertion, string msg = null)
         {
-            var compiled = emit ? OptimizedExpressionCompiler.Compile(assertion) : assertion.Compile();
-            bool ok = false;
-            try {
-                ok = compiled();
-            } catch (Exception e) {
-                throw Err(assertion, msg ?? "failed with exception", e);
-            }
-            if (!ok) {
-                throw Err(assertion, msg ?? "failed", null);
-            }
+            var config = PAssertConfiguration.CurrentConfiguration;
+
+            ExpressionTreeAssertion.Assert(config, assertion, msg);
         }
 
-        static Exception Err(Expression<Func<bool>> assertion, string msg, Exception innerException)
-        {
-            return UnitTestingFailure.AssertionExceptionFactory(
-                PAssertConfiguration.CurrentConfiguration.CodeAnnotator.AnnotateExpressionTree(assertion.Body, msg, true),
-                innerException);
-        }
     }
 }

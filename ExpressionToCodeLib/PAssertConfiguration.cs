@@ -8,14 +8,24 @@ namespace ExpressionToCodeLib
 {
     public class PAssertConfiguration
     {
-        public static readonly PAssertConfiguration DefaultConfiguration = new PAssertConfiguration(new ValuesOnStalksCodeAnnotator());
+        public static readonly PAssertConfiguration DefaultConfiguration = new PAssertConfiguration(new ValuesOnStalksCodeAnnotator(), new NormalExpressionCompiler());
         public static PAssertConfiguration CurrentConfiguration = DefaultConfiguration;
         public readonly ICodeAnnotator CodeAnnotator;
-        public PAssertConfiguration(ICodeAnnotator codeAnnotator) { CodeAnnotator = codeAnnotator; }
+        public readonly IExpressionCompiler ExpressionCompiler;
+        public PAssertConfiguration(ICodeAnnotator codeAnnotator, IExpressionCompiler expressionCompiler)
+        {
+            CodeAnnotator = codeAnnotator;
+            ExpressionCompiler = expressionCompiler;
+        }
     }
 
     public interface ICodeAnnotator
     {
         string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOutermostValue);
     }
+    public interface IExpressionCompiler
+    {
+        Func<T> Compile<T>(Expression<Func<T>> expression);
+    }
+
 }

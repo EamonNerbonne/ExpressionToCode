@@ -7,14 +7,23 @@ using System.Reflection.Emit;
 
 namespace ExpressionToCodeLib
 {
+
+    public class NormalExpressionCompiler : IExpressionCompiler
+    {
+        public Func<T> Compile<T>(Expression<Func<T>> expression) { return expression.Compile(); }
+    }
+
     /// <summary>
     /// This expression tree compiler should have the same semantics as the .net built-in Expression.Compile method, but it's faster.
     /// It only supports a subset of parameterless lambdas.  Unsupported expressions fall-back to the builtin Expression.Compile methods.
     /// </summary>
-    public static class OptimizedExpressionCompiler
+    public class OptimizedExpressionCompiler : IExpressionCompiler
     {
-        public static Func<T> Compile<T>(Expression<Func<T>> expression) { return TryCompile(expression) ?? expression.Compile(); }
+        public Func<T> Compile<T>(Expression<Func<T>> expression) { return OptimizedExpressionCompilerImplementation.TryCompile(expression) ?? expression.Compile(); }
+    }
 
+    public static class OptimizedExpressionCompilerImplementation
+    {
         public static Func<T> TryCompile<T>(Expression<Func<T>> expression)
         {
             var closure = TryGetClosure(expression.Body);

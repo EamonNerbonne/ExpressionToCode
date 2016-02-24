@@ -13,7 +13,7 @@ namespace ExpressionToCode.Benchmarks
         static void Main(string[] args)
         {
             BenchmarkRunner.Run<BenchmarkCompile>();
-            //BenchmarkRunner.Run<BenchmarkPAssert>();
+            BenchmarkRunner.Run<BenchmarkPAssert>();
             Console.ReadKey();
         }
     }
@@ -32,23 +32,44 @@ namespace ExpressionToCode.Benchmarks
         public void Compile() { testExpr.Compile(); }
 
         [Benchmark]
-        public void Emit() { OptimizedExpressionCompiler.Compile(testExpr); }
+        public void Emit() { new OptimizedExpressionCompiler().Compile(testExpr); }
     }
 
     public class BenchmarkPAssert
     {
+        static readonly PAssertConfiguration
+            baseLineConfiguration = PAssertConfiguration.DefaultConfiguration,
+            withOptimizationConfiguration = new PAssertConfiguration(PAssertConfiguration.DefaultConfiguration.CodeAnnotator, new OptimizedExpressionCompiler());
+
         [Benchmark]
         public void PAssertWithCompile()
         {
             var x = 1;
-            PAssert.That(() => x == 1, emit: false);
+            string s = "Test";
+            baseLineConfiguration.Assert(() => x == 1 && (s.Contains("S") || s.Contains("s")));
         }
 
         [Benchmark]
         public void PAssertWithEmit()
         {
             var x = 1;
-            PAssert.That(() => x == 1, emit: true);
+            string s = "Test";
+            withOptimizationConfiguration.Assert(() => x == 1 && (s.Contains("S") || s.Contains("s")));
+        }
+
+        [Benchmark]
+        public void BaseLinePlainLambdaExec()
+        {
+            var x = 1;
+            string s = "Test";
+            BaseLineAssert(() => x == 1 && (s.Contains("S") || s.Contains("s")));
+        }
+
+        static void BaseLineAssert(Func<bool> assertion)
+        {
+            if (!assertion()) {
+                throw new Exception();
+            }
         }
     }
 }
