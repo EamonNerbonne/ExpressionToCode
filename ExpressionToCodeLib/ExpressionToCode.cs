@@ -13,12 +13,11 @@ namespace ExpressionToCodeLib
 {
     public static class ExpressionToCode
     {
-        public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => GetExpressionStringifier().ToCode(e);
-        public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => GetExpressionStringifier().ToCode(e);
-        public static string ToCode<T, T1>(Expression<Func<T, T1>> e) => GetExpressionStringifier().ToCode(e);
-        public static string ToCode<T>(Expression<Func<T>> e) => GetExpressionStringifier().ToCode(e);
-        public static string ToCode(Expression e) => GetExpressionStringifier().ToCode(e);
-        static ExpressionStringify GetExpressionStringifier() { return new ExpressionStringify(ExpressionToCodeConfiguration.CurrentConfiguration); }
+        public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T, T1>(Expression<Func<T, T1>> e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T>(Expression<Func<T>> e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode(Expression e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
 
         public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => AnnotatedToCode((Expression)e);
         public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => AnnotatedToCode((Expression)e);
