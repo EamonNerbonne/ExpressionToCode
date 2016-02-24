@@ -12,17 +12,17 @@ namespace ExpressionToCodeLib
     internal class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {
         #region General Helpers
-        readonly IObjectToCode objectToCode;
+        readonly IObjectStringifier objectStringifier;
         readonly bool alwaysUseExplicitTypeArguments;
 
-        ExpressionToCodeImpl(IObjectToCode objectToCode, bool alwaysUseExplicitTypeArguments)
+        ExpressionToCodeImpl(IObjectStringifier objectStringifier, bool alwaysUseExplicitTypeArguments)
         {
-            this.objectToCode = objectToCode;
+            this.objectStringifier = objectStringifier;
             this.alwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments;
         }
 
         internal ExpressionToCodeImpl(ExpressionToCodeConfiguration config)
-            : this(config.Value.ObjectToCode, config.Value.AlwaysUseExplicitTypeArguments) { }
+            : this(config.Value.ObjectStringifier, config.Value.AlwaysUseExplicitTypeArguments) { }
 
         [Pure]
         IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
@@ -191,9 +191,9 @@ namespace ExpressionToCodeLib
             var ue = (UnaryExpression)e;
             if (e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
             {
-                kids.Add("(" + objectToCode.TypeNameToCode(e.Type) + ")");
+                kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")");
             } else {
-                kids.Add("(" + objectToCode.TypeNameToCode(e.Type) + ")", e);
+                kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")", e);
             }
             kids.Add(NestExpression(ue.NodeType, ue.Operand));
             return kids.Finish();
@@ -215,7 +215,7 @@ namespace ExpressionToCodeLib
             var kids = KidsBuilder.Create();
             kids.Add(NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression));
             kids.Add(" " + op + " ", e);
-            kids.Add(objectToCode.TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
+            kids.Add(objectStringifier.TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
             return kids.Finish();
         }
 
@@ -272,7 +272,7 @@ namespace ExpressionToCodeLib
                 kids.Add(NestExpression(e.NodeType, memberOfExpr));
                 kids.Add(".");
             } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
-                kids.Add(objectToCode.TypeNameToCode(me.Member.ReflectedType) + ".");
+                kids.Add(objectStringifier.TypeNameToCode(me.Member.ReflectedType) + ".");
             }
 
             kids.Add(me.Member.Name, e);
@@ -332,7 +332,7 @@ namespace ExpressionToCodeLib
                 ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
-                var codeRepresentation = "$" + objectToCode.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
+                var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
                 kids.Add(codeRepresentation);
             } else {
                 bool isExtensionMethod = mce.Method.IsStatic
@@ -367,7 +367,7 @@ namespace ExpressionToCodeLib
                     kids.Add(".");
                 }
             } else if (method.IsStatic) {
-                kids.Add(objectToCode.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
+                kids.Add(objectStringifier.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
             }
             var methodName = method.Name;
 
@@ -405,7 +405,7 @@ namespace ExpressionToCodeLib
                 }
             }
 
-            var methodTypeArgs = method.GetGenericArguments().Select(type => objectToCode.TypeNameToCode(type)).ToArray();
+            var methodTypeArgs = method.GetGenericArguments().Select(type => objectStringifier.TypeNameToCode(type)).ToArray();
             return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
         }
 
@@ -440,7 +440,7 @@ namespace ExpressionToCodeLib
 
             var ie = (InvocationExpression)e;
             if (ie.Expression.NodeType == ExpressionType.Lambda) {
-                kids.Add("new " + objectToCode.TypeNameToCode(ie.Expression.Type));
+                kids.Add("new " + objectStringifier.TypeNameToCode(ie.Expression.Type));
             }
             kids.Add(NestExpression(ie.NodeType, ie.Expression));
             var invokeMethod = ie.Expression.Type.GetMethod("Invoke");
@@ -455,7 +455,7 @@ namespace ExpressionToCodeLib
             var kids = KidsBuilder.Create();
 
             var const_Val = ((ConstantExpression)e).Value;
-            string codeRepresentation = objectToCode.PlainObjectToCode(const_Val, e.Type);
+            string codeRepresentation = objectStringifier.PlainObjectToCode(const_Val, e.Type);
             //e.Type.IsVisible
             if (codeRepresentation == null) {
                 var typeclass = e.Type.GuessTypeClass();
@@ -495,7 +495,7 @@ namespace ExpressionToCodeLib
 
             var lie = (ListInitExpression)e;
             kids.Add("new ", lie);
-            kids.Add(objectToCode.TypeNameToCode(lie.NewExpression.Constructor.ReflectedType));
+            kids.Add(objectStringifier.TypeNameToCode(lie.NewExpression.Constructor.ReflectedType));
             if (lie.NewExpression.Arguments.Any()) {
                 kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments)));
             }
@@ -547,7 +547,7 @@ namespace ExpressionToCodeLib
 
             var mie = (MemberInitExpression)e;
             kids.Add("new ", mie);
-            kids.Add(objectToCode.TypeNameToCode(mie.NewExpression.Constructor.ReflectedType));
+            kids.Add(objectStringifier.TypeNameToCode(mie.NewExpression.Constructor.ReflectedType));
             if (mie.NewExpression.Arguments.Any()) {
                 kids.Add(ArgListDispatch(GetArgumentsForMethod(mie.NewExpression.Constructor, mie.NewExpression.Arguments)));
             }
@@ -587,7 +587,7 @@ namespace ExpressionToCodeLib
                 }
                 kids.Add(" }");
             } else {
-                kids.Add("new " + objectToCode.TypeNameToCode(ne.Type), ne);
+                kids.Add("new " + objectStringifier.TypeNameToCode(ne.Type), ne);
                 kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor, ne.Arguments)));
             }
             //TODO: deal with anonymous types.
@@ -604,7 +604,7 @@ namespace ExpressionToCodeLib
             bool isDelegate = typeof(Delegate).IsAssignableFrom(arrayElemType);
             bool implicitTypeOK = !isDelegate && nae.Expressions.Any()
                 && nae.Expressions.All(expr => expr.Type == arrayElemType);
-            kids.Add("new" + (implicitTypeOK ? "" : " " + objectToCode.TypeNameToCode(arrayElemType)) + "[] ", nae);
+            kids.Add("new" + (implicitTypeOK ? "" : " " + objectStringifier.TypeNameToCode(arrayElemType)) + "[] ", nae);
             kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "{ ", " }"));
             return kids.Finish();
         }
@@ -616,7 +616,7 @@ namespace ExpressionToCodeLib
 
             var nae = (NewArrayExpression)e;
             Type arrayElemType = nae.Type.GetElementType();
-            kids.Add("new " + objectToCode.TypeNameToCode(arrayElemType), nae);
+            kids.Add("new " + objectStringifier.TypeNameToCode(arrayElemType), nae);
             kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]"));
             return kids.Finish();
         }
@@ -633,7 +633,7 @@ namespace ExpressionToCodeLib
             kids.Add("{ ");
 
             foreach (var v in be.Variables) {
-                kids.Add(StatementDispatch(objectToCode.TypeNameToCode(v.Type), v, ExpressionType.Block));
+                kids.Add(StatementDispatch(objectStringifier.TypeNameToCode(v.Type), v, ExpressionType.Block));
             }
 
             foreach (var child in statements) {
@@ -781,7 +781,7 @@ namespace ExpressionToCodeLib
         public StringifiedExpression DispatchSubtractChecked(Expression e) => BinaryDispatch("-", e);
 
         [Pure]
-        public StringifiedExpression DispatchTypeAs(Expression e) => UnaryPostfixDispatch(" as " + objectToCode.TypeNameToCode(e.Type), e);
+        public StringifiedExpression DispatchTypeAs(Expression e) => UnaryPostfixDispatch(" as " + objectStringifier.TypeNameToCode(e.Type), e);
 
         [Pure]
         public StringifiedExpression DispatchTypeIs(Expression e) => TypeOpDispatch("is", e);
@@ -865,7 +865,7 @@ namespace ExpressionToCodeLib
         {
             var defExpr = (DefaultExpression)e;
 
-            return StringifiedExpression.TextOnly("default(" + objectToCode.TypeNameToCode(defExpr.Type) + ")");
+            return StringifiedExpression.TextOnly("default(" + objectStringifier.TypeNameToCode(defExpr.Type) + ")");
         }
 
         [Pure]

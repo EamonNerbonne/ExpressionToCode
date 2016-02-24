@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using Xunit;
 
 namespace ExpressionToCodeTest
@@ -47,7 +46,6 @@ namespace ExpressionToCodeTest
         [Fact]
         public void PostDecrementAssign()
         {
-            int x = 1, y = 4, z = 8;
             var expr = Expression.PostDecrementAssign(Expression.Variable(typeof(int), "x"));
             Assert.Equal("x--", ExpressionToCode.ToCode(expr));
         }
@@ -112,7 +110,7 @@ namespace ExpressionToCodeTest
             Expression addAssignment = Expression.AddAssign(p, Expression.Constant(5));
             Assert.Equal(
                 @"{ int p; p = 1; return p += 5; }",
-                ExpressionToCode.ToCode(Expression.Block(typeof(Int32), new ParameterExpression[] { p }, assignment, addAssignment)));
+                ExpressionToCode.ToCode(Expression.Block(typeof(Int32), new[] { p }, assignment, addAssignment)));
         }
     }
 }

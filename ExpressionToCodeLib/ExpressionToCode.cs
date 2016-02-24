@@ -13,16 +13,18 @@ namespace ExpressionToCodeLib
 {
     public static class ExpressionToCode
     {
-        public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => ToCode((Expression)e);
-        public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => ToCode((Expression)e);
-        public static string ToCode<T, T1>(Expression<Func<T, T1>> e) => ToCode((Expression)e);
-        public static string ToCode<T>(Expression<Func<T>> e) => ToCode((Expression)e);
+        public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => GetExpressionStringifier().ToCode(e);
+        public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => GetExpressionStringifier().ToCode(e);
+        public static string ToCode<T, T1>(Expression<Func<T, T1>> e) => GetExpressionStringifier().ToCode(e);
+        public static string ToCode<T>(Expression<Func<T>> e) => GetExpressionStringifier().ToCode(e);
+        public static string ToCode(Expression e) => GetExpressionStringifier().ToCode(e);
+        static ExpressionStringify GetExpressionStringifier() { return new ExpressionStringify(ExpressionToCodeConfiguration.CurrentConfiguration); }
+
         public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => AnnotatedToCode((Expression)e);
         public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => AnnotatedToCode((Expression)e);
         public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) => AnnotatedToCode((Expression)e);
         public static string AnnotatedToCode<T>(Expression<Func<T>> e) => AnnotatedToCode((Expression)e);
         internal static bool ShouldIgnoreSpaceAfter(char c) => c == ' ' || c == '(';
-        public static string ToCode(Expression e) => new ExpressionStringify(ExpressionToCodeConfiguration.CurrentConfiguration).ToCode(e);
 
         public static string AnnotatedToCode(Expression expr)
             =>
@@ -31,5 +33,18 @@ namespace ExpressionToCodeLib
                     expr,
                     null,
                     false);
+    }
+
+    public interface IExpressionToCode
+    {
+        string ToCode(Expression e);
+    }
+
+    public static class ExpressionToCodeExtensions
+    {
+        public static string ToCode<T, T1, T2, T3>(this IExpressionToCode it, Expression<Func<T, T1, T2, T3>> e) => it.ToCode(e);
+        public static string ToCode<T, T1, T2>(this IExpressionToCode it, Expression<Func<T, T1, T2>> e) => it.ToCode(e);
+        public static string ToCode<T, T1>(this IExpressionToCode it, Expression<Func<T, T1>> e) => it.ToCode(e);
+        public static string ToCode<T>(this IExpressionToCode it, Expression<Func<T>> e) => it.ToCode(e);
     }
 }

@@ -11,7 +11,7 @@ namespace ExpressionToCodeLib
     {
         public ICodeAnnotator CodeAnnotator;
         public IExpressionCompiler ExpressionCompiler;
-        public IObjectToCode ObjectToCode;
+        public IObjectStringifier ObjectStringifier;
         public bool AlwaysUseExplicitTypeArguments;
     }
 
@@ -22,7 +22,7 @@ namespace ExpressionToCodeLib
                 new ExpressionToCodeConfigurationValue {
                     CodeAnnotator = new ValuesOnStalksCodeAnnotator(),
                     ExpressionCompiler = new NormalExpressionCompiler(),
-                    ObjectToCode = ObjectStringify.Default,
+                    ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,
                 });
 
@@ -42,7 +42,7 @@ namespace ExpressionToCodeLib
 
         public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler) => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
         public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator) => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
-        public ExpressionToCodeConfiguration WithObjectStringifier(IObjectToCode objectToCode) => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectToCode = objectToCode);
+        public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier) => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
         public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments) => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
     }
 
@@ -56,7 +56,7 @@ namespace ExpressionToCodeLib
         Func<T> Compile<T>(Expression<Func<T>> expression);
     }
 
-    public interface IObjectToCode
+    public interface IObjectStringifier
     {
         string PlainObjectToCode(object val, Type type);
         string TypeNameToCode(Type type);

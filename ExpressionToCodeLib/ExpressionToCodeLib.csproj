@@ -49,7 +49,6 @@
     <Compile Include="ExpressionToCodeConfiguration.cs" />
     <Compile Include="SubExpressionPerLineCodeAnnotator.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithName.cs" />
-    <Compile Include="Unstable_v2_Api\IObjectToCode.cs" />
     <Compile Include="Unstable_v2_Api\ObjectStringify.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionStringify.cs" />
     <Compile Include="ExpressionToCode.cs" />

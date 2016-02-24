@@ -6,18 +6,23 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Unstable_v2_Api
 {
+    public static class ObjectStringifierExtensions
+    {
+        public static string PlainObjectToCode(this IObjectStringifier it, object val) => it.PlainObjectToCode(val, val == null ? null : val.GetType());
+    }
+
     public static class ObjectStringify
     {
-        public static readonly IObjectToCode Default = new DefaultImpl();
-        public static readonly IObjectToCode WithFullTypeNames = new DefaultImpl(true);
+        public static readonly IObjectStringifier Default = new DefaultImpl();
+        public static readonly IObjectStringifier WithFullTypeNames = new DefaultImpl(true);
 
-        class DefaultImpl : IObjectToCode
+        class DefaultImpl : IObjectStringifier
         {
             readonly bool fullTypeNames;
             public DefaultImpl(bool fullTypeNames = false) { this.fullTypeNames = fullTypeNames; }
             public string TypeNameToCode(Type type) => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
 
-            string IObjectToCode.PlainObjectToCode(object val, Type type)
+            string IObjectStringifier.PlainObjectToCode(object val, Type type)
             {
                 if (val == null) {
                     return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";

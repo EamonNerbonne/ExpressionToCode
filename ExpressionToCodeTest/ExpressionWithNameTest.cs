@@ -3,6 +3,7 @@ using ExpressionToCodeLib.Unstable_v2_Api;
 using Xunit;
 using System.Linq;
 using System.Linq.Expressions;
+using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest
 {
@@ -32,7 +33,7 @@ namespace ExpressionToCodeTest
             var actual = ExpressionWithName.ToNameOf(theComplexMethod);
             Assert.Equal("TheComplexMethod", actual);
 
-            var full = ExpressionToCodeLib.ExpressionToCode.ToCode(theComplexMethod.Body);
+            var full = ExpressionToCode.ToCode(theComplexMethod.Body);
             Assert.NotEqual(full, actual);
         }
 
