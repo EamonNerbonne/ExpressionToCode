@@ -104,6 +104,10 @@ class EqualityExpressions
     IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression<Func<bool>> e)
     IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression left, Expression right, bool shouldBeEqual)
 
+class ExpressionCompiler
+    Func<T> TYPE.Compile<T>(Expression<Func<T>> expression)
+    Func<T> TYPE.TryCompile<T>(Expression<Func<T>> expression)
+
 class ExpressionToCode
     string TYPE.ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
     string TYPE.ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
@@ -130,7 +134,5 @@ class ObjectToCode
 
 class PAssert
     void TYPE.IsTrue(Expression<Func<bool>> assertion)
-    void TYPE.That(Expression<Func<bool>> assertion, string msg)
-
-class PAssertFailedException : Exception
+    void TYPE.That(Expression<Func<bool>> assertion, string msg, bool emit)
 
