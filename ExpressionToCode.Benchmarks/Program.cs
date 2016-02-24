@@ -31,14 +31,14 @@ namespace ExpressionToCode.Benchmarks
         public void Compile() { testExpr.Compile(); }
 
         [Benchmark]
-        public void Emit() { new OptimizedExpressionCompiler().Compile(testExpr); }
+        public void Emit() { ExpressionTreeCompilers.OptimizedExpressionCompiler.Compile(testExpr); }
     }
 
     public class BenchmarkPAssert
     {
         static readonly ExpressionToCodeConfiguration
             baseLineConfiguration = ExpressionToCodeConfiguration.DefaultConfiguration,
-            withOptimizationConfiguration = ExpressionToCodeConfiguration.DefaultConfiguration.WithCompiler(new OptimizedExpressionCompiler());
+            withOptimizationConfiguration = ExpressionToCodeConfiguration.DefaultConfiguration.WithCompiler(ExpressionTreeCompilers.OptimizedExpressionCompiler);
 
         [Benchmark]
         public void PAssertWithCompile()

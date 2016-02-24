@@ -22,7 +22,7 @@ namespace ExpressionToCodeLib
             new ExpressionToCodeConfiguration(
                 new ExpressionToCodeConfigurationValue {
                     CodeAnnotator = new ValuesOnStalksCodeAnnotator(),
-                    ExpressionCompiler = new NormalExpressionCompiler(),
+                    ExpressionCompiler = ExpressionTreeCompilers.DefaultExpressionCompiler,
                     ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,
                 });
