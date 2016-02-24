@@ -8,9 +8,9 @@ namespace ExpressionToCodeLib
 {
     internal class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotateExpressionTree(Expression expr, string msg, bool hideOutermostValue)
+        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
         {
-            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, hideOutermostValue).ComposeToSingleString();
+            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(config, expr, hideOutermostValue).ComposeToSingleString();
         }
 
         struct ExpressionWithSubExpressions
@@ -23,11 +23,11 @@ namespace ExpressionToCodeLib
                 public string SubExpression, ValueAsString;
             }
 
-            public static ExpressionWithSubExpressions Create(Expression e, bool hideOutermostValue)
+            public static ExpressionWithSubExpressions Create(ExpressionToCodeConfiguration config, Expression e, bool hideOutermostValue)
             {
                 var sb = new StringBuilder();
                 bool ignoreInitialSpace = true;
-                var node = new ExpressionToCodeImpl().ExpressionDispatch(e);
+                var node = new ExpressionToCodeImpl(config).ExpressionDispatch(e);
                 AppendNodeToStringBuilder(sb, node, ref ignoreInitialSpace);
                 var fullExprText = sb.ToString();
                 var subExpressionValues = new List<SubExpressionValue>();

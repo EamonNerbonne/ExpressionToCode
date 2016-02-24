@@ -8,9 +8,9 @@ namespace ExpressionToCodeLib
 {
     internal class ValuesOnStalksCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotateExpressionTree(Expression expr, string msg, bool hideOutermostValue)
+        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
         {
-            var splitLine = ExpressionToStringWithValues(expr, hideOutermostValue);
+            var splitLine = ExpressionToStringWithValues(config, expr, hideOutermostValue);
 
             var exprWithStalkedValues = new StringBuilder();
             if (msg == null) {
@@ -45,12 +45,12 @@ namespace ExpressionToCodeLib
             return idxAfterNewline > 0 && idxAfterNewline < msg.Length;
         }
 
-        static SplitExpressionLine ExpressionToStringWithValues(Expression e, bool hideOutermostValue)
+        static SplitExpressionLine ExpressionToStringWithValues(ExpressionToCodeConfiguration config, Expression e, bool hideOutermostValue)
         {
             var nodeInfos = new List<SubExpressionInfo>();
             var sb = new StringBuilder();
             bool ignoreInitialSpace = true;
-            var node = new ExpressionToCodeImpl().ExpressionDispatch(e);
+            var node = new ExpressionToCodeImpl(config).ExpressionDispatch(e);
             AppendTo(sb, nodeInfos, node, ref ignoreInitialSpace, !hideOutermostValue);
             nodeInfos.Add(new SubExpressionInfo { Location = sb.Length, Value = null });
             return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };

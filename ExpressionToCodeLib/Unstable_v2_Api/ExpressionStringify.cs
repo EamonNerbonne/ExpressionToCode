@@ -6,23 +6,18 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
 {
     public sealed class ExpressionStringify : IExpressionToCode
     {
-        public static readonly IExpressionToCode Default = new ExpressionStringify(ObjectStringify.Default, false);
-        readonly IObjectToCode objectToCode;
-        readonly bool explicitMethodTypeArgs;
+        readonly ExpressionToCodeConfiguration config;
 
-        ExpressionStringify(IObjectToCode objectToCode, bool explicitMethodTypeArgs)
+        public ExpressionStringify(ExpressionToCodeConfiguration config)
         {
-            this.objectToCode = objectToCode;
-            this.explicitMethodTypeArgs = explicitMethodTypeArgs;
+            this.config = config;
         }
 
-        string IExpressionToCode.ToCode(Expression e)
+        public string ToCode(Expression e)
         {
             var sb = new StringBuilder();
             var ignoreInitialSpace = true;
-            var stringifiedExpr = new ExpressionToCodeImpl(
-                objectToCode,
-                explicitMethodTypeArgs).ExpressionDispatch(e);
+            var stringifiedExpr = new ExpressionToCodeImpl(config).ExpressionDispatch(e);
             AppendTo(sb, ref ignoreInitialSpace, stringifiedExpr);
             return sb.ToString();
         }
@@ -40,6 +35,6 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
         }
 
         public static IExpressionToCode With(bool fullTypeNames = false, bool explicitMethodTypeArgs = false)
-            => new ExpressionStringify(fullTypeNames ? ObjectStringify.WithFullTypeNames : ObjectStringify.Default, explicitMethodTypeArgs);
+            => new ExpressionStringify(ExpressionToCodeConfiguration.DefaultConfiguration.WithAlwaysUseExplicitTypeArguments(explicitMethodTypeArgs).WithObjectStringifier(fullTypeNames ? ObjectStringify.WithFullTypeNames : ObjectStringify.Default));
     }
 }

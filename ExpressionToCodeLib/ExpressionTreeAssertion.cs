@@ -5,7 +5,7 @@ namespace ExpressionToCodeLib
 {
     public static class ExpressionTreeAssertion
     {
-        public static void Assert(this ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg=null)
+        public static void Assert(this ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg = null)
         {
             var compiled = config.Value.ExpressionCompiler.Compile(assertion);
             bool ok;
@@ -22,7 +22,7 @@ namespace ExpressionToCodeLib
         static Exception Err(ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg, Exception innerException)
         {
             return UnitTestingFailure.AssertionExceptionFactory(
-                config.Value.CodeAnnotator.AnnotateExpressionTree(assertion.Body, msg, true),
+                config.Value.CodeAnnotator.AnnotateExpressionTree(config, assertion.Body, msg, true),
                 innerException);
         }
     }

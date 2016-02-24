@@ -13,17 +13,16 @@ namespace ExpressionToCodeLib
     {
         #region General Helpers
         readonly IObjectToCode objectToCode;
-        readonly bool explicitMethodTypeArgs;
+        readonly bool alwaysUseExplicitTypeArguments;
 
-        //TODO: refactor IExpressionTypeDispatch into an input/output model to avoid this tricky side-effect approach.
-        internal ExpressionToCodeImpl(IObjectToCode objectToCode, bool explicitMethodTypeArgs)
+        ExpressionToCodeImpl(IObjectToCode objectToCode, bool alwaysUseExplicitTypeArguments)
         {
             this.objectToCode = objectToCode;
-            this.explicitMethodTypeArgs = explicitMethodTypeArgs;
+            this.alwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments;
         }
 
-        internal ExpressionToCodeImpl()
-            : this(ObjectStringify.Default, false) { }
+        internal ExpressionToCodeImpl(ExpressionToCodeConfiguration config)
+            : this(config.Value.ObjectToCode, config.Value.AlwaysUseExplicitTypeArguments) { }
 
         [Pure]
         IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
@@ -383,7 +382,7 @@ namespace ExpressionToCodeLib
                 return "";
             }
 
-            if (!explicitMethodTypeArgs) {
+            if (!alwaysUseExplicitTypeArguments) {
                 var genericMethodDefinition = method.GetGenericMethodDefinition();
                 var relevantBindingFlagsForOverloads =
                     BindingFlags.Public
