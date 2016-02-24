@@ -10,7 +10,7 @@ namespace ExpressionToCodeLib
 
         public static void That(Expression<Func<bool>> assertion, string msg = null, bool emit = false)
         {
-            var compiled = emit ? ExpressionCompiler.Compile(assertion) : assertion.Compile();
+            var compiled = emit ? OptimizedExpressionCompiler.Compile(assertion) : assertion.Compile();
             bool ok = false;
             try {
                 ok = compiled();
@@ -24,7 +24,7 @@ namespace ExpressionToCodeLib
 
         static Exception Err(Expression<Func<bool>> assertion, string msg, Exception innerException)
         {
-            return UnitTestingFailure.AssertionExceptionFactory(PAssertConfiguration.CurrentConfiguration.CodeAnnotator.AnnotatedToCode(assertion.Body, msg, true), innerException);
+            return UnitTestingFailure.AssertionExceptionFactory(PAssertConfiguration.CurrentConfiguration.CodeAnnotator.AnnotateExpressionTree(assertion.Body, msg, true), innerException);
         }
     }
 }

@@ -20,9 +20,9 @@ namespace ExpressionToCode.Benchmarks
 
     public class BenchmarkCompile
     {
-        private readonly Expression<Func<bool>> testExpr = GetExpression();
+        readonly Expression<Func<bool>> testExpr = GetExpression();
 
-        private static Expression<Func<bool>> GetExpression()
+        static Expression<Func<bool>> GetExpression()
         {
             var x = 1;
             return () => x == 1;

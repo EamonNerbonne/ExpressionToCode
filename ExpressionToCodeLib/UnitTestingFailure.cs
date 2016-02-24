@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 
 namespace ExpressionToCodeLib
 {
-    static class UnitTestingFailure
+    internal static class UnitTestingFailure
     {
         static Func<T0, TR> F<T0, TR>(Func<T0, TR> f) => f;
         static Func<T0, T1, TR> F<T0, T1, TR>(Func<T0, T1, TR> f) => f;

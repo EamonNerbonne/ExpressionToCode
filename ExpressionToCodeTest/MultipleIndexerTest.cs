@@ -8,7 +8,7 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    class HasIndexers
+    internal class HasIndexers
     {
         public object this[string s] { get { return null; } }
         public object this[int i] { get { return null; } }

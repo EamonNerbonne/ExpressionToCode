@@ -8,7 +8,7 @@ namespace ExpressionToCodeLib
 {
     internal class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotatedToCode(Expression expr, string msg, bool ignoreOuterMostValue)
+        public string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOuterMostValue)
         {
             return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, true).ComposeToSingleString();
         }

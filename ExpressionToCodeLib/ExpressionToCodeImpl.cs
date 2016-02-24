@@ -9,7 +9,7 @@ using ExpressionToCodeLib.Unstable_v2_Api;
 
 namespace ExpressionToCodeLib
 {
-    class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
+    internal class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {
         #region General Helpers
         readonly IObjectToCode objectToCode;

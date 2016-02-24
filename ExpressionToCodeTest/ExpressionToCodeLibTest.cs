@@ -648,7 +648,7 @@ namespace ExpressionToCodeTest
 
     public delegate int CustomDelegate(int input);
 
-    static class StaticHelperClass
+    internal static class StaticHelperClass
     {
         public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut)
         {
@@ -656,7 +656,7 @@ namespace ExpressionToCodeTest
         }
     }
 
-    class ClassA
+    internal class ClassA
     {
         public static int MethodWithOutAndRefParam<T>(ref T input, out object output, int x)
         {

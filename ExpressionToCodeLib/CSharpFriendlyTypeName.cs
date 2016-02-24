@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ExpressionToCodeLib
 {
-    struct CSharpFriendlyTypeName
+    internal struct CSharpFriendlyTypeName
     {
         public bool UseFullName;
         public bool IncludeGenericTypeArgumentNames;

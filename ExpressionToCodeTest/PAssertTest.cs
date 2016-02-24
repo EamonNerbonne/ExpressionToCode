@@ -5,7 +5,7 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    static class Assert2 { }
+    internal static class Assert2 { }
 
     public class PAssertTest
     {

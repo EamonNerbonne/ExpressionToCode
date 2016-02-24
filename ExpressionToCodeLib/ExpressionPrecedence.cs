@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib
 {
-    static class ExpressionPrecedence
+    internal static class ExpressionPrecedence
     {
         static bool UnaryDashSym(ExpressionType et) => et == ExpressionType.Negate
             || et == ExpressionType.NegateChecked

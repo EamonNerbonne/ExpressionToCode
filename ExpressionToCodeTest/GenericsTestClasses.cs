@@ -238,7 +238,7 @@ namespace ExpressionToCodeTest
 
     internal class Cake { }
 
-    class GenericClass<T>
+    internal class GenericClass<T>
     {
         T val;
         public GenericClass(T pVal) { val = pVal; }
@@ -255,7 +255,7 @@ namespace ExpressionToCodeTest
         public bool IsSubEqual<U>(U other) where U : T, IEquatable<T> { return other.Equals(val); }
     }
 
-    class GenericSubClass<T, U> : GenericClass<T>
+    internal class GenericSubClass<T, U> : GenericClass<T>
         where T : IEnumerable<U>
     {
         public GenericSubClass(T val)

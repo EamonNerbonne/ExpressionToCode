@@ -28,7 +28,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
         public static string ToNameOf(this Expression<Action> expression) => ToNameOfInternal(expression);
         public static string ToNameOf<T>(this Expression<T> expression) => ToNameOfInternal(expression);
 
-        private static string ToNameOfInternal<T>(Expression<T> expression)
+        static string ToNameOfInternal<T>(Expression<T> expression)
         {
             var value = FromUnary(expression) ?? FromCall(expression) ?? FromMember(expression);
             if (value == null) {
@@ -37,13 +37,13 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
             return value;
         }
 
-        private static string FromCall<T>(Expression<T> expression)
+        static string FromCall<T>(Expression<T> expression)
             => (expression.Body as MethodCallExpression)?.Method.Name ?? null;
 
-        private static string FromMember<T>(Expression<T> expression)
+        static string FromMember<T>(Expression<T> expression)
             => (expression.Body as MemberExpression)?.Member.Name ?? null;
 
-        private static string FromUnary<T>(Expression<T> expression)
+        static string FromUnary<T>(Expression<T> expression)
             => (expression.Body as UnaryExpression)?.Operand.ToString().Split('.').Last() ?? null;
 
         //NOTE: should use recursive visitor as in other method when new failed test case added

@@ -34,7 +34,7 @@ namespace ExpressionToCodeLib
             return null;
         }
 
-        private static object TryGetClosure(Expression expr)
+        static object TryGetClosure(Expression expr)
         {
             if (expr == null) {
                 return null;
@@ -69,12 +69,12 @@ namespace ExpressionToCodeLib
             }
         }
 
-        private static bool IsClosureType(this Type type) { return type.Name.Contains("<>c__DisplayClass"); }
+        static bool IsClosureType(this Type type) { return type.Name.Contains("<>c__DisplayClass"); }
 
         /// <summary>Supports emitting IL for selected expressions (May be extended per NodeType basis).
         /// When emitter find not supported expression it will return false from <see cref="TryEmit"/>, 
         /// so the compilation may fallback to usual/slow Expression.Compile.</summary>
-        private static class EmittingVisitor
+        static class EmittingVisitor
         {
             public static bool TryEmit(Expression expr, ILGenerator il, bool withClosure)
             {
@@ -108,7 +108,7 @@ namespace ExpressionToCodeLib
                 }
             }
 
-            private static bool VisitBinary(BinaryExpression b, ILGenerator il, bool withClosure)
+            static bool VisitBinary(BinaryExpression b, ILGenerator il, bool withClosure)
             {
                 var ok = TryEmit(b.Left, il, withClosure);
                 if (ok) {
@@ -118,7 +118,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitExpressionList(IList<Expression> eList, ILGenerator state, bool withClosure)
+            static bool VisitExpressionList(IList<Expression> eList, ILGenerator state, bool withClosure)
             {
                 var ok = true;
                 for (int i = 0, n = eList.Count; i < n && ok; i++) {
@@ -127,7 +127,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitConvert(UnaryExpression node, ILGenerator il, bool withClosure)
+            static bool VisitConvert(UnaryExpression node, ILGenerator il, bool withClosure)
             {
                 var ok = TryEmit(node.Operand, il, withClosure);
                 if (ok) {
@@ -141,7 +141,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitConstant(ConstantExpression node, ILGenerator il, bool withClosure)
+            static bool VisitConstant(ConstantExpression node, ILGenerator il, bool withClosure)
             {
                 var value = node.Value;
                 if (value == null) {
@@ -162,7 +162,7 @@ namespace ExpressionToCodeLib
                 return true;
             }
 
-            private static bool VisitNew(NewExpression node, ILGenerator il, bool withClosure)
+            static bool VisitNew(NewExpression node, ILGenerator il, bool withClosure)
             {
                 var ok = VisitExpressionList(node.Arguments, il, withClosure);
                 if (ok) {
@@ -171,7 +171,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitNewArray(NewArrayExpression node, ILGenerator il, bool withClosure)
+            static bool VisitNewArray(NewArrayExpression node, ILGenerator il, bool withClosure)
             {
                 var elems = node.Expressions;
                 var arrType = node.Type;
@@ -208,7 +208,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitArrayIndex(BinaryExpression node, ILGenerator il, bool withClosure)
+            static bool VisitArrayIndex(BinaryExpression node, ILGenerator il, bool withClosure)
             {
                 var ok = VisitBinary(node, il, withClosure);
                 if (ok) {
@@ -217,7 +217,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitMemberInit(MemberInitExpression mi, ILGenerator il, bool withClosure)
+            static bool VisitMemberInit(MemberInitExpression mi, ILGenerator il, bool withClosure)
             {
                 var ok = VisitNew(mi.NewExpression, il, withClosure);
                 if (!ok) {
@@ -260,7 +260,7 @@ namespace ExpressionToCodeLib
                 return true;
             }
 
-            private static bool VisitMethodCall(MethodCallExpression expr, ILGenerator il, bool withClosure)
+            static bool VisitMethodCall(MethodCallExpression expr, ILGenerator il, bool withClosure)
             {
                 var ok = true;
                 if (expr.Object != null) {
@@ -284,7 +284,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static bool VisitMemberAccess(MemberExpression expr, ILGenerator il, bool withClosure)
+            static bool VisitMemberAccess(MemberExpression expr, ILGenerator il, bool withClosure)
             {
                 if (expr.Expression != null) {
                     var ok = TryEmit(expr.Expression, il, withClosure);
@@ -311,7 +311,7 @@ namespace ExpressionToCodeLib
                 return true;
             }
 
-            private static bool VisitComparison(BinaryExpression comparison, ILGenerator il, bool withClosure)
+            static bool VisitComparison(BinaryExpression comparison, ILGenerator il, bool withClosure)
             {
                 var ok = VisitBinary(comparison, il, withClosure);
                 if (ok) {
@@ -345,9 +345,9 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static void EmitMethodCall(MethodInfo method, ILGenerator il) { il.Emit(method.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, method); }
+            static void EmitMethodCall(MethodInfo method, ILGenerator il) { il.Emit(method.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, method); }
 
-            private static void EmitLoadConstantInt(ILGenerator il, int i)
+            static void EmitLoadConstantInt(ILGenerator il, int i)
             {
                 switch (i) {
                     case 0:

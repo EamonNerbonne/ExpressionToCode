@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib
 {
-    struct StringifiedExpression
+    internal struct StringifiedExpression
     {
         //a node cannot have children and text.  If it has neither, it is considered empty.
         public readonly string Text;

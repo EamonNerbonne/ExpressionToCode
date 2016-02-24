@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ExpressionToCodeLib
 {
-    static class ReflectionHelpers
+    internal static class ReflectionHelpers
     {
         public static PropertyInfo GetPropertyIfGetter(MethodInfo mi)
         {

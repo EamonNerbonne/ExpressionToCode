@@ -8,12 +8,12 @@ using System.Text;
 namespace ExpressionToCodeLib
 {
     public interface ICodeAnnotator {
-        string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue);
+        string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOutermostValue);
     }
 
     internal class ValuesOnStalksCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue)
+        public string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOutermostValue)
         {
             var splitLine = ExpressionToStringWithValues(expr, ignoreOutermostValue);
 
