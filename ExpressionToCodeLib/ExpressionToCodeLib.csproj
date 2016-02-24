@@ -57,7 +57,7 @@
     <Compile Include="IObjectStringifier.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithName.cs" />
     <Compile Include="ObjectStringify.cs" />
-    <Compile Include="Unstable_v2_Api\ExpressionStringify.cs" />
+    <Compile Include="Internal\ExpressionStringify.cs" />
     <Compile Include="ExpressionToCode.cs" />
     <Compile Include="Internal\ExpressionToCodeImpl.cs" />
     <Compile Include="Internal\ExpressionPrecedence.cs" />

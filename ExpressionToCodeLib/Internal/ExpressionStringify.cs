@@ -1,11 +1,10 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using ExpressionToCodeLib.Internal;
 
-namespace ExpressionToCodeLib.Unstable_v2_Api
+namespace ExpressionToCodeLib.Internal
 {
-    public sealed class ExpressionStringify : IExpressionToCode
+    internal sealed class ExpressionStringify : IExpressionToCode
     {
         readonly ExpressionToCodeConfiguration config;
 
