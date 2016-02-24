@@ -7,9 +7,13 @@ using System.Text;
 
 namespace ExpressionToCodeLib
 {
-    internal static class ValuesOnStalksCodeAnnotator
+    internal interface ICodeAnnotator {
+        string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue);
+    }
+
+    internal class ValuesOnStalksCodeAnnotator : ICodeAnnotator
     {
-        internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue)
+        public string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue)
         {
             var splitLine = ExpressionToStringWithValues(expr, ignoreOutermostValue);
 

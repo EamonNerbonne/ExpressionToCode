@@ -6,17 +6,17 @@ using System.Text;
 
 namespace ExpressionToCodeLib
 {
-    internal static class SubExpressionPerLineCodeAnnotator
+    internal class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
-        static string AnnotatedToCode2(Expression expr, string msg)
+        public string AnnotatedToCode(Expression expr, string msg, bool ignoreOuterMostValue)
         {
             return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, true).ComposeToSingleString();
         }
 
         struct ExpressionWithSubExpressions
         {
-            public string ExpressionString;
-            public SubExpressionValue[] SubExpressions;
+            string ExpressionString;
+            SubExpressionValue[] SubExpressions;
 
             public struct SubExpressionValue
             {
