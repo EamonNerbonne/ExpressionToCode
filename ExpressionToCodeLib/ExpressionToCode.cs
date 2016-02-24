@@ -27,7 +27,6 @@ namespace ExpressionToCodeLib
 
         internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue)
         {
-            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, true).ComposeToSingleString();
             var splitLine = ExpressionToStringWithValues(expr, ignoreOutermostValue);
 
             var exprWithStalkedValues = new StringBuilder();
@@ -55,6 +54,11 @@ namespace ExpressionToCodeLib
             }
 
             return exprWithStalkedValues.ToString();
+        }
+
+        static string AnnotatedToCode2(Expression expr, string msg)
+        {
+            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, true).ComposeToSingleString();
         }
 
         static bool IsMultiline(string msg)
