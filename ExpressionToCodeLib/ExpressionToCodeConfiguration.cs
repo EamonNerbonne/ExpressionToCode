@@ -7,7 +7,7 @@ using ExpressionToCodeLib.Internal;
 
 namespace ExpressionToCodeLib
 {
-    public struct ExpressionToCodeConfigurationValue
+    struct ExpressionToCodeConfigurationValue
     {
         public ICodeAnnotator CodeAnnotator;
         public IExpressionCompiler ExpressionCompiler;
@@ -27,8 +27,8 @@ namespace ExpressionToCodeLib
                 });
 
         public static ExpressionToCodeConfiguration CurrentConfiguration = DefaultConfiguration;
-        public readonly ExpressionToCodeConfigurationValue Value;
-        public ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value) { Value = value; }
+        internal readonly ExpressionToCodeConfigurationValue Value;
+        ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value) { Value = value; }
 
         delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
 
