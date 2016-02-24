@@ -21,7 +21,7 @@ namespace ExpressionToCodeLib
         public static readonly ExpressionToCodeConfiguration DefaultConfiguration =
             new ExpressionToCodeConfiguration(
                 new ExpressionToCodeConfigurationValue {
-                    CodeAnnotator = new ValuesOnStalksCodeAnnotator(),
+                    CodeAnnotator = CodeAnnotators.ValuesOnStalksCodeAnnotator,
                     ExpressionCompiler = ExpressionTreeCompilers.DefaultExpressionCompiler,
                     ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,
