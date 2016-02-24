@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Collections.Generic;
 
-namespace ExpressionToCodeLib
+namespace ExpressionToCodeLib.Internal
 {
     internal static class ReflectionHelpers
     {

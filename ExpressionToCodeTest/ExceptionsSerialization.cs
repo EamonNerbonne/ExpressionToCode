@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using ExpressionToCodeLib;
 using ExpressionToCodeLib.Internal;
+using ExpressionToCodeLib.Internal.Internal;
 using Xunit;
 
 namespace ExpressionToCodeTest

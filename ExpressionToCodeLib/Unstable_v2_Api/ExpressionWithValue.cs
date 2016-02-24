@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using ExpressionToCodeLib;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace ExpressionToCodeTest.Unstable_v2_Api
+namespace ExpressionToCodeLib.Unstable_v2_Api
 {
     public static class ExpressionWithValue
     {

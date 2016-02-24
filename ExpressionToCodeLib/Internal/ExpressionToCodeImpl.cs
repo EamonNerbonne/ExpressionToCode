@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 using System.Reflection;
-using ExpressionToCodeLib.Unstable_v2_Api;
+using System.Runtime.CompilerServices;
 
-namespace ExpressionToCodeLib
+namespace ExpressionToCodeLib.Internal
 {
     internal class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {

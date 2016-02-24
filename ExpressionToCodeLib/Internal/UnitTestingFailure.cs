@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace ExpressionToCodeLib
+namespace ExpressionToCodeLib.Internal
 {
     internal static class UnitTestingFailure
     {

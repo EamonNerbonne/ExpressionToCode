@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using ExpressionToCodeLib.Internal;
 
 namespace ExpressionToCodeLib.Unstable_v2_Api
 {

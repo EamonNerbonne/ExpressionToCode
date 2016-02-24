@@ -2,7 +2,7 @@
 using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 
-namespace ExpressionToCodeLib
+namespace ExpressionToCodeLib.Internal
 {
     internal struct StringifiedExpression
     {

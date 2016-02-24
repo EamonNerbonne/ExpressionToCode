@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace ExpressionToCodeLib
+namespace ExpressionToCodeLib.Internal
 {
     internal class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using ExpressionToCodeLib.Internal;
 
 namespace ExpressionToCodeLib.Unstable_v2_Api
 {
