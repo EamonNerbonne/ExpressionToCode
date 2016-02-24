@@ -179,7 +179,7 @@ namespace ExpressionToCodeTest
             SomeEnum? a = SomeEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
 
-            var exprToCode = ExpressionStringify.With(fullTypeNames: true);
+            var exprToCode = ExpressionToCodeConfiguration.DefaultConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode();
 
             Assert.Equal(
                 @"() => a == ExpressionToCodeTest.SomeEnum.B",

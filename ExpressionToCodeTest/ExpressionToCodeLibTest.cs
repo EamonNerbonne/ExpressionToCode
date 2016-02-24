@@ -114,7 +114,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"() => new System.Func<int>[] { () => 1, () => 2 }",
-                ExpressionStringify.With(fullTypeNames: true).ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+                ExpressionToCodeConfiguration.DefaultConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode().ToCode(() => new Func<int>[] { () => 1, () => 2 }));
         }
 
         [Fact]
@@ -549,7 +549,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 "() => new ExpressionToCodeTest.ClassA()",
-                ExpressionStringify.With(true).ToCode(() => new ClassA()));
+                ExpressionToCodeConfiguration.DefaultConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode().ToCode(() => new ClassA()));
         }
 
         [Fact]
@@ -557,7 +557,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 "() => typeof(ExpressionToCodeTest.Outer<int, int>.Nested<string>)",
-                ExpressionStringify.With(true).ToCode(() => typeof(Outer<int, int>.Nested<string>)));
+                ExpressionToCodeConfiguration.DefaultConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode().ToCode(() => typeof(Outer<int, int>.Nested<string>)));
         }
 
         [Fact]
@@ -565,7 +565,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 "() => typeof(Outer<int, int>.Nested<string>)",
-                ExpressionStringify.With().ToCode(() => typeof(Outer<int, int>.Nested<string>)));
+                ExpressionToCodeConfiguration.DefaultConfiguration.GetExpressionToCode().ToCode(() => typeof(Outer<int, int>.Nested<string>)));
         }
 
         [Fact]
@@ -580,7 +580,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void FullTypeName_ForNestedType()
         {
-            var code = ExpressionStringify.With(true).ToCode(() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B());
+            var code = ExpressionToCodeConfiguration.DefaultConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode().ToCode(() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B());
             Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()", code);
         }
 

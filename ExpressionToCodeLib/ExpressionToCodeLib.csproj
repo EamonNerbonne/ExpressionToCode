@@ -54,6 +54,7 @@
     <Compile Include="Internal\SubExpressionPerLineCodeAnnotator.cs" />
     <Compile Include="Internal\OptimizedExpressionCompiler.cs" />
     <Compile Include="Internal\OptimizedExpressionCompilerImpl.cs" />
+    <Compile Include="IObjectStringifier.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithName.cs" />
     <Compile Include="Unstable_v2_Api\ObjectStringify.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionStringify.cs" />

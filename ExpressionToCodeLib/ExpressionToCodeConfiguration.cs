@@ -45,6 +45,8 @@ namespace ExpressionToCodeLib
         public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator) => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
         public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier) => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
         public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments) => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
+
+        public IExpressionToCode GetExpressionToCode() => new ExpressionStringify(this);
     }
 
     public interface ICodeAnnotator
@@ -55,11 +57,5 @@ namespace ExpressionToCodeLib
     public interface IExpressionCompiler
     {
         Func<T> Compile<T>(Expression<Func<T>> expression);
-    }
-
-    public interface IObjectStringifier
-    {
-        string PlainObjectToCode(object val, Type type);
-        string TypeNameToCode(Type type);
     }
 }

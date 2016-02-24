@@ -7,11 +7,6 @@ using ExpressionToCodeLib.Internal;
 
 namespace ExpressionToCodeLib.Unstable_v2_Api
 {
-    public static class ObjectStringifierExtensions
-    {
-        public static string PlainObjectToCode(this IObjectStringifier it, object val) => it.PlainObjectToCode(val, val?.GetType());
-    }
-
     public static class ObjectStringify
     {
         public static readonly IObjectStringifier Default = new DefaultImpl();

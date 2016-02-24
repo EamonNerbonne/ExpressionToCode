@@ -34,8 +34,5 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
                 }
             }
         }
-
-        public static IExpressionToCode With(bool fullTypeNames = false, bool explicitMethodTypeArgs = false)
-            => new ExpressionStringify(ExpressionToCodeConfiguration.DefaultConfiguration.WithAlwaysUseExplicitTypeArguments(explicitMethodTypeArgs).WithObjectStringifier(fullTypeNames ? ObjectStringify.WithFullTypeNames : ObjectStringify.Default));
     }
 }
