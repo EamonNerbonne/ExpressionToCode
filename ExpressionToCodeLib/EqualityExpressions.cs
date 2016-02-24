@@ -33,33 +33,33 @@ namespace ExpressionToCodeLib
 
         public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression e)
         {
-            if(e.Type == typeof(bool)) {
-                if(e is BinaryExpression) {
+            if (e.Type == typeof(bool)) {
+                if (e is BinaryExpression) {
                     var binExpr = (BinaryExpression)e;
-                    if(binExpr.NodeType == ExpressionType.Equal) {
+                    if (binExpr.NodeType == ExpressionType.Equal) {
                         return Tuple.Create(EqualityExpressionClass.EqualsOp, binExpr.Left, binExpr.Right);
-                    } else if(e.NodeType == ExpressionType.NotEqual) {
+                    } else if (e.NodeType == ExpressionType.NotEqual) {
                         return Tuple.Create(EqualityExpressionClass.NotEqualsOp, binExpr.Left, binExpr.Right);
                     }
-                } else if(e.NodeType == ExpressionType.Call) {
+                } else if (e.NodeType == ExpressionType.Call) {
                     var mce = (MethodCallExpression)e;
-                    if(mce.Method.Equals(((Func<object, bool>)new object().Equals).Method)) {
+                    if (mce.Method.Equals(((Func<object, bool>)new object().Equals).Method)) {
                         return Tuple.Create(EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
-                    } else if(mce.Method.Equals(objEqualStaticMethod)) {
+                    } else if (mce.Method.Equals(objEqualStaticMethod)) {
                         return Tuple.Create(
                             EqualityExpressionClass.ObjectEqualsStatic,
                             mce.Arguments.First(),
                             mce.Arguments.Skip(1).Single());
-                    } else if(mce.Method.Equals(objEqualReferenceMethod)) {
+                    } else if (mce.Method.Equals(objEqualReferenceMethod)) {
                         return Tuple.Create(
                             EqualityExpressionClass.ObjectReferenceEquals,
                             mce.Arguments.First(),
                             mce.Arguments.Skip(1).Single());
-                    } else if(IsImplementationOfGenericInterfaceMethod(mce.Method, typeof(IEquatable<>), "Equals")) {
+                    } else if (IsImplementationOfGenericInterfaceMethod(mce.Method, typeof(IEquatable<>), "Equals")) {
                         return Tuple.Create(EqualityExpressionClass.EquatableEquals, mce.Object, mce.Arguments.Single());
-                    } else if(IsImplementationOfInterfaceMethod(mce.Method, typeof(IStructuralEquatable), "Equals")) {
+                    } else if (IsImplementationOfInterfaceMethod(mce.Method, typeof(IStructuralEquatable), "Equals")) {
                         return Tuple.Create(EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
-                    } else if(HaveSameGenericDefinition(
+                    } else if (HaveSameGenericDefinition(
                         mce.Method,
                         ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).Method)) {
                         return Tuple.Create(EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
@@ -76,10 +76,10 @@ namespace ExpressionToCodeLib
                 try {
                     object val = func.DynamicInvoke();
                     return Expression.Constant(val, e.Type);
-                } catch(Exception) {
+                } catch (Exception) {
                     return null; //todo:more specific?
                 }
-            } catch(InvalidOperationException) {
+            } catch (InvalidOperationException) {
                 return null;
             }
         }
@@ -88,7 +88,7 @@ namespace ExpressionToCodeLib
         {
             try {
                 return EvalBoolLambda(Expression.Lambda<Func<bool>>(e));
-            } catch(InvalidCastException) {
+            } catch (InvalidCastException) {
                 return null;
             }
         }
@@ -97,7 +97,7 @@ namespace ExpressionToCodeLib
         {
             try {
                 return EvalBoolFunc(e.Compile());
-            } catch(InvalidOperationException) {
+            } catch (InvalidOperationException) {
                 return null;
             }
         }
@@ -106,7 +106,7 @@ namespace ExpressionToCodeLib
         {
             try {
                 return func();
-            } catch(Exception) {
+            } catch (Exception) {
                 return null;
             }
         }
@@ -114,11 +114,11 @@ namespace ExpressionToCodeLib
         public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(Expression<Func<bool>> e)
         {
             var currEquals = ExtractEqualityType(e);
-            if(currEquals.Item1 == EqualityExpressionClass.None) {
+            if (currEquals.Item1 == EqualityExpressionClass.None) {
                 return null;
             }
             var currVal = EvalBoolLambda(e);
-            if(!currVal.HasValue) {
+            if (!currVal.HasValue) {
                 return null;
             }
             return DisagreeingEqualities(currEquals.Item2, currEquals.Item3, currVal.Value);
@@ -190,19 +190,19 @@ namespace ExpressionToCodeLib
         }
 
         static bool HaveSameGenericDefinition(MethodInfo a, MethodInfo b) => a.IsGenericMethod && b.IsGenericMethod
-    && a.GetGenericMethodDefinition().Equals(b.GetGenericMethodDefinition());
+            && a.GetGenericMethodDefinition().Equals(b.GetGenericMethodDefinition());
 
         static bool IsImplementationOfGenericInterfaceMethod(
-MethodInfo method,
-Type genericInterfaceType,
-string methodName) => GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
-        .Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
-        || method.DeclaringType.IsInterface && method.Name == methodName && method.DeclaringType.IsGenericType
-            && method.DeclaringType.GetGenericTypeDefinition() == genericInterfaceType;
+            MethodInfo method,
+            Type genericInterfaceType,
+            string methodName) => GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
+                .Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
+                || method.DeclaringType.IsInterface && method.Name == methodName && method.DeclaringType.IsGenericType
+                    && method.DeclaringType.GetGenericTypeDefinition() == genericInterfaceType;
 
         static bool IsImplementationOfInterfaceMethod(MethodInfo method, Type interfaceType, string methodName)
         {
-            if(!interfaceType.IsAssignableFrom(method.DeclaringType)) {
+            if (!interfaceType.IsAssignableFrom(method.DeclaringType)) {
                 return false;
             }
             var interfaceMap = method.DeclaringType.GetInterfaceMap(interfaceType);
@@ -212,8 +212,7 @@ string methodName) => GetGenericInterfaceImplementation(method.DeclaringType, ge
         }
 
         static IEnumerable<Type> GetGenericInterfaceImplementation(Type type, Type genericInterfaceType) => from itype in type.GetInterfaces()
-                                                                                                            where itype.IsGenericType && itype.GetGenericTypeDefinition() == genericInterfaceType
-                                                                                                            select itype
-    ;
+            where itype.IsGenericType && itype.GetGenericTypeDefinition() == genericInterfaceType
+            select itype;
     }
 }

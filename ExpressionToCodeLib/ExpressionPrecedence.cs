@@ -6,20 +6,18 @@ namespace ExpressionToCodeLib
     static class ExpressionPrecedence
     {
         static bool UnaryDashSym(ExpressionType et) => et == ExpressionType.Negate
-    || et == ExpressionType.NegateChecked
-    || et == ExpressionType.PreDecrementAssign
-    ;
+            || et == ExpressionType.NegateChecked
+            || et == ExpressionType.PreDecrementAssign;
 
         static bool UnaryPlusSym(ExpressionType et) => et == ExpressionType.UnaryPlus
-    || et == ExpressionType.PreIncrementAssign
-    ;
+            || et == ExpressionType.PreIncrementAssign;
 
         public static bool TokenizerConfusable(ExpressionType a, ExpressionType b) => UnaryDashSym(a) && UnaryDashSym(b) || UnaryPlusSym(a) && UnaryPlusSym(b);
 
         public static int Rank(ExpressionType exprType)
         {
-            switch(exprType) {
-                    //brackets make no sense:
+            switch (exprType) {
+                //brackets make no sense:
                 case ExpressionType.Block:
                     return -1;
                 case ExpressionType.Goto:
@@ -35,7 +33,7 @@ namespace ExpressionToCodeLib
                 case ExpressionType.Label:
                     return -1;
 
-                    //brackets built-in; thus unnecesary (for params only!).
+                //brackets built-in; thus unnecesary (for params only!).
                 case ExpressionType.MemberInit:
                     return 1;
                 case ExpressionType.ArrayIndex:
@@ -55,7 +53,7 @@ namespace ExpressionToCodeLib
                 case ExpressionType.Power:
                     return 1; //non-native, uses Call.
 
-                    //other primary expressions
+                //other primary expressions
                 case ExpressionType.Constant:
                     return 1;
                 case ExpressionType.Parameter:
@@ -73,7 +71,7 @@ namespace ExpressionToCodeLib
                 case ExpressionType.PostDecrementAssign:
                     return 1;
 
-                    //unary prefixes
+                //unary prefixes
                 case ExpressionType.UnaryPlus:
                     return 2;
                 case ExpressionType.Negate:
@@ -97,7 +95,7 @@ namespace ExpressionToCodeLib
                 case ExpressionType.PreDecrementAssign:
                     return 2;
 
-                    //binary multiplicative
+                //binary multiplicative
                 case ExpressionType.Modulo:
                     return 3;
                 case ExpressionType.Multiply:
@@ -107,7 +105,7 @@ namespace ExpressionToCodeLib
                 case ExpressionType.Divide:
                     return 3;
 
-                    //binary addition
+                //binary addition
                 case ExpressionType.Add:
                     return 4;
                 case ExpressionType.AddChecked:
@@ -121,13 +119,13 @@ namespace ExpressionToCodeLib
                 case ExpressionType.Increment:
                     return 4; //nonnative; uses ... - 1
 
-                    //binary shift
+                //binary shift
                 case ExpressionType.LeftShift:
                     return 5;
                 case ExpressionType.RightShift:
                     return 5;
 
-                    //relational excl. equals
+                //relational excl. equals
                 case ExpressionType.LessThan:
                     return 6;
                 case ExpressionType.LessThanOrEqual:
@@ -141,13 +139,13 @@ namespace ExpressionToCodeLib
                 case ExpressionType.TypeIs:
                     return 6;
 
-                    //equality
+                //equality
                 case ExpressionType.NotEqual:
                     return 7;
                 case ExpressionType.Equal:
                     return 7;
 
-                    //bitwise/eager
+                //bitwise/eager
                 case ExpressionType.And:
                     return 8;
                 case ExpressionType.ExclusiveOr:
@@ -155,21 +153,21 @@ namespace ExpressionToCodeLib
                 case ExpressionType.Or:
                     return 10;
 
-                    //logical/shortcircuit:
+                //logical/shortcircuit:
                 case ExpressionType.AndAlso:
                     return 11;
                 case ExpressionType.OrElse:
                     return 12;
 
-                    //null-coalesce
+                //null-coalesce
                 case ExpressionType.Coalesce:
                     return 13;
 
-                    //ternary ? : 
+                //ternary ? : 
                 case ExpressionType.Conditional:
                     return 14;
 
-                    //assignments & lamba's
+                //assignments & lamba's
                 case ExpressionType.Lambda:
                     return 15;
                 case ExpressionType.Quote:
@@ -205,8 +203,8 @@ namespace ExpressionToCodeLib
                 case ExpressionType.SubtractAssignChecked:
                     return 15;
 
-                    //Can't deal with these:
-                    /*
+                //Can't deal with these:
+                /*
 			case ExpressionType.Dynamic: return 0;//hmm...
 			case ExpressionType.Extension: return 0;
 			case ExpressionType.DebugInfo: return 0;//hmm...

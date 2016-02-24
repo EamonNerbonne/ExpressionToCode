@@ -21,41 +21,41 @@ namespace ExpressionToCodeLib
 
         string AliasName(Type type)
         {
-            if(type == typeof(bool)) {
+            if (type == typeof(bool)) {
                 return "bool";
-            } else if(type == typeof(byte)) {
+            } else if (type == typeof(byte)) {
                 return "byte";
-            } else if(type == typeof(sbyte)) {
+            } else if (type == typeof(sbyte)) {
                 return "sbyte";
-            } else if(type == typeof(char)) {
+            } else if (type == typeof(char)) {
                 return "char";
-            } else if(type == typeof(decimal)) {
+            } else if (type == typeof(decimal)) {
                 return "decimal";
-            } else if(type == typeof(double)) {
+            } else if (type == typeof(double)) {
                 return "double";
-            } else if(type == typeof(float)) {
+            } else if (type == typeof(float)) {
                 return "float";
-            } else if(type == typeof(int)) {
+            } else if (type == typeof(int)) {
                 return "int";
-            } else if(type == typeof(uint)) {
+            } else if (type == typeof(uint)) {
                 return "uint";
-            } else if(type == typeof(long)) {
+            } else if (type == typeof(long)) {
                 return "long";
-            } else if(type == typeof(ulong)) {
+            } else if (type == typeof(ulong)) {
                 return "ulong";
-            } else if(type == typeof(object)) {
+            } else if (type == typeof(object)) {
                 return "object";
-            } else if(type == typeof(short)) {
+            } else if (type == typeof(short)) {
                 return "short";
-            } else if(type == typeof(ushort)) {
+            } else if (type == typeof(ushort)) {
                 return "ushort";
-            } else if(type == typeof(string)) {
+            } else if (type == typeof(string)) {
                 return "string";
-            } else if(type == typeof(void)) {
+            } else if (type == typeof(void)) {
                 return "void";
-            } else if(type.IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+            } else if (type.IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
                 return GetTypeName(type.GetGenericArguments().Single()) + "?";
-            } else if(type.IsGenericParameter) {
+            } else if (type.IsGenericParameter) {
                 return type.Name;
             } else {
                 return ArrayTypeName(type);
@@ -64,7 +64,7 @@ namespace ExpressionToCodeLib
 
         string NormalName(Type type)
         {
-            if(type.DeclaringType != null) {
+            if (type.DeclaringType != null) {
                 var settingsWithoutUseFullname = this;
                 settingsWithoutUseFullname.UseFullName = false;
 
@@ -76,7 +76,7 @@ namespace ExpressionToCodeLib
 
         string GenericTypeName(Type type)
         {
-            if(!type.IsGenericType) {
+            if (!type.IsGenericType) {
                 return null;
             }
 
@@ -86,23 +86,23 @@ namespace ExpressionToCodeLib
             var typeArgIdx = typeArgs.Length;
             var revNestedTypeNames = new List<string>();
 
-            while(type != null) {
+            while (type != null) {
                 var name = type.Name;
                 var backtickIdx = name.IndexOf('`');
-                if(backtickIdx == -1) {
+                if (backtickIdx == -1) {
                     revNestedTypeNames.Add(name);
                 } else {
                     var afterArgCountIdx = name.IndexOf('[', backtickIdx + 1);
-                    if(afterArgCountIdx == -1) {
+                    if (afterArgCountIdx == -1) {
                         afterArgCountIdx = name.Length;
                     }
                     var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1, afterArgCountIdx - backtickIdx - 1));
-                    if(renderAsGenericTypeDefinition) {
+                    if (renderAsGenericTypeDefinition) {
                         typeArgIdx -= thisTypeArgCount;
                         revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + new string(',', thisTypeArgCount - 1) + ">");
                     } else {
                         var argNames = new List<string>();
-                        for(int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
+                        for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
                             argNames.Add(GetTypeName(typeArgs[i]));
                         }
                         typeArgIdx -= thisTypeArgCount;
@@ -117,7 +117,7 @@ namespace ExpressionToCodeLib
 
         string ArrayTypeName(Type type)
         {
-            if(!type.IsArray) {
+            if (!type.IsArray) {
                 return null;
             }
             string arraySuffix = null;
@@ -126,7 +126,7 @@ namespace ExpressionToCodeLib
                 type = type.GetElementType();
                 arraySuffix = arraySuffix + "[" + rankCommas + "]";
             }
-            while(type.IsArray);
+            while (type.IsArray);
             string basename = GetTypeName(type);
             return basename + arraySuffix;
         }

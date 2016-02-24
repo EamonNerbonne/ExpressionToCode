@@ -258,10 +258,10 @@ namespace ExpressionToCodeLib
         }
 
         static bool isThisRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-        && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
+            && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 
         static bool isClosureRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-        && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
+            && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
 
         [Pure]
         public StringifiedExpression DispatchMemberAccess(Expression e)
@@ -348,7 +348,8 @@ namespace ExpressionToCodeLib
             return kids.Finish();
         }
 
-        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs) => GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
+        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs)
+            => GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
 
         static IEnumerable<Argument> GetArgumentsForMethod(ParameterInfo[] parameters, IEnumerable<Expression> argValueExprs)
         {
@@ -410,8 +411,8 @@ namespace ExpressionToCodeLib
         }
 
         static bool ContainsInferableType(Type haystack, Type needle) => haystack == needle
-    || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
-    || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
+            || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
+            || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
         [Pure]
         public StringifiedExpression DispatchIndex(Expression e)

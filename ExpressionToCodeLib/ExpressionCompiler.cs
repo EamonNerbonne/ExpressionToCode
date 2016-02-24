@@ -9,16 +9,13 @@ namespace ExpressionToCodeLib
 {
     public static class ExpressionCompiler
     {
-        public static Func<T> Compile<T>(Expression<Func<T>> expression)
-        {
-            return TryCompile(expression) ?? expression.Compile();
-        }
+        public static Func<T> Compile<T>(Expression<Func<T>> expression) { return TryCompile(expression) ?? expression.Compile(); }
 
         public static Func<T> TryCompile<T>(Expression<Func<T>> expression)
         {
             var closure = TryGetClosure(expression.Body);
-            var method = closure == null 
-                ? new DynamicMethod(string.Empty, typeof(T), Type.EmptyTypes, typeof(ExpressionCompiler).Module) 
+            var method = closure == null
+                ? new DynamicMethod(string.Empty, typeof(T), Type.EmptyTypes, typeof(ExpressionCompiler).Module)
                 : new DynamicMethod(string.Empty, typeof(T), new[] { closure.GetType() }, closure.GetType());
 
             var il = method.GetILGenerator();
@@ -34,8 +31,9 @@ namespace ExpressionToCodeLib
 
         private static object TryGetClosure(Expression expr)
         {
-            if (expr == null)
+            if (expr == null) {
                 return null;
+            }
 
             switch (expr.NodeType) {
                 case ExpressionType.Constant:
@@ -55,11 +53,13 @@ namespace ExpressionToCodeLib
                     return null;
                 default:
                     var unaryExpr = expr as UnaryExpression;
-                    if (unaryExpr != null)
+                    if (unaryExpr != null) {
                         return TryGetClosure(unaryExpr.Operand);
+                    }
                     var binaryExpr = expr as BinaryExpression;
-                    if (binaryExpr != null)
+                    if (binaryExpr != null) {
                         return TryGetClosure(binaryExpr.Left) ?? TryGetClosure(binaryExpr.Right);
+                    }
                     return null;
             }
         }
@@ -340,10 +340,7 @@ namespace ExpressionToCodeLib
                 return ok;
             }
 
-            private static void EmitMethodCall(MethodInfo method, ILGenerator il)
-            {
-                il.Emit(method.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, method);
-            }
+            private static void EmitMethodCall(MethodInfo method, ILGenerator il) { il.Emit(method.IsVirtual ? OpCodes.Callvirt : OpCodes.Call, method); }
 
             private static void EmitLoadConstantInt(ILGenerator il, int i)
             {

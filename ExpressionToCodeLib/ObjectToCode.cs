@@ -6,9 +6,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using ExpressionToCodeLib.Unstable_v2_Api;
 
-namespace ExpressionToCodeLib {
-    public static class ObjectToCode {
-        public static string ComplexObjectToPseudoCode(object val, int indent = 0) {
+namespace ExpressionToCodeLib
+{
+    public static class ObjectToCode
+    {
+        public static string ComplexObjectToPseudoCode(object val, int indent = 0)
+        {
             string retval = PlainObjectToCode(val);
             if (retval != null) {
                 return retval;
@@ -38,7 +41,8 @@ namespace ExpressionToCodeLib {
 
         static string FormatEnumerable(IEnumerable list) => "{" + String.Join(", ", ExtractFirst10(list).ToArray()) + "}";
 
-        static IEnumerable<string> ExtractFirst10(IEnumerable list) {
+        static IEnumerable<string> ExtractFirst10(IEnumerable list)
+        {
             int count = 0;
             foreach (var item in list) {
                 count++;
@@ -52,10 +56,7 @@ namespace ExpressionToCodeLib {
         }
 
         public static string PlainObjectToCode(object val) => PlainObjectToCode(val, val == null ? null : val.GetType());
-
         public static string PlainObjectToCode(object val, Type type) => ObjectStringify.Default.PlainObjectToCode(val, type);
-
-
         public static string GetCSharpFriendlyTypeName(Type type) => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true }.GetTypeName(type);
 
         internal static string ExpressionValueAsCode(Expression expression)

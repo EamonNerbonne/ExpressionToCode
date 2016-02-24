@@ -14,7 +14,8 @@ namespace ExpressionToCodeLib
         static UnitTestingFailure() { }
         public static readonly Func<string, Exception, Exception> AssertionExceptionFactory = GetAssertionExceptionFactory();
 
-        static Func<string, Exception, Exception> GetAssertionExceptionFactory() => GetExceptionFactories().Where(t => t.CreateException != null).OrderByDescending(t => t.Priority).First().CreateException;
+        static Func<string, Exception, Exception> GetAssertionExceptionFactory()
+            => GetExceptionFactories().Where(t => t.CreateException != null).OrderByDescending(t => t.Priority).First().CreateException;
 
         static IEnumerable<ExceptionFactory> GetExceptionFactories()
         {
@@ -77,15 +78,15 @@ namespace ExpressionToCodeLib
                         new ExceptionFactory {
                             Priority = 3,
                             CreateException =
-                            Expression.Lambda<Func<string, Exception, Exception>>(
-                                Expression.New(
-                                    exConstructor,
-                                    Expression.Add(Expression.Constant("\r\n"), failureMessageArg, ((Func<string, string, string>)string.Concat).Method),
-                                    innerExceptionArg),
-                                failureMessageArg,
-                                innerExceptionArg)
-                                .Compile(),
-                                };
+                                Expression.Lambda<Func<string, Exception, Exception>>(
+                                    Expression.New(
+                                        exConstructor,
+                                        Expression.Add(Expression.Constant("\r\n"), failureMessageArg, ((Func<string, string, string>)string.Concat).Method),
+                                        innerExceptionArg),
+                                    failureMessageArg,
+                                    innerExceptionArg)
+                                    .Compile(),
+                        };
                 } else if (assemblyName == "nunit.framework") {
                     yield return new ExceptionFactory { Priority = 2, CreateException = mkFailFunc(assembly, "NUnit.Framework.AssertionException") };
                 } else if (assemblyName == "Microsoft.VisualStudio.QualityTools.UnitTestFramework") {
