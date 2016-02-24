@@ -7,11 +7,6 @@ using System.Text;
 
 namespace ExpressionToCodeLib
 {
-    public interface ICodeAnnotator
-    {
-        string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOutermostValue);
-    }
-
     internal class ValuesOnStalksCodeAnnotator : ICodeAnnotator
     {
         public string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOutermostValue)

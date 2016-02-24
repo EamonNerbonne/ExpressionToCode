@@ -13,4 +13,9 @@ namespace ExpressionToCodeLib
         public readonly ICodeAnnotator CodeAnnotator;
         public PAssertConfiguration(ICodeAnnotator codeAnnotator) { CodeAnnotator = codeAnnotator; }
     }
+
+    public interface ICodeAnnotator
+    {
+        string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOutermostValue);
+    }
 }
