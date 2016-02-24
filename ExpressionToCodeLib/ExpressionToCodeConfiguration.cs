@@ -10,6 +10,14 @@ namespace ExpressionToCodeLib
     {
         public ICodeAnnotator CodeAnnotator;
         public IExpressionCompiler ExpressionCompiler;
+        internal delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
+        internal ExpressionToCodeConfigurationValue With(WithDelegate edit)
+        {
+            var configCopy = this;
+            edit(ref configCopy);
+            return configCopy;
+        }
+
     }
 
     public class ExpressionToCodeConfiguration
@@ -25,6 +33,18 @@ namespace ExpressionToCodeLib
 
         public readonly ExpressionToCodeConfigurationValue Value;
         public ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value) { Value = value; }
+
+        delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
+        ExpressionToCodeConfiguration With(WithDelegate edit)
+        {
+            var configCopy = Value;
+            edit(ref configCopy);
+            return new ExpressionToCodeConfiguration(configCopy);
+        }
+
+
+        public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler) => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
+        public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator) => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
     }
 
     public interface ICodeAnnotator
