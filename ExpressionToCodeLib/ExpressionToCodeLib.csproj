@@ -42,33 +42,33 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CSharpFriendlyTypeName.cs" />
+    <Compile Include="Internal\CSharpFriendlyTypeName.cs" />
     <Compile Include="EqualityExpressions.cs" />
     <Compile Include="ExpressionTreeAssertion.cs" />
     <Compile Include="OptimizedExpressionCompiler.cs" />
     <Compile Include="ExpressionToCodeConfiguration.cs" />
-    <Compile Include="SubExpressionPerLineCodeAnnotator.cs" />
+    <Compile Include="Internal\SubExpressionPerLineCodeAnnotator.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithName.cs" />
     <Compile Include="Unstable_v2_Api\ObjectStringify.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionStringify.cs" />
     <Compile Include="ExpressionToCode.cs" />
-    <Compile Include="ExpressionToCodeImpl.cs" />
-    <Compile Include="ExpressionPrecedence.cs" />
+    <Compile Include="Internal\ExpressionToCodeImpl.cs" />
+    <Compile Include="Internal\ExpressionPrecedence.cs" />
     <Compile Include="ExpressionTypeDispatch.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
     </Compile>
-    <Compile Include="StringifiedExpression.cs" />
-    <Compile Include="NullabilityHelpers.cs" />
+    <Compile Include="Internal\StringifiedExpression.cs" />
+    <Compile Include="Internal\NullabilityHelpers.cs" />
     <Compile Include="ObjectToCode.cs" />
     <Compile Include="PAssert.cs" />
-    <Compile Include="AssertFailedException.cs" />
+    <Compile Include="Internal\AssertFailedException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReflectionHelpers.cs" />
-    <Compile Include="UnitTestingFailure.cs" />
+    <Compile Include="Internal\ReflectionHelpers.cs" />
+    <Compile Include="Internal\UnitTestingFailure.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithValue.cs" />
-    <Compile Include="ValuesOnStalksCodeAnnotator.cs" />
+    <Compile Include="Internal\ValuesOnStalksCodeAnnotator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ExpressionToCodeLib.nuspec">
