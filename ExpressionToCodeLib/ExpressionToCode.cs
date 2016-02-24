@@ -25,7 +25,37 @@ namespace ExpressionToCodeLib
         public static string ToCode(Expression e) => ExpressionStringify.Default.ToCode(e);
         public static string AnnotatedToCode(Expression expr) => AnnotatedToCode(expr, null, false);
 
-        internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue) => (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, true).ComposeToSingleString();
+        internal static string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue)
+        {
+            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, true).ComposeToSingleString();
+            var splitLine = ExpressionToStringWithValues(expr, ignoreOutermostValue);
+
+            var exprWithStalkedValues = new StringBuilder();
+            if (msg == null) {
+                exprWithStalkedValues.AppendLine(splitLine.Line);
+            } else if (IsMultiline(msg)) {
+                exprWithStalkedValues.AppendLine(msg);
+                exprWithStalkedValues.AppendLine(splitLine.Line);
+            } else {
+                exprWithStalkedValues.AppendLine(splitLine.Line + "  :  " + msg);
+            }
+
+            for (int nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
+                char[] stalkLine = new string('\u2007', splitLine.Nodes[nodeI].Location).ToCharArray(); //figure-spaces.
+                for (int i = 0; i < stalkLine.Length; i++) {
+                    if (splitLine.Line[i] == ' ') {
+                        stalkLine[i] = ' '; //use normal spaces where the expr used normal spaces for more natural spacing.
+                    }
+                }
+
+                for (int prevI = 0; prevI < nodeI; prevI++) {
+                    stalkLine[splitLine.Nodes[prevI].Location] = '\u2502'; //light vertical lines
+                }
+                exprWithStalkedValues.AppendLine((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
+            }
+
+            return exprWithStalkedValues.ToString();
+        }
 
         static bool IsMultiline(string msg)
         {
@@ -104,7 +134,10 @@ namespace ExpressionToCodeLib
                 }
             }
 
-            public string ComposeToSingleString() => ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression + ": " + sub.ValueAsString + "\n"));
+            public string ComposeToSingleString()
+            {
+                return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression + ": " + sub.ValueAsString + "\n"));
+            }
         }
 
         static SplitExpressionLine ExpressionToStringWithValues(Expression e, bool ignoreOutermostValue)
