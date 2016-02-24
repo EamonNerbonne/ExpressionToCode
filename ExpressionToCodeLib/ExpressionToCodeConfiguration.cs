@@ -48,7 +48,7 @@ namespace ExpressionToCodeLib
 
     public interface ICodeAnnotator
     {
-        string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOutermostValue);
+        string AnnotateExpressionTree(Expression expr, string msg, bool hideOutermostValue);
     }
 
     public interface IExpressionCompiler

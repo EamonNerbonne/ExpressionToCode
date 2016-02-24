@@ -8,9 +8,9 @@ namespace ExpressionToCodeLib
 {
     internal class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOuterMostValue)
+        public string AnnotateExpressionTree(Expression expr, string msg, bool hideOutermostValue)
         {
-            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, ignoreOuterMostValue).ComposeToSingleString();
+            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, hideOutermostValue).ComposeToSingleString();
         }
 
         struct ExpressionWithSubExpressions
@@ -23,7 +23,7 @@ namespace ExpressionToCodeLib
                 public string SubExpression, ValueAsString;
             }
 
-            public static ExpressionWithSubExpressions Create(Expression e, bool ignoreOutermostValue)
+            public static ExpressionWithSubExpressions Create(Expression e, bool hideOutermostValue)
             {
                 var sb = new StringBuilder();
                 bool ignoreInitialSpace = true;
@@ -31,7 +31,7 @@ namespace ExpressionToCodeLib
                 AppendNodeToStringBuilder(sb, node, ref ignoreInitialSpace);
                 var fullExprText = sb.ToString();
                 var subExpressionValues = new List<SubExpressionValue>();
-                FindSubExpressionValues(node, node, subExpressionValues, ignoreOutermostValue);
+                FindSubExpressionValues(node, node, subExpressionValues, hideOutermostValue);
                 return new ExpressionWithSubExpressions { ExpressionString = fullExprText, SubExpressions = subExpressionValues.ToArray() };
             }
 
@@ -52,9 +52,9 @@ namespace ExpressionToCodeLib
                 StringifiedExpression node,
                 StringifiedExpression subExprNode,
                 List<SubExpressionValue> subExpressionValues,
-                bool ignoreOutermostValue)
+                bool hideOutermostValue)
             {
-                if (!ignoreOutermostValue && node.OptionalValue != null) {
+                if (!hideOutermostValue && node.OptionalValue != null) {
                     var sb = new StringBuilder();
                     var ignoreInitialSpace = true;
                     AppendNodeWithLimitedDepth(sb, subExprNode, ref ignoreInitialSpace, 1);
@@ -66,7 +66,7 @@ namespace ExpressionToCodeLib
                     if (kid.IsConceptualChild) {
                         FindSubExpressionValues(kid, kid, subExpressionValues, false);
                     } else {
-                        FindSubExpressionValues(kid, subExprNode, subExpressionValues, ignoreOutermostValue);
+                        FindSubExpressionValues(kid, subExprNode, subExpressionValues, hideOutermostValue);
                     }
                 }
             }
