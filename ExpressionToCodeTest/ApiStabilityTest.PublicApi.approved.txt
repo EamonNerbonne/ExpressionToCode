@@ -1,127 +1,59 @@
-﻿enum EqualityExpressionClass
-    int value__
-    const EqualityExpressionClass None = 0
-    const EqualityExpressionClass EqualsOp = 1
-    const EqualityExpressionClass NotEqualsOp = 2
-    const EqualityExpressionClass ObjectEquals = 3
-    const EqualityExpressionClass ObjectEqualsStatic = 4
-    const EqualityExpressionClass ObjectReferenceEquals = 5
-    const EqualityExpressionClass EquatableEquals = 6
-    const EqualityExpressionClass SequenceEqual = 7
-    const EqualityExpressionClass StructuralEquals = 8
+﻿interface ICodeAnnotator
+    string inst.AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
 
-interface IExpressionTypeDispatch<T>
-    T inst.DispatchAdd(Expression e)
-    T inst.DispatchAddChecked(Expression e)
-    T inst.DispatchAnd(Expression e)
-    T inst.DispatchAndAlso(Expression e)
-    T inst.DispatchArrayLength(Expression e)
-    T inst.DispatchArrayIndex(Expression e)
-    T inst.DispatchCall(Expression e)
-    T inst.DispatchCoalesce(Expression e)
-    T inst.DispatchConditional(Expression e)
-    T inst.DispatchConstant(Expression e)
-    T inst.DispatchConvert(Expression e)
-    T inst.DispatchConvertChecked(Expression e)
-    T inst.DispatchDivide(Expression e)
-    T inst.DispatchEqual(Expression e)
-    T inst.DispatchExclusiveOr(Expression e)
-    T inst.DispatchGreaterThan(Expression e)
-    T inst.DispatchGreaterThanOrEqual(Expression e)
-    T inst.DispatchInvoke(Expression e)
-    T inst.DispatchLambda(Expression e)
-    T inst.DispatchLeftShift(Expression e)
-    T inst.DispatchLessThan(Expression e)
-    T inst.DispatchLessThanOrEqual(Expression e)
-    T inst.DispatchListInit(Expression e)
-    T inst.DispatchMemberAccess(Expression e)
-    T inst.DispatchMemberInit(Expression e)
-    T inst.DispatchModulo(Expression e)
-    T inst.DispatchMultiply(Expression e)
-    T inst.DispatchMultiplyChecked(Expression e)
-    T inst.DispatchNegate(Expression e)
-    T inst.DispatchUnaryPlus(Expression e)
-    T inst.DispatchNegateChecked(Expression e)
-    T inst.DispatchNew(Expression e)
-    T inst.DispatchNewArrayInit(Expression e)
-    T inst.DispatchNewArrayBounds(Expression e)
-    T inst.DispatchNot(Expression e)
-    T inst.DispatchNotEqual(Expression e)
-    T inst.DispatchOr(Expression e)
-    T inst.DispatchOrElse(Expression e)
-    T inst.DispatchParameter(Expression e)
-    T inst.DispatchPower(Expression e)
-    T inst.DispatchQuote(Expression e)
-    T inst.DispatchRightShift(Expression e)
-    T inst.DispatchSubtract(Expression e)
-    T inst.DispatchSubtractChecked(Expression e)
-    T inst.DispatchTypeAs(Expression e)
-    T inst.DispatchTypeIs(Expression e)
-    T inst.DispatchAssign(Expression e)
-    T inst.DispatchBlock(Expression e)
-    T inst.DispatchDebugInfo(Expression e)
-    T inst.DispatchDecrement(Expression e)
-    T inst.DispatchDynamic(Expression e)
-    T inst.DispatchDefault(Expression e)
-    T inst.DispatchExtension(Expression e)
-    T inst.DispatchGoto(Expression e)
-    T inst.DispatchIncrement(Expression e)
-    T inst.DispatchIndex(Expression e)
-    T inst.DispatchLabel(Expression e)
-    T inst.DispatchRuntimeVariables(Expression e)
-    T inst.DispatchLoop(Expression e)
-    T inst.DispatchSwitch(Expression e)
-    T inst.DispatchThrow(Expression e)
-    T inst.DispatchTry(Expression e)
-    T inst.DispatchUnbox(Expression e)
-    T inst.DispatchAddAssign(Expression e)
-    T inst.DispatchAndAssign(Expression e)
-    T inst.DispatchDivideAssign(Expression e)
-    T inst.DispatchExclusiveOrAssign(Expression e)
-    T inst.DispatchLeftShiftAssign(Expression e)
-    T inst.DispatchModuloAssign(Expression e)
-    T inst.DispatchMultiplyAssign(Expression e)
-    T inst.DispatchOrAssign(Expression e)
-    T inst.DispatchPowerAssign(Expression e)
-    T inst.DispatchRightShiftAssign(Expression e)
-    T inst.DispatchSubtractAssign(Expression e)
-    T inst.DispatchAddAssignChecked(Expression e)
-    T inst.DispatchMultiplyAssignChecked(Expression e)
-    T inst.DispatchSubtractAssignChecked(Expression e)
-    T inst.DispatchPreIncrementAssign(Expression e)
-    T inst.DispatchPreDecrementAssign(Expression e)
-    T inst.DispatchPostIncrementAssign(Expression e)
-    T inst.DispatchPostDecrementAssign(Expression e)
-    T inst.DispatchTypeEqual(Expression e)
-    T inst.DispatchOnesComplement(Expression e)
-    T inst.DispatchIsTrue(Expression e)
-    T inst.DispatchIsFalse(Expression e)
+interface IExpressionCompiler
+    Func<T> inst.Compile<T>(Expression<Func<T>> expression)
 
-class EqualityExpressions
-    EqualityExpressionClass TYPE.CheckForEquality(Expression<Func<bool>> e)
-    Tuple<EqualityExpressionClass, Expression, Expression> TYPE.ExtractEqualityType(Expression<Func<bool>> e)
-    Tuple<EqualityExpressionClass, Expression, Expression> TYPE.ExtractEqualityType(Expression e)
-    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression<Func<bool>> e)
-    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(Expression left, Expression right, bool shouldBeEqual)
+interface IExpressionToCode
+    string inst.ToCode(Expression e)
 
-class ExpressionCompiler
-    Func<T> TYPE.Compile<T>(Expression<Func<T>> expression)
-    Func<T> TYPE.TryCompile<T>(Expression<Func<T>> expression)
+interface IObjectStringifier
+    string inst.PlainObjectToCode(object val, Type type)
+    string inst.TypeNameToCode(Type type)
+
+class CodeAnnotators
+    static readonly ICodeAnnotator ValuesOnStalksCodeAnnotator
+    static readonly ICodeAnnotator SubExpressionPerLineCodeAnnotator
 
 class ExpressionToCode
     string TYPE.ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
     string TYPE.ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
     string TYPE.ToCode<T, T1>(Expression<Func<T, T1>> e)
     string TYPE.ToCode<T>(Expression<Func<T>> e)
+    string TYPE.ToCode(Expression e)
     string TYPE.AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
     string TYPE.AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
     string TYPE.AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e)
     string TYPE.AnnotatedToCode<T>(Expression<Func<T>> e)
-    string TYPE.ToCode(Expression e)
     string TYPE.AnnotatedToCode(Expression expr)
 
-class ExpressionTypeDispatcher
-    T TYPE.ExpressionDispatch<T>(IExpressionTypeDispatch<T> dispatcher, Expression e)
+class ExpressionToCodeConfiguration
+    readonly ExpressionToCodeConfigurationValue Value
+    static readonly ExpressionToCodeConfiguration DefaultConfiguration
+    static ExpressionToCodeConfiguration CurrentConfiguration
+    ExpressionToCodeConfiguration inst.WithCompiler(IExpressionCompiler compiler)
+    ExpressionToCodeConfiguration inst.WithAnnotator(ICodeAnnotator annotator)
+    ExpressionToCodeConfiguration inst.WithObjectStringifier(IObjectStringifier objectStringifier)
+    ExpressionToCodeConfiguration inst.WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments)
+
+struct ExpressionToCodeConfigurationValue : ValueType
+    ICodeAnnotator CodeAnnotator
+    IExpressionCompiler ExpressionCompiler
+    IObjectStringifier ObjectStringifier
+    bool AlwaysUseExplicitTypeArguments
+
+class ExpressionToCodeExtensions
+    string TYPE.ToCode<T, T1, T2, T3>(IExpressionToCode it, Expression<Func<T, T1, T2, T3>> e)
+    string TYPE.ToCode<T, T1, T2>(IExpressionToCode it, Expression<Func<T, T1, T2>> e)
+    string TYPE.ToCode<T, T1>(IExpressionToCode it, Expression<Func<T, T1>> e)
+    string TYPE.ToCode<T>(IExpressionToCode it, Expression<Func<T>> e)
+
+class ExpressionTreeAssertion
+    void TYPE.Assert(ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg)
+
+class ExpressionTreeCompilers
+    static readonly IExpressionCompiler DefaultExpressionCompiler
+    static readonly IExpressionCompiler OptimizedExpressionCompiler
 
 class UnitTestingInternalsAccess
     Exception TYPE.CreateException(string msg)
@@ -134,5 +66,5 @@ class ObjectToCode
 
 class PAssert
     void TYPE.IsTrue(Expression<Func<bool>> assertion)
-    void TYPE.That(Expression<Func<bool>> assertion, string msg, bool emit)
+    void TYPE.That(Expression<Func<bool>> assertion, string msg)
 

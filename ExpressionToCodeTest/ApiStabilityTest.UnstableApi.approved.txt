@@ -1,15 +1,6 @@
-﻿interface IExpressionToCode
-    string inst.ToCode(Expression e)
-
-class ExpressionStringify : IExpressionToCode
+﻿class ExpressionStringify : IExpressionToCode
     string inst.ToCode(Expression e)
     IExpressionToCode TYPE.With(bool fullTypeNames, bool explicitMethodTypeArgs)
-
-class ExpressionToCodeExt
-    string TYPE.ToCode<T, T1, T2, T3>(IExpressionToCode it, Expression<Func<T, T1, T2, T3>> e)
-    string TYPE.ToCode<T, T1, T2>(IExpressionToCode it, Expression<Func<T, T1, T2>> e)
-    string TYPE.ToCode<T, T1>(IExpressionToCode it, Expression<Func<T, T1>> e)
-    string TYPE.ToCode<T>(IExpressionToCode it, Expression<Func<T>> e)
 
 class ExpressionWithName
     string TYPE.ToNameOf<TResult>(Expression<Func<TResult>> expression)
@@ -23,13 +14,13 @@ class ExpressionWithName
     string TYPE.ToNameOf<T>(Expression<T> expression)
     string TYPE.ToFullNameOf<T>(Expression<T> expression)
 
+class ExpressionWithValue
+    string TYPE.ToValuedCode<TResult>(Expression<Func<TResult>> expression)
+
 class ObjectStringifierExtensions
     string TYPE.PlainObjectToCode(IObjectStringifier it, object val)
 
 class ObjectStringify
     static readonly IObjectStringifier Default
     static readonly IObjectStringifier WithFullTypeNames
-
-class ExpressionWithValue
-    string TYPE.ToValuedCode<TResult>(Expression<Func<TResult>> expression)
 
