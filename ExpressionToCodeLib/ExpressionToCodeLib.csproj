@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="CSharpFriendlyTypeName.cs" />
     <Compile Include="EqualityExpressions.cs" />
+    <Compile Include="ExpressionCompiler.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithName.cs" />
     <Compile Include="Unstable_v2_Api\IObjectToCode.cs" />
     <Compile Include="Unstable_v2_Api\ObjectStringify.cs" />
