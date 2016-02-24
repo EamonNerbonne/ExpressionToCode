@@ -31,7 +31,7 @@ namespace ExpressionToCodeLib.Internal
                 AppendNodeToStringBuilder(sb, node, ref ignoreInitialSpace);
                 var fullExprText = sb.ToString();
                 var subExpressionValues = new List<SubExpressionValue>();
-                FindSubExpressionValues(node, node, subExpressionValues, hideOutermostValue);
+                FindSubExpressionValues(config, node, node, subExpressionValues, hideOutermostValue);
                 return new ExpressionWithSubExpressions { ExpressionString = fullExprText, SubExpressions = subExpressionValues.ToArray() };
             }
 
@@ -49,6 +49,7 @@ namespace ExpressionToCodeLib.Internal
             }
 
             static void FindSubExpressionValues(
+                ExpressionToCodeConfiguration config, 
                 StringifiedExpression node,
                 StringifiedExpression subExprNode,
                 List<SubExpressionValue> subExpressionValues,
@@ -59,14 +60,14 @@ namespace ExpressionToCodeLib.Internal
                     var ignoreInitialSpace = true;
                     AppendNodeWithLimitedDepth(sb, subExprNode, ref ignoreInitialSpace, 1);
                     var subExprString = sb.ToString();
-                    string valueString = ObjectToCode.ExpressionValueAsCode(node.OptionalValue);
+                    string valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue);
                     subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
                 }
                 foreach (var kid in node.Children) {
                     if (kid.IsConceptualChild) {
-                        FindSubExpressionValues(kid, kid, subExpressionValues, false);
+                        FindSubExpressionValues(config, kid, kid, subExpressionValues, false);
                     } else {
-                        FindSubExpressionValues(kid, subExprNode, subExpressionValues, hideOutermostValue);
+                        FindSubExpressionValues(config, kid, subExprNode, subExpressionValues, hideOutermostValue);
                     }
                 }
             }

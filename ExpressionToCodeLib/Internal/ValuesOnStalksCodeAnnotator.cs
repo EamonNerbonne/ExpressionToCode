@@ -51,12 +51,12 @@ namespace ExpressionToCodeLib.Internal
             var sb = new StringBuilder();
             bool ignoreInitialSpace = true;
             var node = new ExpressionToCodeImpl(config).ExpressionDispatch(e);
-            AppendTo(sb, nodeInfos, node, ref ignoreInitialSpace, !hideOutermostValue);
+            AppendTo(config, sb, nodeInfos, node, ref ignoreInitialSpace, !hideOutermostValue);
             nodeInfos.Add(new SubExpressionInfo { Location = sb.Length, Value = null });
             return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };
         }
 
-        static void AppendTo(StringBuilder sb, List<SubExpressionInfo> nodeInfos, StringifiedExpression node, ref bool ignoreInitialSpace, bool showTopExpressionValue)
+        static void AppendTo(ExpressionToCodeConfiguration config, StringBuilder sb, List<SubExpressionInfo> nodeInfos, StringifiedExpression node, ref bool ignoreInitialSpace, bool showTopExpressionValue)
         {
             if (node.Text != null) {
                 var trimmedText = ignoreInitialSpace ? node.Text.TrimStart() : node.Text;
@@ -64,14 +64,14 @@ namespace ExpressionToCodeLib.Internal
                 sb.Append(trimmedText);
                 ignoreInitialSpace = node.Text.Any() && ExpressionToCode.ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
                 if (showTopExpressionValue) {
-                    string valueString = node.OptionalValue == null ? null : ObjectToCode.ExpressionValueAsCode(node.OptionalValue);
+                    string valueString = node.OptionalValue == null ? null : ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue);
                     if (valueString != null) {
                         nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
                     }
                 }
             }
             foreach (var kid in node.Children) {
-                AppendTo(sb, nodeInfos, kid, ref ignoreInitialSpace, showTopExpressionValue || kid.IsConceptualChild);
+                AppendTo(config, sb, nodeInfos, kid, ref ignoreInitialSpace, showTopExpressionValue || kid.IsConceptualChild);
             }
         }
 

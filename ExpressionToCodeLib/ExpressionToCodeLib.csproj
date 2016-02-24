@@ -46,6 +46,7 @@
     <Compile Include="Internal\CSharpFriendlyTypeName.cs" />
     <Compile Include="Internal\EqualityExpressions.cs" />
     <Compile Include="ExpressionTreeAssertion.cs" />
+    <Compile Include="Internal\ObjectToCodeImpl.cs" />
     <Compile Include="OptimizedExpressionCompiler.cs" />
     <Compile Include="ExpressionToCodeConfiguration.cs" />
     <Compile Include="Internal\SubExpressionPerLineCodeAnnotator.cs" />
