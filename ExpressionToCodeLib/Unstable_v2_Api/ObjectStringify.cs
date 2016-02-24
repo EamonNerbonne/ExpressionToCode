@@ -44,7 +44,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
                     return DoubleToCode((double)val);
                 } else if (val is byte || val is sbyte || val is short || val is ushort || val is int || val is uint || val is long
                     || val is ulong) {
-                    return (Convert.ToString(val, CultureInfo.InvariantCulture)); //TODO: get numeric suffixes right - is this OK?
+                    return Convert.ToString(val, CultureInfo.InvariantCulture); //TODO: get numeric suffixes right - is this OK?
                 } else if (val is bool && val.Equals(true)) {
                     return "true";
                 } else if (val is bool && val.Equals(false)) {
