@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using ExpressionToCodeLib.Unstable_v2_Api;
 
 namespace ExpressionToCodeLib {
@@ -56,5 +57,26 @@ namespace ExpressionToCodeLib {
 
 
         public static string GetCSharpFriendlyTypeName(Type type) => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true }.GetTypeName(type);
+
+        internal static string ExpressionValueAsCode(Expression expression)
+        {
+            try {
+                Delegate lambda;
+                try {
+                    lambda = Expression.Lambda(expression).Compile();
+                } catch (InvalidOperationException) {
+                    return null;
+                }
+
+                var val = lambda.DynamicInvoke();
+                try {
+                    return ObjectToCode.ComplexObjectToPseudoCode(val);
+                } catch (Exception e) {
+                    return "stringification throws " + e.GetType().FullName;
+                }
+            } catch (TargetInvocationException tie) {
+                return "throws " + tie.InnerException.GetType().FullName;
+            }
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace ExpressionToCodeLib
             }
         }
 
-        static Exception Err(Expression<Func<bool>> assertion, string msg, Exception innerException) => UnitTestingFailure.AssertionExceptionFactory(ExpressionToCode.AnnotatedToCode(assertion.Body, msg, true), innerException);
+        static Exception Err(Expression<Func<bool>> assertion, string msg, Exception innerException) => UnitTestingFailure.AssertionExceptionFactory(ValuesOnStalksCodeAnnotator.AnnotatedToCode(assertion.Body, msg, true), innerException);
     }
 }
 
