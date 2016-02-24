@@ -8,9 +8,9 @@ using System.Reflection;
 // ReSharper disable PossiblyMistakenUseOfParamsMethod
 // ReSharper disable RedundantNameQualifier
 
-namespace ExpressionToCodeLib
+namespace ExpressionToCodeLib.Internal
 {
-    public enum EqualityExpressionClass
+    internal enum EqualityExpressionClass
     {
         None,
         EqualsOp,
@@ -23,7 +23,7 @@ namespace ExpressionToCodeLib
         StructuralEquals,
     }
 
-    public static class EqualityExpressions
+    internal static class EqualityExpressions
     {
         static readonly MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).Method;
         static readonly MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).Method;

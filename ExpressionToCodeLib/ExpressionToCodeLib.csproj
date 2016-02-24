@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Internal\CSharpFriendlyTypeName.cs" />
-    <Compile Include="EqualityExpressions.cs" />
+    <Compile Include="Internal\EqualityExpressions.cs" />
     <Compile Include="ExpressionTreeAssertion.cs" />
     <Compile Include="OptimizedExpressionCompiler.cs" />
     <Compile Include="ExpressionToCodeConfiguration.cs" />
