@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using ExpressionToCodeLib.Unstable_v2_Api;
 
 namespace ExpressionToCodeLib
 {
@@ -10,14 +11,8 @@ namespace ExpressionToCodeLib
     {
         public ICodeAnnotator CodeAnnotator;
         public IExpressionCompiler ExpressionCompiler;
-        internal delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
-        internal ExpressionToCodeConfigurationValue With(WithDelegate edit)
-        {
-            var configCopy = this;
-            edit(ref configCopy);
-            return configCopy;
-        }
-
+        public IObjectToCode ObjectToCode;
+        public bool AlwaysUseExplicitTypeArguments;
     }
 
     public class ExpressionToCodeConfiguration
@@ -26,7 +21,9 @@ namespace ExpressionToCodeLib
             new ExpressionToCodeConfiguration(
                 new ExpressionToCodeConfigurationValue {
                     CodeAnnotator = new ValuesOnStalksCodeAnnotator(),
-                    ExpressionCompiler = new NormalExpressionCompiler()
+                    ExpressionCompiler = new NormalExpressionCompiler(),
+                    ObjectToCode = ObjectStringify.Default,
+                    AlwaysUseExplicitTypeArguments = false,
                 });
 
         public static ExpressionToCodeConfiguration CurrentConfiguration = DefaultConfiguration;
@@ -45,6 +42,8 @@ namespace ExpressionToCodeLib
 
         public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler) => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
         public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator) => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
+        public ExpressionToCodeConfiguration WithObjectStringifier(IObjectToCode objectToCode) => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectToCode = objectToCode);
+        public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments) => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
     }
 
     public interface ICodeAnnotator
@@ -55,5 +54,11 @@ namespace ExpressionToCodeLib
     public interface IExpressionCompiler
     {
         Func<T> Compile<T>(Expression<Func<T>> expression);
+    }
+
+    public interface IObjectToCode
+    {
+        string PlainObjectToCode(object val, Type type);
+        string TypeNameToCode(Type type);
     }
 }

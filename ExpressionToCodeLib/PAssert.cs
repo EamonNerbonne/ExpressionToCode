@@ -15,7 +15,7 @@ namespace ExpressionToCodeLib
         {
             var config = ExpressionToCodeConfiguration.CurrentConfiguration;
 
-            ExpressionTreeAssertion.Assert(config, assertion, msg);
+            config.Assert(assertion, msg);
         }
 
     }
