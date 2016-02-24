@@ -29,16 +29,10 @@ namespace ExpressionToCode.Benchmarks
         }
 
         [Benchmark]
-        public void Compile()
-        {
-            testExpr.Compile();
-        }
+        public void Compile() { testExpr.Compile(); }
 
         [Benchmark]
-        public void Emit()
-        {
-            OptimizedExpressionCompiler.Compile(testExpr);
-        }
+        public void Emit() { OptimizedExpressionCompiler.Compile(testExpr); }
     }
 
     public class BenchmarkPAssert

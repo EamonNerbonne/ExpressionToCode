@@ -6,7 +6,10 @@ namespace ExpressionToCodeLib
     public static class PAssert
     {
         [Obsolete("Prefer PAssert.That: IsTrue is provided for compatibility with PowerAssert.NET")]
-        public static void IsTrue(Expression<Func<bool>> assertion) { That(assertion); }
+        public static void IsTrue(Expression<Func<bool>> assertion)
+        {
+            That(assertion);
+        }
 
         public static void That(Expression<Func<bool>> assertion, string msg = null, bool emit = false)
         {
@@ -24,7 +27,9 @@ namespace ExpressionToCodeLib
 
         static Exception Err(Expression<Func<bool>> assertion, string msg, Exception innerException)
         {
-            return UnitTestingFailure.AssertionExceptionFactory(PAssertConfiguration.CurrentConfiguration.CodeAnnotator.AnnotateExpressionTree(assertion.Body, msg, true), innerException);
+            return UnitTestingFailure.AssertionExceptionFactory(
+                PAssertConfiguration.CurrentConfiguration.CodeAnnotator.AnnotateExpressionTree(assertion.Body, msg, true),
+                innerException);
         }
     }
 }

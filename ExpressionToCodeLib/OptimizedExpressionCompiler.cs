@@ -7,7 +7,6 @@ using System.Reflection.Emit;
 
 namespace ExpressionToCodeLib
 {
-
     /// <summary>
     /// This expression tree compiler should have the same semantics as the .net built-in Expression.Compile method, but it's faster.
     /// It only supports a subset of parameterless lambdas.  Unsupported expressions fall-back to the builtin Expression.Compile methods.

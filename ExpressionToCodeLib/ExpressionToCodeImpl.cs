@@ -853,22 +853,13 @@ namespace ExpressionToCodeLib
 
         #region Unused by C#'s expression support; or unavailable in the language at all.
         [Pure]
-        public StringifiedExpression DispatchTypeEqual(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchTypeEqual(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchDebugInfo(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchDebugInfo(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchDynamic(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchDynamic(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
         public StringifiedExpression DispatchDefault(Expression e)
@@ -879,76 +870,40 @@ namespace ExpressionToCodeLib
         }
 
         [Pure]
-        public StringifiedExpression DispatchExtension(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchExtension(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchGoto(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchGoto(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchLabel(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchLabel(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchRuntimeVariables(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchRuntimeVariables(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchLoop(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchLoop(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchSwitch(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchSwitch(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchThrow(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchThrow(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchTry(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchTry(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchUnbox(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchUnbox(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchPowerAssign(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchPowerAssign(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchIsTrue(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchIsTrue(Expression e) { throw new NotImplementedException(); }
 
         [Pure]
-        public StringifiedExpression DispatchIsFalse(Expression e)
-        {
-            throw new NotImplementedException();
-        }
+        public StringifiedExpression DispatchIsFalse(Expression e) { throw new NotImplementedException(); }
         #endregion
     }
 }
