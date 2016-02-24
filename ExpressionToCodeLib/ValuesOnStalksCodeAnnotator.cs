@@ -7,7 +7,7 @@ using System.Text;
 
 namespace ExpressionToCodeLib
 {
-    internal interface ICodeAnnotator {
+    public interface ICodeAnnotator {
         string AnnotatedToCode(Expression expr, string msg, bool ignoreOutermostValue);
     }
 

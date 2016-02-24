@@ -45,6 +45,7 @@
     <Compile Include="CSharpFriendlyTypeName.cs" />
     <Compile Include="EqualityExpressions.cs" />
     <Compile Include="ExpressionCompiler.cs" />
+    <Compile Include="PAssertConfiguration.cs" />
     <Compile Include="SubExpressionPerLineCodeAnnotator.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithName.cs" />
     <Compile Include="Unstable_v2_Api\IObjectToCode.cs" />
