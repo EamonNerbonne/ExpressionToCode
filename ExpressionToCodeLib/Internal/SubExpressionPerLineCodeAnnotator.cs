@@ -58,7 +58,7 @@ namespace ExpressionToCodeLib.Internal
                 if (!hideOutermostValue && node.OptionalValue != null) {
                     var sb = new StringBuilder();
                     var ignoreInitialSpace = true;
-                    AppendNodeWithLimitedDepth(sb, subExprNode, ref ignoreInitialSpace, 1);
+                    AppendNodeWithLimitedDepth(sb, subExprNode, ref ignoreInitialSpace, 2);
                     var subExprString = sb.ToString();
                     string valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue);
                     subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
