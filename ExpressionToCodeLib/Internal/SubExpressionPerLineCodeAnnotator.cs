@@ -82,6 +82,7 @@ namespace ExpressionToCodeLib.Internal
                     foreach (var kid in node.Children) {
                         if (kid.IsConceptualChild && unfoldToDepth == 0) {
                             sb.Append("...");
+                            ignoreInitialSpace = false;
                         } else {
                             AppendNodeWithLimitedDepth(sb, kid, ref ignoreInitialSpace, unfoldToDepth - (kid.IsConceptualChild ? 1 : 0));
                         }
