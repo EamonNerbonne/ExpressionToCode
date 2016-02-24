@@ -35,6 +35,7 @@ class ExpressionToCodeConfiguration
     ExpressionToCodeConfiguration inst.WithAnnotator(ICodeAnnotator annotator)
     ExpressionToCodeConfiguration inst.WithObjectStringifier(IObjectStringifier objectStringifier)
     ExpressionToCodeConfiguration inst.WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments)
+    IExpressionToCode inst.GetExpressionToCode()
 
 struct ExpressionToCodeConfigurationValue : ValueType
     ICodeAnnotator CodeAnnotator
@@ -57,6 +58,13 @@ class ExpressionTreeCompilers
 
 class UnitTestingInternalsAccess
     Exception TYPE.CreateException(string msg)
+
+class ObjectStringifierExtensions
+    string TYPE.PlainObjectToCode(IObjectStringifier it, object val)
+
+class ObjectStringify
+    static readonly IObjectStringifier Default
+    static readonly IObjectStringifier WithFullTypeNames
 
 class ObjectToCode
     string TYPE.ComplexObjectToPseudoCode(object val, int indent)
