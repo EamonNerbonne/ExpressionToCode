@@ -10,7 +10,7 @@ namespace ExpressionToCodeLib
     {
         public string AnnotateExpressionTree(Expression expr, string msg, bool ignoreOuterMostValue)
         {
-            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, true).ComposeToSingleString();
+            return (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(expr, ignoreOuterMostValue).ComposeToSingleString();
         }
 
         struct ExpressionWithSubExpressions
