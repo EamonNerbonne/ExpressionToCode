@@ -59,7 +59,7 @@
     <Compile Include="ExpressionToCode.cs" />
     <Compile Include="Internal\ExpressionToCodeImpl.cs" />
     <Compile Include="Internal\ExpressionPrecedence.cs" />
-    <Compile Include="ExpressionTypeDispatch.Generated.cs">
+    <Compile Include="Internal\ExpressionTypeDispatch.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
@@ -79,7 +79,7 @@
     <None Include="ExpressionToCodeLib.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ExpressionTypeDispatch.tt">
+    <None Include="Internal\ExpressionTypeDispatch.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
     </None>

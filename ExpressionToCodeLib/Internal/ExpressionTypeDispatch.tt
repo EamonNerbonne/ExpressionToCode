@@ -9,8 +9,8 @@ using System;
 using System.Linq.Expressions;
 using System.Diagnostics.Contracts;
 
-namespace ExpressionToCodeLib {
-  public interface IExpressionTypeDispatch<T> {
+namespace ExpressionToCodeLib.Internal {
+  internal interface IExpressionTypeDispatch<T> {
 <#
 	foreach(var v in ExpressionTypes()) {
 #>
@@ -20,7 +20,7 @@ namespace ExpressionToCodeLib {
 #>
   }
 
-    public static class ExpressionTypeDispatcher {
+    internal static class ExpressionTypeDispatcher {
 		[Pure] public static T ExpressionDispatch<T>(this IExpressionTypeDispatch<T> dispatcher, Expression e) {
 			try{
 				switch(e.NodeType) {

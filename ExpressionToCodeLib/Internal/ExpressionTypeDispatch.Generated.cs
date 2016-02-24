@@ -2,8 +2,8 @@
 using System.Linq.Expressions;
 using System.Diagnostics.Contracts;
 
-namespace ExpressionToCodeLib {
-  public interface IExpressionTypeDispatch<T> {
+namespace ExpressionToCodeLib.Internal {
+  internal interface IExpressionTypeDispatch<T> {
 		[Pure] T DispatchAdd(Expression e);
 		[Pure] T DispatchAddChecked(Expression e);
 		[Pure] T DispatchAnd(Expression e);
@@ -91,7 +91,7 @@ namespace ExpressionToCodeLib {
 		[Pure] T DispatchIsFalse(Expression e);
   }
 
-    public static class ExpressionTypeDispatcher {
+    internal static class ExpressionTypeDispatcher {
 		[Pure] public static T ExpressionDispatch<T>(this IExpressionTypeDispatch<T> dispatcher, Expression e) {
 			try{
 				switch(e.NodeType) {
