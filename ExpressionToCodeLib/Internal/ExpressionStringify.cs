@@ -13,7 +13,11 @@ namespace ExpressionToCodeLib.Internal
             this.config = config;
         }
 
-        public string ToCode(Expression e)
+        public string ToCode(Expression e) {
+            return ToCodeImpl(config, e);
+        }
+
+        public static string ToCodeImpl(ExpressionToCodeConfiguration config, Expression e)
         {
             var sb = new StringBuilder();
             var ignoreInitialSpace = true;

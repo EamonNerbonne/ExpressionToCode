@@ -49,6 +49,16 @@ namespace ExpressionToCodeLib
             => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
 
         public IExpressionToCode GetExpressionToCode() => new ExpressionStringify(this);
+        public IAnnotatedToCode GetAnnotatedToCode() => new AnnotatedToCodeWrapper(this);
+
+        class AnnotatedToCodeWrapper : IAnnotatedToCode
+        {
+            readonly ExpressionToCodeConfiguration config;
+            public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config) { this.config = config; }
+
+            public string AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
+                => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, hideOutermostValue);
+        }
     }
 
     public interface ICodeAnnotator
