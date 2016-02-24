@@ -23,6 +23,6 @@ namespace ExpressionToCodeLib
         public static string AnnotatedToCode<T>(Expression<Func<T>> e) => AnnotatedToCode((Expression)e);
         internal static bool ShouldIgnoreSpaceAfter(char c) => c == ' ' || c == '(';
         public static string ToCode(Expression e) => ExpressionStringify.Default.ToCode(e);
-        public static string AnnotatedToCode(Expression expr) => PAssertConfiguration.CurrentConfiguration.CodeAnnotator.AnnotateExpressionTree(expr, null, false);
+        public static string AnnotatedToCode(Expression expr) => ExpressionToCodeConfiguration.CurrentConfiguration.Value.CodeAnnotator.AnnotateExpressionTree(expr, null, false);
     }
 }

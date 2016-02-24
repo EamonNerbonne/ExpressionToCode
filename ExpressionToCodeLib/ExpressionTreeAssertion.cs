@@ -5,9 +5,9 @@ namespace ExpressionToCodeLib
 {
     public static class ExpressionTreeAssertion
     {
-        public static void Assert(this PAssertConfiguration config, Expression<Func<bool>> assertion, string msg=null)
+        public static void Assert(this ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg=null)
         {
-            var compiled = config.ExpressionCompiler.Compile(assertion);
+            var compiled = config.Value.ExpressionCompiler.Compile(assertion);
             bool ok;
             try {
                 ok = compiled();
@@ -19,10 +19,10 @@ namespace ExpressionToCodeLib
             }
         }
 
-        static Exception Err(PAssertConfiguration config, Expression<Func<bool>> assertion, string msg, Exception innerException)
+        static Exception Err(ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg, Exception innerException)
         {
             return UnitTestingFailure.AssertionExceptionFactory(
-                config.CodeAnnotator.AnnotateExpressionTree(assertion.Body, msg, true),
+                config.Value.CodeAnnotator.AnnotateExpressionTree(assertion.Body, msg, true),
                 innerException);
         }
     }

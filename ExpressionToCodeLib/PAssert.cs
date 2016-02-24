@@ -13,7 +13,7 @@ namespace ExpressionToCodeLib
 
         public static void That(Expression<Func<bool>> assertion, string msg = null)
         {
-            var config = PAssertConfiguration.CurrentConfiguration;
+            var config = ExpressionToCodeConfiguration.CurrentConfiguration;
 
             ExpressionTreeAssertion.Assert(config, assertion, msg);
         }

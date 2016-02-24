@@ -46,7 +46,7 @@
     <Compile Include="EqualityExpressions.cs" />
     <Compile Include="ExpressionTreeAssertion.cs" />
     <Compile Include="OptimizedExpressionCompiler.cs" />
-    <Compile Include="PAssertConfiguration.cs" />
+    <Compile Include="ExpressionToCodeConfiguration.cs" />
     <Compile Include="SubExpressionPerLineCodeAnnotator.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithName.cs" />
     <Compile Include="Unstable_v2_Api\IObjectToCode.cs" />
