@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable MemberCanBePrivate.Global
-
-namespace ExpressionToCodeLib.Unstable_v2_Api
+namespace ExpressionToCodeLib.Unstable_Experimental_Api
 {
+    /// <summary>
+    /// EXPERIMENTAL: subject to breaking changes without major version bump!
+    /// </summary>
     public static class ExpressionWithValue
     {
         ///<summary>
