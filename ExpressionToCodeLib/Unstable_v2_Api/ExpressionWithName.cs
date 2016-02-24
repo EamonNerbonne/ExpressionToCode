@@ -32,22 +32,22 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
         {
             var value = FromUnary(expression) ?? FromCall(expression) ?? FromMember(expression);
             if (value == null) {
-                throw new ArgumentException("Unsupported or unknown or complex expression to get `name` of it", "expression");
+                throw new ArgumentException("Unsupported or unknown or complex expression to get `name` of it", nameof(expression));
             }
             return value;
         }
 
         static string FromCall<T>(Expression<T> expression)
-            => (expression.Body as MethodCallExpression)?.Method.Name ?? null;
+            => (expression.Body as MethodCallExpression)?.Method.Name;
 
         static string FromMember<T>(Expression<T> expression)
-            => (expression.Body as MemberExpression)?.Member.Name ?? null;
+            => (expression.Body as MemberExpression)?.Member.Name;
 
         static string FromUnary<T>(Expression<T> expression)
-            => (expression.Body as UnaryExpression)?.Operand.ToString().Split('.').Last() ?? null;
+            => (expression.Body as UnaryExpression)?.Operand.ToString().Split('.').Last();
 
         //NOTE: should use recursive visitor as in other method when new failed test case added
-        public static string ToFullNameOf<T>(this Expression<T> expression)
+        public static string ToFullNameOf<T>(Expression<T> expression)
         {
             string name = null;
             var unaryExpression = expression.Body as UnaryExpression;
@@ -81,7 +81,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
                 }
                 if (methodName == "get_Item" && methodCallExpression.Arguments.Count > 0) {
                     //indexed property
-                    string typeName = methodCallExpression.Object != null ? methodCallExpression.Object.Type.Name : "";
+                    string typeName = methodCallExpression.Object?.Type.Name ?? "";
                     name = typeName + "[" + arguments + "]";
                 } else {
                     var typePrefix = "";
@@ -92,7 +92,7 @@ namespace ExpressionToCodeLib.Unstable_v2_Api
                 }
             }
             if (name == null) {
-                throw new ArgumentException("Failed to translate expression to its valued representation", "expression");
+                throw new ArgumentException("Failed to translate expression to its valued representation", nameof(expression));
             }
             return name;
         }
