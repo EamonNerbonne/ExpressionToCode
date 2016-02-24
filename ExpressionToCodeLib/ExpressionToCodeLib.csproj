@@ -56,7 +56,7 @@
     <Compile Include="Internal\OptimizedExpressionCompilerImpl.cs" />
     <Compile Include="IObjectStringifier.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithName.cs" />
-    <Compile Include="Unstable_v2_Api\ObjectStringify.cs" />
+    <Compile Include="ObjectStringify.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionStringify.cs" />
     <Compile Include="ExpressionToCode.cs" />
     <Compile Include="Internal\ExpressionToCodeImpl.cs" />
@@ -76,6 +76,7 @@
     <Compile Include="Internal\UnitTestingFailure.cs" />
     <Compile Include="Unstable_v2_Api\ExpressionWithValue.cs" />
     <Compile Include="Internal\ValuesOnStalksCodeAnnotator.cs" />
+    <Compile Include="Internal\ObjectStringifyImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ExpressionToCodeLib.nuspec">
