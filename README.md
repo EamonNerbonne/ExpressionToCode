@@ -1,9 +1,10 @@
 ExpressionToCode
 ================
+ExpressionToCode generates valid, readable C# from an Expression Tree. (nuget: [ExpressionToCodeLib](http://nuget.org/packages/ExpressionToCodeLib/))
+------
 
-Download package via nuget: [ExpressionToCodeLib](http://nuget.org/packages/ExpressionToCodeLib/)
 
-ExpressionToCode generates valid, readable C# from an Expression Tree.  For example, this is true:
+  An example:
 
 ```C#
   ExpressionToCode.ToCode(
