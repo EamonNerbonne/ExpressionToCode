@@ -38,14 +38,14 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list) => "{" + string.Join(", ", ExtractFirst10(config, list).ToArray()) + "}";
+        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list) => "{" + string.Join(", ", PrintListContents(config, list).ToArray()) + "}";
 
-        static IEnumerable<string> ExtractFirst10(ExpressionToCodeConfiguration config, IEnumerable list)
+        static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list)
         {
             int count = 0;
             foreach (var item in list) {
                 count++;
-                if (count > 10) {
+                if (count > config.Value.PrintedListLengthLimit) {
                     yield return "...";
                     yield break;
                 } else {
@@ -53,8 +53,6 @@ namespace ExpressionToCodeLib.Internal
                 }
             }
         }
-
-        public static string PlainObjectToCode(ExpressionToCodeConfiguration config, object val, Type type) => config.Value.ObjectStringifier.PlainObjectToCode(val, type);
 
         public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression)
         {
