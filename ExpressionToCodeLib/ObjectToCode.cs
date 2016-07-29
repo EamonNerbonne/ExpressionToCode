@@ -12,6 +12,6 @@ namespace ExpressionToCodeLib
 
         public static string PlainObjectToCode(object val) => ObjectToCodeImpl.PlainObjectToCode(ExpressionToCodeConfiguration.CurrentConfiguration, val, val?.GetType());
         public static string PlainObjectToCode(object val, Type type) => ObjectToCodeImpl.PlainObjectToCode(ExpressionToCodeConfiguration.CurrentConfiguration, val, type);
-        public static string GetCSharpFriendlyTypeName(Type type) => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true }.GetTypeName(type);
+        public static string ToCSharpFriendlyTypeName(this Type type) => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true }.GetTypeName(type);
     }
 }

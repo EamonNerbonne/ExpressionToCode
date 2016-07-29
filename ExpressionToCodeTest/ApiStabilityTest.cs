@@ -66,9 +66,9 @@ namespace ExpressionToCodeTest
             var allInterfaces = type.GetInterfaces();
             var interfaces = baseType == null ? allInterfaces : allInterfaces.Except(baseType.GetInterfaces());
             var inheritanceTypes = new[] { baseType }.OfType<Type>().Concat(interfaces);
-            var suffix = !inheritanceTypes.Any() || type.IsEnum ? "" : " : " + string.Join(", ", inheritanceTypes.Select(ObjectToCode.GetCSharpFriendlyTypeName));
+            var suffix = !inheritanceTypes.Any() || type.IsEnum ? "" : " : " + string.Join(", ", inheritanceTypes.Select(ObjectToCode.ToCSharpFriendlyTypeName));
 
-            var name = ObjectToCode.GetCSharpFriendlyTypeName(type);
+            var name = ObjectToCode.ToCSharpFriendlyTypeName(type);
 
             return prefix + " " + name + suffix;
         }
@@ -90,7 +90,7 @@ namespace ExpressionToCodeTest
         {
             var fakeTarget = mi.IsStatic ? "TYPE" : "inst";
 
-            return "    " + ObjectToCode.GetCSharpFriendlyTypeName(mi.ReturnType) + " " + fakeTarget +
+            return "    " + ObjectToCode.ToCSharpFriendlyTypeName(mi.ReturnType) + " " + fakeTarget +
                 "." + mi.Name
                 + PrettyPrintGenericArguments(mi)
                 + PrettyPrintParameterList(mi);
@@ -100,7 +100,7 @@ namespace ExpressionToCodeTest
         {
             return "    "
                 + (fi.IsLiteral ? "const " : (fi.IsStatic ? "static " : "") + (fi.IsInitOnly ? "readonly " : ""))
-                + ObjectToCode.GetCSharpFriendlyTypeName(fi.FieldType)
+                + ObjectToCode.ToCSharpFriendlyTypeName(fi.FieldType)
                 + " " + fi.Name
                 + (fi.IsLiteral ? " = " + ObjectToCode.ComplexObjectToPseudoCode(fi.GetRawConstantValue()) : "")
                 ;
@@ -112,7 +112,7 @@ namespace ExpressionToCodeTest
                 ", ",
                 mi.GetParameters().Select(
                     pi =>
-                        ObjectToCode.GetCSharpFriendlyTypeName(pi.ParameterType) + " " + pi.Name)) + ")");
+                        ObjectToCode.ToCSharpFriendlyTypeName(pi.ParameterType) + " " + pi.Name)) + ")");
         }
 
         static string PrettyPrintGenericArguments(MethodInfo mi)
@@ -121,7 +121,7 @@ namespace ExpressionToCodeTest
                 return "";
             }
             return "<"
-                + string.Join(", ", mi.GetGenericArguments().Select(ObjectToCode.GetCSharpFriendlyTypeName))
+                + string.Join(", ", mi.GetGenericArguments().Select(ObjectToCode.ToCSharpFriendlyTypeName))
                 + ">";
         }
 
