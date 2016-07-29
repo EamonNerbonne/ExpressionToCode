@@ -3,7 +3,6 @@ using Xunit;
 using System.Linq;
 using System.Linq.Expressions;
 using ExpressionToCodeLib;
-using ExpressionToCodeLib.Unstable_Experimental_Api;
 
 namespace ExpressionToCodeTest
 {
@@ -13,7 +12,7 @@ namespace ExpressionToCodeTest
         public void TheVariable_ToNameOf()
         {
             var theVariable = "theValue";
-            var actual = ExpressionWithName.ToNameOf(() => theVariable);
+            var actual = ExpressionToCode.GetNameIn(() => theVariable);
             Assert.Equal("theVariable", actual);
         }
 
@@ -22,7 +21,7 @@ namespace ExpressionToCodeTest
         {
             var x = 1;
             var y = "";
-            var actual = ExpressionWithName.ToNameOf(() => TheComplexMethod(x, y));
+            var actual = ExpressionToCode.GetNameIn(() => TheComplexMethod(x, y));
             Assert.Equal("TheComplexMethod", actual);
         }
 
@@ -30,7 +29,7 @@ namespace ExpressionToCodeTest
         public void TheMethod_ToNameOf_asVariable()
         {
             Expression<Func<int, string, string>> theComplexMethod = (x, y) => TheComplexMethod(x, y);
-            var actual = ExpressionWithName.ToNameOf(theComplexMethod);
+            var actual = ExpressionToCode.GetNameIn(theComplexMethod);
             Assert.Equal("TheComplexMethod", actual);
 
             var full = ExpressionToCode.ToCode(theComplexMethod.Body);
@@ -40,7 +39,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void TheMethod_ToNameOf_withValues()
         {
-            var actual = ExpressionWithName.ToNameOf(() => TheComplexMethod(1, "2"));
+            var actual = ExpressionToCode.GetNameIn(() => TheComplexMethod(1, "2"));
             Assert.Equal("TheComplexMethod", actual);
         }
 
@@ -57,21 +56,21 @@ namespace ExpressionToCodeTest
         [Fact]
         public void TheGenericMethod_ToNameOf()
         {
-            var actual = ExpressionWithName.ToNameOf(() => TheGenericMethod<int>(2));
+            var actual = ExpressionToCode.GetNameIn(() => TheGenericMethod<int>(2));
             Assert.Equal("TheGenericMethod", actual);
         }
 
         [Fact]
         public void TheProperty_ToNameOf()
         {
-            var actual = ExpressionWithName.ToNameOf(() => TheProperty);
+            var actual = ExpressionToCode.GetNameIn(() => TheProperty);
             Assert.Equal("TheProperty", actual);
         }
 
         [Fact]
         public void TheSimpleMethod_ToNameOf()
         {
-            var actual = ExpressionWithName.ToNameOf(() => TheSimpleMethod());
+            var actual = ExpressionToCode.GetNameIn(() => TheSimpleMethod());
             Assert.Equal("TheSimpleMethod", actual);
         }
 

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -30,6 +26,64 @@ namespace ExpressionToCodeLib
                     expr,
                     null,
                     false);
+
+        ///<summary>
+        /// Converts expression to variable/property/method C# like representation adding it's string value.
+        ///</summary>
+        /// <example>
+        /// string toNameValueRepresentation = "Value";
+        /// ToRepr(() => toNameValueRepresentation); // "toNameValueRepresentation = Value"
+        /// </example>
+        /// <remarks>
+        /// Unlike <see cref="ExpressionToCode.ToCode"/>(which targets compilable output), this method is geared towards dumping simple objects into text, so may skip some C# issues for sake of readability.
+        /// </remarks>
+        public static string ToValuedCode<TResult>(this Expression<Func<TResult>> expression)
+        {
+            TResult retValue;
+            try {
+                retValue = expression.Compile().Invoke();
+            } catch (Exception ex) {
+                throw new InvalidOperationException("Cannon get return value of expression when it throws error", ex);
+            }
+            return ToCode(expression.Body) + " = " + retValue;
+        }
+
+        /// <summary>
+        /// Gets property, variable or method name from lambda expression.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        /// <example>
+        /// var example = "some text";
+        /// var name = toName( () => example);  // "example"
+        /// </example>
+        public static string GetNameIn<TResult>(Expression<Func<TResult>> expression) => GetNameIn((Expression)expression);
+
+        public static string GetNameIn(Expression<Action> expression) => GetNameIn((Expression)expression);
+
+        public static string GetNameIn(Expression expr)
+        {
+            var methodCall = expr as MethodCallExpression;
+            if (methodCall != null)
+                return methodCall.Method.Name;
+
+            var memberAccess = expr as MemberExpression;
+            if (memberAccess != null)
+                return memberAccess.Member.Name;
+
+            if (expr.NodeType == ExpressionType.ArrayLength)
+                return "Length";
+
+            var lambda = expr as LambdaExpression;
+            if (lambda != null)
+                return GetNameIn(lambda.Body);
+
+            var unary = expr as UnaryExpression;
+            if (unary != null)
+                return GetNameIn(unary.Operand);
+
+            throw new ArgumentException("Unsupported or unknown or complex expression to get `name` of it", nameof(expr));
+        }
     }
 
     public interface IExpressionToCode

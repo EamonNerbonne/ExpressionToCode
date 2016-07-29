@@ -55,7 +55,6 @@
     <Compile Include="Internal\OptimizedExpressionCompiler.cs" />
     <Compile Include="Internal\OptimizedExpressionCompilerImpl.cs" />
     <Compile Include="IObjectStringifier.cs" />
-    <Compile Include="Unstable_Experimental_Api\ExpressionWithName.cs" />
     <Compile Include="ObjectStringify.cs" />
     <Compile Include="Internal\ExpressionToCodeString.cs" />
     <Compile Include="ExpressionToCode.cs" />
@@ -74,7 +73,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Internal\ReflectionHelpers.cs" />
     <Compile Include="Internal\UnitTestingFailure.cs" />
-    <Compile Include="Unstable_Experimental_Api\ExpressionWithValue.cs" />
     <Compile Include="Internal\ValuesOnStalksCodeAnnotator.cs" />
     <Compile Include="Internal\ObjectStringifyImpl.cs" />
   </ItemGroup>
@@ -90,6 +88,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Exec Command="nuget pack -sym ExpressionToCodeLib.csproj" />
