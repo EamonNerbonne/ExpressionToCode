@@ -13,6 +13,7 @@ namespace ExpressionToCodeLib
         public IExpressionCompiler ExpressionCompiler;
         public IObjectStringifier ObjectStringifier;
         public bool AlwaysUseExplicitTypeArguments;
+        public int? PrintedListLengthLimit;
     }
 
     public class ExpressionToCodeConfiguration
@@ -24,6 +25,7 @@ namespace ExpressionToCodeLib
                     ExpressionCompiler = ExpressionTreeCompilers.DefaultExpressionCompiler,
                     ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,
+                    PrintedListLengthLimit = 10,
                 });
 
         public static ExpressionToCodeConfiguration CurrentConfiguration = DefaultConfiguration;
@@ -41,6 +43,7 @@ namespace ExpressionToCodeLib
 
         public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler) => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
         public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator) => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
+        public ExpressionToCodeConfiguration WithPrintedListLengthLimit(int? limitListsToLength) => With((ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
 
         public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier)
             => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
