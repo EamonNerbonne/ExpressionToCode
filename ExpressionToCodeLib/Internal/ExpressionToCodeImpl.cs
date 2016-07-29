@@ -228,7 +228,7 @@ namespace ExpressionToCodeLib.Internal
         }
 
         [Pure]
-        StringifiedExpression StatementDispatch(String prefix, Expression e, ExpressionType? parentType = null)
+        StringifiedExpression StatementDispatch(string prefix, Expression e, ExpressionType? parentType = null)
         {
             var kids = KidsBuilder.Create();
             kids.Add(prefix);

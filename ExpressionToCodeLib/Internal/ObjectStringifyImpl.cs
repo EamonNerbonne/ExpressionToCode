@@ -53,7 +53,7 @@ namespace ExpressionToCodeLib.Internal
                             ? "default(" + TypeNameToCode(val.GetType()) + ")"
                             : components.Length == 1
                                 ? TypeNameToCode(val.GetType()) + "." + components[0]
-                                : "(" + String.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
+                                : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
                     }
                 }
             } else if (val.GetType().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {

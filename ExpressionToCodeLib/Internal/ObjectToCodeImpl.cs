@@ -24,7 +24,7 @@ namespace ExpressionToCodeLib.Internal
                 var type = val.GetType();
                 return "\n" + new string(' ', indent * 2) +
                     "new {" +
-                    String.Join(
+                    string.Join(
                         "",
                         type.GetProperties()
                             .Select(
@@ -38,7 +38,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list) => "{" + String.Join(", ", ExtractFirst10(config, list).ToArray()) + "}";
+        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list) => "{" + string.Join(", ", ExtractFirst10(config, list).ToArray()) + "}";
 
         static IEnumerable<string> ExtractFirst10(ExpressionToCodeConfiguration config, IEnumerable list)
         {

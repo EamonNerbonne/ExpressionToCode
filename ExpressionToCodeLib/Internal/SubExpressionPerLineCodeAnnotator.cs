@@ -92,7 +92,7 @@ namespace ExpressionToCodeLib.Internal
 
             public string ComposeToSingleString()
             {
-                return ExpressionString + "\n" + String.Join("", SubExpressions.Select(sub => sub.SubExpression + ": " + sub.ValueAsString + "\n"));
+                return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression + ": " + sub.ValueAsString + "\n"));
             }
         }
     }
