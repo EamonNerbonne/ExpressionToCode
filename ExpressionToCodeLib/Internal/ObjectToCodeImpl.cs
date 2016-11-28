@@ -15,15 +15,14 @@ namespace ExpressionToCodeLib.Internal
             if (retval != null) {
                 return retval;
             } else if (val is Array) {
-                return "new[] " + FormatEnumerable(config, (IEnumerable)val);
+                return "new[] " + FormatEnumerable(config, (IEnumerable)val, indent);
             } else if (val is IEnumerable) {
-                return FormatEnumerable(config, (IEnumerable)val);
+                return FormatEnumerable(config, (IEnumerable)val, indent);
             } else if (val is Expression) {
                 return config.GetExpressionToCode().ToCode((Expression)val);
             } else if (val.GetType().GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
                 var type = val.GetType();
-                return "\n" + new string(' ', indent * 2) +
-                    "new {" +
+                return "new {" +
                     string.Join(
                         "",
                         type.GetProperties()
@@ -38,9 +37,20 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list) => "{" + string.Join(", ", PrintListContents(config, list).ToArray()) + "}";
+        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list, int indent)
+        {
+            var contents = PrintListContents(config, list, indent).ToArray();
+            if (contents.Sum(s => s.Length) > 100 || contents.Any(s => s.Any(c => c == '\n'))) {
+                var indentString = new string(' ', indent * 2 + 2);
+                return "{\n"
+                    + string.Join("", contents.Select(s => indentString + s + (s == "..." ? "" : ",") + "\n"))
+                    + new string(' ', indent * 2)
+                    + "}";
+            }
+            return "{" + string.Join(", ", contents) + "}";
+        }
 
-        static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list)
+        static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list, int indent)
         {
             int count = 0;
             foreach (var item in list) {
@@ -49,7 +59,7 @@ namespace ExpressionToCodeLib.Internal
                     yield return "...";
                     yield break;
                 } else {
-                    yield return ComplexObjectToPseudoCode(config, item, 0);
+                    yield return ComplexObjectToPseudoCode(config, item, indent + 4);
                 }
             }
         }
