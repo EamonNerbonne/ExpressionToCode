@@ -11,7 +11,6 @@ namespace ExpressionToCodeLib.Internal
         public static PropertyInfo GetPropertyIfGetter(MethodInfo mi)
         {
             bool supposedGetter = mi.Name.StartsWith("get_");
-            //bool supposedSetter = mi.Name.StartsWith("set_");
 
             if (!mi.IsSpecialName || !supposedGetter) {
                 return null;
@@ -21,15 +20,13 @@ namespace ExpressionToCodeLib.Internal
                 BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
             var pars = mi.GetParameters();
             if (pars.Length == 0) {
-                return mi.DeclaringType.GetProperty(pName, bindingFlags);
+                return mi.DeclaringType.GetTypeInfo().GetProperty(pName, bindingFlags);
             } else {
-                return mi.DeclaringType.GetProperty(
-                    pName,
-                    bindingFlags,
-                    null,
-                    mi.ReturnType,
-                    pars.Select(p => p.ParameterType).ToArray(),
-                    null);
+                foreach (var prop in mi.DeclaringType.GetProperties(bindingFlags)) {
+                    if (prop.GetMethod == mi)
+                        return prop;
+                }
+                return null;
             }
         }
 
@@ -79,7 +76,7 @@ namespace ExpressionToCodeLib.Internal
             || from == typeof(float) && (to == typeof(double))
             || from == typeof(ulong) && (to == typeof(float) || to == typeof(double) || to == typeof(decimal));
 
-        public static bool CanImplicitlyCast(Type from, Type to) => to.IsAssignableFrom(from) || HasBuiltinConversion(from, to);
+        public static bool CanImplicitlyCast(Type from, Type to) => to.GetTypeInfo().IsAssignableFrom(from) || HasBuiltinConversion(from, to);
 
         public enum TypeClass
         {
@@ -92,16 +89,16 @@ namespace ExpressionToCodeLib.Internal
 
         public static TypeClass GuessTypeClass(this Type type)
         {
-            bool compilerGenerated = type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
+            bool compilerGenerated = type.GetTypeInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
             string name = type.Name;
             bool name_StartWithLessThan = name.StartsWith("<");
-            bool isBuiltin = type.IsPrimitive || type.IsEnum || type == typeof(decimal) || type == typeof(string)
-                || typeof(Type).IsAssignableFrom(type);
+            bool isBuiltin = type.GetTypeInfo().IsPrimitive || type.GetTypeInfo().IsEnum || type == typeof(decimal) || type == typeof(string)
+                || typeof(Type).GetTypeInfo().IsAssignableFrom(type);
 
             if (name_StartWithLessThan && compilerGenerated) {
                 bool named_AnonymousType = name.Contains("AnonymousType");
                 bool named_DisplayClass = name.Contains("DisplayClass");
-                bool isGeneric = type.IsGenericType;
+                bool isGeneric = type.GetTypeInfo().IsGenericType;
                 bool isNested = type.IsNested;
 
                 if (!isBuiltin && isGeneric && !isNested && named_AnonymousType) {
@@ -116,7 +113,7 @@ namespace ExpressionToCodeLib.Internal
                             + ", " + isNested);
                 }
             } else if (!compilerGenerated && !name_StartWithLessThan) {
-                return isBuiltin ? TypeClass.BuiltinType : type.IsValueType ? TypeClass.StructType : TypeClass.NormalType;
+                return isBuiltin ? TypeClass.BuiltinType : type.GetTypeInfo().IsValueType ? TypeClass.StructType : TypeClass.NormalType;
             } else {
                 throw new ArgumentException("Unusual type, heuristics uncertain:" + name);
             }

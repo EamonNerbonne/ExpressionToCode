@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using Microsoft.Extensions.DependencyModel;
 
 namespace ExpressionToCodeLib.Internal
 {
@@ -27,7 +28,7 @@ namespace ExpressionToCodeLib.Internal
                     if (exType == null) {
                         return null;
                     }
-                    var exConstructor = exType.GetConstructor(new[] { typeof(string), typeof(Exception) });
+                    var exConstructor = exType.GetTypeInfo().GetConstructor(new[] { typeof(string), typeof(Exception) });
                     if (exConstructor == null) {
                         return null;
                     }
@@ -38,21 +39,20 @@ namespace ExpressionToCodeLib.Internal
                             innerExceptionArg)
                             .Compile();
                 });
-
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly assembly in assemblies) {
-                string assemblyName = assembly.GetName().Name;
+            
+            var assemblies = DependencyContext.Default.RuntimeLibraries.SelectMany(lib=>lib.Assemblies);
+            foreach (var runtimeAssembly in assemblies) {
+                string assemblyName = runtimeAssembly.Name.Name;
+                
                 if (assemblyName == "xunit" || assemblyName == "xunit.assert") {
+                    var assembly = Assembly.Load(runtimeAssembly.Name);
                     var xUnitExceptionType = assembly.GetType("Xunit.Sdk.XunitException") ?? assembly.GetType("Xunit.Sdk.AssertException");
                     var xUnitExceptionConstructor =
-                        xUnitExceptionType.GetConstructor(
-                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                            null,
-                            new[] { typeof(string), typeof(Exception) },
-                            null);
+                        xUnitExceptionType.GetTypeInfo().GetConstructor(new[] { typeof(string), typeof(Exception) });
 
+                    
                     var assemblyBuilder =
-                        AppDomain.CurrentDomain.DefineDynamicAssembly(
+                        AssemblyBuilder.DefineDynamicAssembly(
                             new AssemblyName("Dynamic xUnit ExpressionToCode integration"),
                             AssemblyBuilderAccess.Run);
 
@@ -71,7 +71,7 @@ namespace ExpressionToCodeLib.Internal
                     ilgen.Emit(OpCodes.Call, xUnitExceptionConstructor);
                     ilgen.Emit(OpCodes.Ret);
 
-                    var exType = typeBuilder.CreateType();
+                    var exType = typeBuilder.CreateTypeInfo();
                     var exConstructor = exType.GetConstructor(new[] { typeof(string), typeof(Exception) });
 
                     yield return
@@ -81,17 +81,17 @@ namespace ExpressionToCodeLib.Internal
                                 Expression.Lambda<Func<string, Exception, Exception>>(
                                     Expression.New(
                                         exConstructor,
-                                        Expression.Add(Expression.Constant("\r\n"), failureMessageArg, ((Func<string, string, string>)string.Concat).Method),
+                                        Expression.Add(Expression.Constant("\r\n"), failureMessageArg, ((Func<string, string, string>)string.Concat).GetMethodInfo()),
                                         innerExceptionArg),
                                     failureMessageArg,
                                     innerExceptionArg)
                                     .Compile(),
                         };
                 } else if (assemblyName == "nunit.framework") {
-                    yield return new ExceptionFactory { Priority = 2, CreateException = mkFailFunc(assembly, "NUnit.Framework.AssertionException") };
+                    yield return new ExceptionFactory { Priority = 2, CreateException = mkFailFunc(Assembly.Load(runtimeAssembly.Name), "NUnit.Framework.AssertionException") };
                 } else if (assemblyName == "Microsoft.VisualStudio.QualityTools.UnitTestFramework") {
                     yield return
-                        new ExceptionFactory { Priority = 1, CreateException = mkFailFunc(assembly, "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException") };
+                        new ExceptionFactory { Priority = 1, CreateException = mkFailFunc(Assembly.Load(runtimeAssembly.Name), "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException") };
                 }
             }
             yield return new ExceptionFactory { Priority = 0, CreateException = F((string s, Exception e) => (Exception)new AssertFailedException(s, e)) };

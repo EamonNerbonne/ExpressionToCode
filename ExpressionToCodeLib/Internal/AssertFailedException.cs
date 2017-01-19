@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 
 namespace ExpressionToCodeLib.Internal
 {
-    [Serializable]
     internal sealed class AssertFailedException : Exception
     {
         public AssertFailedException(string message)
@@ -14,8 +12,6 @@ namespace ExpressionToCodeLib.Internal
         public AssertFailedException(string message, Exception inner)
             : base(message, inner) { }
 
-        public AssertFailedException(SerializationInfo info, StreamingContext context)
-            : base(info, context) { }
     }
 
     namespace Internal

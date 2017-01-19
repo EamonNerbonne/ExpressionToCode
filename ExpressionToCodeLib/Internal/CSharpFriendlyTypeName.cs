@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace ExpressionToCodeLib.Internal
 {
@@ -52,8 +53,8 @@ namespace ExpressionToCodeLib.Internal
                 return "string";
             } else if (type == typeof(void)) {
                 return "void";
-            } else if (type.IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
-                return GetTypeName(type.GetGenericArguments().Single()) + "?";
+            } else if (type.GetTypeInfo().IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+                return GetTypeName(type.GetTypeInfo().GetGenericArguments().Single()) + "?";
             } else if (type.IsGenericParameter) {
                 return type.Name;
             } else {
@@ -75,13 +76,13 @@ namespace ExpressionToCodeLib.Internal
 
         string GenericTypeName(Type type)
         {
-            if (!type.IsGenericType) {
+            if (!type.GetTypeInfo().IsGenericType) {
                 return null;
             }
 
-            var renderAsGenericTypeDefinition = !IncludeGenericTypeArgumentNames && type.IsGenericTypeDefinition;
+            var renderAsGenericTypeDefinition = !IncludeGenericTypeArgumentNames && type.GetTypeInfo().IsGenericTypeDefinition;
 
-            var typeArgs = type.GetGenericArguments();
+            var typeArgs = type.GetTypeInfo().GetGenericArguments();
             var typeArgIdx = typeArgs.Length;
             var revNestedTypeNames = new List<string>();
 

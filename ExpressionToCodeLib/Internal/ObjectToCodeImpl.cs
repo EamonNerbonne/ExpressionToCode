@@ -25,7 +25,7 @@ namespace ExpressionToCodeLib.Internal
                 return "new {" +
                     string.Join(
                         "",
-                        type.GetProperties()
+                        type.GetTypeInfo().GetProperties()
                             .Select(
                                 pi =>
                                     "\n" + new string(' ', indent * 2 + 2) + pi.Name + " = "

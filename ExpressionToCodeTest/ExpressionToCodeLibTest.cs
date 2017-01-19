@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Reflection;
+using Xunit;
 using Assert = Xunit.Assert;
 // ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
@@ -175,17 +176,18 @@ namespace ExpressionToCodeTest
                 @"() => default(int[]).Length == 0",
                 ExpressionToCode.ToCode(() => default(int[]).Length == 0));
             Assert.Equal(
-                @"() => default(Type).IsLayoutSequential",
-                ExpressionToCode.ToCode(() => default(Type).IsLayoutSequential));
+                @"() => default(Type).GetTypeInfo().IsLayoutSequential",
+                ExpressionToCode.ToCode(() => default(Type).GetTypeInfo().IsLayoutSequential));
             Assert.Equal(
                 @"() => default(List<int>).Count",
                 ExpressionToCode.ToCode(() => default(List<int>).Count));
             Assert.Equal(
                 @"() => default(int[]).Clone() == null",
                 ExpressionToCode.ToCode(() => default(int[]).Clone() == null));
+            //default(Type).IsInstanceOfType(new object()) is not compiled as extension method in .net core!
             Assert.Equal(
-                @"() => default(Type).IsInstanceOfType(new object())",
-                ExpressionToCode.ToCode(() => default(Type).IsInstanceOfType(new object())));
+                @"() => default(IEnumerable<Type>).Any()",
+                ExpressionToCode.ToCode(() => default(IEnumerable<Type>).Any()));
             Assert.Equal(
                 @"() => default(List<int>).AsReadOnly()",
                 ExpressionToCode.ToCode(() => default(List<int>).AsReadOnly()));

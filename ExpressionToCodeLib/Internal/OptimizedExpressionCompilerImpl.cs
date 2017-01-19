@@ -13,7 +13,7 @@ namespace ExpressionToCodeLib.Internal
         {
             var closure = TryGetClosure(expression.Body);
             var method = closure == null
-                ? new DynamicMethod(string.Empty, typeof(T), Type.EmptyTypes, typeof(OptimizedExpressionCompiler).Module)
+                ? new DynamicMethod(string.Empty, typeof(T), Type.EmptyTypes, typeof(OptimizedExpressionCompiler).GetTypeInfo().Module)
                 : new DynamicMethod(string.Empty, typeof(T), new[] { closure.GetType() }, closure.GetType());
 
             var il = method.GetILGenerator();
@@ -139,7 +139,7 @@ namespace ExpressionToCodeLib.Internal
                 var value = node.Value;
                 if (value == null) {
                     il.Emit(OpCodes.Ldnull);
-                } else if (value is int || value.GetType().IsEnum) {
+                } else if (value is int || value.GetType().GetTypeInfo().IsEnum) {
                     EmitLoadConstantInt(il, (int)value);
                 } else if (value is double) {
                     il.Emit(OpCodes.Ldc_R8, (double)value);
@@ -169,7 +169,7 @@ namespace ExpressionToCodeLib.Internal
                 var elems = node.Expressions;
                 var arrType = node.Type;
                 var elemType = arrType.GetElementType();
-                var isElemOfValueType = elemType.IsValueType;
+                var isElemOfValueType = elemType.GetTypeInfo().IsValueType;
 
                 var arrVar = il.DeclareLocal(arrType);
 
@@ -258,7 +258,7 @@ namespace ExpressionToCodeLib.Internal
                 var ok = true;
                 if (expr.Object != null) {
                     ok = TryEmit(expr.Object, il, withClosure);
-                    if (ok && expr.Object.Type.IsValueType) {
+                    if (ok && expr.Object.Type.GetTypeInfo().IsValueType) {
                         // for instance methods store and load instance variable
                         var objectVar = il.DeclareLocal(expr.Object.Type);
                         il.Emit(OpCodes.Stloc, objectVar);

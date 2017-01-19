@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿/*  DOESN'T WORK YET!
+ 
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -25,4 +27,10 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("008ee713-7baa-491a-96f3-0a8ce3a473b1")]
 [assembly: AssemblyVersion("1.9.9")]
+
+
+*/
+
+using System.Runtime.CompilerServices;
+
 [assembly: InternalsVisibleTo("ExpressionToCodeTest")]
