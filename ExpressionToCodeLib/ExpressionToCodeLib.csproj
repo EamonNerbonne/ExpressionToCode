@@ -2,6 +2,11 @@
   <PropertyGroup Label="Configuration">
     <AssemblyName>ExpressionToCodeLib</AssemblyName>
     <RootNamespace>ExpressionToCodeLib</RootNamespace>
+    <Version>2.0.0-alpha7</Version>
+    <Authors>Eamon Nerbonne</Authors>
+    <Owners>Eamon Nerbonne</Owners>
+    <Title>ExpressionToCode</Title>
+    <Description>Create readable C# assertions (or other code) from an expression tree; can annotate subexpressions with their runtime value.  Integrates with xUnit.NET, NUnit and MSTest.</Description>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
