@@ -6,7 +6,7 @@
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
     <Title>ExpressionToCode</Title>
-    <Description>Create readable C# assertions (or other code) from an expression tree; can annotate subexpressions with their runtime value.  Integrates with xUnit.NET, NUnit and MSTest.</Description>
+    <Description>Create readable C# assertions (or other code) from an expression tree; can annotate subexpressions with their runtime value. Also works as test assertion library (e.g. for xUnit.NET, NUnit, MSTest or others).</Description>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
