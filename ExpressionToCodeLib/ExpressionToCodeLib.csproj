@@ -19,6 +19,9 @@
     <EmbeddedResource Include="**\*.resx" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ExpressionToCodeLib.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
     <PackageReference Include="NETStandard.Library" Version="1.6" />
