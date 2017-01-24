@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup Label="Configuration">
     <AssemblyName>ExpressionToCodeLib</AssemblyName>
     <RootNamespace>ExpressionToCodeLib</RootNamespace>
-    <Version>2.0.0-alpha7</Version>
+    <Version>2.0.0-alpha8</Version>
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
     <Title>ExpressionToCode</Title>
