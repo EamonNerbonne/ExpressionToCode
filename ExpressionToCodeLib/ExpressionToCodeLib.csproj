@@ -9,7 +9,7 @@
     <Description>Create readable C# assertions (or other code) from an expression tree; can annotate subexpressions with their runtime value. Also works as test assertion library (e.g. for xUnit.NET, NUnit, MSTest or others).</Description>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard1.5</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>library</OutputType>
