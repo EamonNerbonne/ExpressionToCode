@@ -26,7 +26,7 @@
     </___THIS_IS_A_COMMENT>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>library</OutputType>
@@ -40,6 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework)=='netstandard1.5' ">
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
     <PackageReference Include="NETStandard.Library" Version="1.6" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
