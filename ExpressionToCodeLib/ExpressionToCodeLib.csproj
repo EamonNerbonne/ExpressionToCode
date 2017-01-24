@@ -9,7 +9,6 @@
     <Description>
       Generates valid, readable C# from an expression tree, and can annotate that code with runtime values. Useful for e.g. code generation and unit testing assertions.
     </Description>
-    <PackageSummary></PackageSummary>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>First release</PackageReleaseNotes>
     <PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
