@@ -15,7 +15,7 @@ namespace ExpressionToCodeLib
         /// Evaluates an assertion and throws an exception the assertion it returns false or throws an exception.
         /// The exception includes the code of the assertion annotated with runtime values for its sub-expressions.
         /// 
-        /// Identical functionality is available via Expect(()=>...); this can be accessed via "using static ExpressionToCodeLib.ExpressionAssertions;".
+        /// Identical functionality is available via Expect(()=>...); this can be accessed via "using static ExpressionToCodeLib.ExpressionExpectations;".
         /// 
         /// If you want to change the layout of the value annotations, see ExpressionToCodeConfiguration.GlobalAssertionConfiguration
         /// </summary>
