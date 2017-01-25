@@ -20,7 +20,7 @@ namespace ExpressionToCodeLib
         /// 
         /// If you want to change the layout of the value annotations, see ExpressionToCodeConfiguration.GlobalAssertionConfiguration
         /// </summary>
-        public static void Assert(Expression<Func<bool>> assertion, string msg = null)
+        public static void Expect(Expression<Func<bool>> assertion, string msg = null)
         {
             ExpressionToCodeConfiguration.GlobalAssertionConfiguration.Assert(assertion, msg);
         }
