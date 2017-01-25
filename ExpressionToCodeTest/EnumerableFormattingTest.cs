@@ -34,14 +34,14 @@ namespace ExpressionToCodeTest
         [Fact]
         public void LongArraysDoNotBreakIfSoConfigured()
         {
-            var config = ExpressionToCodeConfiguration.DefaultConfiguration.WithPrintedListLengthLimit(null);
+            var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithPrintedListLengthLimit(null);
             Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}", ObjectToCode.ComplexObjectToPseudoCode(config, Enumerable.Range(1, 13).ToArray()));
         }
 
         [Fact]
         public void EnumerableElisionIsConfigurable()
         {
-            var config = ExpressionToCodeConfiguration.DefaultConfiguration.WithPrintedListLengthLimit(3);
+            var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithPrintedListLengthLimit(3);
             Assert.Equal("{1, 2, 3, ...}", ObjectToCode.ComplexObjectToPseudoCode(config, Enumerable.Range(1, 13)));
         }
 
@@ -85,7 +85,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void NestedArraysUseProperConfig()
         {
-            var config = ExpressionToCodeConfiguration.DefaultConfiguration.WithPrintedListLengthLimit(3);
+            var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithPrintedListLengthLimit(3);
             Assert.Equal(
                 "new[] {\n  null,\n  new {\n          A = 3,\n          B = new[] {1, 2, 3, ...},\n        },\n}",
                 ObjectToCode.ComplexObjectToPseudoCode(config, new[] { null, new { A = 3, B = new[] { 1, 2, 3, 4, 5 } } }));

@@ -2,7 +2,7 @@
 <package >
 	<metadata>
 		<id>$id$</id>
-		<version>2.0.0-alpha6</version>
+		<version>2.0.0-alpha9</version>
 		<title>$title$</title>
 		<authors>$author$</authors>
 		<owners>$author$</owners>
@@ -20,7 +20,7 @@
 			ExpressionToCode was inspired by Power Asssert.NET. It differs from PowerAssert.NET by supporting a much larger
       portion of the lambda syntax and to respect C#'s normal operator precedence, in addition to general polish.
 		</description>
-    <releaseNotes>Improve pseudocode generator and make it configurable.</releaseNotes>
+    <releaseNotes>Add static "Assert" method to be imported via "using static ExpressionToCodeLib.ExpressionAssertions;"</releaseNotes>
 		<copyright>Copyright 2015 © Eamon Nerbonne</copyright>
 		<tags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</tags>
 	</metadata>
