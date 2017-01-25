@@ -1,4 +1,7 @@
-﻿interface ICodeAnnotator
+﻿interface IAnnotatedToCode
+    string inst.AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
+
+interface ICodeAnnotator
     string inst.AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
 
 interface IExpressionCompiler
@@ -11,9 +14,23 @@ interface IObjectStringifier
     string inst.PlainObjectToCode(object val, Type type)
     string inst.TypeNameToCode(Type type)
 
+class AnnotatedToCodeExtensions
+    string TYPE.AnnotatedToCode(IAnnotatedToCode it, Expression e)
+    string TYPE.AnnotatedToCode<T, T1, T2, T3>(IAnnotatedToCode it, Expression<Func<T, T1, T2, T3>> e)
+    string TYPE.AnnotatedToCode<T, T1, T2>(IAnnotatedToCode it, Expression<Func<T, T1, T2>> e)
+    string TYPE.AnnotatedToCode<T, T1>(IAnnotatedToCode it, Expression<Func<T, T1>> e)
+    string TYPE.AnnotatedToCode<T>(IAnnotatedToCode it, Expression<Func<T>> e)
+    string TYPE.AnnotatedToCode<T, T1, T2, T3>(IAnnotatedToCode it, Expression<Func<T, T1, T2, T3>> e, string msg, bool hideOutermostValue)
+    string TYPE.AnnotatedToCode<T, T1, T2>(IAnnotatedToCode it, Expression<Func<T, T1, T2>> e, string msg, bool hideOutermostValue)
+    string TYPE.AnnotatedToCode<T, T1>(IAnnotatedToCode it, Expression<Func<T, T1>> e, string msg, bool hideOutermostValue)
+    string TYPE.AnnotatedToCode<T>(IAnnotatedToCode it, Expression<Func<T>> e, string msg, bool hideOutermostValue)
+
 class CodeAnnotators
     static readonly ICodeAnnotator ValuesOnStalksCodeAnnotator
     static readonly ICodeAnnotator SubExpressionPerLineCodeAnnotator
+
+class ExpressionAssertions
+    void TYPE.Assert(Expression<Func<bool>> assertion, string msg)
 
 class ExpressionToCode
     string TYPE.ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
@@ -26,22 +43,21 @@ class ExpressionToCode
     string TYPE.AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e)
     string TYPE.AnnotatedToCode<T>(Expression<Func<T>> e)
     string TYPE.AnnotatedToCode(Expression expr)
+    string TYPE.ToValuedCode<TResult>(Expression<Func<TResult>> expression)
+    string TYPE.GetNameIn<TResult>(Expression<Func<TResult>> expression)
+    string TYPE.GetNameIn(Expression<Action> expression)
+    string TYPE.GetNameIn(Expression expr)
 
 class ExpressionToCodeConfiguration
-    readonly ExpressionToCodeConfigurationValue Value
     static readonly ExpressionToCodeConfiguration DefaultConfiguration
     static ExpressionToCodeConfiguration CurrentConfiguration
     ExpressionToCodeConfiguration inst.WithCompiler(IExpressionCompiler compiler)
     ExpressionToCodeConfiguration inst.WithAnnotator(ICodeAnnotator annotator)
+    ExpressionToCodeConfiguration inst.WithPrintedListLengthLimit(int? limitListsToLength)
     ExpressionToCodeConfiguration inst.WithObjectStringifier(IObjectStringifier objectStringifier)
     ExpressionToCodeConfiguration inst.WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments)
     IExpressionToCode inst.GetExpressionToCode()
-
-struct ExpressionToCodeConfigurationValue : ValueType
-    ICodeAnnotator CodeAnnotator
-    IExpressionCompiler ExpressionCompiler
-    IObjectStringifier ObjectStringifier
-    bool AlwaysUseExplicitTypeArguments
+    IAnnotatedToCode inst.GetAnnotatedToCode()
 
 class ExpressionToCodeExtensions
     string TYPE.ToCode<T, T1, T2, T3>(IExpressionToCode it, Expression<Func<T, T1, T2, T3>> e)
@@ -67,10 +83,11 @@ class ObjectStringify
     static readonly IObjectStringifier WithFullTypeNames
 
 class ObjectToCode
-    string TYPE.ComplexObjectToPseudoCode(object val, int indent)
+    string TYPE.ComplexObjectToPseudoCode(object val)
+    string TYPE.ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val)
     string TYPE.PlainObjectToCode(object val)
     string TYPE.PlainObjectToCode(object val, Type type)
-    string TYPE.GetCSharpFriendlyTypeName(Type type)
+    string TYPE.ToCSharpFriendlyTypeName(Type type)
 
 class PAssert
     void TYPE.IsTrue(Expression<Func<bool>> assertion)
