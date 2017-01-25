@@ -11,6 +11,11 @@ namespace ExpressionToCodeLib
             That(assertion);
         }
 
+        public static void PAssert(Expression<Func<bool>> assertion, string msg = null)
+        {
+        	That(assertion, msg);
+        }
+        
         public static void That(Expression<Func<bool>> assertion, string msg = null)
         {
             var config = ExpressionToCodeConfiguration.CurrentConfiguration;
