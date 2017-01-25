@@ -16,6 +16,11 @@ namespace ExpressionToCodeLib
         public int? PrintedListLengthLimit;
     }
 
+
+    /// <summary>
+    /// Specifies details of how expressions and their values are to be formatted.  This object is immutable; all instance methods are thread safe.
+    /// Changes to configuration return new configuration instances.
+    /// </summary>
     public class ExpressionToCodeConfiguration
     {
         /// <summary>
