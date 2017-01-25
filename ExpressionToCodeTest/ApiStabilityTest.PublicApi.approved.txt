@@ -49,8 +49,10 @@ class ExpressionToCode
     string TYPE.GetNameIn(Expression expr)
 
 class ExpressionToCodeConfiguration
-    static readonly ExpressionToCodeConfiguration DefaultConfiguration
-    static ExpressionToCodeConfiguration CurrentConfiguration
+    static readonly ExpressionToCodeConfiguration DefaultCodeGenConfiguration
+    static readonly ExpressionToCodeConfiguration DefaultAssertionConfiguration
+    static ExpressionToCodeConfiguration GlobalAssertionConfiguration
+    static ExpressionToCodeConfiguration GlobalCodeGenConfiguration
     ExpressionToCodeConfiguration inst.WithCompiler(IExpressionCompiler compiler)
     ExpressionToCodeConfiguration inst.WithAnnotator(ICodeAnnotator annotator)
     ExpressionToCodeConfiguration inst.WithPrintedListLengthLimit(int? limitListsToLength)
