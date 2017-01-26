@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using JetBrains.Annotations;
+using System.Diagnostics.Contracts;
 
 namespace ExpressionToCodeLib.Internal {
   internal interface IExpressionTypeDispatch<T> {

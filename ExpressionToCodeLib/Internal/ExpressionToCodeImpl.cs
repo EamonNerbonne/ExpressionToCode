@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
+using System.Diagnostics.Contracts;
 
 namespace ExpressionToCodeLib.Internal
 {

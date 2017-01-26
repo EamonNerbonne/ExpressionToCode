@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup Label="Configuration">
     <AssemblyName>ExpressionToCodeLib</AssemblyName>
     <RootNamespace>ExpressionToCodeLib</RootNamespace>
@@ -31,6 +31,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ExpressionToCodeLib.nuspec" />
+    <None Include="Internal\ExpressionTypeDispatch.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
@@ -42,5 +46,15 @@
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Internal\ExpressionTypeDispatch.Generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
