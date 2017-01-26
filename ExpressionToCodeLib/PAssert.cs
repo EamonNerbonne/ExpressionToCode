@@ -11,12 +11,17 @@ namespace ExpressionToCodeLib
             That(assertion);
         }
 
+        /// <summary>
+        /// Evaluates an assertion and throws an exception the assertion it returns false or throws an exception.
+        /// The exception includes the code of the assertion annotated with runtime values for its sub-expressions.
+        /// 
+        /// Identical functionality is available via Expect(()=>...); this can be accessed via "using static ExpressionToCodeLib.ExpressionExpectations;".
+        /// 
+        /// If you want to change the layout of the value annotations, see ExpressionToCodeConfiguration.GlobalAssertionConfiguration
+        /// </summary>
         public static void That(Expression<Func<bool>> assertion, string msg = null)
         {
-            var config = ExpressionToCodeConfiguration.CurrentConfiguration;
-
-            config.Assert(assertion, msg);
+            ExpressionToCodeConfiguration.GlobalAssertionConfiguration.Assert(assertion, msg);
         }
-
     }
 }

@@ -16,19 +16,56 @@ namespace ExpressionToCodeLib
         public int? PrintedListLengthLimit;
     }
 
+
+    /// <summary>
+    /// Specifies details of how expressions and their values are to be formatted.  This object is immutable; all instance methods are thread safe.
+    /// Changes to configuration return new configuration instances.
+    /// </summary>
     public class ExpressionToCodeConfiguration
     {
-        public static readonly ExpressionToCodeConfiguration DefaultConfiguration =
+        /// <summary>
+        /// The default formatter for converting an expression to code. Defaults are:
+        /// <para>- Avoid generic type parameters in output where they can be inferred.</para>
+        /// <para>- Omit namespaces from type names (as opposed to fully qualifying type names)</para>
+        /// <para>- Use the default .net expression compiler (as opposed to the experimental optimized compiler).</para>
+        /// <para>- Annotate values using "stalks" hanging under expressions.</para>
+        /// <para>- Print all elements in an enumerable (this will cause crashes on infinite or very large enumerables).</para>
+        /// </summary>
+        public static readonly ExpressionToCodeConfiguration DefaultCodeGenConfiguration =
             new ExpressionToCodeConfiguration(
                 new ExpressionToCodeConfigurationValue {
                     CodeAnnotator = CodeAnnotators.ValuesOnStalksCodeAnnotator,
                     ExpressionCompiler = ExpressionTreeCompilers.DefaultExpressionCompiler,
                     ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,
-                    PrintedListLengthLimit = 10,
                 });
 
-        public static ExpressionToCodeConfiguration CurrentConfiguration = DefaultConfiguration;
+        /// <summary>
+        /// The default formatter for formatting an assertion violation.
+        /// This is identical to DefaultCodeGenConfiguration, except that enumerable contents after the first 10 elements are elided.
+        /// </summary>
+        public static readonly ExpressionToCodeConfiguration DefaultAssertionConfiguration =
+            DefaultCodeGenConfiguration.WithPrintedListLengthLimit(10);
+
+
+
+        /// <summary>
+        /// This configuration is used for PAssert.That(()=>...) and Expect(()=>...).  Initially ExpressionToCodeConfiguration.DefaultAssertionConfiguration.
+        /// 
+        /// <para>This field is globally mutable to allow consumers to configure the library.  If you wish to use multiple configurations, it is recommended
+        /// to use the instance methods on a configuration instance instead of the static methods in PAssert, ExpressionToCode and ExpressionAssertions.</para>
+        /// </summary>
+        public static ExpressionToCodeConfiguration GlobalAssertionConfiguration = DefaultAssertionConfiguration;
+
+        /// <summary>
+        /// This configuration is used for Expression.ToCode(() => ...) and other code-generation methods. Initially ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.
+        /// 
+        /// <para>This field is globally mutable to allow consumers to configure the library.  If you wish to use multiple configurations, it is recommended
+        /// to use the instance methods on a configuration instance instead of the static methods in PAssert, ExpressionToCode and ExpressionAssertions.</para>
+        /// </summary>
+        public static ExpressionToCodeConfiguration GlobalCodeGenConfiguration = DefaultCodeGenConfiguration;
+
+
         internal readonly ExpressionToCodeConfigurationValue Value;
         ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value) { Value = value; }
 

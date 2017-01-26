@@ -6,13 +6,16 @@ using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib
 {
+    /// <summary>
+    /// If you wish to override some formatting aspects of these methods, set ExpressionToCodeConfiguration.GlobalCodeGetConfiguration.
+    /// </summary>
     public static class ExpressionToCode
     {
-        public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
-        public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
-        public static string ToCode<T, T1>(Expression<Func<T, T1>> e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
-        public static string ToCode<T>(Expression<Func<T>> e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
-        public static string ToCode(Expression e) => ExpressionToCodeConfiguration.CurrentConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T, T1>(Expression<Func<T, T1>> e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T>(Expression<Func<T>> e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode(Expression e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
         public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => AnnotatedToCode((Expression)e);
         public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => AnnotatedToCode((Expression)e);
         public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) => AnnotatedToCode((Expression)e);
@@ -21,8 +24,8 @@ namespace ExpressionToCodeLib
 
         public static string AnnotatedToCode(Expression expr)
             =>
-                ExpressionToCodeConfiguration.CurrentConfiguration.Value.CodeAnnotator.AnnotateExpressionTree(
-                    ExpressionToCodeConfiguration.CurrentConfiguration,
+                ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.Value.CodeAnnotator.AnnotateExpressionTree(
+                    ExpressionToCodeConfiguration.GlobalCodeGenConfiguration,
                     expr,
                     null,
                     false);

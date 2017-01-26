@@ -37,8 +37,8 @@ namespace ExpressionToCode.Benchmarks
     public class BenchmarkPAssert
     {
         static readonly ExpressionToCodeConfiguration
-            baseLineConfiguration = ExpressionToCodeConfiguration.DefaultConfiguration,
-            withOptimizationConfiguration = ExpressionToCodeConfiguration.DefaultConfiguration.WithCompiler(ExpressionTreeCompilers.OptimizedExpressionCompiler);
+            baseLineConfiguration = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration,
+            withOptimizationConfiguration = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithCompiler(ExpressionTreeCompilers.OptimizedExpressionCompiler);
 
         [Benchmark]
         public void PAssertWithCompile()

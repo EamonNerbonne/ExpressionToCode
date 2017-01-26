@@ -20,29 +20,35 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
-        public void LongEnumerablesBreakAfter10()
+        public void LongEnumerablesBreakAfter10_InCodeGen()
         {
-            Assert.Equal("{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}", ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Range(1, 13)));
+            Assert.Equal("{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}", ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 13)));
         }
 
         [Fact]
-        public void LongArraysBreakAfter10()
+        public void LongArraysBreakAfter10_InAssertions()
         {
-            Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}", ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Range(1, 13).ToArray()));
+            Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}", ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 13).ToArray()));
+        }
+
+        [Fact]
+        public void LongArraysDoNotBreakAfter10_InCodeGen()
+        {
+            Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}", ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Range(1, 13).ToArray()));
         }
 
         [Fact]
         public void LongArraysDoNotBreakIfSoConfigured()
         {
-            var config = ExpressionToCodeConfiguration.DefaultConfiguration.WithPrintedListLengthLimit(null);
-            Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}", ObjectToCode.ComplexObjectToPseudoCode(config, Enumerable.Range(1, 13).ToArray()));
+            var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithPrintedListLengthLimit(null);
+            Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}", config.ComplexObjectToPseudoCode(Enumerable.Range(1, 13).ToArray()));
         }
 
         [Fact]
         public void EnumerableElisionIsConfigurable()
         {
-            var config = ExpressionToCodeConfiguration.DefaultConfiguration.WithPrintedListLengthLimit(3);
-            Assert.Equal("{1, 2, 3, ...}", ObjectToCode.ComplexObjectToPseudoCode(config, Enumerable.Range(1, 13)));
+            var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithPrintedListLengthLimit(3);
+            Assert.Equal("{1, 2, 3, ...}", config.ComplexObjectToPseudoCode(Enumerable.Range(1, 13)));
         }
 
         [Fact]
@@ -62,7 +68,7 @@ namespace ExpressionToCodeTest
   ""12345009"",
   ...
 }",
-                ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Range(12345000, 13).Select(i => i.ToString(CultureInfo.InvariantCulture))));
+                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(12345000, 13).Select(i => i.ToString(CultureInfo.InvariantCulture))));
         }
 
         [Fact]
@@ -85,7 +91,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void NestedArraysUseProperConfig()
         {
-            var config = ExpressionToCodeConfiguration.DefaultConfiguration.WithPrintedListLengthLimit(3);
+            var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithPrintedListLengthLimit(3);
             Assert.Equal(
                 "new[] {\n  null,\n  new {\n          A = 3,\n          B = new[] {1, 2, 3, ...},\n        },\n}",
                 ObjectToCode.ComplexObjectToPseudoCode(config, new[] { null, new { A = 3, B = new[] { 1, 2, 3, 4, 5 } } }));
