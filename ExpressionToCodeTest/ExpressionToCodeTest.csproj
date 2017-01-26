@@ -4,7 +4,7 @@
     <RootNamespace>ExpressionToCodeTest</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>library</OutputType>
     <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
