@@ -20,7 +20,7 @@
     </___THIS_IS_A_COMMENT>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard1.5</TargetFrameworks>
+    <TargetFrameworks>net45</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>library</OutputType>
