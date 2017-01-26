@@ -22,7 +22,9 @@ namespace ExpressionToCodeLib
 
         static Exception Err(ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg, Exception innerException)
         {
-            return new AssertFailedException(config.Value.CodeAnnotator.AnnotateExpressionTree(config, assertion.Body, msg, true), innerException);
+            return UnitTestingFailure.AssertionExceptionFactory(
+                config.Value.CodeAnnotator.AnnotateExpressionTree(config, assertion.Body, msg, true),
+                innerException);
         }
     }
 }
