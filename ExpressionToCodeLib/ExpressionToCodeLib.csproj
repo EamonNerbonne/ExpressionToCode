@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Configuration">
     <AssemblyName>ExpressionToCodeLib</AssemblyName>
     <RootNamespace>ExpressionToCodeLib</RootNamespace>
@@ -25,10 +25,6 @@
   <PropertyGroup>
     <OutputType>library</OutputType>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="**\*.cs" />
-    <EmbeddedResource Include="**\*.resx" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="ExpressionToCodeLib.nuspec" />
     <None Include="Internal\ExpressionTypeDispatch.tt">
