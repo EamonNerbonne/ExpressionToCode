@@ -3,8 +3,8 @@ using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal class OptimizedExpressionCompiler : IExpressionCompiler
+    class OptimizedExpressionCompiler : IExpressionCompiler
     {
-        public Func<T> Compile<T>(Expression<Func<T>> expression) { return OptimizedExpressionCompilerImpl.TryCompile(expression) ?? expression.Compile(); }
+        public Func<T> Compile<T>(Expression<Func<T>> expression) => FastExpressionCompiler.ExpressionCompiler.Compile(expression);
     }
 }
