@@ -1,0 +1,18 @@
+﻿() => a < b && (c > (double)-a || c > (double)b) && b < 10
+a: 2
+a < b: true
+b: 5
+a < b && (... > ... || ... > ...): true
+c: 3.45
+c > (double)-...: true
+(double)-a: -2.0
+-a: -2
+a: 2
+c > (double)... || c > (double)...: true
+c: 3.45
+c > (double)b: false
+(double)b: 5.0
+b: 5
+... < ... && (... || ...) && b < 10: true
+b: 5
+b < 10: true

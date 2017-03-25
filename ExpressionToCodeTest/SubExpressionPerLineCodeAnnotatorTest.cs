@@ -38,5 +38,23 @@ namespace ExpressionToCodeTest
             var nums = Enumerable.Range(10, 10).ToArray();
             ApprovalTest.Verify(annotator.AnnotatedToCode(() => a < b && nums[a + b] < 7 && b < 10));
         }
+
+        [Fact]
+        public void Binary_expressions_with_nesting()
+        {
+            var a = 2;
+            var b = 5;
+            var c = 3.45;
+            var nums = Enumerable.Range(10, 10).ToArray();
+            ApprovalTest.Verify(annotator.AnnotatedToCode(() => a < b && (c > -a || c > b) && b < 10));
+        }
+
+        [Fact]
+        public void MethodCallsAndArrayLiterals()
+        {
+            var a = 2;
+            var b = 5;
+            ApprovalTest.Verify(annotator.AnnotatedToCode(() => Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()));
+        }
     }
 }

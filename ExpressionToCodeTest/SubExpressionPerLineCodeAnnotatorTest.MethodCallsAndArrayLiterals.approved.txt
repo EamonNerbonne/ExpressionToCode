@@ -1,0 +1,8 @@
+﻿() => (double)Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
+(double)Math.Max(a, b): 5.0
+Math.Max(a, b): 5
+a: 2
+b: 5
+(double)Math.Max(..., ...) > new[] { ..., ..., ..., ... }.Average(): false
+new[] { 3, 8, 13, 4 }: new[] {3, 8, 13, 4}
+new[] { 3, 8, 13, 4 }.Average(): 7.0
