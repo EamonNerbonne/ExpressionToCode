@@ -62,24 +62,18 @@ namespace ExpressionToCode.Benchmarks
         [Benchmark]
         public void PAssertWithCompile()
         {
-            var x = 1;
-            string s = "Test";
             baseLineConfiguration.Assert(GetExpression());
         }
 
         [Benchmark]
         public void PAssertWithFastCompile()
         {
-            var x = 1;
-            string s = "Test";
             withOptimizationConfiguration.Assert(GetExpression());
         }
 
         [Benchmark]
         public void BaseLinePlainLambdaExec()
         {
-            var x = 1;
-            string s = "Test";
             BaseLineAssert(GetFunc());
         }
     }
