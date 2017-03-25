@@ -15,22 +15,6 @@ namespace ExpressionToCodeTest
 {
     public class ApiStabilityTest
     {
-        class SaneNamer : IApprovalNamer
-        {
-            public string SourcePath { get; set; }
-            public string Name { get; set; }
-        }
-
-        static void MyApprove(string text, object IGNORE_PAST_THIS = null, [CallerFilePath] string filepath = null, [CallerMemberName] string membername = null)
-        {
-            var writer = WriterFactory.CreateTextWriter(text);
-            var filename = Path.GetFileNameWithoutExtension(filepath);
-            var filedir = Path.GetDirectoryName(filepath);
-            var namer = new SaneNamer { Name = filename + "." + membername, SourcePath = filedir };
-            var reporter = new DiffReporter();
-            Approver.Verify(new FileApprover(writer, namer, true), reporter);
-        }
-
         [Fact]
         public void PublicApi()
         {
@@ -41,7 +25,7 @@ namespace ExpressionToCodeTest
                 .ThenByDescending(type => type.IsInterface)
                 .ThenBy(type => type.FullName);
 
-            MyApprove(PrettyPrintTypes(publicTypes));
+            ApprovalTest.Verify(PrettyPrintTypes(publicTypes));
         }
 
         [Fact]
@@ -54,7 +38,7 @@ namespace ExpressionToCodeTest
                 .ThenByDescending(type => type.IsInterface)
                 .ThenBy(type => type.FullName);
 
-            MyApprove(PrettyPrintTypes(unstableTypes));
+            ApprovalTest.Verify(PrettyPrintTypes(unstableTypes));
         }
 
         static string PrettyPrintTypes(IEnumerable<Type> types) { return string.Join("", types.Select(PrettyPrintTypeDescription)); }
