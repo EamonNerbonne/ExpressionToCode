@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using ExpressionToCodeLib;
+using JetBrains.Annotations;
 
 namespace ExpressionToCode.Benchmarks
 {
@@ -17,6 +18,7 @@ namespace ExpressionToCode.Benchmarks
         }
     }
 
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class BenchmarkCompile
     {
         readonly Expression<Func<bool>> testExpr = GetExpression();
@@ -34,6 +36,7 @@ namespace ExpressionToCode.Benchmarks
         public void Emit() { ExpressionTreeCompilers.OptimizedExpressionCompiler.Compile(testExpr); }
     }
 
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class BenchmarkPAssert
     {
         static readonly ExpressionToCodeConfiguration
