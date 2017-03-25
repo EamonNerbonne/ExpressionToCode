@@ -66,7 +66,10 @@ namespace ExpressionToCodeLib.Internal
                 foreach (var kid in node.Children) {
                     if (kid.IsConceptualChild) {
                         FindSubExpressionValues(config, kid, kid, subExpressionValues, false);
-                    } else {
+                    }
+                }
+                foreach (var kid in node.Children) {
+                    if (!kid.IsConceptualChild) {
                         FindSubExpressionValues(config, kid, subExprNode, subExpressionValues, hideOutermostValue);
                     }
                 }
