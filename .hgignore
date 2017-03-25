@@ -9,3 +9,4 @@ ExpressionToCodeLib/*.nupkg
 *.approved.txt.bak
 *.received.txt
 TestResults/**.coverage
+*.orig
