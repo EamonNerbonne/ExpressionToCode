@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
+    class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
         public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
         {
@@ -26,7 +26,7 @@ namespace ExpressionToCodeLib.Internal
             public static ExpressionWithSubExpressions Create(ExpressionToCodeConfiguration config, Expression e, bool hideOutermostValue)
             {
                 var sb = new StringBuilder();
-                bool ignoreInitialSpace = true;
+                var ignoreInitialSpace = true;
                 var node = new ExpressionToCodeImpl(config).ExpressionDispatch(e);
                 AppendNodeToStringBuilder(sb, node, ref ignoreInitialSpace);
                 var fullExprText = sb.ToString();
@@ -49,7 +49,7 @@ namespace ExpressionToCodeLib.Internal
             }
 
             static void FindSubExpressionValues(
-                ExpressionToCodeConfiguration config, 
+                ExpressionToCodeConfiguration config,
                 StringifiedExpression node,
                 StringifiedExpression subExprNode,
                 List<SubExpressionValue> subExpressionValues,
