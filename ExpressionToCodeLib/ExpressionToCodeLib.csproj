@@ -33,7 +33,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework)=='netstandard1.5' ">
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
