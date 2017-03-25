@@ -18,12 +18,7 @@
       see also https://docs.microsoft.com/en-us/nuget/schema/msbuild-targets
       and a much more complete walkthrough by the zeroconf author here: https://oren.codes/2017/01/04/multi-targeting-the-world-a-single-project-to-rule-them-all/
     -->
-  </PropertyGroup>
-  <PropertyGroup>
     <TargetFrameworks>net45</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup>
-    <OutputType>library</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <None Include="ExpressionToCodeLib.nuspec" />
@@ -33,7 +28,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="10.2.1" />
+    <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework)=='netstandard1.5' ">
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
