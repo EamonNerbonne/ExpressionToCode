@@ -10,3 +10,4 @@ ExpressionToCodeLib/*.nupkg
 *.received.txt
 TestResults/**.coverage
 *.orig
+ExpressionToCode.Benchmarks/BenchmarkDotNet.Artifacts
