@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>ExpressionToCode.Roslyn.Tests</RootNamespace>
     <AssemblyName>ExpressionToCode.Roslyn.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <TargetFrameworkProfile />
     <NoWin32Manifest>False</NoWin32Manifest>

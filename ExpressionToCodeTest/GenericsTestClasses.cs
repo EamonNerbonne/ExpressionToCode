@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Reflection;
+using Xunit;
 using Assert = Xunit.Assert;
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantEnumerableCastCall
@@ -247,7 +248,7 @@ namespace ExpressionToCodeTest
         public void Reset() { val = default(T); }
         public bool IsSet() { return Equals(default(T), val); }
         public static T GetDefault() { return default(T); }
-        public static bool IsEnumerableOfType<U>(IEnumerable<U> x) { return typeof(T).IsAssignableFrom(typeof(U)); }
+        public static bool IsEnumerableOfType<U>(IEnumerable<U> x) { return typeof(T).GetTypeInfo().IsAssignableFrom(typeof(U)); }
         public static bool IsFuncOfType<U>(Func<U> x) { return typeof(T).IsAssignableFrom(typeof(U)); }
         public static bool IsFunc2OfType<U>(Func<U, U> x) { return typeof(T).IsAssignableFrom(typeof(U)); }
         public bool IsSubClass<U>() where U : T { return val is U; }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Diagnostics.Contracts;
 
 namespace ExpressionToCodeLib.Internal
 {
@@ -151,8 +151,8 @@ namespace ExpressionToCodeLib.Internal
         {
             Type expr1nonnullableType = expr1uncast.Type.AvoidNullability();
             Type expr2nonnullableType = expr2.Type.AvoidNullability();
-            if (expr1nonnullableType.IsEnum
-                && expr1nonnullableType.GetEnumUnderlyingType() == expr2nonnullableType
+            if (expr1nonnullableType.GetTypeInfo().IsEnum
+                && expr1nonnullableType.GetTypeInfo().GetEnumUnderlyingType() == expr2nonnullableType
                 || expr1nonnullableType == typeof(char) && expr2nonnullableType == typeof(int)
                 ) {
                 expr1 = expr1uncast;
@@ -188,7 +188,7 @@ namespace ExpressionToCodeLib.Internal
         {
             var kids = KidsBuilder.Create();
             var ue = (UnaryExpression)e;
-            if (e.Type.IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
+            if (e.Type.GetTypeInfo().IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
             {
                 kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")");
             } else {
@@ -271,14 +271,14 @@ namespace ExpressionToCodeLib.Internal
                 kids.Add(NestExpression(e.NodeType, memberOfExpr));
                 kids.Add(".");
             } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
-                kids.Add(objectStringifier.TypeNameToCode(me.Member.ReflectedType) + ".");
+                kids.Add(objectStringifier.TypeNameToCode(me.Member.DeclaringType) + ".");
             }
 
             kids.Add(me.Member.Name, e);
             return kids.Finish();
         }
 
-        static readonly MethodInfo createDelegate = typeof(Delegate).GetMethod(
+        static readonly MethodInfo createDelegate = typeof(Delegate).GetTypeInfo().GetMethod(
             "CreateDelegate",
             new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
 
@@ -389,7 +389,7 @@ namespace ExpressionToCodeLib.Internal
                         | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)
                     ;
 
-                var confusibleOverloads = method.DeclaringType.GetMethods(relevantBindingFlagsForOverloads)
+                var confusibleOverloads = method.DeclaringType.GetTypeInfo().GetMethods(relevantBindingFlagsForOverloads)
                     .Where(
                         otherMethod =>
                             otherMethod != genericMethodDefinition
@@ -410,7 +410,7 @@ namespace ExpressionToCodeLib.Internal
 
         static bool ContainsInferableType(Type haystack, Type needle) => haystack == needle
             || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
-            || haystack.IsGenericType && haystack.GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
+            || haystack.GetTypeInfo().IsGenericType && haystack.GetTypeInfo().GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
         [Pure]
         public StringifiedExpression DispatchIndex(Expression e)
@@ -442,7 +442,7 @@ namespace ExpressionToCodeLib.Internal
                 kids.Add("new " + objectStringifier.TypeNameToCode(ie.Expression.Type));
             }
             kids.Add(NestExpression(ie.NodeType, ie.Expression));
-            var invokeMethod = ie.Expression.Type.GetMethod("Invoke");
+            var invokeMethod = ie.Expression.Type.GetTypeInfo().GetMethod("Invoke");
             var args = GetArgumentsForMethod(invokeMethod, ie.Arguments);
             kids.Add(ArgListDispatch(args, ie));
             return kids.Finish();
@@ -494,7 +494,7 @@ namespace ExpressionToCodeLib.Internal
 
             var lie = (ListInitExpression)e;
             kids.Add("new ", lie);
-            kids.Add(objectStringifier.TypeNameToCode(lie.NewExpression.Constructor.ReflectedType));
+            kids.Add(objectStringifier.TypeNameToCode(lie.NewExpression.Constructor.DeclaringType));
             if (lie.NewExpression.Arguments.Any()) {
                 kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments)));
             }
@@ -546,7 +546,7 @@ namespace ExpressionToCodeLib.Internal
 
             var mie = (MemberInitExpression)e;
             kids.Add("new ", mie);
-            kids.Add(objectStringifier.TypeNameToCode(mie.NewExpression.Constructor.ReflectedType));
+            kids.Add(objectStringifier.TypeNameToCode(mie.NewExpression.Constructor.DeclaringType));
             if (mie.NewExpression.Arguments.Any()) {
                 kids.Add(ArgListDispatch(GetArgumentsForMethod(mie.NewExpression.Constructor, mie.NewExpression.Arguments)));
             }
@@ -564,8 +564,8 @@ namespace ExpressionToCodeLib.Internal
 
             var ne = (NewExpression)e;
             if (ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
-                var parms = ne.Type.GetConstructors().Single().GetParameters();
-                var props = ne.Type.GetProperties();
+                var parms = ne.Type.GetTypeInfo().GetConstructors().Single().GetParameters();
+                var props = ne.Type.GetTypeInfo().GetProperties();
                 if (
                     !parms.Select(p => new { p.Name, Type = p.ParameterType })
                         .SequenceEqual(props.Select(p => new { p.Name, Type = p.PropertyType }))) {
@@ -600,7 +600,7 @@ namespace ExpressionToCodeLib.Internal
 
             var nae = (NewArrayExpression)e;
             Type arrayElemType = nae.Type.GetElementType();
-            bool isDelegate = typeof(Delegate).IsAssignableFrom(arrayElemType);
+            bool isDelegate = typeof(Delegate).GetTypeInfo().IsAssignableFrom(arrayElemType);
             bool implicitTypeOK = !isDelegate && nae.Expressions.Any()
                 && nae.Expressions.All(expr => expr.Type == arrayElemType);
             kids.Add("new" + (implicitTypeOK ? "" : " " + objectStringifier.TypeNameToCode(arrayElemType)) + "[] ", nae);

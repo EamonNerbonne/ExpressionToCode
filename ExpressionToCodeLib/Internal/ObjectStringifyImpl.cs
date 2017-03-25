@@ -56,7 +56,7 @@ namespace ExpressionToCodeLib.Internal
                                 : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
                     }
                 }
-            } else if (val.GetType().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
+            } else if (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
                 return "default(" + TypeNameToCode(val.GetType()) + ")";
             } else if (val is Type) {
                 return "typeof(" + TypeNameToCode((Type)val) + ")";

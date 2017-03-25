@@ -29,8 +29,8 @@ class CodeAnnotators
     static readonly ICodeAnnotator ValuesOnStalksCodeAnnotator
     static readonly ICodeAnnotator SubExpressionPerLineCodeAnnotator
 
-class ExpressionAssertions
-    void TYPE.Assert(Expression<Func<bool>> assertion, string msg)
+class ExpressionExpectations
+    void TYPE.Expect(Expression<Func<bool>> assertion, string msg)
 
 class ExpressionToCode
     string TYPE.ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)

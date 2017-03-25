@@ -25,9 +25,9 @@ namespace ExpressionToCodeLib.Internal
 
     internal static class EqualityExpressions
     {
-        static readonly MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).Method;
-        static readonly MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).Method;
-        static readonly MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>)object.ReferenceEquals).Method;
+        static readonly MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).GetMethodInfo();
+        static readonly MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).GetMethodInfo();
+        static readonly MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>)object.ReferenceEquals).GetMethodInfo();
         public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e) => ExtractEqualityType(e).Item1;
         public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression<Func<bool>> e) => ExtractEqualityType(e.Body);
 
@@ -43,7 +43,7 @@ namespace ExpressionToCodeLib.Internal
                     }
                 } else if (e.NodeType == ExpressionType.Call) {
                     var mce = (MethodCallExpression)e;
-                    if (mce.Method.Equals(((Func<object, bool>)new object().Equals).Method)) {
+                    if (mce.Method.Equals(((Func<object, bool>)new object().Equals).GetMethodInfo())) {
                         return Tuple.Create(EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
                     } else if (mce.Method.Equals(objEqualStaticMethod)) {
                         return Tuple.Create(
@@ -61,7 +61,7 @@ namespace ExpressionToCodeLib.Internal
                         return Tuple.Create(EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
                     } else if (HaveSameGenericDefinition(
                         mce.Method,
-                        ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).Method)) {
+                        ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).GetMethodInfo())) {
                         return Tuple.Create(EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
                     }
                 }
@@ -138,16 +138,16 @@ namespace ExpressionToCodeLib.Internal
             var ienumerableTypes =
                 GetGenericInterfaceImplementation(leftC.Type, typeof(IEnumerable<>))
                     .Intersect(GetGenericInterfaceImplementation(rightC.Type, typeof(IEnumerable<>)))
-                    .Select(seqType => seqType.GetGenericArguments().Single());
+                    .Select(seqType => seqType.GetTypeInfo().GetGenericArguments().Single());
 
             var seqEqualsMethod =
-                ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).Method.GetGenericMethodDefinition();
+                ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).GetMethodInfo().GetGenericMethodDefinition();
 
             var iequatableEqualsMethods =
                 (from genEquatable in GetGenericInterfaceImplementation(leftC.Type, typeof(IEquatable<>))
-                    let otherType = genEquatable.GetGenericArguments().Single()
-                    where otherType.IsAssignableFrom(rightC.Type)
-                    let ifacemap = leftC.Type.GetInterfaceMap(genEquatable)
+                    let otherType = genEquatable.GetTypeInfo().GetGenericArguments().Single()
+                    where otherType.GetTypeInfo().IsAssignableFrom(rightC.Type)
+                    let ifacemap = leftC.Type.GetTypeInfo().GetRuntimeInterfaceMap(genEquatable)
                     select
                         ifacemap.InterfaceMethods.Zip(ifacemap.InterfaceMethods, Tuple.Create)
                             .Single(ifaceAndImpl => ifaceAndImpl.Item1.Name == "Equals")
@@ -197,22 +197,22 @@ namespace ExpressionToCodeLib.Internal
             Type genericInterfaceType,
             string methodName) => GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
                 .Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
-                || method.DeclaringType.IsInterface && method.Name == methodName && method.DeclaringType.IsGenericType
+                || method.DeclaringType.GetTypeInfo().IsInterface && method.Name == methodName && method.DeclaringType.GetTypeInfo().IsGenericType
                     && method.DeclaringType.GetGenericTypeDefinition() == genericInterfaceType;
 
         static bool IsImplementationOfInterfaceMethod(MethodInfo method, Type interfaceType, string methodName)
         {
-            if (!interfaceType.IsAssignableFrom(method.DeclaringType)) {
+            if (!interfaceType.GetTypeInfo().IsAssignableFrom(method.DeclaringType)) {
                 return false;
             }
-            var interfaceMap = method.DeclaringType.GetInterfaceMap(interfaceType);
+            var interfaceMap = method.DeclaringType.GetTypeInfo().GetRuntimeInterfaceMap(interfaceType);
             return
                 interfaceMap.InterfaceMethods.Where((t, i) => t.Name == methodName && method.Equals(interfaceMap.TargetMethods[i]))
                     .Any();
         }
 
-        static IEnumerable<Type> GetGenericInterfaceImplementation(Type type, Type genericInterfaceType) => from itype in type.GetInterfaces()
-            where itype.IsGenericType && itype.GetGenericTypeDefinition() == genericInterfaceType
+        static IEnumerable<Type> GetGenericInterfaceImplementation(Type type, Type genericInterfaceType) => from itype in type.GetTypeInfo().GetInterfaces()
+            where itype.GetTypeInfo().IsGenericType && itype.GetGenericTypeDefinition() == genericInterfaceType
             select itype;
     }
 }

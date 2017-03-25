@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using ApprovalTests;
+using ApprovalTests.Approvers;
+using ApprovalTests.Core;
+using ApprovalTests.Reporters;
+using ApprovalTests.Writers;
 using ExpressionToCodeLib;
 using Xunit;
 
@@ -11,7 +15,23 @@ namespace ExpressionToCodeTest
 {
     public class ApiStabilityTest
     {
-        [Fact, MethodImpl(MethodImplOptions.NoInlining)]
+        class SaneNamer : IApprovalNamer
+        {
+            public string SourcePath { get; set; }
+            public string Name { get; set; }
+        }
+
+        static void MyApprove(string text, object IGNORE_PAST_THIS = null, [CallerFilePath] string filepath = null, [CallerMemberName] string membername = null)
+        {
+            var writer = WriterFactory.CreateTextWriter(text);
+            var filename = Path.GetFileNameWithoutExtension(filepath);
+            var filedir = Path.GetDirectoryName(filepath);
+            var namer = new SaneNamer { Name = filename + "." + membername, SourcePath = filedir };
+            var reporter = new DiffReporter();
+            Approver.Verify(new FileApprover(writer, namer, true), reporter);
+        }
+
+        [Fact]
         public void PublicApi()
         {
             var publicTypes = typeof(ExpressionToCode).Assembly.GetTypes()
@@ -21,10 +41,10 @@ namespace ExpressionToCodeTest
                 .ThenByDescending(type => type.IsInterface)
                 .ThenBy(type => type.FullName);
 
-            Approvals.Verify(PrettyPrintTypes(publicTypes));
+            MyApprove(PrettyPrintTypes(publicTypes));
         }
 
-        [Fact, MethodImpl(MethodImplOptions.NoInlining)]
+        [Fact]
         public void UnstableApi()
         {
             var unstableTypes = typeof(ExpressionToCode).Assembly.GetTypes()
@@ -34,7 +54,7 @@ namespace ExpressionToCodeTest
                 .ThenByDescending(type => type.IsInterface)
                 .ThenBy(type => type.FullName);
 
-            Approvals.Verify(PrettyPrintTypes(unstableTypes));
+            MyApprove(PrettyPrintTypes(unstableTypes));
         }
 
         static string PrettyPrintTypes(IEnumerable<Type> types) { return string.Join("", types.Select(PrettyPrintTypeDescription)); }
@@ -43,14 +63,14 @@ namespace ExpressionToCodeTest
         static string PrettyPrintTypeContents(Type type)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                .OrderBy(mi => mi.MetadataToken)
-                .Where(mi => mi.DeclaringType.Assembly != typeof(object).Assembly) //exclude noise
+                    .OrderBy(mi => mi.MetadataToken)
+                    .Where(mi => mi.DeclaringType.Assembly != typeof(object).Assembly) //exclude noise
                 ;
 
             var methodBlock = string.Join("", methods.Select(mi => PrettyPrintMethod(mi) + "\n"));
 
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                .Where(mi => mi.DeclaringType.Assembly != typeof(object).Assembly) //exclude noise
+                    .Where(mi => mi.DeclaringType.Assembly != typeof(object).Assembly) //exclude noise
                 ;
 
             var fieldBlock = string.Join("", fields.Select(fi => PrettyPrintField(fi) + "\n"));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using ExpressionToCodeLib;
 using Xunit;
@@ -116,7 +117,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void GenericArgumentTypes()
         {
-            Assert.Equal("Func<Z>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>).GetMethod("Method").GetParameters()[0].ParameterType));
+            Assert.Equal("Func<Z>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>).GetTypeInfo().GetMethod("Method").GetParameters()[0].ParameterType));
         }
 
         [Fact]
