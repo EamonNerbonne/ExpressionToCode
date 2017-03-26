@@ -89,16 +89,19 @@ namespace ExpressionToCodeLib.Internal
 
         public static TypeClass GuessTypeClass(this Type type)
         {
-            bool compilerGenerated = type.GetTypeInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
+            var typeInfo = type.GetTypeInfo();
+            if (typeInfo.IsArray)
+                return TypeClass.BuiltinType;
+            bool compilerGenerated = typeInfo.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
             string name = type.Name;
             bool name_StartWithLessThan = name.StartsWith("<");
-            bool isBuiltin = type.GetTypeInfo().IsPrimitive || type.GetTypeInfo().IsEnum || type == typeof(decimal) || type == typeof(string)
+            bool isBuiltin = typeInfo.IsPrimitive || typeInfo.IsEnum || type == typeof(decimal) || type == typeof(string)
                 || typeof(Type).GetTypeInfo().IsAssignableFrom(type);
 
             if (name_StartWithLessThan && compilerGenerated) {
                 bool named_AnonymousType = name.Contains("AnonymousType");
                 bool named_DisplayClass = name.Contains("DisplayClass");
-                bool isGeneric = type.GetTypeInfo().IsGenericType;
+                bool isGeneric = typeInfo.IsGenericType;
                 bool isNested = type.IsNested;
 
                 if (!isBuiltin && isGeneric && !isNested && named_AnonymousType) {
@@ -113,7 +116,7 @@ namespace ExpressionToCodeLib.Internal
                             + ", " + isNested);
                 }
             } else if (!compilerGenerated && !name_StartWithLessThan) {
-                return isBuiltin ? TypeClass.BuiltinType : type.GetTypeInfo().IsValueType ? TypeClass.StructType : TypeClass.NormalType;
+                return isBuiltin ? TypeClass.BuiltinType : typeInfo.IsValueType ? TypeClass.StructType : TypeClass.NormalType;
             } else {
                 throw new ArgumentException("Unusual type, heuristics uncertain:" + name);
             }

@@ -1,0 +1,13 @@
+﻿() => arr.Any()
+       │   │
+       │   true
+       new[] {
+  new {
+          Name = "hmm",
+          Val = 3,
+        },
+  new {
+          Name = "foo",
+          Val = "test",
+        },
+}

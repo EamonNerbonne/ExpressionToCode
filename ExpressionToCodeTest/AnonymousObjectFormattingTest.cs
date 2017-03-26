@@ -23,6 +23,14 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
+        public void AnonymousObjectsInArrayExpression()
+        {
+            var arr = new[] { new { Name = "hmm", Val = (object)3, }, new { Name = "foo", Val = (object)"test" } };
+
+            ApprovalTest.Verify(ExpressionToCode.AnnotatedToCode(() => arr.Any()));
+        }
+
+        [Fact]
         public void EnumerableInAnonymousObject()
         {
             Assert.Equal("new {\n  Nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...},\n}", ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(new { Nums = Enumerable.Range(1, 13) }));

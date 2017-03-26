@@ -256,9 +256,8 @@ namespace ExpressionToCodeLib.Internal
         }
 
         static bool isThisRef(Expression e)
-            => (
-                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-                )
+            => e.NodeType == ExpressionType.Constant
+                && ((ConstantExpression)e).Value != null
                 && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 
         static bool isClosureRef(Expression e)
