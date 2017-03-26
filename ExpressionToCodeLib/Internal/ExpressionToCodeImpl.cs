@@ -255,11 +255,18 @@ namespace ExpressionToCodeLib.Internal
             return kids.Finish();
         }
 
-        static bool isThisRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-            && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
+        static bool isThisRef(Expression e)
+            => (
+                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+                )
+                && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 
-        static bool isClosureRef(Expression e) => e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-            && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
+        static bool isClosureRef(Expression e)
+            => (
+                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+                    || e.NodeType == ExpressionType.MemberAccess
+                )
+                && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
 
         [Pure]
         public StringifiedExpression DispatchMemberAccess(Expression e)

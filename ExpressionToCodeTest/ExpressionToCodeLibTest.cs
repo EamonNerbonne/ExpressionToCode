@@ -644,7 +644,7 @@ namespace ExpressionToCodeTest
             var expr= new ClassWithClosure {
                 someValue = "test "
             }.GetExpression(DayOfWeek.Friday);
-            Assert.Equal(@"() => someValue + (object)closedVariable + "" "" + argument", expr);
+            Assert.Equal(@"() => someValue + (object)closedVariable + "" "" + (object)argument", expr);
         }
 
         class ClassWithClosure
