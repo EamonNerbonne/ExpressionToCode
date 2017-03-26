@@ -638,6 +638,28 @@ namespace ExpressionToCodeTest
             Assert.Equal("() => this[1]", actual);
         }
 
+        [Fact]
+        public void DetectsClosuresInNestedClasses()
+        {
+            var expr= new ClassWithClosure {
+                someValue = "test "
+            }.GetExpression(DayOfWeek.Friday);
+            Assert.Equal(@"() => someValue + (object)closedVariable + "" "" + argument", expr);
+        }
+
+        class ClassWithClosure
+        {
+            public string someValue;
+
+            public string GetExpression(DayOfWeek argument)
+            {
+                var arr = new[] { 37 };
+                foreach (var closedVariable in arr)
+                    return ExpressionToCode.ToCode(() => someValue + closedVariable + " " + argument);
+                throw new Exception();
+            }
+        }
+
         public string this[int index] => "TheIndexedValue";
         public string TheProperty => "TheValue";
         protected string TheProtectedProperty => "TheValue";
