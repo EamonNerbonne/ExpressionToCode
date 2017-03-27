@@ -56,5 +56,13 @@ namespace ExpressionToCodeTest
             var b = 5;
             ApprovalTest.Verify(annotator.AnnotatedToCode(() => Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()));
         }
+
+        [Fact]
+        public void MessyStructureElidesNeatly() {
+            var hmm = "1234567890";
+            ApprovalTest.Verify(annotator.AnnotatedToCode(
+                () => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
+                ));
+        }
     }
 }

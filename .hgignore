@@ -11,3 +11,4 @@ ExpressionToCodeLib/*.nupkg
 TestResults/**.coverage
 *.orig
 ExpressionToCode.Benchmarks/BenchmarkDotNet.Artifacts
+.vs
