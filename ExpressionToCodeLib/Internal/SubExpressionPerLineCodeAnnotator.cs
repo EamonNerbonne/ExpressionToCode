@@ -18,9 +18,12 @@ namespace ExpressionToCodeLib.Internal
             string ExpressionString;
             SubExpressionValue[] SubExpressions;
 
-            public struct SubExpressionValue
+            public struct SubExpressionValue : IEquatable<SubExpressionValue>
             {
                 public string SubExpression, ValueAsString;
+                public override int GetHashCode() => SubExpression.GetHashCode() + 37 * ValueAsString.GetHashCode();
+                public override bool Equals(object obj) => obj is SubExpressionValue val && Equals(val);
+                public bool Equals(SubExpressionValue val) => SubExpression == val.SubExpression && ValueAsString == val.ValueAsString;
             }
 
             public static ExpressionWithSubExpressions Create(ExpressionToCodeConfiguration config, Expression e, bool hideOutermostValue)
@@ -32,7 +35,7 @@ namespace ExpressionToCodeLib.Internal
                 var fullExprText = sb.ToString();
                 var subExpressionValues = new List<SubExpressionValue>();
                 FindSubExpressionValues(config, node, node, subExpressionValues, hideOutermostValue);
-                return new ExpressionWithSubExpressions { ExpressionString = fullExprText, SubExpressions = subExpressionValues.ToArray() };
+                return new ExpressionWithSubExpressions { ExpressionString = fullExprText, SubExpressions = subExpressionValues.Distinct().ToArray() };
             }
 
             static void AppendNodeToStringBuilder(StringBuilder sb, StringifiedExpression node, ref bool ignoreInitialSpace)
