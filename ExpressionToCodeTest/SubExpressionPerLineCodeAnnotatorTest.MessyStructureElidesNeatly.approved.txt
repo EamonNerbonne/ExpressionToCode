@@ -1,13 +1,13 @@
 ﻿() => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
-hmm: "1234567890"
-hmm[1]: '2'
-hmm[2]: '3'
-hmm[1] == hmm[2]: false
-hmm[4]: '5'
-hmm[8]: '9'
-hmm[8].ToString(): "9"
-int.Parse(...[...].ToString()): 9
-hmm[int.Parse(....ToString())]: '0'
-hmm[4] == hmm[int.Parse(...)]: false
-...[...] == ...[...] || ...[...] == ...[...]: false
-... == ... || ... == ... || false: false
+                                                      hmm   →   "1234567890"
+                                                   hmm[1]   →   '2'
+                                                   hmm[2]   →   '3'
+                                         hmm[1] == hmm[2]   →   false
+                                                   hmm[4]   →   '5'
+                                                   hmm[8]   →   '9'
+                                        hmm[8].ToString()   →   "9"
+                             int.Parse(hmm[8].ToString())   →   9
+                        hmm[int.Parse(hmm[8].ToString())]   →   '0'
+              hmm[4] == hmm[int.Parse(hmm[8].ToString())]   →   false
+hmm[1] == hmm[2] || hmm[4]  …  .Parse(hmm[8].ToString())]   →   false
+hmm[1] == hmm[2] || hmm[4]  …  m[8].ToString())] || false   →   false
