@@ -1,11 +1,11 @@
 ﻿() => a < b && nums[a + b] < 7 && b < 10
-                                 a   →   2
-                                 b   →   5
-                             a < b   →   true
-                              nums   →   new[] {10, 11, 12, 13, 14, 15, 16, 17, 18, 19}
-                             a + b   →   7
-                       nums[a + b]   →   17
-                   nums[a + b] < 7   →   false
-          a < b && nums[a + b] < 7   →   false
-                            b < 10   →   true
-a < b && nums[a + b] < 7 && b < 10   →   false
+                                             2   ←   a
+                                             5   ←   b
+                                          true   ←   a < b
+new[] {10, 11, 12, 13, 14, 15, 16, 17, 18, 19}   ←   nums
+                                             7   ←   a + b
+                                            17   ←   nums[a + b]
+                                         false   ←   nums[a + b] < 7
+                                         false   ←   a < b && nums[a + b] < 7
+                                          true   ←   b < 10
+                                         false   ←   a < b && nums[a + b] < 7 && b < 10
