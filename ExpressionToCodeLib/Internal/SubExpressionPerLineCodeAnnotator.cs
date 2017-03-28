@@ -63,7 +63,6 @@ namespace ExpressionToCodeLib.Internal
                     var ignoreInitialSpace = true;
                     string valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue) ?? "";
                     AppendNodeToStringBuilder(sb, subExprNode, ref ignoreInitialSpace);
-                    //AppendNodeWithLimitedDepth(sb, subExprNode, ref ignoreInitialSpace, 2);
                     var maxSize = 80;
                     var subExprString = sb.Length <= maxSize ? sb.ToString()
                         : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);

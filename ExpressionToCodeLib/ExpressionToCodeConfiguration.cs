@@ -45,7 +45,7 @@ namespace ExpressionToCodeLib
         /// This is identical to DefaultCodeGenConfiguration, except that enumerable contents after the first 10 elements are elided.
         /// </summary>
         public static readonly ExpressionToCodeConfiguration DefaultAssertionConfiguration =
-            DefaultCodeGenConfiguration.WithPrintedListLengthLimit(10).WithMaximumValueLength(150);
+            DefaultCodeGenConfiguration.WithPrintedListLengthLimit(10).WithMaximumValueLength(80);
 
         /// <summary>
         /// This configuration is used for PAssert.That(()=>...) and Expect(()=>...).  Initially ExpressionToCodeConfiguration.DefaultAssertionConfiguration.
