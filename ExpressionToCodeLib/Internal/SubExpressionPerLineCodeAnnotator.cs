@@ -61,7 +61,7 @@ namespace ExpressionToCodeLib.Internal
                 if (!hideOutermostValue && node.OptionalValue != null) {
                     var sb = new StringBuilder();
                     var ignoreInitialSpace = true;
-                    string valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue) ?? "";
+                    string valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10) ?? "";
                     AppendNodeToStringBuilder(sb, subExprNode, ref ignoreInitialSpace);
                     var maxSize = 80;
                     var subExprString = sb.Length <= maxSize ? sb.ToString()

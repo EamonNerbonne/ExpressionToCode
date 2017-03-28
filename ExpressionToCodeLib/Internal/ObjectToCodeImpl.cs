@@ -31,10 +31,10 @@ namespace ExpressionToCodeLib.Internal
                         type.GetTypeInfo().GetProperties()
                             .Select(
                                 pi =>
-                                    "\n" + new string(' ', indent * 2 + 2) + pi.Name + " = "
-                                        + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 2, valueSize - pi.Name.Length) + ",")
+                                    "\n" + new string(' ', indent + 2) + pi.Name + " = "
+                                        + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 4, valueSize - pi.Name.Length) + ",")
                         )
-                    + "\n" + new string(' ', indent * 2) + "}";
+                    + "\n" + new string(' ', indent) + "}";
             } else {
                 return ElideAfter(val.ToString(), valueSize);
             }
@@ -50,10 +50,10 @@ namespace ExpressionToCodeLib.Internal
         {
             var contents = PrintListContents(config, list, indent).ToArray();
             if (contents.Sum(s => s.Length + 2) > Math.Min(valueSize, 120) || contents.Any(s => s.Any(c => c == '\n'))) {
-                var indentString = new string(' ', indent * 2 + 2);
+                var indentString = new string(' ', indent + 2);
                 return "{\n"
                     + string.Join("", contents.Select(s => indentString + ElideAfter(s, valueSize - 3) + (s == "..." ? "" : ",") + "\n"))
-                    + new string(' ', indent * 2)
+                    + new string(' ', indent)
                     + "}";
             }
             return "{" + string.Join(", ", contents) + "}";
@@ -68,12 +68,12 @@ namespace ExpressionToCodeLib.Internal
                     yield return "...";
                     yield break;
                 } else {
-                    yield return ComplexObjectToPseudoCode(config, item, indent + 4);
+                    yield return ComplexObjectToPseudoCode(config, item, indent + 8);
                 }
             }
         }
 
-        public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression)
+        public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent)
         {
             try {
                 Delegate lambda;
@@ -85,7 +85,7 @@ namespace ExpressionToCodeLib.Internal
 
                 var val = lambda.DynamicInvoke();
                 try {
-                    return ComplexObjectToPseudoCode(config, val, 0);
+                    return ComplexObjectToPseudoCode(config, val, indent);
                 } catch (Exception e) {
                     return "stringification throws " + e.GetType().FullName;
                 }
