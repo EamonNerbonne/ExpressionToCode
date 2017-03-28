@@ -64,7 +64,7 @@ namespace ExpressionToCodeLib.Internal
                     string valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue) ?? "";
                     AppendNodeToStringBuilder(sb, subExprNode, ref ignoreInitialSpace);
                     //AppendNodeWithLimitedDepth(sb, subExprNode, ref ignoreInitialSpace, 2);
-                    var maxSize = Math.Max(30, 60 - valueString.Length);
+                    var maxSize = 80;
                     var subExprString = sb.Length <= maxSize ? sb.ToString()
                         : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);
                     subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
@@ -101,13 +101,13 @@ namespace ExpressionToCodeLib.Internal
 
             public string ComposeToSingleString()
             {
-                var maxValLen = SubExpressions.Max(sub => sub.ValueAsString.Length);
-
-                return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.ValueAsString.PadLeft(maxValLen) + "   ←   " + sub.SubExpression + "\n"));
-
                 var maxExprLen = SubExpressions.Max(sub => sub.SubExpression.Length);
 
-                return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLen) + "   →   " + sub.ValueAsString + "\n"));
+                if (maxExprLen < 30) {
+                    return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLen) + "   →   " + sub.ValueAsString + "\n"));
+                }
+
+                return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression+ "\n     →   " + sub.ValueAsString + "\n"));
             }
         }
     }
