@@ -45,7 +45,6 @@ namespace ExpressionToCodeTest
             var a = 2;
             var b = 5;
             var c = 3.45;
-            var nums = Enumerable.Range(10, 10).ToArray();
             ApprovalTest.Verify(annotator.AnnotatedToCode(() => a < b && (c > -a || c > b) && b < 10));
         }
 
