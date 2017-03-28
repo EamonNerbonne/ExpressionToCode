@@ -14,8 +14,8 @@ namespace ExpressionToCodeLib
         public IObjectStringifier ObjectStringifier;
         public bool AlwaysUseExplicitTypeArguments;
         public int? PrintedListLengthLimit;
+        public int? MaximumValueLength;
     }
-
 
     /// <summary>
     /// Specifies details of how expressions and their values are to be formatted.  This object is immutable; all instance methods are thread safe.
@@ -45,9 +45,7 @@ namespace ExpressionToCodeLib
         /// This is identical to DefaultCodeGenConfiguration, except that enumerable contents after the first 10 elements are elided.
         /// </summary>
         public static readonly ExpressionToCodeConfiguration DefaultAssertionConfiguration =
-            DefaultCodeGenConfiguration.WithPrintedListLengthLimit(10);
-
-
+            DefaultCodeGenConfiguration.WithPrintedListLengthLimit(10).WithMaximumValueLength(150);
 
         /// <summary>
         /// This configuration is used for PAssert.That(()=>...) and Expect(()=>...).  Initially ExpressionToCodeConfiguration.DefaultAssertionConfiguration.
@@ -65,9 +63,12 @@ namespace ExpressionToCodeLib
         /// </summary>
         public static ExpressionToCodeConfiguration GlobalCodeGenConfiguration = DefaultCodeGenConfiguration;
 
-
         internal readonly ExpressionToCodeConfigurationValue Value;
-        ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value) { Value = value; }
+
+        ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value)
+        {
+            Value = value;
+        }
 
         delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
 
@@ -81,6 +82,7 @@ namespace ExpressionToCodeLib
         public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler) => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
         public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator) => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
         public ExpressionToCodeConfiguration WithPrintedListLengthLimit(int? limitListsToLength) => With((ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
+        public ExpressionToCodeConfiguration WithMaximumValueLength(int? limitValueStringsToLength) => With((ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
 
         public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier)
             => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
@@ -94,7 +96,11 @@ namespace ExpressionToCodeLib
         class AnnotatedToCodeWrapper : IAnnotatedToCode
         {
             readonly ExpressionToCodeConfiguration config;
-            public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config) { this.config = config; }
+
+            public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config)
+            {
+                this.config = config;
+            }
 
             public string AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
                 => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, hideOutermostValue);
@@ -103,7 +109,12 @@ namespace ExpressionToCodeLib
         sealed class ExpressionToCodeWrapper : IExpressionToCode
         {
             readonly ExpressionToCodeConfiguration config;
-            public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config) { this.config = config; }
+
+            public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config)
+            {
+                this.config = config;
+            }
+
             public string ToCode(Expression e) => ExpressionToCodeString.ToCodeString(config, e);
         }
     }
