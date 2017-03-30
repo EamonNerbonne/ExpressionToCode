@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal struct CSharpFriendlyTypeName
+    struct CSharpFriendlyTypeName
     {
         public bool UseFullName;
         public bool IncludeGenericTypeArgumentNames;
@@ -15,7 +15,7 @@ namespace ExpressionToCodeLib.Internal
         {
             var typeNameWithoutNamespace =
                 GenericTypeName(type)
-                    ?? NormalName(type);
+                ?? NormalName(type);
             return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
         }
 
@@ -102,7 +102,7 @@ namespace ExpressionToCodeLib.Internal
                         revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + new string(',', thisTypeArgCount - 1) + ">");
                     } else {
                         var argNames = new List<string>();
-                        for (int i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
+                        for (var i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
                             argNames.Add(GetTypeName(typeArgs[i]));
                         }
                         typeArgIdx -= thisTypeArgCount;
@@ -125,9 +125,8 @@ namespace ExpressionToCodeLib.Internal
                 var rankCommas = new string(',', type.GetArrayRank() - 1);
                 type = type.GetElementType();
                 arraySuffix = arraySuffix + "[" + rankCommas + "]";
-            }
-            while (type.IsArray);
-            string basename = GetTypeName(type);
+            } while (type.IsArray);
+            var basename = GetTypeName(type);
             return basename + arraySuffix;
         }
     }

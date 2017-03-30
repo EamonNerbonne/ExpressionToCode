@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ExpressionToCodeLib.Internal;
 
 namespace ExpressionToCodeLib
@@ -14,6 +13,7 @@ namespace ExpressionToCodeLib
         /// This works best in monospace fonts.
         /// </summary>
         public static readonly ICodeAnnotator ValuesOnStalksCodeAnnotator = new ValuesOnStalksCodeAnnotator();
+
         /// <summary>
         /// This code annotator summarizes sub-expression values on separate lines below the stringified expression.  
         /// This works reasonably well even for large expressions because the sub-expressions are represented compactly and there's no need for overal alignment.

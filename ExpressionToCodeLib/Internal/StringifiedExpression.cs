@@ -4,11 +4,13 @@ using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal struct StringifiedExpression
+    struct StringifiedExpression
     {
         //a node cannot have children and text.  If it has neither, it is considered empty.
         public readonly string Text;
+
         readonly StringifiedExpression[] children;
+
         //can only have a value it it has text.
         public readonly Expression OptionalValue;
 

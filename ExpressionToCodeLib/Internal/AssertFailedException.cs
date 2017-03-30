@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace ExpressionToCodeLib.Internal
 {
     [Serializable]
-    internal sealed class AssertFailedException : Exception
+    sealed class AssertFailedException : Exception
     {
         public AssertFailedException(string message)
             : base(message) { }

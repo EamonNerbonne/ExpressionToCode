@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal class ValuesOnStalksCodeAnnotator : ICodeAnnotator
+    class ValuesOnStalksCodeAnnotator : ICodeAnnotator
     {
         public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
         {
@@ -22,15 +22,15 @@ namespace ExpressionToCodeLib.Internal
                 exprWithStalkedValues.AppendLine(splitLine.Line + "  :  " + msg);
             }
 
-            for (int nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
-                char[] stalkLine = new string('\u2007', splitLine.Nodes[nodeI].Location).ToCharArray(); //figure-spaces.
-                for (int i = 0; i < stalkLine.Length; i++) {
+            for (var nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
+                var stalkLine = new string('\u2007', splitLine.Nodes[nodeI].Location).ToCharArray(); //figure-spaces.
+                for (var i = 0; i < stalkLine.Length; i++) {
                     if (splitLine.Line[i] == ' ') {
                         stalkLine[i] = ' '; //use normal spaces where the expr used normal spaces for more natural spacing.
                     }
                 }
 
-                for (int prevI = 0; prevI < nodeI; prevI++) {
+                for (var prevI = 0; prevI < nodeI; prevI++) {
                     stalkLine[splitLine.Nodes[prevI].Location] = '\u2502'; //light vertical lines
                 }
                 exprWithStalkedValues.AppendLine((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
@@ -49,7 +49,7 @@ namespace ExpressionToCodeLib.Internal
         {
             var nodeInfos = new List<SubExpressionInfo>();
             var sb = new StringBuilder();
-            bool ignoreInitialSpace = true;
+            var ignoreInitialSpace = true;
             var node = new ExpressionToCodeImpl(config).ExpressionDispatch(e);
             AppendTo(config, sb, nodeInfos, node, ref ignoreInitialSpace, !hideOutermostValue);
             nodeInfos.Add(new SubExpressionInfo { Location = sb.Length, Value = null });
@@ -64,7 +64,7 @@ namespace ExpressionToCodeLib.Internal
                 sb.Append(trimmedText);
                 ignoreInitialSpace = node.Text.Any() && ExpressionToCode.ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
                 if (showTopExpressionValue) {
-                    string valueString = node.OptionalValue == null ? null : ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 0);
+                    var valueString = node.OptionalValue == null ? null : ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 0);
                     if (valueString != null) {
                         nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
                     }

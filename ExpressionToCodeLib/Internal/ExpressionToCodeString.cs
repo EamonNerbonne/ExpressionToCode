@@ -4,9 +4,8 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal sealed class ExpressionToCodeString 
+    sealed class ExpressionToCodeString
     {
-
         public static string ToCodeString(ExpressionToCodeConfiguration config, Expression e)
         {
             var sb = new StringBuilder();

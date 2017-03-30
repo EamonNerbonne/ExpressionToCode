@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal static class UnitTestingFailure
+    static class UnitTestingFailure
     {
         static Func<T0, TR> F<T0, TR>(Func<T0, TR> f) => f;
         static Func<T0, T1, TR> F<T0, T1, TR>(Func<T0, T1, TR> f) => f;
@@ -33,15 +33,15 @@ namespace ExpressionToCodeLib.Internal
                     }
                     return
                         Expression.Lambda<Func<string, Exception, Exception>>(
-                            Expression.New(exConstructor, failureMessageArg, innerExceptionArg),
-                            failureMessageArg,
-                            innerExceptionArg)
+                                Expression.New(exConstructor, failureMessageArg, innerExceptionArg),
+                                failureMessageArg,
+                                innerExceptionArg)
                             .Compile();
                 });
 
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (Assembly assembly in assemblies) {
-                string assemblyName = assembly.GetName().Name;
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies) {
+                var assemblyName = assembly.GetName().Name;
                 if (assemblyName == "xunit" || assemblyName == "xunit.assert") {
                     var xUnitExceptionType = assembly.GetType("Xunit.Sdk.XunitException") ?? assembly.GetType("Xunit.Sdk.AssertException");
                     var xUnitExceptionConstructor =
@@ -79,12 +79,12 @@ namespace ExpressionToCodeLib.Internal
                             Priority = 3,
                             CreateException =
                                 Expression.Lambda<Func<string, Exception, Exception>>(
-                                    Expression.New(
-                                        exConstructor,
-                                        Expression.Add(Expression.Constant("\r\n"), failureMessageArg, ((Func<string, string, string>)string.Concat).Method),
-                                        innerExceptionArg),
-                                    failureMessageArg,
-                                    innerExceptionArg)
+                                        Expression.New(
+                                            exConstructor,
+                                            Expression.Add(Expression.Constant("\r\n"), failureMessageArg, ((Func<string, string, string>)string.Concat).Method),
+                                            innerExceptionArg),
+                                        failureMessageArg,
+                                        innerExceptionArg)
                                     .Compile(),
                         };
                 } else if (assemblyName == "nunit.framework") {

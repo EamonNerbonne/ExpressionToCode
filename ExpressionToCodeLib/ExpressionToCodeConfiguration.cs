@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using ExpressionToCodeLib.Internal;
 
 namespace ExpressionToCodeLib
@@ -64,11 +63,7 @@ namespace ExpressionToCodeLib
         public static ExpressionToCodeConfiguration GlobalCodeGenConfiguration = DefaultCodeGenConfiguration;
 
         internal readonly ExpressionToCodeConfigurationValue Value;
-
-        ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value)
-        {
-            Value = value;
-        }
+        ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value) => Value = value;
 
         delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
 
@@ -96,11 +91,7 @@ namespace ExpressionToCodeLib
         class AnnotatedToCodeWrapper : IAnnotatedToCode
         {
             readonly ExpressionToCodeConfiguration config;
-
-            public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config)
-            {
-                this.config = config;
-            }
+            public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config) => this.config = config;
 
             public string AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
                 => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, hideOutermostValue);
@@ -109,12 +100,7 @@ namespace ExpressionToCodeLib
         sealed class ExpressionToCodeWrapper : IExpressionToCode
         {
             readonly ExpressionToCodeConfiguration config;
-
-            public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config)
-            {
-                this.config = config;
-            }
-
+            public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config) => this.config = config;
             public string ToCode(Expression e) => ExpressionToCodeString.ToCodeString(config, e);
         }
     }

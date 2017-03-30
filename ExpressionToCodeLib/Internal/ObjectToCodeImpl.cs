@@ -14,7 +14,7 @@ namespace ExpressionToCodeLib.Internal
 
         internal static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize)
         {
-            string retval = ObjectToCode.PlainObjectToCode(val);
+            var retval = ObjectToCode.PlainObjectToCode(val);
             if (retval != null) {
                 return ElideAfter(retval, valueSize);
             } else if (val is Array) {
@@ -28,12 +28,13 @@ namespace ExpressionToCodeLib.Internal
                 return "new {" +
                     string.Join(
                         "",
-                        type.GetTypeInfo().GetProperties()
+                        type.GetTypeInfo()
+                            .GetProperties()
                             .Select(
                                 pi =>
                                     "\n" + new string(' ', indent + 2) + pi.Name + " = "
-                                        + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 4, valueSize - pi.Name.Length) + ",")
-                        )
+                                    + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 4, valueSize - pi.Name.Length) + ",")
+                    )
                     + "\n" + new string(' ', indent) + "}";
             } else {
                 return ElideAfter(val.ToString(), valueSize);
@@ -61,7 +62,7 @@ namespace ExpressionToCodeLib.Internal
 
         static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list, int indent)
         {
-            int count = 0;
+            var count = 0;
             foreach (var item in list) {
                 count++;
                 if (count > config.Value.PrintedListLengthLimit) {

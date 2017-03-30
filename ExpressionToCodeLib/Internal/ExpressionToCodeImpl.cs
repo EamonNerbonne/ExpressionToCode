@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Diagnostics.Contracts;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
+    class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {
         #region General Helpers
         readonly IObjectStringifier objectStringifier;
@@ -26,8 +26,8 @@ namespace ExpressionToCodeLib.Internal
         [Pure]
         IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
         {
-            int parentRank = parentType == null ? 0 : ExpressionPrecedence.Rank(parentType.Value);
-            bool needsParens = parentRank > 0
+            var parentRank = parentType == null ? 0 : ExpressionPrecedence.Rank(parentType.Value);
+            var needsParens = parentRank > 0
                 && (parensIfEqualRank ? parentRank - 1 : parentRank) < ExpressionPrecedence.Rank(child.NodeType);
 
             if (needsParens) {
@@ -56,7 +56,7 @@ namespace ExpressionToCodeLib.Internal
         [Pure]
         static IEnumerable<StringifiedExpression> JoinDispatch<T>(IEnumerable<T> children, string joiner, Func<T, IEnumerable<StringifiedExpression>> childVisitor)
         {
-            bool isFirst = true;
+            var isFirst = true;
             foreach (var child in children) {
                 if (!isFirst) {
                     yield return StringifiedExpression.TextOnly(joiner);
@@ -99,15 +99,31 @@ namespace ExpressionToCodeLib.Internal
         struct KidsBuilder
         {
             readonly List<StringifiedExpression> kids;
-            KidsBuilder(List<StringifiedExpression> init) { kids = init; }
+            KidsBuilder(List<StringifiedExpression> init) => kids = init;
 
             [Pure]
             public static KidsBuilder Create() => new KidsBuilder(new List<StringifiedExpression>());
 
-            public void Add(StringifiedExpression node) { kids.Add(node); }
-            public void Add(IEnumerable<StringifiedExpression> nodes) { kids.AddRange(nodes); }
-            public void Add(string text, Expression value) { kids.Add(StringifiedExpression.TextAndExpr(text, value)); }
-            public void Add(string text) { kids.Add(StringifiedExpression.TextOnly(text)); }
+            public void Add(StringifiedExpression node)
+            {
+                kids.Add(node);
+            }
+
+            public void Add(IEnumerable<StringifiedExpression> nodes)
+            {
+                kids.AddRange(nodes);
+            }
+
+            public void Add(string text, Expression value)
+            {
+                kids.Add(StringifiedExpression.TextAndExpr(text, value));
+            }
+
+            public void Add(string text)
+            {
+                kids.Add(StringifiedExpression.TextOnly(text));
+            }
+
             public StringifiedExpression Finish() => StringifiedExpression.WithChildren(kids.ToArray());
         }
 
@@ -149,16 +165,16 @@ namespace ExpressionToCodeLib.Internal
         [Pure]
         static void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2)
         {
-            Type expr1nonnullableType = expr1uncast.Type.AvoidNullability();
-            Type expr2nonnullableType = expr2.Type.AvoidNullability();
+            var expr1nonnullableType = expr1uncast.Type.AvoidNullability();
+            var expr2nonnullableType = expr2.Type.AvoidNullability();
             if (expr1nonnullableType.GetTypeInfo().IsEnum
                 && expr1nonnullableType.GetTypeInfo().GetEnumUnderlyingType() == expr2nonnullableType
                 || expr1nonnullableType == typeof(char) && expr2nonnullableType == typeof(int)
-                ) {
+            ) {
                 expr1 = expr1uncast;
 
                 if (expr2.NodeType == ExpressionType.Constant) {
-                    object value = ((ConstantExpression)expr2).Value;
+                    var value = ((ConstantExpression)expr2).Value;
                     if (value == null) {
                         expr2 = Expression.Default(expr1uncast.Type.EnusureNullability());
                     } else if (expr1nonnullableType == typeof(char)) {
@@ -176,7 +192,7 @@ namespace ExpressionToCodeLib.Internal
         StringifiedExpression UnaryDispatch(string op, Expression e)
         {
             var ue = (UnaryExpression)e;
-            bool needsSpace = ExpressionPrecedence.TokenizerConfusable(ue.NodeType, ue.Operand.NodeType);
+            var needsSpace = ExpressionPrecedence.TokenizerConfusable(ue.NodeType, ue.Operand.NodeType);
             var kids = KidsBuilder.Create();
             kids.Add(op + (needsSpace ? " " : ""), e);
             kids.Add(NestExpression(ue.NodeType, ue.Operand));
@@ -262,7 +278,7 @@ namespace ExpressionToCodeLib.Internal
 
         static bool isClosureRef(Expression e)
             => (
-                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+                    e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
                     || e.NodeType == ExpressionType.MemberAccess
                 )
                 && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
@@ -272,7 +288,7 @@ namespace ExpressionToCodeLib.Internal
         {
             var kids = KidsBuilder.Create();
             var me = (MemberExpression)e;
-            Expression memberOfExpr = me.Expression;
+            var memberOfExpr = me.Expression;
             if (memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr)) {
                 kids.Add(NestExpression(e.NodeType, memberOfExpr));
                 kids.Add(".");
@@ -284,9 +300,10 @@ namespace ExpressionToCodeLib.Internal
             return kids.Finish();
         }
 
-        static readonly MethodInfo createDelegate = typeof(Delegate).GetTypeInfo().GetMethod(
-            "CreateDelegate",
-            new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
+        static readonly MethodInfo createDelegate = typeof(Delegate).GetTypeInfo()
+            .GetMethod(
+                "CreateDelegate",
+                new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
 
         [Pure]
         public StringifiedExpression DispatchCall(Expression e)
@@ -309,22 +326,22 @@ namespace ExpressionToCodeLib.Internal
                 var targetMethod = (MethodInfo)((ConstantExpression)mce.Arguments[2]).Value;
                 var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
-                    ? null
-                    : mce.Arguments[1];
+                        ? null
+                        : mce.Arguments[1];
                 kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Method.Name == "CreateDelegate"
                 && mce.Arguments.Count == 2
                 && mce.Object.Type == typeof(MethodInfo)
                 && mce.Object.NodeType == ExpressionType.Constant
                 && mce.Method.GetParameters()[1].ParameterType == typeof(object)
-                ) {
+            ) {
                 //.net 4.5
                 //implicitly constructed delegate from method group.
                 var targetMethod = (MethodInfo)((ConstantExpression)mce.Object).Value;
                 var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
-                    ? null
-                    : mce.Arguments[1];
+                        ? null
+                        : mce.Arguments[1];
                 kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Object == null
                 && mce.Type.FullName == "System.FormattableString"
@@ -334,16 +351,16 @@ namespace ExpressionToCodeLib.Internal
                 && mce.Arguments[0].NodeType == ExpressionType.Constant
                 && mce.Arguments[1].NodeType == ExpressionType.NewArrayInit
                 && ((NewArrayExpression)mce.Arguments[1]).Expressions.Count == 0
-                ) {
+            ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
                 var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
                 kids.Add(codeRepresentation);
             } else {
-                bool isExtensionMethod = mce.Method.IsStatic
+                var isExtensionMethod = mce.Method.IsStatic
                     && mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any()
                     && mce.Object == null;
-                Expression objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
+                var objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
                 kids.Add(SinkMethodName(mce, mce.Method, objectExpr));
                 var args = GetArgumentsForMethod(mce.Method, mce.Arguments);
 
@@ -390,17 +407,18 @@ namespace ExpressionToCodeLib.Internal
             if (!alwaysUseExplicitTypeArguments) {
                 var genericMethodDefinition = method.GetGenericMethodDefinition();
                 var relevantBindingFlagsForOverloads =
-                    BindingFlags.Public
+                        BindingFlags.Public
                         | (!method.IsPublic ? BindingFlags.NonPublic : 0)
                         | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)
                     ;
 
-                var confusibleOverloads = method.DeclaringType.GetTypeInfo().GetMethods(relevantBindingFlagsForOverloads)
+                var confusibleOverloads = method.DeclaringType.GetTypeInfo()
+                    .GetMethods(relevantBindingFlagsForOverloads)
                     .Where(
                         otherMethod =>
                             otherMethod != genericMethodDefinition
-                                && otherMethod.Name == method.Name
-                                && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
+                            && otherMethod.Name == method.Name
+                            && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
                     );
 
                 if (!confusibleOverloads.Any()
@@ -460,7 +478,7 @@ namespace ExpressionToCodeLib.Internal
             var kids = KidsBuilder.Create();
 
             var const_Val = ((ConstantExpression)e).Value;
-            string codeRepresentation = objectStringifier.PlainObjectToCode(const_Val, e.Type);
+            var codeRepresentation = objectStringifier.PlainObjectToCode(const_Val, e.Type);
             //e.Type.IsVisible
             if (codeRepresentation == null) {
                 var typeclass = e.Type.GuessTypeClass();
@@ -471,7 +489,7 @@ namespace ExpressionToCodeLib.Internal
                     throw new ArgumentOutOfRangeException(
                         "e",
                         "Can't print constant " + (const_Val == null ? "<null>" : const_Val.ToString())
-                            + " in expr of type " + e.Type);
+                        + " in expr of type " + e.Type);
                 }
             } else {
                 kids.Add(codeRepresentation);
@@ -583,7 +601,7 @@ namespace ExpressionToCodeLib.Internal
                         "Constructor Arguments for anonymous type don't match it's type signature!");
                 }
                 kids.Add("new { ");
-                for (int i = 0; i < props.Length; i++) {
+                for (var i = 0; i < props.Length; i++) {
                     kids.Add(props[i].Name + " = ");
                     kids.Add(RawChildDispatch(ne.Arguments[i]));
                     if (i + 1 < props.Length) {
@@ -605,9 +623,9 @@ namespace ExpressionToCodeLib.Internal
             var kids = KidsBuilder.Create();
 
             var nae = (NewArrayExpression)e;
-            Type arrayElemType = nae.Type.GetElementType();
-            bool isDelegate = typeof(Delegate).GetTypeInfo().IsAssignableFrom(arrayElemType);
-            bool implicitTypeOK = !isDelegate && nae.Expressions.Any()
+            var arrayElemType = nae.Type.GetElementType();
+            var isDelegate = typeof(Delegate).GetTypeInfo().IsAssignableFrom(arrayElemType);
+            var implicitTypeOK = !isDelegate && nae.Expressions.Any()
                 && nae.Expressions.All(expr => expr.Type == arrayElemType);
             kids.Add("new" + (implicitTypeOK ? "" : " " + objectStringifier.TypeNameToCode(arrayElemType)) + "[] ", nae);
             kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "{ ", " }"));
@@ -620,7 +638,7 @@ namespace ExpressionToCodeLib.Internal
             var kids = KidsBuilder.Create();
 
             var nae = (NewArrayExpression)e;
-            Type arrayElemType = nae.Type.GetElementType();
+            var arrayElemType = nae.Type.GetElementType();
             kids.Add("new " + objectStringifier.TypeNameToCode(arrayElemType), nae);
             kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]"));
             return kids.Finish();
@@ -632,7 +650,7 @@ namespace ExpressionToCodeLib.Internal
             var kids = KidsBuilder.Create();
 
             var be = (BlockExpression)e;
-            bool hasReturn = (be.Type != typeof(void));
+            var hasReturn = be.Type != typeof(void);
             var statements = hasReturn ? be.Expressions.Take(be.Expressions.Count - 1) : be.Expressions;
 
             kids.Add("{ ");
@@ -768,7 +786,7 @@ namespace ExpressionToCodeLib.Internal
         [Pure]
         public StringifiedExpression DispatchParameter(Expression e)
         {
-            var parameterExpression = ((ParameterExpression)e);
+            var parameterExpression = (ParameterExpression)e;
             // ReSharper disable once ConstantNullCoalescingCondition
             return StringifiedExpression.TextAndExpr(parameterExpression.Name ?? parameterExpression.Type.Name + parameterExpression.GetHashCode(), e);
         }
@@ -857,13 +875,13 @@ namespace ExpressionToCodeLib.Internal
 
         #region Unused by C#'s expression support; or unavailable in the language at all.
         [Pure]
-        public StringifiedExpression DispatchTypeEqual(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchTypeEqual(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchDebugInfo(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchDebugInfo(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchDynamic(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchDynamic(Expression e) => throw new NotImplementedException();
 
         [Pure]
         public StringifiedExpression DispatchDefault(Expression e)
@@ -874,40 +892,40 @@ namespace ExpressionToCodeLib.Internal
         }
 
         [Pure]
-        public StringifiedExpression DispatchExtension(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchExtension(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchGoto(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchGoto(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchLabel(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchLabel(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchRuntimeVariables(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchRuntimeVariables(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchLoop(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchLoop(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchSwitch(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchSwitch(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchThrow(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchThrow(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchTry(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchTry(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchUnbox(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchUnbox(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchPowerAssign(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchPowerAssign(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchIsTrue(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchIsTrue(Expression e) => throw new NotImplementedException();
 
         [Pure]
-        public StringifiedExpression DispatchIsFalse(Expression e) { throw new NotImplementedException(); }
+        public StringifiedExpression DispatchIsFalse(Expression e) => throw new NotImplementedException();
         #endregion
     }
 }

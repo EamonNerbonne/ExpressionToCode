@@ -3,7 +3,6 @@ using System.Linq.Expressions;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
-
 namespace ExpressionToCodeLib
 {
     /// <summary>
@@ -67,23 +66,28 @@ namespace ExpressionToCodeLib
         public static string GetNameIn(Expression expr)
         {
             var methodCall = expr as MethodCallExpression;
-            if (methodCall != null)
+            if (methodCall != null) {
                 return methodCall.Method.Name;
+            }
 
             var memberAccess = expr as MemberExpression;
-            if (memberAccess != null)
+            if (memberAccess != null) {
                 return memberAccess.Member.Name;
+            }
 
-            if (expr.NodeType == ExpressionType.ArrayLength)
+            if (expr.NodeType == ExpressionType.ArrayLength) {
                 return "Length";
+            }
 
             var lambda = expr as LambdaExpression;
-            if (lambda != null)
+            if (lambda != null) {
                 return GetNameIn(lambda.Body);
+            }
 
             var unary = expr as UnaryExpression;
-            if (unary != null)
+            if (unary != null) {
                 return GetNameIn(unary.Operand);
+            }
 
             throw new ArgumentException("Unsupported or unknown or complex expression to get `name` of it", nameof(expr));
         }

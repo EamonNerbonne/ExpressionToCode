@@ -6,10 +6,10 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal class ObjectStringifyImpl : IObjectStringifier
+    class ObjectStringifyImpl : IObjectStringifier
     {
         readonly bool fullTypeNames;
-        public ObjectStringifyImpl(bool fullTypeNames = false) { this.fullTypeNames = fullTypeNames; }
+        public ObjectStringifyImpl(bool fullTypeNames = false) => this.fullTypeNames = fullTypeNames;
         public string TypeNameToCode(Type type) => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
 
         string IObjectStringifier.PlainObjectToCode(object val, Type type)
@@ -17,7 +17,7 @@ namespace ExpressionToCodeLib.Internal
             if (val == null) {
                 return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
             } else if (val is string) {
-                bool useLiteralSyntax = ((string)val).Any(c => c < 32 || c == '\\')
+                var useLiteralSyntax = ((string)val).Any(c => c < 32 || c == '\\')
                     && ((string)val).All(c => c != '\n' && c != '\r' && c != '\t');
                 if (useLiteralSyntax) {
                     return "@\"" + ((string)val).Replace("\"", "\"\"") + "\"";
@@ -43,7 +43,7 @@ namespace ExpressionToCodeLib.Internal
                 if (Enum.IsDefined(val.GetType(), val)) {
                     return TypeNameToCode(val.GetType()) + "." + val;
                 } else {
-                    long longVal = ((IConvertible)val).ToInt64(null);
+                    var longVal = ((IConvertible)val).ToInt64(null);
                     var toString = ((IConvertible)val).ToString(CultureInfo.InvariantCulture);
                     if (toString == longVal.ToString(CultureInfo.InvariantCulture)) {
                         return "((" + TypeNameToCode(val.GetType()) + ")" + longVal + ")";
@@ -91,8 +91,8 @@ namespace ExpressionToCodeLib.Internal
 
         static string EscapeStringChars(string str)
         {
-            StringBuilder sb = new StringBuilder(str.Length);
-            foreach (char c in str) {
+            var sb = new StringBuilder(str.Length);
+            foreach (var c in str) {
                 sb.Append(EscapeCharForString(c));
             }
             return sb.ToString();
@@ -100,13 +100,13 @@ namespace ExpressionToCodeLib.Internal
 
         static string DoubleToCode(double p)
         {
-            if (Double.IsNaN(p)) {
+            if (double.IsNaN(p)) {
                 return "double.NaN";
-            } else if (Double.IsNegativeInfinity(p)) {
+            } else if (double.IsNegativeInfinity(p)) {
                 return "double.NegativeInfinity";
-            } else if (Double.IsPositiveInfinity(p)) {
+            } else if (double.IsPositiveInfinity(p)) {
                 return "double.PositiveInfinity";
-            } else if (Math.Abs(p) > UInt32.MaxValue) {
+            } else if (Math.Abs(p) > uint.MaxValue) {
                 return p.ToString("0.0########################e0", CultureInfo.InvariantCulture);
             } else {
                 return p.ToString("0.0########################", CultureInfo.InvariantCulture);
@@ -115,13 +115,13 @@ namespace ExpressionToCodeLib.Internal
 
         static string FloatToCode(float p)
         {
-            if (Single.IsNaN(p)) {
+            if (float.IsNaN(p)) {
                 return "float.NaN";
-            } else if (Single.IsNegativeInfinity(p)) {
+            } else if (float.IsNegativeInfinity(p)) {
                 return "float.NegativeInfinity";
-            } else if (Single.IsPositiveInfinity(p)) {
+            } else if (float.IsPositiveInfinity(p)) {
                 return "float.PositiveInfinity";
-            } else if (Math.Abs(p) >= (1 << 24)) {
+            } else if (Math.Abs(p) >= 1 << 24) {
                 return p.ToString("0.0########e0", CultureInfo.InvariantCulture) + "f";
             } else {
                 return p.ToString("0.0########", CultureInfo.InvariantCulture) + "f";

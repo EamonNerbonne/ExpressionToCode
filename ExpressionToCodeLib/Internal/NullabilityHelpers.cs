@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal static class NullabilityHelpers
+    static class NullabilityHelpers
     {
         public static bool IsNullableValueType(this Type type) => type.GetTypeInfo().IsValueType && type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
         public static Type EnusureNullability(this Type type) => !type.GetTypeInfo().IsValueType || type.IsNullableValueType() ? type : typeof(Nullable<>).MakeGenericType(type);

@@ -7,10 +7,9 @@ using System.Reflection;
 
 // ReSharper disable PossiblyMistakenUseOfParamsMethod
 // ReSharper disable RedundantNameQualifier
-
 namespace ExpressionToCodeLib.Internal
 {
-    internal enum EqualityExpressionClass
+    enum EqualityExpressionClass
     {
         None,
         EqualsOp,
@@ -23,7 +22,7 @@ namespace ExpressionToCodeLib.Internal
         StructuralEquals,
     }
 
-    internal static class EqualityExpressions
+    static class EqualityExpressions
     {
         static readonly MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).GetMethodInfo();
         static readonly MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).GetMethodInfo();
@@ -72,9 +71,9 @@ namespace ExpressionToCodeLib.Internal
         static ConstantExpression ToConstantExpr(Expression e)
         {
             try {
-                Delegate func = Expression.Lambda(e).Compile();
+                var func = Expression.Lambda(e).Compile();
                 try {
-                    object val = func.DynamicInvoke();
+                    var val = func.DynamicInvoke();
                     return Expression.Constant(val, e.Type);
                 } catch (Exception) {
                     return null; //todo:more specific?
@@ -129,8 +128,8 @@ namespace ExpressionToCodeLib.Internal
             Expression right,
             bool shouldBeEqual)
         {
-            ConstantExpression leftC = ToConstantExpr(left);
-            ConstantExpression rightC = ToConstantExpr(right);
+            var leftC = ToConstantExpr(left);
+            var rightC = ToConstantExpr(right);
 
             Func<EqualityExpressionClass, bool?, Tuple<EqualityExpressionClass, bool>> reportIfError =
                 (eqClass, itsVal) => shouldBeEqual == itsVal ? null : Tuple.Create(eqClass, !itsVal.HasValue);
@@ -144,41 +143,41 @@ namespace ExpressionToCodeLib.Internal
                 ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).GetMethodInfo().GetGenericMethodDefinition();
 
             var iequatableEqualsMethods =
-                (from genEquatable in GetGenericInterfaceImplementation(leftC.Type, typeof(IEquatable<>))
-                    let otherType = genEquatable.GetTypeInfo().GetGenericArguments().Single()
-                    where otherType.GetTypeInfo().IsAssignableFrom(rightC.Type)
-                    let ifacemap = leftC.Type.GetTypeInfo().GetRuntimeInterfaceMap(genEquatable)
-                    select
-                        ifacemap.InterfaceMethods.Zip(ifacemap.InterfaceMethods, Tuple.Create)
-                            .Single(ifaceAndImpl => ifaceAndImpl.Item1.Name == "Equals")
-                            .Item2).Distinct();
+            (from genEquatable in GetGenericInterfaceImplementation(leftC.Type, typeof(IEquatable<>))
+                let otherType = genEquatable.GetTypeInfo().GetGenericArguments().Single()
+                where otherType.GetTypeInfo().IsAssignableFrom(rightC.Type)
+                let ifacemap = leftC.Type.GetTypeInfo().GetRuntimeInterfaceMap(genEquatable)
+                select
+                ifacemap.InterfaceMethods.Zip(ifacemap.InterfaceMethods, Tuple.Create)
+                    .Single(ifaceAndImpl => ifaceAndImpl.Item1.Name == "Equals")
+                    .Item2).Distinct();
 
             var errs = new[] {
-                reportIfError(EqualityExpressionClass.EqualsOp, EvalBoolExpr(Expression.Equal(leftC, rightC))),
-                reportIfError(EqualityExpressionClass.NotEqualsOp, EvalBoolExpr(Expression.Not(Expression.NotEqual(leftC, rightC))))
-                ,
-                reportIfError(
-                    EqualityExpressionClass.ObjectEquals,
-                    EvalBoolExpr(Expression.Call(leftC, objEqualInstanceMethod, Expression.Convert(rightC, typeof(object))))),
-                reportIfError(
-                    EqualityExpressionClass.ObjectEqualsStatic,
-                    EvalBoolExpr(
-                        Expression.Call(
-                            objEqualStaticMethod,
-                            Expression.Convert(leftC, typeof(object)),
-                            Expression.Convert(rightC, typeof(object))))),
-                reportIfError(EqualityExpressionClass.ObjectReferenceEquals, object.ReferenceEquals(leftC.Value, rightC.Value)),
-                reportIfError(
-                    EqualityExpressionClass.StructuralEquals,
-                    StructuralComparisons.StructuralEqualityComparer.Equals(leftC.Value, rightC.Value)),
-            }.Concat(
-                iequatableEqualsMethods.Select(
-                    method =>
-                        reportIfError(
-                            EqualityExpressionClass.EquatableEquals,
-                            EvalBoolExpr(
-                                Expression.Call(leftC, method, rightC))))
-                ).Concat(
+                    reportIfError(EqualityExpressionClass.EqualsOp, EvalBoolExpr(Expression.Equal(leftC, rightC))),
+                    reportIfError(EqualityExpressionClass.NotEqualsOp, EvalBoolExpr(Expression.Not(Expression.NotEqual(leftC, rightC)))),
+                    reportIfError(
+                        EqualityExpressionClass.ObjectEquals,
+                        EvalBoolExpr(Expression.Call(leftC, objEqualInstanceMethod, Expression.Convert(rightC, typeof(object))))),
+                    reportIfError(
+                        EqualityExpressionClass.ObjectEqualsStatic,
+                        EvalBoolExpr(
+                            Expression.Call(
+                                objEqualStaticMethod,
+                                Expression.Convert(leftC, typeof(object)),
+                                Expression.Convert(rightC, typeof(object))))),
+                    reportIfError(EqualityExpressionClass.ObjectReferenceEquals, object.ReferenceEquals(leftC.Value, rightC.Value)),
+                    reportIfError(
+                        EqualityExpressionClass.StructuralEquals,
+                        StructuralComparisons.StructuralEqualityComparer.Equals(leftC.Value, rightC.Value)),
+                }.Concat(
+                    iequatableEqualsMethods.Select(
+                        method =>
+                            reportIfError(
+                                EqualityExpressionClass.EquatableEquals,
+                                EvalBoolExpr(
+                                    Expression.Call(leftC, method, rightC))))
+                )
+                .Concat(
                     ienumerableTypes.Select(
                         elemType =>
                             reportIfError(
@@ -197,8 +196,8 @@ namespace ExpressionToCodeLib.Internal
             Type genericInterfaceType,
             string methodName) => GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
                 .Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
-                || method.DeclaringType.GetTypeInfo().IsInterface && method.Name == methodName && method.DeclaringType.GetTypeInfo().IsGenericType
-                    && method.DeclaringType.GetGenericTypeDefinition() == genericInterfaceType;
+            || method.DeclaringType.GetTypeInfo().IsInterface && method.Name == methodName && method.DeclaringType.GetTypeInfo().IsGenericType
+            && method.DeclaringType.GetGenericTypeDefinition() == genericInterfaceType;
 
         static bool IsImplementationOfInterfaceMethod(MethodInfo method, Type interfaceType, string methodName)
         {

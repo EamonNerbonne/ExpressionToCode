@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace ExpressionToCodeLib
 {
-
     /// <summary>
     /// Intended to be used as a static import; i.e. via "using static ExpressionToCodeLib.ExpressionExpectations;"
     /// </summary>
