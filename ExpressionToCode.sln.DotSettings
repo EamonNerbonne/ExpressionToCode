@@ -16,7 +16,7 @@
 	<s:String x:Key="/Default/CodeStyle/CodeCleanup/Profiles/=Var_0020Cleanup/@EntryIndexedValue"></s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeCleanup/Profiles/=Var_0020Cleanup/@EntryIndexRemoved">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeCleanup/RecentlyUsedProfile/@EntryValue">Default: Reformat Code</s:String>
-	<s:String x:Key="/Default/CodeStyle/CodeCleanup/SilentCleanupProfile/@EntryValue">Emn Cleanup</s:String>
+	
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/APPLY_ON_COMPLETION/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/BRACES_FOR_DOWHILE/@EntryValue">RequiredForMultiline</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/BRACES_FOR_FOR/@EntryValue">Required</s:String>
@@ -72,7 +72,7 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_ELSE_ON_NEW_LINE/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_FIELD_ATTRIBUTE_ON_SAME_LINE/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_FINALLY_ON_NEW_LINE/@EntryValue">False</s:Boolean>
-	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_SIMPLE_ACCESSORHOLDER_ON_SINGLE_LINE/@EntryValue">False</s:Boolean>
+	
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_SIMPLE_ACCESSOR_ATTRIBUTE_ON_SAME_LINE/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/PLACE_SIMPLE_ACCESSOR_ON_SINGLE_LINE/@EntryValue">False</s:Boolean>
 	
@@ -108,10 +108,10 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_BEFORE_FIRST_TYPE_PARAMETER_CONSTRAINT/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_FOR_STMT_HEADER_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
 	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LIMIT/@EntryValue">175</s:Int64>
-	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LINES/@EntryValue">False</s:Boolean>
+	
 	
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LINQ_EXPRESSIONS/@EntryValue">CHOP_ALWAYS</s:String>
-	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_MULTIPLE_DECLARATION_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_MULTIPLE_DECLARATION_STYLE/@EntryValue">CHOP_ALWAYS</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_MULTIPLE_TYPE_PARAMEER_CONSTRAINTS_STYLE/@EntryValue">CHOP_ALWAYS</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_PARAMETERS_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CssFormatter/PROPERTIES_STYLE/@EntryValue">SEPARATE_LINES</s:String>
@@ -171,7 +171,9 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PublicFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=StaticReadonly/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FBLOCK_005FSCOPE_005FCONSTANT/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FBLOCK_005FSCOPE_005FFUNCTION/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FBLOCK_005FSCOPE_005FVARIABLE/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FCLASS/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FCONSTRUCTOR/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FFUNCTION/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FGLOBAL_005FVARIABLE/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
@@ -200,6 +202,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=TS_005FPUBLIC_005FSTATIC_005FTYPE_005FFIELD/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=TS_005FPUBLIC_005FTYPE_005FFIELD/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=TS_005FPUBLIC_005FTYPE_005FMETHOD/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=TS_005FTYPE_005FALIAS/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=TS_005FTYPE_005FPARAMETER/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="T" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/VBNaming/ExceptionName/@EntryValue"></s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/VBNaming/PredefinedNamingRules/=Constants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AA_BB" /&gt;</s:String>
@@ -219,6 +222,7 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/XamlNaming/UserRules/=XAML_005FRESOURCE/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:Boolean x:Key="/Default/Environment/Editor/UseCamelHumps/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/Environment/Hierarchy/Browsers/Browsers/@EntryValue">C39+,FF36+,IE11+</s:String>
+	<s:String x:Key="/Default/Environment/Hierarchy/PsiConfigurationSettingsKey/CustomLocation/@EntryValue">C:\Users\Eamon\AppData\Local\JetBrains\Transient\ReSharperPlatformVs15\v08_d34d4b15\SolutionCaches</s:String>
 	<s:Boolean x:Key="/Default/Environment/SearchAndNavigation/AutoExpandResults/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EAddAccessorOwnerDeclarationBracesMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateBlankLinesAroundFieldToBlankLinesAroundProperty/@EntryIndexedValue">True</s:Boolean>
