@@ -3,9 +3,9 @@ using System.Linq.Expressions;
 
 namespace ExpressionToCodeLib.Internal
 {
-    class DefaultExpressionCompiler : IExpressionCompiler
+    class FastExpressionCompilerImpl : IExpressionCompiler
     {
         public Func<T> Compile<T>(Expression<Func<T>> expression)
-            => expression.Compile();
+            => FastExpressionCompiler.ExpressionCompiler.Compile(expression);
     }
 }

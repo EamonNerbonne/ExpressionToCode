@@ -21,8 +21,8 @@ namespace ExpressionToCode.Benchmarks
     public class BenchmarkPAssert
     {
         static readonly ExpressionToCodeConfiguration
-            baseLineConfiguration = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration,
-            withOptimizationConfiguration = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithCompiler(ExpressionTreeCompilers.OptimizedExpressionCompiler);
+            baseLineConfiguration = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithCompiler(ExpressionTreeCompilers.DotnetExpressionCompiler),
+            withOptimizationConfiguration = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithCompiler(ExpressionTreeCompilers.FastExpressionCompiler);
 
         readonly Expression<Func<bool>> testExpr = GetExpression();
 
@@ -62,13 +62,13 @@ namespace ExpressionToCode.Benchmarks
         [Benchmark]
         public void JustFastCompile()
         {
-            ExpressionTreeCompilers.OptimizedExpressionCompiler.Compile(testExpr);
+            ExpressionTreeCompilers.FastExpressionCompiler.Compile(testExpr);
         }
 
         [Benchmark]
         public void FastCompileAndRun()
         {
-            RunAssertion(ExpressionTreeCompilers.OptimizedExpressionCompiler.Compile(testExpr));
+            RunAssertion(ExpressionTreeCompilers.FastExpressionCompiler.Compile(testExpr));
         }
 
         [Benchmark]
