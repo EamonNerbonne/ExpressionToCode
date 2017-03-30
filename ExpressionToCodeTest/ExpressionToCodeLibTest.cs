@@ -48,7 +48,7 @@ namespace ExpressionToCodeTest
         public void ArrayIndex()
         {
             Assert.Equal(
-                @"() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3)] == 3",
+                @"() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3L)] == 3",
                 ExpressionToCode.ToCode(() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3)] == 3));
         }
 
@@ -172,8 +172,8 @@ namespace ExpressionToCodeTest
         public void MembersDefault()
         {
             Assert.Equal(
-                @"() => default(DateTime).Ticks == 0",
-                ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0));
+                @"() => default(DateTime).Ticks == 0L",
+                ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0L));
             Assert.Equal(
                 @"() => default(int[]).Length == 0",
                 ExpressionToCode.ToCode(() => default(int[]).Length == 0));

@@ -51,8 +51,8 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
                 () => PAssert.That(
                     () => 0 == (ulong)(uint)x
                 ));
-            Assert.Equal(@"0 == (ulong)(uint)x  :  failed", (object)msgLines[0]);
-            Assert.Equal(3, (object)msgLines[1].Count(c => c == '│'));
+            Assert.Equal(@"0UL == (uint)x  :  failed", (object)msgLines[0]);
+            Assert.Equal(2, (object)msgLines[1].Count(c => c == '│'));
         }
 
         [Fact]

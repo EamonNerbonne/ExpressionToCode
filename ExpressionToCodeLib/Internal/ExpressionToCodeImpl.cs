@@ -11,17 +11,12 @@ namespace ExpressionToCodeLib.Internal
     class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {
         #region General Helpers
-        readonly IObjectStringifier objectStringifier;
-        readonly bool alwaysUseExplicitTypeArguments;
+        public ExpressionToCodeImpl(ExpressionToCodeConfiguration config) => this.config = config;
+        readonly ExpressionToCodeConfiguration config;
+        IObjectStringifier objectStringifier => config.Value.ObjectStringifier;
+        bool alwaysUseExplicitTypeArguments => config.Value.AlwaysUseExplicitTypeArguments;
 
-        ExpressionToCodeImpl(IObjectStringifier objectStringifier, bool alwaysUseExplicitTypeArguments)
-        {
-            this.objectStringifier = objectStringifier;
-            this.alwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments;
-        }
 
-        internal ExpressionToCodeImpl(ExpressionToCodeConfiguration config)
-            : this(config.Value.ObjectStringifier, config.Value.AlwaysUseExplicitTypeArguments) { }
 
         [Pure]
         IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
@@ -210,11 +205,13 @@ namespace ExpressionToCodeLib.Internal
         {
             var kids = KidsBuilder.Create();
             var ue = (UnaryExpression)e;
-            if (e.Type.GetTypeInfo().IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
-            {
-                kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")");
-            } else {
-                kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")", e);
+            if (!config.Value.OmitImplicitCasts || !ReflectionHelpers.CanImplicitlyCast(ue.Operand.Type, e.Type)) {
+                if (e.Type.GetTypeInfo().IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
+                {
+                    kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")");
+                } else {
+                    kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")", e);
+                }
             }
             kids.Add(NestExpression(ue.NodeType, ue.Operand));
             return kids.Finish();
@@ -310,6 +307,7 @@ namespace ExpressionToCodeLib.Internal
             .GetMethod(
                 "CreateDelegate",
                 new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
+
 
         [Pure]
         public StringifiedExpression DispatchCall(Expression e)

@@ -13,6 +13,7 @@ namespace ExpressionToCodeLib
         public IExpressionCompiler ExpressionCompiler;
         public IObjectStringifier ObjectStringifier;
         public bool AlwaysUseExplicitTypeArguments;
+        public bool OmitImplicitCasts;
         public int? PrintedListLengthLimit;
         public int? MaximumValueLength;
     }
@@ -38,6 +39,7 @@ namespace ExpressionToCodeLib
                     ExpressionCompiler = ExpressionTreeCompilers.DefaultExpressionCompiler,
                     ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,
+                    OmitImplicitCasts = false,
                 });
 
         /// <summary>
@@ -45,7 +47,11 @@ namespace ExpressionToCodeLib
         /// This is identical to DefaultCodeGenConfiguration, except that enumerable contents after the first 10 elements are elided.
         /// </summary>
         public static readonly ExpressionToCodeConfiguration DefaultAssertionConfiguration =
-            DefaultCodeGenConfiguration.WithPrintedListLengthLimit(10).WithMaximumValueLength(80);
+            DefaultCodeGenConfiguration
+                .WithPrintedListLengthLimit(10)
+                .WithMaximumValueLength(80)
+                .WithOmitImplicitCasts(true)
+            ;
 
         /// <summary>
         /// This configuration is used for PAssert.That(()=>...) and Expect(()=>...).  Initially ExpressionToCodeConfiguration.DefaultAssertionConfiguration.
@@ -90,6 +96,13 @@ namespace ExpressionToCodeLib
 
         public ExpressionToCodeConfiguration WithMaximumValueLength(int? limitValueStringsToLength)
             => With((ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
+
+        /// <summary>
+        /// Omits builtin implicit casts.  This can cause the code to select another overload, so it's off by default for the code-gen config.
+        /// </summary>
+        public ExpressionToCodeConfiguration WithOmitImplicitCasts(bool omitImplicitCasts)
+            => With((ref ExpressionToCodeConfigurationValue a) => a.OmitImplicitCasts = omitImplicitCasts);
+
 
         public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier)
             => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);

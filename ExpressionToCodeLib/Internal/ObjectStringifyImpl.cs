@@ -36,9 +36,22 @@ namespace ExpressionToCodeLib.Internal
                 return FloatToCode((float)val);
             } else if (val is double) {
                 return DoubleToCode((double)val);
-            } else if (val is byte || val is sbyte || val is short || val is ushort || val is int || val is uint || val is long
-                || val is ulong) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture); //TODO: get numeric suffixes right - is this OK?
+            } else if (val is byte) {
+                return "((byte)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
+            } else if (val is sbyte) {
+                return "((sbyte)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
+            } else if (val is short) {
+                return "((short)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
+            } else if (val is ushort) {
+                return "((ushort)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
+            } else if (val is int) {
+                return Convert.ToString(val, CultureInfo.InvariantCulture);
+            } else if (val is uint) {
+                return Convert.ToString(val, CultureInfo.InvariantCulture) + "U";
+            } else if (val is long) {
+                return Convert.ToString(val, CultureInfo.InvariantCulture) + "L";
+            } else if (val is ulong) {
+                return Convert.ToString(val, CultureInfo.InvariantCulture) + "UL";
             } else if (val is bool && val.Equals(true)) {
                 return "true";
             } else if (val is bool && val.Equals(false)) {

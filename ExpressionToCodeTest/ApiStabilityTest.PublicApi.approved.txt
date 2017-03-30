@@ -57,6 +57,7 @@ class ExpressionToCodeConfiguration
     ExpressionToCodeConfiguration inst.WithAnnotator(ICodeAnnotator annotator)
     ExpressionToCodeConfiguration inst.WithPrintedListLengthLimit(int? limitListsToLength)
     ExpressionToCodeConfiguration inst.WithMaximumValueLength(int? limitValueStringsToLength)
+    ExpressionToCodeConfiguration inst.WithOmitImplicitCasts(bool omitImplicitCasts)
     ExpressionToCodeConfiguration inst.WithObjectStringifier(IObjectStringifier objectStringifier)
     ExpressionToCodeConfiguration inst.WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments)
     IExpressionToCode inst.GetExpressionToCode()
