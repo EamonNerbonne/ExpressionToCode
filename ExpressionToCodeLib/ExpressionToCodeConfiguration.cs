@@ -35,7 +35,7 @@ namespace ExpressionToCodeLib
         public static readonly ExpressionToCodeConfiguration DefaultCodeGenConfiguration =
             new ExpressionToCodeConfiguration(
                 new ExpressionToCodeConfigurationValue {
-                    CodeAnnotator = CodeAnnotators.ValuesOnStalksCodeAnnotator,
+                    CodeAnnotator = CodeAnnotators.SubExpressionPerLineCodeAnnotator,
                     ExpressionCompiler = ExpressionTreeCompilers.DefaultExpressionCompiler,
                     ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,

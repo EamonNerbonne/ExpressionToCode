@@ -26,8 +26,8 @@ namespace ExpressionToCodeTest
         public void AnonymousObjectsInArrayExpression()
         {
             var arr = new[] { new { Name = "hmm", Val = (object)3, }, new { Name = "foo", Val = (object)"test" } };
-
-            ApprovalTest.Verify(ExpressionToCode.AnnotatedToCode(() => arr.Any()));
+            var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithAnnotator(CodeAnnotators.ValuesOnStalksCodeAnnotator);
+            ApprovalTest.Verify(config.AnnotatedToCode(() => arr.Any()));
         }
 
         [Fact]

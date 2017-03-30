@@ -18,9 +18,8 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"() => FailingClass.SomeFunction()
-                         │
-                         throws System.Exception
-",
+FailingClass.SomeFunction()   →   throws System.Exception
+".Replace("\r\n", "\n"),
                 ExpressionToCode.AnnotatedToCode(() => FailingClass.SomeFunction()));
         }
     }

@@ -5,16 +5,17 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    static class Assert2 { }
-
     public class PAssertTest
     {
+        static readonly ExpressionToCodeConfiguration config =
+            ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithAnnotator(CodeAnnotators.ValuesOnStalksCodeAnnotator);
+
         [Fact]
         public void TestBasicStalks()
         {
             var msgLines = PAssertLines(
                 () =>
-                    PAssert.That(
+                    config.Assert(
                         () =>
                             TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
                     ));
@@ -34,7 +35,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         {
             var msgLines = PAssertLines(
                 () =>
-                    PAssert.That(
+                    config.Assert(
                         () =>
                             Equals(3, 4)
                     ));
@@ -48,7 +49,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         {
             var x = ulong.MaxValue;
             var msgLines = PAssertLines(
-                () => PAssert.That(
+                () => config.Assert(
                     () => 0 == (ulong)(uint)x
                 ));
             Assert.Equal(@"0UL == (uint)x  :  failed", (object)msgLines[0]);
@@ -58,7 +59,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         [Fact]
         public void AppendsFailedOnFailure()
         {
-            var msgLines = PAssertLines(() => PAssert.That(() => false));
+            var msgLines = PAssertLines(() => config.Assert(() => false));
             Assert.Equal(@"false  :  failed", (object)msgLines[0]);
             Assert.Equal(1, (object)msgLines.Length);
         }
@@ -66,7 +67,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         [Fact]
         public void AppendsSingleLineMessageOnFailure()
         {
-            var msgLines = PAssertLines(() => PAssert.That(() => false, "oops"));
+            var msgLines = PAssertLines(() => config.Assert(() => false, "oops"));
             Assert.Equal(@"false  :  oops", (object)msgLines[0]);
             Assert.Equal(1, (object)msgLines.Length);
         }
@@ -74,7 +75,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         [Fact]
         public void AppendsSingleLineMessageWithNewlineOnFailure()
         {
-            var msgLines = PAssertLines(() => PAssert.That(() => false, "oops\n"));
+            var msgLines = PAssertLines(() => config.Assert(() => false, "oops\n"));
             Assert.Equal(@"false  :  oops", (object)msgLines[0]);
             Assert.Equal(1, (object)msgLines.Length);
         }
@@ -83,7 +84,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         public void AppendsSingleLineMessageBeforeStalks()
         {
             var x = 0;
-            var msgLines = PAssertLines(() => PAssert.That(() => x == 1, "oops\n"));
+            var msgLines = PAssertLines(() => config.Assert(() => x == 1, "oops\n"));
             Assert.Equal(@"x == 1  :  oops", (object)msgLines[0]);
             Assert.Equal(3, (object)msgLines.Length);
         }
@@ -92,7 +93,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         public void PrependsMultiLineMessage()
         {
             var x = 0;
-            var msgLines = PAssertLines(() => PAssert.That(() => x == 1, "oops\nagain"));
+            var msgLines = PAssertLines(() => config.Assert(() => x == 1, "oops\nagain"));
             Assert.Equal(@"oops", (object)msgLines[0]);
             Assert.Equal(@"again", (object)msgLines[1]);
             Assert.Equal(@"x == 1", (object)msgLines[2]);
