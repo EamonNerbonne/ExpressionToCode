@@ -45,7 +45,6 @@ namespace ExpressionToCodeTest
             var a = 2;
             var b = 5;
             var c = 3.45;
-            var nums = Enumerable.Range(10, 10).ToArray();
             ApprovalTest.Verify(annotator.AnnotatedToCode(() => a < b && (c > -a || c > b) && b < 10));
         }
 
@@ -58,10 +57,27 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
-        public void MessyStructureElidesNeatly() {
+        public void MessyStructureElidesNeatly()
+        {
             var hmm = "1234567890";
             ApprovalTest.Verify(annotator.AnnotatedToCode(
                 () => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
+                ));
+        }
+
+        [Fact]
+        public void DealsOkWithLongEnumerables()
+        {
+            ApprovalTest.Verify(annotator.AnnotatedToCode(
+                () => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString() == (3.5).ToString()
+                ));
+        }
+
+        [Fact]
+        public void DealsOkWithLongStrings()
+        {
+            ApprovalTest.Verify(annotator.AnnotatedToCode(
+                () => string.Join("##", Enumerable.Range(0, 100)) + "suffix"
                 ));
         }
     }

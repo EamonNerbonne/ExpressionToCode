@@ -64,7 +64,7 @@ namespace ExpressionToCodeLib.Internal
                 sb.Append(trimmedText);
                 ignoreInitialSpace = node.Text.Any() && ExpressionToCode.ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
                 if (showTopExpressionValue) {
-                    string valueString = node.OptionalValue == null ? null : ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue);
+                    string valueString = node.OptionalValue == null ? null : ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 0);
                     if (valueString != null) {
                         nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
                     }

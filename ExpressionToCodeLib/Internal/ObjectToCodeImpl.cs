@@ -7,19 +7,22 @@ using System.Reflection;
 
 namespace ExpressionToCodeLib.Internal
 {
-    internal static class ObjectToCodeImpl
+    static class ObjectToCodeImpl
     {
         public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent)
+            => ComplexObjectToPseudoCode(config, val, indent, config.Value.MaximumValueLength ?? int.MaxValue);
+
+        internal static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize)
         {
             string retval = ObjectToCode.PlainObjectToCode(val);
             if (retval != null) {
-                return retval;
+                return ElideAfter(retval, valueSize);
             } else if (val is Array) {
-                return "new[] " + FormatEnumerable(config, (IEnumerable)val, indent);
+                return "new[] " + FormatEnumerable(config, (IEnumerable)val, indent, valueSize - 6);
             } else if (val is IEnumerable) {
-                return FormatEnumerable(config, (IEnumerable)val, indent);
+                return FormatEnumerable(config, (IEnumerable)val, indent, valueSize);
             } else if (val is Expression) {
-                return config.GetExpressionToCode().ToCode((Expression)val);
+                return ElideAfter(config.GetExpressionToCode().ToCode((Expression)val), valueSize);
             } else if (val.GetType().GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
                 var type = val.GetType();
                 return "new {" +
@@ -28,23 +31,29 @@ namespace ExpressionToCodeLib.Internal
                         type.GetTypeInfo().GetProperties()
                             .Select(
                                 pi =>
-                                    "\n" + new string(' ', indent * 2 + 2) + pi.Name + " = "
-                                        + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 2) + ",")
+                                    "\n" + new string(' ', indent + 2) + pi.Name + " = "
+                                        + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 4, valueSize - pi.Name.Length) + ",")
                         )
-                    + "\n" + new string(' ', indent * 2) + "}";
+                    + "\n" + new string(' ', indent) + "}";
             } else {
-                return val.ToString();
+                return ElideAfter(val.ToString(), valueSize);
             }
         }
 
-        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list, int indent)
+        static string ElideAfter(string val, int len)
+        {
+            var maxLength = Math.Max(10, len);
+            return val.Length > maxLength ? val.Substring(0, maxLength) + " ..." : val;
+        }
+
+        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list, int indent, int valueSize)
         {
             var contents = PrintListContents(config, list, indent).ToArray();
-            if (contents.Sum(s => s.Length) > 100 || contents.Any(s => s.Any(c => c == '\n'))) {
-                var indentString = new string(' ', indent * 2 + 2);
+            if (contents.Sum(s => s.Length + 2) > Math.Min(valueSize, 120) || contents.Any(s => s.Any(c => c == '\n'))) {
+                var indentString = new string(' ', indent + 2);
                 return "{\n"
-                    + string.Join("", contents.Select(s => indentString + s + (s == "..." ? "" : ",") + "\n"))
-                    + new string(' ', indent * 2)
+                    + string.Join("", contents.Select(s => indentString + ElideAfter(s, valueSize - 3) + (s == "..." ? "" : ",") + "\n"))
+                    + new string(' ', indent)
                     + "}";
             }
             return "{" + string.Join(", ", contents) + "}";
@@ -59,12 +68,12 @@ namespace ExpressionToCodeLib.Internal
                     yield return "...";
                     yield break;
                 } else {
-                    yield return ComplexObjectToPseudoCode(config, item, indent + 4);
+                    yield return ComplexObjectToPseudoCode(config, item, indent + 8);
                 }
             }
         }
 
-        public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression)
+        public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent)
         {
             try {
                 Delegate lambda;
@@ -76,7 +85,7 @@ namespace ExpressionToCodeLib.Internal
 
                 var val = lambda.DynamicInvoke();
                 try {
-                    return ObjectToCodeImpl.ComplexObjectToPseudoCode(config, val, 0);
+                    return ComplexObjectToPseudoCode(config, val, indent);
                 } catch (Exception e) {
                     return "stringification throws " + e.GetType().FullName;
                 }

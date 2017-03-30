@@ -1,8 +1,15 @@
 ﻿() => (double)Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
-a: 2
-b: 5
-Math.Max(a, b): 5
-(double)Math.Max(a, b): 5.0
-new[] { 3, 8, 13, 4 }: new[] {3, 8, 13, 4}
-new[] { 3, 8, 13, 4 }.Average(): 7.0
-(double)Math.Max(..., ...) > new[] { ..., ..., ..., ... }.Average(): false
+a
+     →   2
+b
+     →   5
+Math.Max(a, b)
+     →   5
+(double)Math.Max(a, b)
+     →   5.0
+new[] { 3, 8, 13, 4 }
+     →   new[] {3, 8, 13, 4}
+new[] { 3, 8, 13, 4 }.Average()
+     →   7.0
+(double)Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
+     →   false

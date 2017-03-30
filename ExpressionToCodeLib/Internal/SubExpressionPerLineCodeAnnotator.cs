@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,9 +18,12 @@ namespace ExpressionToCodeLib.Internal
             string ExpressionString;
             SubExpressionValue[] SubExpressions;
 
-            public struct SubExpressionValue
+            public struct SubExpressionValue : IEquatable<SubExpressionValue>
             {
                 public string SubExpression, ValueAsString;
+                public override int GetHashCode() => SubExpression.GetHashCode() + 37 * ValueAsString.GetHashCode();
+                public override bool Equals(object obj) => obj is SubExpressionValue val && Equals(val);
+                public bool Equals(SubExpressionValue val) => SubExpression == val.SubExpression && ValueAsString == val.ValueAsString;
             }
 
             public static ExpressionWithSubExpressions Create(ExpressionToCodeConfiguration config, Expression e, bool hideOutermostValue)
@@ -32,7 +35,7 @@ namespace ExpressionToCodeLib.Internal
                 var fullExprText = sb.ToString();
                 var subExpressionValues = new List<SubExpressionValue>();
                 FindSubExpressionValues(config, node, node, subExpressionValues, hideOutermostValue);
-                return new ExpressionWithSubExpressions { ExpressionString = fullExprText, SubExpressions = subExpressionValues.ToArray() };
+                return new ExpressionWithSubExpressions { ExpressionString = fullExprText, SubExpressions = subExpressionValues.Distinct().ToArray() };
             }
 
             static void AppendNodeToStringBuilder(StringBuilder sb, StringifiedExpression node, ref bool ignoreInitialSpace)
@@ -58,9 +61,11 @@ namespace ExpressionToCodeLib.Internal
                 if (!hideOutermostValue && node.OptionalValue != null) {
                     var sb = new StringBuilder();
                     var ignoreInitialSpace = true;
-                    AppendNodeWithLimitedDepth(sb, subExprNode, ref ignoreInitialSpace, 2);
-                    var subExprString = sb.ToString();
-                    string valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue);
+                    string valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10) ?? "";
+                    AppendNodeToStringBuilder(sb, subExprNode, ref ignoreInitialSpace);
+                    var maxSize = 80;
+                    var subExprString = sb.Length <= maxSize ? sb.ToString()
+                        : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);
                     subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
                 }
                 foreach (var kid in node.Children) {
@@ -95,7 +100,13 @@ namespace ExpressionToCodeLib.Internal
 
             public string ComposeToSingleString()
             {
-                return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression + ": " + sub.ValueAsString + "\n"));
+                var maxExprLen = SubExpressions.Max(sub => sub.SubExpression.Length);
+
+                if (maxExprLen < 30) {
+                    return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLen) + "   →   " + sub.ValueAsString + "\n"));
+                }
+
+                return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression+ "\n     →   " + sub.ValueAsString + "\n"));
             }
         }
     }
