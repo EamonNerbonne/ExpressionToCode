@@ -225,10 +225,7 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => MakeMe<Cake, string>(() => new Cake())));
         }
 
-        T MakeMe<T, TNotInferredFromArgument>(Func<T> maker)
-        {
-            return maker();
-        }
+        T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) => maker();
 
         [Fact]
         public void UsesBoundTypeNamesEvenInGenericMethod()
@@ -251,22 +248,11 @@ namespace ExpressionToCodeTest
     {
         T val;
 
-        public GenericClass(T pVal)
-        {
-            val = pVal;
-        }
+        public GenericClass(T pVal) => val = pVal;
 
-        public GenericClass()
-        {
-            val = default(T);
-        }
+        public GenericClass() => val = default(T);
 
-        public T Value
-        {
-            get {
-                return val;
-            }
-        }
+        public T Value => val;
 
         public void Reset(T pVal)
         {
@@ -278,42 +264,18 @@ namespace ExpressionToCodeTest
             val = default(T);
         }
 
-        public bool IsSet()
-        {
-            return Equals(default(T), val);
-        }
+        public bool IsSet() => Equals(default(T), val);
+        public static T GetDefault() => default(T);
 
-        public static T GetDefault()
-        {
-            return default(T);
-        }
-
-        public static bool IsEnumerableOfType<U>(IEnumerable<U> x)
-        {
-            return typeof(T).GetTypeInfo().IsAssignableFrom(typeof(U));
-        }
-
-        public static bool IsFuncOfType<U>(Func<U> x)
-        {
-            return typeof(T).IsAssignableFrom(typeof(U));
-        }
-
-        public static bool IsFunc2OfType<U>(Func<U, U> x)
-        {
-            return typeof(T).IsAssignableFrom(typeof(U));
-        }
+        public static bool IsEnumerableOfType<U>(IEnumerable<U> x) => typeof(T).GetTypeInfo().IsAssignableFrom(typeof(U));
+        public static bool IsFuncOfType<U>(Func<U> x) => typeof(T).IsAssignableFrom(typeof(U));
+        public static bool IsFunc2OfType<U>(Func<U, U> x) => typeof(T).IsAssignableFrom(typeof(U));
 
         public bool IsSubClass<U>()
-            where U : T
-        {
-            return val is U;
-        }
+            where U : T => val is U;
 
         public bool IsSubEqual<U>(U other)
-            where U : T, IEquatable<T>
-        {
-            return other.Equals(val);
-        }
+            where U : T, IEquatable<T> => other.Equals(val);
     }
 
     class GenericSubClass<T, U> : GenericClass<T>
@@ -322,54 +284,18 @@ namespace ExpressionToCodeTest
         public GenericSubClass(T val)
             : base(val) { }
 
-        public bool IsEmpty
-        {
-            get {
-                return !Value.Any();
-            }
-        }
+        public bool IsEmpty => !Value.Any();
     }
 
     public static class StaticTestClass
     {
-        public static T Identity<T>(T val)
-        {
-            return val;
-        }
-
-        public static bool IsType<T, U>(T val)
-        {
-            return val is U;
-        }
-
-        public static bool TEqualsInt<T>(int val)
-        {
-            return val is T;
-        }
-
-        public static bool TwoArgsOneGeneric<T>(int val, T other)
-        {
-            return val.Equals(other);
-        }
-
-        public static bool TwoArgsTwoGeneric<T>(T val, T other)
-        {
-            return val.Equals(other);
-        }
-
-        public static int Consume<T>(T val)
-        {
-            return 42;
-        }
-
-        public static int Consume(int val)
-        {
-            return 1337;
-        }
-
-        public static int IndirectConsume<T>(T val)
-        {
-            return Consume(val);
-        }
+        public static T Identity<T>(T val) => val;
+        public static bool IsType<T, U>(T val) => val is U;
+        public static bool TEqualsInt<T>(int val) => val is T;
+        public static bool TwoArgsOneGeneric<T>(int val, T other) => val.Equals(other);
+        public static bool TwoArgsTwoGeneric<T>(T val, T other) => val.Equals(other);
+        public static int Consume<T>(T val) => 42;
+        public static int Consume(int val) => 1337;
+        public static int IndirectConsume<T>(T val) => Consume(val);
     }
 }

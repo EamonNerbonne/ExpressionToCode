@@ -169,7 +169,6 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        [Pure]
         static void UnwrapEnumBinOp(Expression expr1uncast, ref Expression expr1, ref Expression expr2)
         {
             var expr1nonnullableType = expr1uncast.Type.AvoidNullability();
@@ -267,12 +266,12 @@ namespace ExpressionToCodeLib.Internal
         {
             var kids = KidsBuilder.Create();
             var le = (LambdaExpression)e;
-            if (le.Parameters.Count == 1) {
-                kids.Add(NestExpression(e.NodeType, le.Parameters.Single()));
-            } else {
+            kids.Add(
+                le.Parameters.Count == 1
+                    ? NestExpression(e.NodeType, le.Parameters.Single())
+                    : ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe }))
                 //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
-                kids.Add(ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe })));
-            }
+            );
             kids.Add(" => ");
             kids.Add(NestExpression(le.NodeType, le.Body));
             return kids.Finish();
@@ -400,12 +399,12 @@ namespace ExpressionToCodeLib.Internal
             }
             var methodName = method.Name;
 
-            methodName += CreateGenericArgumentsIfNecessary(mce, method);
+            methodName += CreateGenericArgumentsIfNecessary(method);
             kids.Add(methodName, mce);
             return kids.Finish();
         }
 
-        string CreateGenericArgumentsIfNecessary(MethodCallExpression mce, MethodInfo method)
+        string CreateGenericArgumentsIfNecessary(MethodInfo method)
         {
             if (!method.IsGenericMethod) {
                 return "";
@@ -495,8 +494,8 @@ namespace ExpressionToCodeLib.Internal
                     kids.Add("this"); //TODO:verify that all this references refer to the same object!
                 } else {
                     throw new ArgumentOutOfRangeException(
-                        "e",
-                        "Can't print constant " + (const_Val == null ? "<null>" : const_Val.ToString())
+                        nameof(e),
+                        "Can't print constant " + (const_Val?.ToString() ?? "<null>")
                         + " in expr of type " + e.Type);
                 }
             } else {

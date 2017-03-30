@@ -8,10 +8,7 @@ namespace ExpressionToCodeTest
 {
     public class FailingClass
     {
-        public static int SomeFunction()
-        {
-            throw new Exception();
-        }
+        public static int SomeFunction() => throw new Exception();
     }
 
     public class SubExprExceptionTest

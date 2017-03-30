@@ -35,12 +35,11 @@ namespace ExpressionToCodeLib.Internal
                     if (exConstructor == null) {
                         return null;
                     }
-                    return
-                        Expression.Lambda<Func<string, Exception, Exception>>(
-                                Expression.New(exConstructor, failureMessageArg, innerExceptionArg),
-                                failureMessageArg,
-                                innerExceptionArg)
-                            .Compile();
+                    return Expression.Lambda<Func<string, Exception, Exception>>(
+                            Expression.New(exConstructor, failureMessageArg, innerExceptionArg),
+                            failureMessageArg,
+                            innerExceptionArg)
+                        .Compile();
                 });
 
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();

@@ -277,20 +277,11 @@ namespace ExpressionToCodeTest
             );
         }
 
-        bool Fizz(Func<int, bool> a)
-        {
-            return a(42);
-        }
+        bool Fizz(Func<int, bool> a) => a(42);
 
-        bool Buzz(Func<int, bool> a)
-        {
-            return a(42);
-        }
+        bool Buzz(Func<int, bool> a) => a(42);
 
-        bool Fizz(Func<string, bool> a)
-        {
-            return a("42");
-        }
+        bool Fizz(Func<string, bool> a) => a("42");
 
         [Fact]
         public void NestedLambda_MultipleOverloads()
@@ -485,10 +476,7 @@ namespace ExpressionToCodeTest
         }
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        T MethodWithRefParam<T>(ref T input)
-        {
-            return input;
-        }
+        T MethodWithRefParam<T>(ref T input) => input;
 
         [Fact]
         public void ArgumentWithOutModifier()
@@ -718,10 +706,7 @@ namespace ExpressionToCodeTest
         int x;
         public ClassA() { }
 
-        public ClassA(ref int something, out int output)
-        {
-            output = x = something;
-        }
+        public ClassA(ref int something, out int output) => output = x = something;
 
         public void DoAssert()
         {
@@ -737,14 +722,7 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
         }
 
-        int C()
-        {
-            return x + 5;
-        }
-
-        bool MyEquals(ClassA other)
-        {
-            return other != null && x == other.x;
-        }
+        int C() => x + 5;
+        bool MyEquals(ClassA other) => other != null && x == other.x;
     }
 }

@@ -7,7 +7,7 @@ namespace ExpressionToCodeLib.Internal
 {
     static class NullabilityHelpers
     {
-        public static bool IsNullableValueType(this Type type)
+        static bool IsNullableValueType(this Type type)
             => type.GetTypeInfo().IsValueType && type.GetTypeInfo().IsGenericType
                 && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 

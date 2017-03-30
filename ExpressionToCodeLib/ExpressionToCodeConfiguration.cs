@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using ExpressionToCodeLib.Internal;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace ExpressionToCodeLib
 {
@@ -52,6 +53,7 @@ namespace ExpressionToCodeLib
         /// <para>This field is globally mutable to allow consumers to configure the library.  If you wish to use multiple configurations, it is recommended
         /// to use the instance methods on a configuration instance instead of the static methods in PAssert, ExpressionToCode and ExpressionAssertions.</para>
         /// </summary>
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public static ExpressionToCodeConfiguration GlobalAssertionConfiguration = DefaultAssertionConfiguration;
 
         /// <summary>
@@ -60,6 +62,7 @@ namespace ExpressionToCodeLib
         /// <para>This field is globally mutable to allow consumers to configure the library.  If you wish to use multiple configurations, it is recommended
         /// to use the instance methods on a configuration instance instead of the static methods in PAssert, ExpressionToCode and ExpressionAssertions.</para>
         /// </summary>
+        // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public static ExpressionToCodeConfiguration GlobalCodeGenConfiguration = DefaultCodeGenConfiguration;
 
         internal readonly ExpressionToCodeConfigurationValue Value;
@@ -83,12 +86,10 @@ namespace ExpressionToCodeLib
             => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
 
         public ExpressionToCodeConfiguration WithPrintedListLengthLimit(int? limitListsToLength)
-            => With(
-                (ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
+            => With((ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
 
         public ExpressionToCodeConfiguration WithMaximumValueLength(int? limitValueStringsToLength)
-            => With(
-                (ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
+            => With((ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
 
         public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier)
             => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);

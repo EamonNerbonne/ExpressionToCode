@@ -12,7 +12,7 @@ namespace ExpressionToCodeLib.Internal
         public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent)
             => ComplexObjectToPseudoCode(config, val, indent, config.Value.MaximumValueLength ?? int.MaxValue);
 
-        internal static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize)
+        static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize)
         {
             var retval = ObjectToCode.PlainObjectToCode(val);
             if (retval != null) {

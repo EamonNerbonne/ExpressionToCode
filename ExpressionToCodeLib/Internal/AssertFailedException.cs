@@ -14,6 +14,7 @@ namespace ExpressionToCodeLib.Internal
         public AssertFailedException(string message, Exception inner)
             : base(message, inner) { }
 
+        // ReSharper disable once MemberCanBeProtected.Global
         public AssertFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context) { }
     }

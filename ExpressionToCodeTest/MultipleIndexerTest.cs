@@ -8,19 +8,9 @@ namespace ExpressionToCodeTest
 {
     class HasIndexers
     {
-        public object this[string s]
-        {
-            get {
-                return null;
-            }
-        }
+        public object this[string s] => null;
 
-        public object this[int i]
-        {
-            get {
-                return null;
-            }
-        }
+        public object this[int i] => null;
     }
 
     public class MultipleIndexerTest

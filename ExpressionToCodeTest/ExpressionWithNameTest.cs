@@ -43,16 +43,6 @@ namespace ExpressionToCodeTest
             Assert.Equal("TheComplexMethod", actual);
         }
 
-        //[Fact]
-        //public void TheComplexMethod_ToFullNameOf()
-        //{
-        //	Expression<Func<int, string, string>> theComplexMethod = (x, y) => ExpressionWithNameTest.TheComplexMethod(1, "");
-        //	var actual = ExpressionWithName.ToFullNameOf(theComplexMethod);
-        //	Assert.Equal("ExpressionWithNameTest.TheComplexMethod(parameter1, parameter2)", actual);
-
-        //	var full = ExpressionToCodeLib.ExpressionToCode.ToCode(theComplexMethod.Body);
-        //	Assert.NotEqual(full, actual);
-        //}
         [Fact]
         public void TheGenericMethod_ToNameOf()
         {
@@ -74,43 +64,13 @@ namespace ExpressionToCodeTest
             Assert.Equal("TheSimpleMethod", actual);
         }
 
-        public void TheSimpleMethod() { }
+        // ReSharper disable once MemberCanBeMadeStatic.Local
+        void TheSimpleMethod() { }
 
-        static string TheProperty
-        {
-            get {
-                return "TheValue";
-            }
-        }
+        static string TheProperty => "TheValue";
 
-        // ReSharper disable once UnusedParameter.Local
-        string this[int index]
-        {
-            get {
-                return "TheIndexedValue";
-            }
-        }
+        static string TheComplexMethod(int parameter1, string parameter2) => "TheMethod " + parameter1 + " " + parameter2;
 
-        static int StaticReturnZero()
-        {
-            return 0;
-        }
-
-        // ReSharper disable MemberCanBeMadeStatic.Local
-        static string TheComplexMethod(int parameter1, string parameter2)
-        {
-            return "TheMethod " + parameter1 + " " + parameter2;
-        }
-
-        // ReSharper disable once UnusedTypeParameter
-        static string TheGenericMethod<T>(int two)
-        {
-            return "Return value is " + two * two;
-        }
-
-        int ReturnZero()
-        {
-            return 0;
-        }
+        static string TheGenericMethod<T>(int two) => "Return value is " + two * two + typeof(T).Name;
     }
 }

@@ -35,15 +35,8 @@ namespace ExpressionToCodeTest
             ApprovalTest.Verify(PrettyPrintTypes(unstableTypes));
         }
 
-        static string PrettyPrintTypes(IEnumerable<Type> types)
-        {
-            return string.Join("", types.Select(PrettyPrintTypeDescription));
-        }
-
-        static string PrettyPrintTypeDescription(Type o)
-        {
-            return PrettyPrintTypeHeader(o) + "\n" + PrettyPrintTypeContents(o);
-        }
+        static string PrettyPrintTypes(IEnumerable<Type> types) => string.Join("", types.Select(PrettyPrintTypeDescription));
+        static string PrettyPrintTypeDescription(Type o) => PrettyPrintTypeHeader(o) + "\n" + PrettyPrintTypeContents(o);
 
         static string PrettyPrintTypeContents(Type type)
         {
@@ -101,15 +94,11 @@ namespace ExpressionToCodeTest
                 + PrettyPrintParameterList(mi);
         }
 
-        static object PrettyPrintField(FieldInfo fi)
-        {
-            return "    "
-                + (fi.IsLiteral ? "const " : (fi.IsStatic ? "static " : "") + (fi.IsInitOnly ? "readonly " : ""))
-                + ObjectToCode.ToCSharpFriendlyTypeName(fi.FieldType)
-                + " " + fi.Name
-                + (fi.IsLiteral ? " = " + ObjectToCode.ComplexObjectToPseudoCode(fi.GetRawConstantValue()) : "")
-                ;
-        }
+        static object PrettyPrintField(FieldInfo fi) => "    "
+            + (fi.IsLiteral ? "const " : (fi.IsStatic ? "static " : "") + (fi.IsInitOnly ? "readonly " : ""))
+            + ObjectToCode.ToCSharpFriendlyTypeName(fi.FieldType)
+            + " " + fi.Name
+            + (fi.IsLiteral ? " = " + ObjectToCode.ComplexObjectToPseudoCode(fi.GetRawConstantValue()) : "");
 
         static string PrettyPrintParameterList(MethodInfo mi)
         {
@@ -131,9 +120,6 @@ namespace ExpressionToCodeTest
                 + ">";
         }
 
-        static bool IsPublic(Type type)
-        {
-            return type.IsPublic || type.IsNestedPublic && IsPublic(type.DeclaringType);
-        }
+        static bool IsPublic(Type type) => type.IsPublic || type.IsNestedPublic && IsPublic(type.DeclaringType);
     }
 }
