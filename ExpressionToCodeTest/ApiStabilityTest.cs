@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using ApprovalTests.Approvers;
-using ApprovalTests.Core;
-using ApprovalTests.Reporters;
-using ApprovalTests.Writers;
 using ExpressionToCodeLib;
 using Xunit;
 
@@ -41,8 +35,15 @@ namespace ExpressionToCodeTest
             ApprovalTest.Verify(PrettyPrintTypes(unstableTypes));
         }
 
-        static string PrettyPrintTypes(IEnumerable<Type> types) { return string.Join("", types.Select(PrettyPrintTypeDescription)); }
-        static string PrettyPrintTypeDescription(Type o) { return PrettyPrintTypeHeader(o) + "\n" + PrettyPrintTypeContents(o); }
+        static string PrettyPrintTypes(IEnumerable<Type> types)
+        {
+            return string.Join("", types.Select(PrettyPrintTypeDescription));
+        }
+
+        static string PrettyPrintTypeDescription(Type o)
+        {
+            return PrettyPrintTypeHeader(o) + "\n" + PrettyPrintTypeContents(o);
+        }
 
         static string PrettyPrintTypeContents(Type type)
         {
@@ -112,11 +113,12 @@ namespace ExpressionToCodeTest
 
         static string PrettyPrintParameterList(MethodInfo mi)
         {
-            return ("(" + string.Join(
+            return "(" + string.Join(
                 ", ",
-                mi.GetParameters().Select(
-                    pi =>
-                        ObjectToCode.ToCSharpFriendlyTypeName(pi.ParameterType) + " " + pi.Name)) + ")");
+                mi.GetParameters()
+                    .Select(
+                        pi =>
+                            ObjectToCode.ToCSharpFriendlyTypeName(pi.ParameterType) + " " + pi.Name)) + ")";
         }
 
         static string PrettyPrintGenericArguments(MethodInfo mi)
@@ -129,6 +131,9 @@ namespace ExpressionToCodeTest
                 + ">";
         }
 
-        static bool IsPublic(Type type) { return type.IsPublic || type.IsNestedPublic && IsPublic(type.DeclaringType); }
+        static bool IsPublic(Type type)
+        {
+            return type.IsPublic || type.IsNestedPublic && IsPublic(type.DeclaringType);
+        }
     }
 }

@@ -63,6 +63,7 @@ namespace ExpressionToCodeLib
         public static ExpressionToCodeConfiguration GlobalCodeGenConfiguration = DefaultCodeGenConfiguration;
 
         internal readonly ExpressionToCodeConfigurationValue Value;
+
         ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value)
             => Value = value;
 
@@ -77,16 +78,17 @@ namespace ExpressionToCodeLib
 
         public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler)
             => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
+
         public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator)
             => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
 
         public ExpressionToCodeConfiguration WithPrintedListLengthLimit(int? limitListsToLength)
             => With(
-            (ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
+                (ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
 
         public ExpressionToCodeConfiguration WithMaximumValueLength(int? limitValueStringsToLength)
             => With(
-            (ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
+                (ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
 
         public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier)
             => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
@@ -96,12 +98,14 @@ namespace ExpressionToCodeLib
 
         public IExpressionToCode GetExpressionToCode()
             => new ExpressionToCodeWrapper(this);
+
         public IAnnotatedToCode GetAnnotatedToCode()
             => new AnnotatedToCodeWrapper(this);
 
         class AnnotatedToCodeWrapper : IAnnotatedToCode
         {
             readonly ExpressionToCodeConfiguration config;
+
             public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config)
                 => this.config = config;
 
@@ -112,8 +116,10 @@ namespace ExpressionToCodeLib
         sealed class ExpressionToCodeWrapper : IExpressionToCode
         {
             readonly ExpressionToCodeConfiguration config;
+
             public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config)
                 => this.config = config;
+
             public string ToCode(Expression e)
                 => ExpressionToCodeString.ToCodeString(config, e);
         }

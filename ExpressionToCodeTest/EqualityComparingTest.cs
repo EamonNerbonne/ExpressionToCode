@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using ExpressionToCodeLib;
 using ExpressionToCodeLib.Internal;
 using Xunit;
 
 #pragma warning disable 252,253
+
 // ReSharper disable NegativeEqualityExpression
 // ReSharper disable EqualExpressionComparison
 // ReSharper disable ConvertToConstant.Local
 // ReSharper disable RedundantCast
-
 namespace ExpressionToCodeTest
 {
     public class EqualityComparingTest
@@ -93,14 +92,15 @@ namespace ExpressionToCodeTest
                 EqualityExpressions.DisagreeingEqualities(() => ReferenceEquals(1000.ToString(CultureInfo.InvariantCulture), 10 + "00"))
                     .OrderBy(x => x),
                 eqclasses(
-                    EqualityExpressionClass.EqualsOp,
-                    EqualityExpressionClass.NotEqualsOp,
-                    EqualityExpressionClass.ObjectEquals,
-                    EqualityExpressionClass.ObjectEqualsStatic,
-                    EqualityExpressionClass.EquatableEquals,
-                    EqualityExpressionClass.SequenceEqual,
-                    EqualityExpressionClass.StructuralEquals
-                    ).OrderBy(x => x));
+                        EqualityExpressionClass.EqualsOp,
+                        EqualityExpressionClass.NotEqualsOp,
+                        EqualityExpressionClass.ObjectEquals,
+                        EqualityExpressionClass.ObjectEqualsStatic,
+                        EqualityExpressionClass.EquatableEquals,
+                        EqualityExpressionClass.SequenceEqual,
+                        EqualityExpressionClass.StructuralEquals
+                    )
+                    .OrderBy(x => x));
             Assert.Equal(
                 EqualityExpressions.DisagreeingEqualities(() => 1000.ToString(CultureInfo.InvariantCulture).Equals(10 + "00")).ToArray(),
                 eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
@@ -111,14 +111,15 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 EqualityExpressions.DisagreeingEqualities(
-                    // ReSharper disable ReferenceEqualsWithValueType
-                    () => ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17))).ToArray(),
+                        // ReSharper disable ReferenceEqualsWithValueType
+                        () => ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17)))
+                    .ToArray(),
                 // ReSharper restore ReferenceEqualsWithValueType
                 eqclasses(
                     EqualityExpressionClass.ObjectEquals,
                     EqualityExpressionClass.ObjectEqualsStatic,
                     EqualityExpressionClass.StructuralEquals
-                    ));
+                ));
             //EqualityExpressionClass.EqualsOp, EqualityExpressionClass.NotEqualsOp, EqualityExpressionClass.EquatableEquals: these are equivalent because syntax-type sensitive.
         }
 

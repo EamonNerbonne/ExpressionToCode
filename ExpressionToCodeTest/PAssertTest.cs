@@ -5,7 +5,7 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    internal static class Assert2 { }
+    static class Assert2 { }
 
     public class PAssertTest
     {
@@ -17,7 +17,7 @@ namespace ExpressionToCodeTest
                     PAssert.That(
                         () =>
                             TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
-                        ));
+                    ));
             Assert.Equal(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed", msgLines[0]);
             var expectedMessage = @"
 TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed
@@ -37,7 +37,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
                     PAssert.That(
                         () =>
                             Equals(3, 4)
-                        ));
+                    ));
             Assert.Contains("failed", msgLines[0]);
             Assert.Contains("Equals", msgLines[0]);
             Assert.Equal(1, msgLines.Length);
@@ -46,37 +46,37 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         [Fact]
         public void ValuesForNonBoringCasts()
         {
-            ulong x = ulong.MaxValue;
+            var x = ulong.MaxValue;
             var msgLines = PAssertLines(
                 () => PAssert.That(
                     () => 0 == (ulong)(uint)x
-                    ));
-            Assert.Equal((@"0 == (ulong)(uint)x  :  failed"), (object)msgLines[0]);
-            Assert.Equal((3), (object)msgLines[1].Count(c => c == '│'));
+                ));
+            Assert.Equal(@"0 == (ulong)(uint)x  :  failed", (object)msgLines[0]);
+            Assert.Equal(3, (object)msgLines[1].Count(c => c == '│'));
         }
 
         [Fact]
         public void AppendsFailedOnFailure()
         {
             var msgLines = PAssertLines(() => PAssert.That(() => false));
-            Assert.Equal((@"false  :  failed"), (object)msgLines[0]);
-            Assert.Equal((1), (object)msgLines.Length);
+            Assert.Equal(@"false  :  failed", (object)msgLines[0]);
+            Assert.Equal(1, (object)msgLines.Length);
         }
 
         [Fact]
         public void AppendsSingleLineMessageOnFailure()
         {
             var msgLines = PAssertLines(() => PAssert.That(() => false, "oops"));
-            Assert.Equal((@"false  :  oops"), (object)msgLines[0]);
-            Assert.Equal((1), (object)msgLines.Length);
+            Assert.Equal(@"false  :  oops", (object)msgLines[0]);
+            Assert.Equal(1, (object)msgLines.Length);
         }
 
         [Fact]
         public void AppendsSingleLineMessageWithNewlineOnFailure()
         {
             var msgLines = PAssertLines(() => PAssert.That(() => false, "oops\n"));
-            Assert.Equal((@"false  :  oops"), (object)msgLines[0]);
-            Assert.Equal((1), (object)msgLines.Length);
+            Assert.Equal(@"false  :  oops", (object)msgLines[0]);
+            Assert.Equal(1, (object)msgLines.Length);
         }
 
         [Fact]
@@ -84,8 +84,8 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         {
             var x = 0;
             var msgLines = PAssertLines(() => PAssert.That(() => x == 1, "oops\n"));
-            Assert.Equal((@"x == 1  :  oops"), (object)msgLines[0]);
-            Assert.Equal((3), (object)msgLines.Length);
+            Assert.Equal(@"x == 1  :  oops", (object)msgLines[0]);
+            Assert.Equal(3, (object)msgLines.Length);
         }
 
         [Fact]
@@ -93,10 +93,10 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
         {
             var x = 0;
             var msgLines = PAssertLines(() => PAssert.That(() => x == 1, "oops\nagain"));
-            Assert.Equal((@"oops"), (object)msgLines[0]);
-            Assert.Equal((@"again"), (object)msgLines[1]);
-            Assert.Equal((@"x == 1"), (object)msgLines[2]);
-            Assert.Equal((5), (object)msgLines.Length);
+            Assert.Equal(@"oops", (object)msgLines[0]);
+            Assert.Equal(@"again", (object)msgLines[1]);
+            Assert.Equal(@"x == 1", (object)msgLines[2]);
+            Assert.Equal(5, (object)msgLines.Length);
         }
 
         static string[] PAssertLines(Action action)

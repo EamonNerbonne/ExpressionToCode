@@ -7,7 +7,7 @@ using ApprovalTests.Writers;
 
 namespace ExpressionToCodeTest
 {
-    internal static class ApprovalTest
+    static class ApprovalTest
     {
         public static void Verify(string text, [CallerFilePath] string filepath = null, [CallerMemberName] string membername = null)
         {

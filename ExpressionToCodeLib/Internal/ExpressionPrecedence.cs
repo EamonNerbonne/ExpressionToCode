@@ -7,12 +7,12 @@ namespace ExpressionToCodeLib.Internal
     {
         static bool UnaryDashSym(ExpressionType et)
             => et == ExpressionType.Negate
-            || et == ExpressionType.NegateChecked
-            || et == ExpressionType.PreDecrementAssign;
+                || et == ExpressionType.NegateChecked
+                || et == ExpressionType.PreDecrementAssign;
 
         static bool UnaryPlusSym(ExpressionType et)
             => et == ExpressionType.UnaryPlus
-            || et == ExpressionType.PreIncrementAssign;
+                || et == ExpressionType.PreIncrementAssign;
 
         public static bool TokenizerConfusable(ExpressionType a, ExpressionType b)
             => UnaryDashSym(a) && UnaryDashSym(b) || UnaryPlusSym(a) && UnaryPlusSym(b);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using ExpressionToCodeLib;
 using Xunit;
 
@@ -17,11 +16,11 @@ namespace ExpressionToCodeTest
             var expr = Expression.Lambda(
                 Expression.ArrayIndex(param, Expression.Constant(1)),
                 param
-                );
+            );
             Assert.Equal(
                 "a => a[1]",
                 ExpressionToCode.ToCode(expr)
-                );
+            );
         }
 
         [Fact]
@@ -31,11 +30,11 @@ namespace ExpressionToCodeTest
             var expr = Expression.Lambda(
                 Expression.ArrayAccess(param, Expression.Constant(1)),
                 param
-                );
+            );
             Assert.Equal(
                 "a => a[1]",
                 ExpressionToCode.ToCode(expr)
-                );
+            );
         }
     }
 }

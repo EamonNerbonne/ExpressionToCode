@@ -27,8 +27,10 @@ namespace ExpressionToCodeLib.Internal
         static readonly MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).GetMethodInfo();
         static readonly MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).GetMethodInfo();
         static readonly MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>)object.ReferenceEquals).GetMethodInfo();
+
         public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e)
             => ExtractEqualityType(e).Item1;
+
         public static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression<Func<bool>> e)
             => ExtractEqualityType(e.Body);
 
@@ -192,16 +194,16 @@ namespace ExpressionToCodeLib.Internal
 
         static bool HaveSameGenericDefinition(MethodInfo a, MethodInfo b)
             => a.IsGenericMethod && b.IsGenericMethod
-            && a.GetGenericMethodDefinition().Equals(b.GetGenericMethodDefinition());
+                && a.GetGenericMethodDefinition().Equals(b.GetGenericMethodDefinition());
 
         static bool IsImplementationOfGenericInterfaceMethod(
             MethodInfo method,
             Type genericInterfaceType,
             string methodName)
             => GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
-                .Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
-            || method.DeclaringType.GetTypeInfo().IsInterface && method.Name == methodName && method.DeclaringType.GetTypeInfo().IsGenericType
-            && method.DeclaringType.GetGenericTypeDefinition() == genericInterfaceType;
+                    .Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
+                || method.DeclaringType.GetTypeInfo().IsInterface && method.Name == methodName && method.DeclaringType.GetTypeInfo().IsGenericType
+                && method.DeclaringType.GetGenericTypeDefinition() == genericInterfaceType;
 
         static bool IsImplementationOfInterfaceMethod(MethodInfo method, Type interfaceType, string methodName)
         {
@@ -216,7 +218,7 @@ namespace ExpressionToCodeLib.Internal
 
         static IEnumerable<Type> GetGenericInterfaceImplementation(Type type, Type genericInterfaceType)
             => from itype in type.GetTypeInfo().GetInterfaces()
-            where itype.GetTypeInfo().IsGenericType && itype.GetGenericTypeDefinition() == genericInterfaceType
-            select itype;
+                where itype.GetTypeInfo().IsGenericType && itype.GetGenericTypeDefinition() == genericInterfaceType
+                select itype;
     }
 }

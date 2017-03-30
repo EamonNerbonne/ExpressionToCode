@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using ExpressionToCodeLib;
 using Xunit;
-using Assert = Xunit.Assert;
 
 namespace ExpressionToCodeTest
 {
@@ -79,7 +78,7 @@ namespace ExpressionToCodeTest
         {
             // ReSharper disable once SuggestUseVarKeywordEvident
             // ReSharper disable once RedundantArrayCreationExpression
-            object[][,] v = new[] { new object[2, 3] };
+            var v = new[] { new object[2, 3] };
 
             Assert.Equal("object[][,]", ObjectToCode.ToCSharpFriendlyTypeName(v.GetType()));
         }

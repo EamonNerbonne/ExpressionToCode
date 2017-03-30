@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ExpressionToCodeLib;
 using Xunit;
 
@@ -32,7 +31,7 @@ namespace ExpressionToCodeTest
             var i = 1;
             Assert.Equal(
                 @"() => (1m + -i > 0 || false)",
-                ExpressionToCode.ToCode(() => (1m + -i > 0 || false)));
+                ExpressionToCode.ToCode(() => 1m + -i > 0 || false));
         }
 
         [Fact(Skip = "issue 4")]
@@ -60,19 +59,19 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
-                );
+            );
         }
 
         [Fact(Skip = "Not yet implemented")]
         public void AvoidsImplicitCastWhenTargetTypeIsAGenericArgument()
         {
-            int x = 37;
-            double y = 42.0;
+            var x = 37;
+            var y = 42.0;
 
             Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
-                );
+            );
         }
     }
 }

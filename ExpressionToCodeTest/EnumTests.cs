@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ExpressionToCodeLib;
 using Xunit;
 
@@ -229,7 +228,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void NullableFlagsEnumOr()
         {
-            SomeFlagsEnum a = SomeFlagsEnum.A;
+            var a = SomeFlagsEnum.A;
             SomeFlagsEnum? b = SomeFlagsEnum.B;
             Assert.Equal(
                 @"() => (SomeFlagsEnum?)(a | b) == SomeFlagsEnum.AB",

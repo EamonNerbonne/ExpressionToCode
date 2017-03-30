@@ -1,8 +1,8 @@
 ﻿using System;
-using Xunit;
 using System.Linq;
 using System.Linq.Expressions;
 using ExpressionToCodeLib;
+using Xunit;
 
 namespace ExpressionToCodeTest
 {
@@ -75,14 +75,42 @@ namespace ExpressionToCodeTest
         }
 
         public void TheSimpleMethod() { }
-        static string TheProperty { get { return "TheValue"; } }
+
+        static string TheProperty
+        {
+            get {
+                return "TheValue";
+            }
+        }
+
         // ReSharper disable once UnusedParameter.Local
-        string this[int index] { get { return "TheIndexedValue"; } }
-        static int StaticReturnZero() { return 0; }
+        string this[int index]
+        {
+            get {
+                return "TheIndexedValue";
+            }
+        }
+
+        static int StaticReturnZero()
+        {
+            return 0;
+        }
+
         // ReSharper disable MemberCanBeMadeStatic.Local
-        static string TheComplexMethod(int parameter1, string parameter2) { return "TheMethod " + parameter1 + " " + parameter2; }
+        static string TheComplexMethod(int parameter1, string parameter2)
+        {
+            return "TheMethod " + parameter1 + " " + parameter2;
+        }
+
         // ReSharper disable once UnusedTypeParameter
-        static string TheGenericMethod<T>(int two) { return "Return value is " + two * two; }
-        int ReturnZero() { return 0; }
+        static string TheGenericMethod<T>(int two)
+        {
+            return "Return value is " + two * two;
+        }
+
+        int ReturnZero()
+        {
+            return 0;
+        }
     }
 }

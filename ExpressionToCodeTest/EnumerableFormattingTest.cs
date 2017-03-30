@@ -22,13 +22,17 @@ namespace ExpressionToCodeTest
         [Fact]
         public void LongEnumerablesBreakAfter10_InCodeGen()
         {
-            Assert.Equal("{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}", ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 13)));
+            Assert.Equal(
+                "{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}",
+                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 13)));
         }
 
         [Fact]
         public void LongArraysBreakAfter10_InAssertions()
         {
-            Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}", ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 13).ToArray()));
+            Assert.Equal(
+                "new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}",
+                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 13).ToArray()));
         }
 
         [Fact]
@@ -68,7 +72,8 @@ namespace ExpressionToCodeTest
   ""12345009"",
   ...
 }",
-                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(12345000, 13).Select(i => i.ToString(CultureInfo.InvariantCulture))));
+                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(
+                    Enumerable.Range(12345000, 13).Select(i => i.ToString(CultureInfo.InvariantCulture))));
         }
 
         [Fact]

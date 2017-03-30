@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using ExpressionToCodeLib;
 using Xunit;
 
@@ -36,7 +35,7 @@ namespace ExpressionToCodeTest
                 @"() => Interpolation($""abc"")",
                 ExpressionToCode.ToCode(
                     () => Interpolation(FormattableStringFactory.Create("abc", new object[] { }))
-                    ));
+                ));
         }
 
         [Fact]
@@ -47,7 +46,7 @@ namespace ExpressionToCodeTest
                 @"() => Interpolation(FormattableStringFactory.Create(s, new object[] { }))",
                 ExpressionToCode.ToCode(
                     () => Interpolation(FormattableStringFactory.Create(s, new object[] { }))
-                    ));
+                ));
         }
 
         [Fact]
@@ -59,7 +58,7 @@ namespace ExpressionToCodeTest
                 @"() => Interpolation(FormattableStringFactory.Create(""abc"", arr))",
                 ExpressionToCode.ToCode(
                     () => Interpolation(FormattableStringFactory.Create("abc", arr))
-                    ));
+                ));
         }
 
         [Fact(Skip = "Not yet implemented")]
@@ -85,7 +84,7 @@ namespace ExpressionToCodeTest
                 @"() => Interpolation($""abc {Interpolation($""abc {""def""}"")}""))",
                 ExpressionToCode.ToCode(
                     () => Interpolation($"abc {Interpolation($"abc {"def"}")}"))
-                );
+            );
         }
 
         [Fact(Skip = "Not yet implemented")]

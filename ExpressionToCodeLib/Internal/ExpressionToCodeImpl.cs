@@ -101,6 +101,7 @@ namespace ExpressionToCodeLib.Internal
         struct KidsBuilder
         {
             readonly List<StringifiedExpression> kids;
+
             KidsBuilder(List<StringifiedExpression> init)
                 => kids = init;
 
@@ -440,8 +441,8 @@ namespace ExpressionToCodeLib.Internal
 
         static bool ContainsInferableType(Type haystack, Type needle)
             => haystack == needle
-            || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
-            || haystack.GetTypeInfo().IsGenericType && haystack.GetTypeInfo().GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
+                || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
+                || haystack.GetTypeInfo().IsGenericType && haystack.GetTypeInfo().GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
         [Pure]
         public StringifiedExpression DispatchIndex(Expression e)

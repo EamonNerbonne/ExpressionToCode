@@ -30,7 +30,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void AddOperator()
         {
-            int x = 0;
+            var x = 0;
             Assert.Equal(
                 @"() => 1 + x + 2 == 4",
                 ExpressionToCode.ToCode(() => 1 + x + 2 == 4));
@@ -114,7 +114,9 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"() => new System.Func<int>[] { () => 1, () => 2 }",
-                ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode().ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+                ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
+                    .GetExpressionToCode()
+                    .ToCode(() => new Func<int>[] { () => 1, () => 2 }));
         }
 
         [Fact]
@@ -204,8 +206,7 @@ namespace ExpressionToCodeTest
         {
             var actual = ExpressionToCode.ToCode(() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any);
             Assert.Equal(
-                "() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any"
-                ,
+                "() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any",
                 actual);
             Console.WriteLine(actual);
         }
@@ -217,7 +218,7 @@ namespace ExpressionToCodeTest
                 @"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)DateTime.IsLeapYear)",
                 ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
 
-            HashSet<int> set = new HashSet<int>();
+            var set = new HashSet<int>();
             Assert.Equal(
                 @"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)set.Add)",
                 ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
@@ -251,7 +252,7 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => call(() => 42)",
                 ExpressionToCode.ToCode(() => call(() => 42))
-                ); //no params
+            ); //no params
         }
 
         [Fact]
@@ -260,11 +261,11 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => new[] { 37, 42 }.Select(x => x * 2)",
                 ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select(x => x * 2))
-                );
+            );
             Assert.Equal(
                 @"() => Buzz(x => true)",
                 ExpressionToCode.ToCode(() => Buzz(x => true))
-                );
+            );
         }
 
         [Fact]
@@ -273,12 +274,23 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => new[] { 37, 42 }.Select((x, i) => x * 2)",
                 ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select((x, i) => x * 2))
-                );
+            );
         }
 
-        bool Fizz(Func<int, bool> a) { return a(42); }
-        bool Buzz(Func<int, bool> a) { return a(42); }
-        bool Fizz(Func<string, bool> a) { return a("42"); }
+        bool Fizz(Func<int, bool> a)
+        {
+            return a(42);
+        }
+
+        bool Buzz(Func<int, bool> a)
+        {
+            return a(42);
+        }
+
+        bool Fizz(Func<string, bool> a)
+        {
+            return a("42");
+        }
 
         [Fact]
         public void NestedLambda_MultipleOverloads()
@@ -286,11 +298,11 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => Fizz(x => x == ""a"")",
                 ExpressionToCode.ToCode(() => Fizz(x => x == "a"))
-                );
+            );
             Assert.Equal(
                 @"() => Fizz(x => x == 37)",
                 ExpressionToCode.ToCode(() => Fizz(x => x == 37))
-                );
+            );
         }
 
         [Fact(Skip = "issue 14")]
@@ -299,7 +311,7 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => Fizz((int x) => true)",
                 ExpressionToCode.ToCode(() => Fizz((int x) => true))
-                ); //hard case!
+            ); //hard case!
         }
 
         [Fact]
@@ -322,7 +334,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"() => new object()",
-                ExpressionToCode.ToCode(() => new Object()));
+                ExpressionToCode.ToCode(() => new object()));
         }
 
         [Fact]
@@ -336,8 +348,8 @@ namespace ExpressionToCodeTest
         [Fact]
         public void NotOperator()
         {
-            bool x = true;
-            int y = 3;
+            var x = true;
+            var y = 3;
             byte z = 42;
             Assert.Equal(
                 @"() => ~(int)z == 0",
@@ -473,7 +485,10 @@ namespace ExpressionToCodeTest
         }
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        T MethodWithRefParam<T>(ref T input) { return input; }
+        T MethodWithRefParam<T>(ref T input)
+        {
+            return input;
+        }
 
         [Fact]
         public void ArgumentWithOutModifier()
@@ -486,7 +501,10 @@ namespace ExpressionToCodeTest
         }
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        T MethodWithOutParam<T>(ref T input, out T output) { return output = input; }
+        T MethodWithOutParam<T>(ref T input, out T output)
+        {
+            return output = input;
+        }
 
         [Fact]
         public void StaticMethodWithRefAndOutModifiers()
@@ -501,7 +519,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void ConstructorMethodWithRefAndOutModifiers()
         {
-            int x = 42;
+            var x = 42;
             int y;
             Assert.Equal(
                 @"() => new ClassA(ref x, out y)",
@@ -511,7 +529,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void ExtensionMethodWithRefAndOutModifiers()
         {
-            int x = 42;
+            var x = 42;
             long y;
             Assert.Equal(
                 @"() => DateTime.Now.AnExtensionMethod(ref x, 5, out y)",
@@ -521,7 +539,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void DelegateCallWithRefAndOutModifiers()
         {
-            int x = 42;
+            var x = 42;
             int y;
             DelegateWithRefAndOut myDelegate = (ref int someVar, out int anotherVar) => anotherVar = someVar;
             Assert.Equal(
@@ -550,7 +568,9 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 "() => new ExpressionToCodeTest.ClassA()",
-                ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode().ToCode(() => new ClassA()));
+                ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
+                    .GetExpressionToCode()
+                    .ToCode(() => new ClassA()));
         }
 
         [Fact]
@@ -558,7 +578,9 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 "() => typeof(ExpressionToCodeTest.Outer<int, int>.Nested<string>)",
-                ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode().ToCode(() => typeof(Outer<int, int>.Nested<string>)));
+                ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
+                    .GetExpressionToCode()
+                    .ToCode(() => typeof(Outer<int, int>.Nested<string>)));
         }
 
         [Fact]
@@ -581,7 +603,9 @@ namespace ExpressionToCodeTest
         [Fact]
         public void FullTypeName_ForNestedType()
         {
-            var code = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames).GetExpressionToCode().ToCode(() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B());
+            var code = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
+                .GetExpressionToCode()
+                .ToCode(() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B());
             Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()", code);
         }
 
@@ -630,6 +654,7 @@ namespace ExpressionToCodeTest
 
         public int ReturnZero()
             => 0;
+
         public static int StaticReturnZero()
             => 0;
 
@@ -643,7 +668,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void DetectsClosuresInNestedClasses()
         {
-            var expr= new ClassWithClosure {
+            var expr = new ClassWithClosure {
                 someValue = "test "
             }.GetExpression(DayOfWeek.Friday);
             Assert.Equal(@"() => someValue + (object)closedVariable + "" "" + (object)argument", expr);
@@ -656,8 +681,9 @@ namespace ExpressionToCodeTest
             public string GetExpression(DayOfWeek argument)
             {
                 var arr = new[] { 37 };
-                foreach (var closedVariable in arr)
+                foreach (var closedVariable in arr) {
                     return ExpressionToCode.ToCode(() => someValue + closedVariable + " " + argument);
+                }
                 throw new Exception();
             }
         }
@@ -673,7 +699,7 @@ namespace ExpressionToCodeTest
 
     public delegate int CustomDelegate(int input);
 
-    internal static class StaticHelperClass
+    static class StaticHelperClass
     {
         public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut)
         {
@@ -681,7 +707,7 @@ namespace ExpressionToCodeTest
         }
     }
 
-    internal class ClassA
+    class ClassA
     {
         public static int MethodWithOutAndRefParam<T>(ref T input, out object output, int x)
         {
@@ -691,7 +717,11 @@ namespace ExpressionToCodeTest
 
         int x;
         public ClassA() { }
-        public ClassA(ref int something, out int output) { output = x = something; }
+
+        public ClassA(ref int something, out int output)
+        {
+            output = x = something;
+        }
 
         public void DoAssert()
         {
@@ -707,7 +737,14 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
         }
 
-        int C() { return x + 5; }
-        bool MyEquals(ClassA other) { return other != null && x == other.x; }
+        int C()
+        {
+            return x + 5;
+        }
+
+        bool MyEquals(ClassA other)
+        {
+            return other != null && x == other.x;
+        }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ExpressionToCodeLib;
 using Xunit;
 
@@ -10,7 +8,9 @@ namespace ExpressionToCodeTest
 {
     public class SubExpressionPerLineCodeAnnotatorTest
     {
-        static readonly ExpressionToCodeConfiguration config = ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithAnnotator(CodeAnnotators.SubExpressionPerLineCodeAnnotator);
+        static readonly ExpressionToCodeConfiguration config =
+            ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithAnnotator(CodeAnnotators.SubExpressionPerLineCodeAnnotator);
+
         static readonly IAnnotatedToCode annotator = config.GetAnnotatedToCode();
 
         [Fact]
@@ -60,24 +60,27 @@ namespace ExpressionToCodeTest
         public void MessyStructureElidesNeatly()
         {
             var hmm = "1234567890";
-            ApprovalTest.Verify(annotator.AnnotatedToCode(
-                () => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
+            ApprovalTest.Verify(
+                annotator.AnnotatedToCode(
+                    () => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
                 ));
         }
 
         [Fact]
         public void DealsOkWithLongEnumerables()
         {
-            ApprovalTest.Verify(annotator.AnnotatedToCode(
-                () => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString() == (3.5).ToString()
+            ApprovalTest.Verify(
+                annotator.AnnotatedToCode(
+                    () => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString() == 3.5.ToString()
                 ));
         }
 
         [Fact]
         public void DealsOkWithLongStrings()
         {
-            ApprovalTest.Verify(annotator.AnnotatedToCode(
-                () => string.Join("##", Enumerable.Range(0, 100)) + "suffix"
+            ApprovalTest.Verify(
+                annotator.AnnotatedToCode(
+                    () => string.Join("##", Enumerable.Range(0, 100)) + "suffix"
                 ));
         }
     }
