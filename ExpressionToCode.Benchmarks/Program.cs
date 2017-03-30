@@ -40,7 +40,7 @@ namespace ExpressionToCode.Benchmarks
             return () => x == 1 && (s.Contains("S") || s.Contains("s"));
         }
 
-        static void BaseLineAssert(Func<bool> assertion)
+        static void RunAssertion(Func<bool> assertion)
         {
             if (!assertion()) {
                 throw new Exception();
@@ -54,9 +54,21 @@ namespace ExpressionToCode.Benchmarks
         }
 
         [Benchmark]
+        public void CompileAndRun()
+        {
+            RunAssertion(testExpr.Compile());
+        }
+
+        [Benchmark]
         public void JustFastCompile()
         {
             ExpressionTreeCompilers.OptimizedExpressionCompiler.Compile(testExpr);
+        }
+
+        [Benchmark]
+        public void FastCompileAndRun()
+        {
+            RunAssertion(ExpressionTreeCompilers.OptimizedExpressionCompiler.Compile(testExpr));
         }
 
         [Benchmark]
@@ -74,7 +86,7 @@ namespace ExpressionToCode.Benchmarks
         [Benchmark]
         public void BaseLinePlainLambdaExec()
         {
-            BaseLineAssert(GetFunc());
+            RunAssertion(GetFunc());
         }
     }
 }
