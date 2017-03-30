@@ -10,16 +10,28 @@ namespace ExpressionToCodeLib
     /// </summary>
     public static class ExpressionToCode
     {
-        public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
-        public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
-        public static string ToCode<T, T1>(Expression<Func<T, T1>> e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
-        public static string ToCode<T>(Expression<Func<T>> e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
-        public static string ToCode(Expression e) => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
-        public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e) => AnnotatedToCode((Expression)e);
-        public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e) => AnnotatedToCode((Expression)e);
-        public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e) => AnnotatedToCode((Expression)e);
-        public static string AnnotatedToCode<T>(Expression<Func<T>> e) => AnnotatedToCode((Expression)e);
-        internal static bool ShouldIgnoreSpaceAfter(char c) => c == ' ' || c == '(';
+        public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
+            => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode()
+            .ToCode(e);
+
+        public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
+            => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T, T1>(Expression<Func<T, T1>> e)
+            => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode<T>(Expression<Func<T>> e)
+            => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
+        public static string ToCode(Expression e)
+            => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.GetExpressionToCode().ToCode(e);
+        public static string AnnotatedToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
+            => AnnotatedToCode((Expression)e);
+        public static string AnnotatedToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
+            => AnnotatedToCode((Expression)e);
+        public static string AnnotatedToCode<T, T1>(Expression<Func<T, T1>> e)
+            => AnnotatedToCode((Expression)e);
+        public static string AnnotatedToCode<T>(Expression<Func<T>> e)
+            => AnnotatedToCode((Expression)e);
+        internal static bool ShouldIgnoreSpaceAfter(char c)
+            => c == ' ' || c == '(';
 
         public static string AnnotatedToCode(Expression expr)
             =>
@@ -59,9 +71,11 @@ namespace ExpressionToCodeLib
         /// var example = "some text";
         /// var name = toName( () => example);  // "example"
         /// </example>
-        public static string GetNameIn<TResult>(Expression<Func<TResult>> expression) => GetNameIn((Expression)expression);
+        public static string GetNameIn<TResult>(Expression<Func<TResult>> expression)
+            => GetNameIn((Expression)expression);
 
-        public static string GetNameIn(Expression<Action> expression) => GetNameIn((Expression)expression);
+        public static string GetNameIn(Expression<Action> expression)
+            => GetNameIn((Expression)expression);
 
         public static string GetNameIn(Expression expr)
         {
@@ -100,10 +114,14 @@ namespace ExpressionToCodeLib
 
     public static class ExpressionToCodeExtensions
     {
-        public static string ToCode<T, T1, T2, T3>(this IExpressionToCode it, Expression<Func<T, T1, T2, T3>> e) => it.ToCode(e);
-        public static string ToCode<T, T1, T2>(this IExpressionToCode it, Expression<Func<T, T1, T2>> e) => it.ToCode(e);
-        public static string ToCode<T, T1>(this IExpressionToCode it, Expression<Func<T, T1>> e) => it.ToCode(e);
-        public static string ToCode<T>(this IExpressionToCode it, Expression<Func<T>> e) => it.ToCode(e);
+        public static string ToCode<T, T1, T2, T3>(this IExpressionToCode it, Expression<Func<T, T1, T2, T3>> e)
+            => it.ToCode(e);
+        public static string ToCode<T, T1, T2>(this IExpressionToCode it, Expression<Func<T, T1, T2>> e)
+            => it.ToCode(e);
+        public static string ToCode<T, T1>(this IExpressionToCode it, Expression<Func<T, T1>> e)
+            => it.ToCode(e);
+        public static string ToCode<T>(this IExpressionToCode it, Expression<Func<T>> e)
+            => it.ToCode(e);
     }
 
     public interface IAnnotatedToCode
@@ -113,11 +131,16 @@ namespace ExpressionToCodeLib
 
     public static class AnnotatedToCodeExtensions
     {
-        public static string AnnotatedToCode(this IAnnotatedToCode it, Expression e) => it.AnnotatedToCode(e, null, false);
-        public static string AnnotatedToCode<T, T1, T2, T3>(this IAnnotatedToCode it, Expression<Func<T, T1, T2, T3>> e) => it.AnnotatedToCode(e, null, false);
-        public static string AnnotatedToCode<T, T1, T2>(this IAnnotatedToCode it, Expression<Func<T, T1, T2>> e) => it.AnnotatedToCode(e, null, false);
-        public static string AnnotatedToCode<T, T1>(this IAnnotatedToCode it, Expression<Func<T, T1>> e) => it.AnnotatedToCode(e, null, false);
-        public static string AnnotatedToCode<T>(this IAnnotatedToCode it, Expression<Func<T>> e) => it.AnnotatedToCode(e, null, false);
+        public static string AnnotatedToCode(this IAnnotatedToCode it, Expression e)
+            => it.AnnotatedToCode(e, null, false);
+        public static string AnnotatedToCode<T, T1, T2, T3>(this IAnnotatedToCode it, Expression<Func<T, T1, T2, T3>> e)
+            => it.AnnotatedToCode(e, null, false);
+        public static string AnnotatedToCode<T, T1, T2>(this IAnnotatedToCode it, Expression<Func<T, T1, T2>> e)
+            => it.AnnotatedToCode(e, null, false);
+        public static string AnnotatedToCode<T, T1>(this IAnnotatedToCode it, Expression<Func<T, T1>> e)
+            => it.AnnotatedToCode(e, null, false);
+        public static string AnnotatedToCode<T>(this IAnnotatedToCode it, Expression<Func<T>> e)
+            => it.AnnotatedToCode(e, null, false);
 
         public static string AnnotatedToCode<T, T1, T2, T3>(this IAnnotatedToCode it, Expression<Func<T, T1, T2, T3>> e, string msg, bool hideOutermostValue)
             => it.AnnotatedToCode((Expression)e, msg, hideOutermostValue);

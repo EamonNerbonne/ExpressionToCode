@@ -9,8 +9,10 @@ namespace ExpressionToCodeLib.Internal
     class ObjectStringifyImpl : IObjectStringifier
     {
         readonly bool fullTypeNames;
-        public ObjectStringifyImpl(bool fullTypeNames = false) => this.fullTypeNames = fullTypeNames;
-        public string TypeNameToCode(Type type) => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
+        public ObjectStringifyImpl(bool fullTypeNames = false)
+            => this.fullTypeNames = fullTypeNames;
+        public string TypeNameToCode(Type type)
+            => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
 
         string IObjectStringifier.PlainObjectToCode(object val, Type type)
         {

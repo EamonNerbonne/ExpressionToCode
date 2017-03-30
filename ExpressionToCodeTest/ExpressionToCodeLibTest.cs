@@ -628,8 +628,10 @@ namespace ExpressionToCodeTest
             Assert.Equal("() => ExpressionToCodeLibTest.StaticReturnZero()", code);
         }
 
-        public int ReturnZero() => 0;
-        public static int StaticReturnZero() => 0;
+        public int ReturnZero()
+            => 0;
+        public static int StaticReturnZero()
+            => 0;
 
         [Fact]
         public void ThisIndexedProperty()

@@ -20,8 +20,10 @@ namespace ExpressionToCodeLib
             }
         }
 
-        static Exception Err(ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg, Exception innerException) => UnitTestingFailure.AssertionExceptionFactory(
-            config.Value.CodeAnnotator.AnnotateExpressionTree(config, assertion.Body, msg, true),
-            innerException);
+        static Exception Err(ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg, Exception innerException)
+            => UnitTestingFailure
+            .AssertionExceptionFactory(
+                config.Value.CodeAnnotator.AnnotateExpressionTree(config, assertion.Body, msg, true),
+                innerException);
     }
 }

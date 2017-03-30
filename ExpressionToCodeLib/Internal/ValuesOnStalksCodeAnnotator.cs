@@ -56,7 +56,13 @@ namespace ExpressionToCodeLib.Internal
             return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };
         }
 
-        static void AppendTo(ExpressionToCodeConfiguration config, StringBuilder sb, List<SubExpressionInfo> nodeInfos, StringifiedExpression node, ref bool ignoreInitialSpace, bool showTopExpressionValue)
+        static void AppendTo(
+            ExpressionToCodeConfiguration config,
+            StringBuilder sb,
+            List<SubExpressionInfo> nodeInfos,
+            StringifiedExpression node,
+            ref bool ignoreInitialSpace,
+            bool showTopExpressionValue)
         {
             if (node.Text != null) {
                 var trimmedText = ignoreInitialSpace ? node.Text.TrimStart() : node.Text;

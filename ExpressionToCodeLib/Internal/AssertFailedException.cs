@@ -25,7 +25,8 @@ namespace ExpressionToCodeLib.Internal
         /// </summary>
         public static class UnitTestingInternalsAccess
         {
-            public static Exception CreateException(string msg) => new AssertFailedException(msg);
+            public static Exception CreateException(string msg)
+                => new AssertFailedException(msg);
         }
     }
 }

@@ -5,6 +5,7 @@ namespace ExpressionToCodeLib.Internal
 {
     class OptimizedExpressionCompiler : IExpressionCompiler
     {
-        public Func<T> Compile<T>(Expression<Func<T>> expression) => FastExpressionCompiler.ExpressionCompiler.Compile(expression);
+        public Func<T> Compile<T>(Expression<Func<T>> expression)
+            => FastExpressionCompiler.ExpressionCompiler.Compile(expression);
     }
 }

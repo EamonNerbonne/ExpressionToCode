@@ -63,7 +63,8 @@ namespace ExpressionToCodeLib
         public static ExpressionToCodeConfiguration GlobalCodeGenConfiguration = DefaultCodeGenConfiguration;
 
         internal readonly ExpressionToCodeConfigurationValue Value;
-        ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value) => Value = value;
+        ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value)
+            => Value = value;
 
         delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
 
@@ -74,10 +75,18 @@ namespace ExpressionToCodeLib
             return new ExpressionToCodeConfiguration(configCopy);
         }
 
-        public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler) => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
-        public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator) => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
-        public ExpressionToCodeConfiguration WithPrintedListLengthLimit(int? limitListsToLength) => With((ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
-        public ExpressionToCodeConfiguration WithMaximumValueLength(int? limitValueStringsToLength) => With((ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
+        public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler)
+            => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
+        public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator)
+            => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
+
+        public ExpressionToCodeConfiguration WithPrintedListLengthLimit(int? limitListsToLength)
+            => With(
+            (ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
+
+        public ExpressionToCodeConfiguration WithMaximumValueLength(int? limitValueStringsToLength)
+            => With(
+            (ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
 
         public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier)
             => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
@@ -85,13 +94,16 @@ namespace ExpressionToCodeLib
         public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments)
             => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
 
-        public IExpressionToCode GetExpressionToCode() => new ExpressionToCodeWrapper(this);
-        public IAnnotatedToCode GetAnnotatedToCode() => new AnnotatedToCodeWrapper(this);
+        public IExpressionToCode GetExpressionToCode()
+            => new ExpressionToCodeWrapper(this);
+        public IAnnotatedToCode GetAnnotatedToCode()
+            => new AnnotatedToCodeWrapper(this);
 
         class AnnotatedToCodeWrapper : IAnnotatedToCode
         {
             readonly ExpressionToCodeConfiguration config;
-            public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config) => this.config = config;
+            public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config)
+                => this.config = config;
 
             public string AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
                 => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, hideOutermostValue);
@@ -100,8 +112,10 @@ namespace ExpressionToCodeLib
         sealed class ExpressionToCodeWrapper : IExpressionToCode
         {
             readonly ExpressionToCodeConfiguration config;
-            public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config) => this.config = config;
-            public string ToCode(Expression e) => ExpressionToCodeString.ToCodeString(config, e);
+            public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config)
+                => this.config = config;
+            public string ToCode(Expression e)
+                => ExpressionToCodeString.ToCodeString(config, e);
         }
     }
 

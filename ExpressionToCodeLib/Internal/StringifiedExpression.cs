@@ -32,7 +32,8 @@ namespace ExpressionToCodeLib.Internal
         }
 
         [Pure]
-        public static StringifiedExpression TextOnly(string text) => new StringifiedExpression(text, null, null, false);
+        public static StringifiedExpression TextOnly(string text)
+            => new StringifiedExpression(text, null, null, false);
 
         [Pure]
         public static StringifiedExpression TextAndExpr(string text, Expression expr)
@@ -44,11 +45,14 @@ namespace ExpressionToCodeLib.Internal
         }
 
         [Pure]
-        public static StringifiedExpression WithChildren(StringifiedExpression[] children) => new StringifiedExpression(null, children, null, false);
+        public static StringifiedExpression WithChildren(StringifiedExpression[] children)
+            => new StringifiedExpression(null, children, null, false);
 
         [Pure]
-        public override string ToString() => Text ?? string.Join("", children);
+        public override string ToString()
+            => Text ?? string.Join("", children);
 
-        public StringifiedExpression MarkAsConceptualChild() => new StringifiedExpression(Text, children, OptionalValue, true);
+        public StringifiedExpression MarkAsConceptualChild()
+            => new StringifiedExpression(Text, children, OptionalValue, true);
     }
 }

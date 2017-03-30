@@ -10,7 +10,8 @@ namespace ExpressionToCodeTest
 {
     public class StringInterpolationTest
     {
-        FormattableString Interpolation(FormattableString str) => str;
+        FormattableString Interpolation(FormattableString str)
+            => str;
 
         [Fact]
         public void InterpolationWithArgumentsIsJustAString()

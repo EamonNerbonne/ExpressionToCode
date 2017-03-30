@@ -81,11 +81,15 @@ namespace ExpressionToCodeTest
         static string TheProperty => "TheValue";
         // ReSharper disable once UnusedParameter.Local
         string this[int index] => "TheIndexedValue";
-        static int StaticReturnZero() => 0;
+        static int StaticReturnZero()
+            => 0;
         // ReSharper disable MemberCanBeMadeStatic.Local
-        string TheMethod(int parameter1, string parameter2) => "TheMethod " + parameter1 + " " + parameter2;
+        string TheMethod(int parameter1, string parameter2)
+            => "TheMethod " + parameter1 + " " + parameter2;
         // ReSharper disable once UnusedTypeParameter
-        string TheGenericMethod<T>(int two) => "Return value is " + two * two;
-        int ReturnZero() => 0;
+        string TheGenericMethod<T>(int two)
+            => "Return value is " + two * two;
+        int ReturnZero()
+            => 0;
     }
 }

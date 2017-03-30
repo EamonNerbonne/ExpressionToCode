@@ -52,7 +52,8 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        public static bool HasBuiltinConversion(Type from, Type to) => from == typeof(sbyte)
+        public static bool HasBuiltinConversion(Type from, Type to)
+            => from == typeof(sbyte)
             && (to == typeof(short) || to == typeof(int) || to == typeof(long) || to == typeof(float)
                 || to == typeof(double) || to == typeof(decimal))
             || from == typeof(byte)
@@ -77,7 +78,8 @@ namespace ExpressionToCodeLib.Internal
             || from == typeof(float) && to == typeof(double)
             || from == typeof(ulong) && (to == typeof(float) || to == typeof(double) || to == typeof(decimal));
 
-        public static bool CanImplicitlyCast(Type from, Type to) => to.GetTypeInfo().IsAssignableFrom(from) || HasBuiltinConversion(from, to);
+        public static bool CanImplicitlyCast(Type from, Type to)
+            => to.GetTypeInfo().IsAssignableFrom(from) || HasBuiltinConversion(from, to);
 
         public enum TypeClass
         {

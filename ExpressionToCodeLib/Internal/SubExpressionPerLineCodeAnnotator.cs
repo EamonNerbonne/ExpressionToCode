@@ -18,10 +18,15 @@ namespace ExpressionToCodeLib.Internal
 
             public struct SubExpressionValue : IEquatable<SubExpressionValue>
             {
-                public string SubExpression, ValueAsString;
-                public override int GetHashCode() => SubExpression.GetHashCode() + 37 * ValueAsString.GetHashCode();
-                public override bool Equals(object obj) => obj is SubExpressionValue val && Equals(val);
-                public bool Equals(SubExpressionValue val) => SubExpression == val.SubExpression && ValueAsString == val.ValueAsString;
+                public string SubExpression,
+                    ValueAsString;
+
+                public override int GetHashCode()
+                    => SubExpression.GetHashCode() + 37 * ValueAsString.GetHashCode();
+                public override bool Equals(object obj)
+                    => obj is SubExpressionValue val && Equals(val);
+                public bool Equals(SubExpressionValue val)
+                    => SubExpression == val.SubExpression && ValueAsString == val.ValueAsString;
             }
 
             public static ExpressionWithSubExpressions Create(ExpressionToCodeConfiguration config, Expression e, bool hideOutermostValue)
@@ -84,7 +89,9 @@ namespace ExpressionToCodeLib.Internal
                 var maxExprLen = SubExpressions.Max(sub => sub.SubExpression.Length);
 
                 if (maxExprLen < 30) {
-                    return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLen) + "   →   " + sub.ValueAsString + "\n"));
+                    return ExpressionString + "\n" + string.Join(
+                        "",
+                        SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLen) + "   →   " + sub.ValueAsString + "\n"));
                 }
 
                 return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression + "\n     →   " + sub.ValueAsString + "\n"));
