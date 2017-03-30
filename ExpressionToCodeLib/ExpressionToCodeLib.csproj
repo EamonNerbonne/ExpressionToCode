@@ -28,7 +28,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FastExpressionCompiler" Version="1.0.0-preview-01" />
+    <PackageReference Include="FastExpressionCompiler" Version="1.0.0-preview-03" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework)=='netstandard1.5' ">
