@@ -8,7 +8,7 @@ namespace ExpressionToCodeTest
     public class PAssertTest
     {
         static readonly ExpressionToCodeConfiguration config =
-            ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithAnnotator(CodeAnnotators.ValuesOnStalksCodeAnnotator);
+            ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithAnnotator(CodeAnnotators.ValuesOnStalksCodeAnnotator).WithCompiler(ExpressionTreeCompilers.DotnetExpressionCompiler);
 
         [Fact]
         public void TestBasicStalks()

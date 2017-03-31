@@ -83,8 +83,8 @@ class ExpressionTreeAssertion
     void TYPE.Assert(ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg)
 
 class ExpressionTreeCompilers
-    static readonly IExpressionCompiler DefaultExpressionCompiler
-    static readonly IExpressionCompiler OptimizedExpressionCompiler
+    static readonly IExpressionCompiler DotnetExpressionCompiler
+    static readonly IExpressionCompiler FastExpressionCompiler
 
 class UnitTestingInternalsAccess
     Exception TYPE.CreateException(string msg)

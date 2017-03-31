@@ -36,7 +36,7 @@ namespace ExpressionToCodeLib
             new ExpressionToCodeConfiguration(
                 new ExpressionToCodeConfigurationValue {
                     CodeAnnotator = CodeAnnotators.SubExpressionPerLineCodeAnnotator,
-                    ExpressionCompiler = ExpressionTreeCompilers.FastExpressionCompiler,
+                    ExpressionCompiler = ExpressionTreeCompilers.DotnetExpressionCompiler,
                     ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,
                     OmitImplicitCasts = false,
