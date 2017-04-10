@@ -88,7 +88,7 @@ namespace ExpressionToCodeLib.Internal
 
             public string ComposeToSingleString()
             {
-                var maxExprLen = SubExpressions.Max(sub => sub.SubExpression.Length);
+                var maxExprLen = SubExpressions.Max(sub => (int?)sub.SubExpression.Length) ?? 0;
 
                 if (maxExprLen < 30) {
                     return ExpressionString + "\n" + string.Join(
