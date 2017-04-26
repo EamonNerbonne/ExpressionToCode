@@ -2,7 +2,7 @@
   <PropertyGroup Label="Configuration">
     <AssemblyName>ExpressionToCodeLib</AssemblyName>
     <RootNamespace>ExpressionToCodeLib</RootNamespace>
-    <Version>2.0.0-beta7</Version>
+    <Version>2.0.0</Version>
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
     <Title>ExpressionToCode</Title>
@@ -31,7 +31,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FastExpressionCompiler" Version="1.0.0-preview-03" />
+    <PackageReference Include="FastExpressionCompiler" Version="1.0.0" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework)=='netstandard1.5' ">

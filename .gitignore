@@ -11,3 +11,4 @@ Release
 *[_.][Nn][Cc]runch*
 *.orig
 *.nupkg
+*.received.txt
