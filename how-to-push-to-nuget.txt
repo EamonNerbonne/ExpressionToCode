@@ -1,6 +1,6 @@
 to publish, run the following commands in the library  directory:
     
     dotnet pack -c release --include-symbols --include-source
-    dotnet nuget push .\bin\Release\ExpressionToCodeLib.<version>.nupkg -s https://www.nuget.org/api/v2/package
+    dotnet nuget push -s https://www.nuget.org/api/v2/package .\bin\Release\<package>.<version>.nupkg 
 
  You must also have configured your nuget api-key, e.g. via  NuGet.exe setApiKey <your-api-key-here>.  The api key is saved in your profile, so you need to do that only once.
