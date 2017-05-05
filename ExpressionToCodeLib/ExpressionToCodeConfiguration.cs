@@ -147,5 +147,6 @@ namespace ExpressionToCodeLib
     public interface IExpressionCompiler
     {
         Func<T> Compile<T>(Expression<Func<T>> expression);
+        Delegate Compile(LambdaExpression expression);
     }
 }

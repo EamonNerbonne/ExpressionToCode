@@ -79,7 +79,7 @@ namespace ExpressionToCodeLib.Internal
             try {
                 Delegate lambda;
                 try {
-                    lambda = Expression.Lambda(expression).Compile();
+                    lambda = config.Value.ExpressionCompiler.Compile(Expression.Lambda(expression));
                 } catch (InvalidOperationException) {
                     return null;
                 }
