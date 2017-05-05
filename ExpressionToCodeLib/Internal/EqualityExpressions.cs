@@ -72,10 +72,10 @@ namespace ExpressionToCodeLib.Internal
             return Tuple.Create(EqualityExpressionClass.None, default(Expression), default(Expression));
         }
 
-        static ConstantExpression ToConstantExpr(Expression e)
+        static ConstantExpression ToConstantExpr(ExpressionToCodeConfiguration config, Expression e)
         {
             try {
-                var func = Expression.Lambda(e).Compile();
+                var func = config.Value.ExpressionCompiler.Compile(Expression.Lambda(e));
                 try {
                     var val = func.DynamicInvoke();
                     return Expression.Constant(val, e.Type);
@@ -133,8 +133,8 @@ namespace ExpressionToCodeLib.Internal
             Expression right,
             bool shouldBeEqual)
         {
-            var leftC = ToConstantExpr(left);
-            var rightC = ToConstantExpr(right);
+            var leftC = ToConstantExpr(config, left);
+            var rightC = ToConstantExpr(config, right);
 
             Tuple<EqualityExpressionClass, bool> ReportIfError(EqualityExpressionClass eqClass, bool? itsVal) => shouldBeEqual == itsVal ? null : Tuple.Create(eqClass, !itsVal.HasValue);
 
