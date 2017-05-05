@@ -12,11 +12,11 @@ namespace ExpressionToCodeTest
         [Fact]
         public void PublicApi()
         {
-            var publicTypes = typeof(ExpressionToCode).Assembly.GetTypes()
+            var publicTypes = typeof(ExpressionToCode).GetTypeInfo().Assembly.GetTypes()
                 .Where(IsPublic)
                 .Where(type => !type.Namespace.Contains("Unstable"))
-                .OrderByDescending(type => type.IsEnum)
-                .ThenByDescending(type => type.IsInterface)
+                .OrderByDescending(type => type.GetTypeInfo().IsEnum)
+                .ThenByDescending(type => type.GetTypeInfo().IsInterface)
                 .ThenBy(type => type.FullName);
 
             ApprovalTest.Verify(PrettyPrintTypes(publicTypes));
@@ -25,11 +25,11 @@ namespace ExpressionToCodeTest
         [Fact]
         public void UnstableApi()
         {
-            var unstableTypes = typeof(ExpressionToCode).Assembly.GetTypes()
+            var unstableTypes = typeof(ExpressionToCode).GetTypeInfo().Assembly.GetTypes()
                 .Where(IsPublic)
                 .Where(type => type.Namespace.Contains("Unstable"))
-                .OrderByDescending(type => type.IsEnum)
-                .ThenByDescending(type => type.IsInterface)
+                .OrderByDescending(type => type.GetTypeInfo().IsEnum)
+                .ThenByDescending(type => type.GetTypeInfo().IsInterface)
                 .ThenBy(type => type.FullName);
 
             ApprovalTest.Verify(PrettyPrintTypes(unstableTypes));
@@ -42,13 +42,13 @@ namespace ExpressionToCodeTest
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
                     .OrderBy(mi => mi.MetadataToken)
-                    .Where(mi => mi.DeclaringType.Assembly != typeof(object).Assembly) //exclude noise
+                    .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
                 ;
 
             var methodBlock = string.Join("", methods.Select(mi => PrettyPrintMethod(mi) + "\n"));
 
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                    .Where(mi => mi.DeclaringType.Assembly != typeof(object).Assembly) //exclude noise
+                    .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
                 ;
 
             var fieldBlock = string.Join("", fields.Select(fi => PrettyPrintField(fi) + "\n"));
@@ -60,11 +60,11 @@ namespace ExpressionToCodeTest
         {
             var prefix = TypePrefix(type);
 
-            var baseType = type.BaseType == typeof(object) ? null : type.BaseType;
+            var baseType = type.GetTypeInfo().BaseType == typeof(object) ? null : type.GetTypeInfo().BaseType;
             var allInterfaces = type.GetInterfaces();
             var interfaces = baseType == null ? allInterfaces : allInterfaces.Except(baseType.GetInterfaces());
             var inheritanceTypes = new[] { baseType }.OfType<Type>().Concat(interfaces);
-            var suffix = !inheritanceTypes.Any() || type.IsEnum ? "" : " : " + string.Join(", ", inheritanceTypes.Select(ObjectToCode.ToCSharpFriendlyTypeName));
+            var suffix = !inheritanceTypes.Any() || type.GetTypeInfo().IsEnum ? "" : " : " + string.Join(", ", inheritanceTypes.Select(ObjectToCode.ToCSharpFriendlyTypeName));
 
             var name = ObjectToCode.ToCSharpFriendlyTypeName(type);
 
@@ -73,11 +73,11 @@ namespace ExpressionToCodeTest
 
         static string TypePrefix(Type type)
         {
-            if (type.IsEnum) {
+            if (type.GetTypeInfo().IsEnum) {
                 return "enum";
-            } else if (type.IsValueType) {
+            } else if (type.GetTypeInfo().IsValueType) {
                 return "struct";
-            } else if (type.IsInterface) {
+            } else if (type.GetTypeInfo().IsInterface) {
                 return "interface";
             } else {
                 return "class";
@@ -88,7 +88,7 @@ namespace ExpressionToCodeTest
         {
             var fakeTarget = mi.IsStatic ? "TYPE" : "inst";
 
-            return "    " + ObjectToCode.ToCSharpFriendlyTypeName(mi.ReturnType) + " " + fakeTarget +
+            return "    " + mi.ReturnType.ToCSharpFriendlyTypeName() + " " + fakeTarget +
                 "." + mi.Name
                 + PrettyPrintGenericArguments(mi)
                 + PrettyPrintParameterList(mi);
@@ -120,6 +120,6 @@ namespace ExpressionToCodeTest
                 + ">";
         }
 
-        static bool IsPublic(Type type) => type.IsPublic || type.IsNestedPublic && IsPublic(type.DeclaringType);
+        static bool IsPublic(Type type) => type.GetTypeInfo().IsPublic || type.GetTypeInfo().IsNestedPublic && IsPublic(type.DeclaringType);
     }
 }

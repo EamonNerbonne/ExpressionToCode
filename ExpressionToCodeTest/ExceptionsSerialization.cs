@@ -1,9 +1,9 @@
-﻿using System;
+﻿#if dotnet_framework
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using ExpressionToCodeLib;
 using ExpressionToCodeLib.Internal.Internal;
 using Xunit;
@@ -40,7 +40,7 @@ namespace ExpressionToCodeTest
         {
             var original = Assert.ThrowsAny<Exception>(intentionallyFailingMethod);
 
-            var formatter = new BinaryFormatter();
+            var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
             var ms = new MemoryStream();
             formatter.Serialize(ms, original);
             var deserialized = formatter.Deserialize(new MemoryStream(ms.ToArray()));
@@ -48,3 +48,4 @@ namespace ExpressionToCodeTest
         }
     }
 }
+#endif
