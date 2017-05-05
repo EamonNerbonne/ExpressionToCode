@@ -6,6 +6,7 @@ interface ICodeAnnotator
 
 interface IExpressionCompiler
     Func<T> inst.Compile<T>(Expression<Func<T>> expression)
+    Delegate inst.Compile(LambdaExpression expression)
 
 interface IExpressionToCode
     string inst.ToCode(Expression e)
