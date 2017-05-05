@@ -2,14 +2,14 @@
   <PropertyGroup Label="Configuration">
     <AssemblyName>ExpressionToCodeLib</AssemblyName>
     <RootNamespace>ExpressionToCodeLib</RootNamespace>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
     <Title>ExpressionToCode</Title>
     <Description>Generates valid, readable C# from an expression tree, and can annotate that code with runtime values. Useful for e.g. code generation and unit testing assertions.
 </Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageReleaseNotes>Add support for .net standard 1.6 (.net core 1.0).</PackageReleaseNotes>
     <PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/EamonNerbonne/ExpressionToCode</PackageProjectUrl>
@@ -17,11 +17,15 @@
       see also https://docs.microsoft.com/en-us/nuget/schema/msbuild-targets
       and a much more complete walkthrough by the zeroconf author here: https://oren.codes/2017/01/04/multi-targeting-the-world-a-single-project-to-rule-them-all/
     -->
-    <TargetFrameworks>net452</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup>
+    <TargetFrameworks>net452;netstandard1.6</TargetFrameworks>
     <RepositoryUrl>https://github.com/EamonNerbonne/ExpressionToCode</RepositoryUrl>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net47' or '$(TargetFramework)' == 'net452' ">
+    <DefineConstants>dotnet_framework</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.6' ">
+    <DefineConstants>dotnet_core</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Include="ExpressionToCodeLib.nuspec" />
@@ -34,13 +38,13 @@
     <PackageReference Include="FastExpressionCompiler" Version="1.0.0" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework)=='netstandard1.5' ">
+  <ItemGroup Condition="$(TargetFramework)=='netstandard1.6' ">
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
-    <PackageReference Include="NETStandard.Library" Version="1.6" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />

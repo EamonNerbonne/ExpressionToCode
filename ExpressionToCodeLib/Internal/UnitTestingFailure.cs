@@ -42,6 +42,7 @@ namespace ExpressionToCodeLib.Internal
                         .Compile();
                 });
 
+#if dotnet_framework
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies) {
                 var assemblyName = assembly.GetName().Name;
@@ -97,6 +98,7 @@ namespace ExpressionToCodeLib.Internal
                         new ExceptionFactory { Priority = 1, CreateException = mkFailFunc(assembly, "Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException") };
                 }
             }
+#endif
             yield return new ExceptionFactory { Priority = 0, CreateException = F((string s, Exception e) => (Exception)new AssertFailedException(s, e)) };
         }
 
