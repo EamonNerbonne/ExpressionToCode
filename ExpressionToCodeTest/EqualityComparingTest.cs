@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using ExpressionToCodeLib;
 using ExpressionToCodeLib.Internal;
 using Xunit;
 
@@ -89,7 +90,7 @@ namespace ExpressionToCodeTest
         public void StringEqDisagreement()
         {
             Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(() => ReferenceEquals(1000.ToString(CultureInfo.InvariantCulture), 10 + "00"))
+                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => ReferenceEquals(1000.ToString(CultureInfo.InvariantCulture), 10 + "00"))
                     .OrderBy(x => x),
                 eqclasses(
                         EqualityExpressionClass.EqualsOp,
@@ -102,7 +103,7 @@ namespace ExpressionToCodeTest
                     )
                     .OrderBy(x => x));
             Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(() => 1000.ToString(CultureInfo.InvariantCulture).Equals(10 + "00")).ToArray(),
+                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => 1000.ToString(CultureInfo.InvariantCulture).Equals(10 + "00")).ToArray(),
                 eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
         }
 
@@ -110,7 +111,7 @@ namespace ExpressionToCodeTest
         public void DtRefEqDisagreement()
         {
             Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(
+                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration,
                         // ReSharper disable ReferenceEqualsWithValueType
                         () => ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17)))
                     .ToArray(),
@@ -127,7 +128,7 @@ namespace ExpressionToCodeTest
         public void DtEqDisagreement()
         {
             Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(() => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17))).ToArray(),
+                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17))).ToArray(),
                 eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
         }
     }

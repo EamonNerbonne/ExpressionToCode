@@ -87,19 +87,19 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static bool? EvalBoolExpr(Expression e)
+        static bool? EvalBoolExpr(ExpressionToCodeConfiguration config, Expression e)
         {
             try {
-                return EvalBoolLambda(Expression.Lambda<Func<bool>>(e));
+                return EvalBoolLambda(config, Expression.Lambda<Func<bool>>(e));
             } catch (InvalidCastException) {
                 return null;
             }
         }
 
-        static bool? EvalBoolLambda(Expression<Func<bool>> e)
+        static bool? EvalBoolLambda(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
         {
             try {
-                return EvalBoolFunc(e.Compile());
+                return EvalBoolFunc(config.Value.ExpressionCompiler.Compile(e));
             } catch (InvalidOperationException) {
                 return null;
             }
@@ -114,20 +114,21 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(Expression<Func<bool>> e)
+        public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
         {
             var currEquals = ExtractEqualityType(e);
             if (currEquals.Item1 == EqualityExpressionClass.None) {
                 return null;
             }
-            var currVal = EvalBoolLambda(e);
+            var currVal = EvalBoolLambda(config, e);
             if (!currVal.HasValue) {
                 return null;
             }
-            return DisagreeingEqualities(currEquals.Item2, currEquals.Item3, currVal.Value);
+            return DisagreeingEqualities(config, currEquals.Item2, currEquals.Item3, currVal.Value);
         }
 
         static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(
+            ExpressionToCodeConfiguration config,
             Expression left,
             Expression right,
             bool shouldBeEqual)
@@ -156,15 +157,15 @@ namespace ExpressionToCodeLib.Internal
                     .Item2).Distinct();
 
             var errs = new[] {
-                    ReportIfError(EqualityExpressionClass.EqualsOp, EvalBoolExpr(Expression.Equal(leftC, rightC))),
-                    ReportIfError(EqualityExpressionClass.NotEqualsOp, EvalBoolExpr(Expression.Not(Expression.NotEqual(leftC, rightC)))),
+                    ReportIfError(EqualityExpressionClass.EqualsOp, EvalBoolExpr(config,Expression.Equal(leftC, rightC))),
+                    ReportIfError(EqualityExpressionClass.NotEqualsOp, EvalBoolExpr(config, Expression.Not(Expression.NotEqual(leftC, rightC)))),
                     ReportIfError(
                         EqualityExpressionClass.ObjectEquals,
-                        EvalBoolExpr(Expression.Call(leftC, objEqualInstanceMethod, Expression.Convert(rightC, typeof(object))))),
+                        EvalBoolExpr(config, Expression.Call(leftC, objEqualInstanceMethod, Expression.Convert(rightC, typeof(object))))),
                     ReportIfError(
                         EqualityExpressionClass.ObjectEqualsStatic,
                         EvalBoolExpr(
-                            Expression.Call(
+                            config, Expression.Call(
                                 objEqualStaticMethod,
                                 Expression.Convert(leftC, typeof(object)),
                                 Expression.Convert(rightC, typeof(object))))),
@@ -178,7 +179,7 @@ namespace ExpressionToCodeLib.Internal
                             ReportIfError(
                                 EqualityExpressionClass.EquatableEquals,
                                 EvalBoolExpr(
-                                    Expression.Call(leftC, method, rightC))))
+                                    config, Expression.Call(leftC, method, rightC))))
                 )
                 .Concat(
                     ienumerableTypes.Select(
@@ -186,7 +187,7 @@ namespace ExpressionToCodeLib.Internal
                             ReportIfError(
                                 EqualityExpressionClass.SequenceEqual,
                                 EvalBoolExpr(
-                                    Expression.Call(seqEqualsMethod.MakeGenericMethod(elemType), leftC, rightC))))
+                                    config, Expression.Call(seqEqualsMethod.MakeGenericMethod(elemType), leftC, rightC))))
                 );
             return errs.Where(err => err != null).Distinct().ToArray();
         }

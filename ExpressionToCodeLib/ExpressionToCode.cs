@@ -89,7 +89,7 @@ namespace ExpressionToCodeLib
         {
             TResult retValue;
             try {
-                retValue = expression.Compile().Invoke();
+                retValue = ExpressionToCodeConfiguration.GlobalAssertionConfiguration.Value.ExpressionCompiler.Compile(expression)();
             } catch (Exception ex) {
                 throw new InvalidOperationException("Cannon get return value of expression when it throws error", ex);
             }
