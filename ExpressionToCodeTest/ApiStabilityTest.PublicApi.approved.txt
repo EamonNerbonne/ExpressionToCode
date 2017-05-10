@@ -87,9 +87,6 @@ class ExpressionTreeCompilers
     static readonly IExpressionCompiler DotnetExpressionCompiler
     static readonly IExpressionCompiler FastExpressionCompiler
 
-class UnitTestingInternalsAccess
-    Exception TYPE.CreateException(string msg)
-
 class ObjectStringifierExtensions
     string TYPE.PlainObjectToCode(IObjectStringifier it, object val)
 

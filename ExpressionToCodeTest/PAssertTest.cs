@@ -19,9 +19,9 @@ namespace ExpressionToCodeTest
                         () =>
                             TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0
                     ));
-            Assert.Equal(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed", msgLines[0]);
+            Assert.Equal(@"TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  assertion failed", msgLines[0]);
             var expectedMessage = @"
-TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  failed
+TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  assertion failed
                  │                  │                   │
                  │                  │                   00:01:00
                  │                  -1
@@ -52,15 +52,15 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  fai
                 () => config.Assert(
                     () => 0 == (ulong)(uint)x
                 ));
-            Assert.Equal(@"0UL == (uint)x  :  failed", (object)msgLines[0]);
+            Assert.Equal(@"0UL == (uint)x  :  assertion failed", (object)msgLines[0]);
             Assert.Equal(2, (object)msgLines[1].Count(c => c == '│'));
         }
 
         [Fact]
-        public void AppendsFailedOnFailure()
+        public void AppendsAssertionFailedOnFailure()
         {
             var msgLines = PAssertLines(() => config.Assert(() => false));
-            Assert.Equal(@"false  :  failed", (object)msgLines[0]);
+            Assert.Equal(@"false  :  assertion failed", (object)msgLines[0]);
             Assert.Equal(1, (object)msgLines.Length);
         }
 
