@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ExpressionToCodeLib;
 using Xunit;
 
@@ -8,7 +9,10 @@ namespace ExpressionToCodeTest
 {
     public class FailingClass
     {
-        public static int SomeFunction() => throw new Exception();
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static bool SomeFunction() => throw new Exception();
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static bool SomeWrappedFunction() => SomeFunction();
     }
 
     public class SubExprExceptionTest
@@ -18,9 +22,9 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"() => FailingClass.SomeFunction()
-FailingClass.SomeFunction()   →   throws System.Exception
+FailingClass.SomeWrappedFunction()   →   throws System.Exception
 ".Replace("\r\n", "\n"),
-                ExpressionToCode.AnnotatedToCode(() => FailingClass.SomeFunction()));
+                ExpressionToCode.AnnotatedToCode(() => FailingClass.SomeWrappedFunction()));
         }
     }
 }

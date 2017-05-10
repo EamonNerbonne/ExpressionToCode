@@ -1,6 +1,5 @@
 using System;
 using System.Linq.Expressions;
-using ExpressionToCodeLib.Internal;
 
 namespace ExpressionToCodeLib
 {
@@ -13,17 +12,11 @@ namespace ExpressionToCodeLib
             try {
                 ok = compiled();
             } catch (Exception e) {
-                throw Err(config, assertion, msg ?? "failed with exception", e);
+                throw new AssertionFailedException(config.Value.CodeAnnotator.AnnotateExpressionTree(config, assertion.Body, "evaluating assertion aborted due to exception: "+msg , true), e);
             }
             if (!ok) {
-                throw Err(config, assertion, msg ?? "failed", null);
+                throw new AssertionFailedException(config.Value.CodeAnnotator.AnnotateExpressionTree(config, assertion.Body, msg ?? "assertion failed", true), null);
             }
         }
-
-        static Exception Err(ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg, Exception innerException)
-            => UnitTestingFailure
-                .AssertionExceptionFactory(
-                    config.Value.CodeAnnotator.AnnotateExpressionTree(config, assertion.Body, msg, true),
-                    innerException);
     }
 }
