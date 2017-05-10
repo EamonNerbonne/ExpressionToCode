@@ -1,6 +1,7 @@
 ﻿using System;
 using ExpressionToCodeLib;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Xunit;
 
@@ -35,7 +36,7 @@ namespace ExpressionToCodeTest
         {
             ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
-                    () => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString() == 3.5.ToString()
+                    () => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture) == 3.5.ToString(CultureInfo.InvariantCulture)
                 ));
         }
 

@@ -1,4 +1,6 @@
-﻿() => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString() == 3.5.ToString()
+() => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture) == 3.5.ToString(CultureInfo.InvariantCulture)
+CultureInfo.InvariantCulture
+     →   
 i
      →   
 "n" + i
@@ -21,9 +23,9 @@ Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)
           }
 Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"]
      →   3
-Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString()
+Enumerable.Range(0, 1000).ToDictionary(  …  .ToString(CultureInfo.InvariantCulture)
      →   "3"
-3.5.ToString()
+3.5.ToString(CultureInfo.InvariantCulture)
      →   "3.5"
-Enumerable.Range(0, 1000).ToDictionary(  …  + i)["n3"].ToString() == 3.5.ToString()
+Enumerable.Range(0, 1000).ToDictionary(  …  .ToString(CultureInfo.InvariantCulture)
      →   false
