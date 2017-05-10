@@ -99,7 +99,7 @@ namespace ExpressionToCodeTest
             var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithPrintedListLengthLimit(3);
             Assert.Equal(
                 "new[] {\n  null,\n  new {\n          A = 3,\n          B = new[] {1, 2, 3, ...},\n        },\n}",
-                ObjectToCode.ComplexObjectToPseudoCode(config, new[] { null, new { A = 3, B = new[] { 1, 2, 3, 4, 5 } } }));
+                config.ComplexObjectToPseudoCode(new[] { null, new { A = 3, B = new[] { 1, 2, 3, 4, 5 } } }));
         }
     }
 }

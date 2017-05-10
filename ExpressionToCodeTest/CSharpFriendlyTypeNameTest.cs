@@ -13,64 +13,64 @@ namespace ExpressionToCodeTest
         [Fact]
         public void SupportsBuiltInCases()
         {
-            Assert.Equal("object", ObjectToCode.ToCSharpFriendlyTypeName(typeof(object)));
-            Assert.Equal("string", ObjectToCode.ToCSharpFriendlyTypeName(typeof(string)));
-            Assert.Equal("char", ObjectToCode.ToCSharpFriendlyTypeName(typeof(char)));
-            Assert.Equal("byte", ObjectToCode.ToCSharpFriendlyTypeName(typeof(byte)));
-            Assert.Equal("sbyte", ObjectToCode.ToCSharpFriendlyTypeName(typeof(sbyte)));
-            Assert.Equal("short", ObjectToCode.ToCSharpFriendlyTypeName(typeof(short)));
-            Assert.Equal("ushort", ObjectToCode.ToCSharpFriendlyTypeName(typeof(ushort)));
-            Assert.Equal("int", ObjectToCode.ToCSharpFriendlyTypeName(typeof(int)));
-            Assert.Equal("uint", ObjectToCode.ToCSharpFriendlyTypeName(typeof(uint)));
-            Assert.Equal("long", ObjectToCode.ToCSharpFriendlyTypeName(typeof(long)));
-            Assert.Equal("ulong", ObjectToCode.ToCSharpFriendlyTypeName(typeof(ulong)));
-            Assert.Equal("void", ObjectToCode.ToCSharpFriendlyTypeName(typeof(void)));
-            Assert.Equal("float", ObjectToCode.ToCSharpFriendlyTypeName(typeof(float)));
-            Assert.Equal("decimal", ObjectToCode.ToCSharpFriendlyTypeName(typeof(decimal)));
+            Assert.Equal("object", typeof(object).ToCSharpFriendlyTypeName());
+            Assert.Equal("string", typeof(string).ToCSharpFriendlyTypeName());
+            Assert.Equal("char", typeof(char).ToCSharpFriendlyTypeName());
+            Assert.Equal("byte", typeof(byte).ToCSharpFriendlyTypeName());
+            Assert.Equal("sbyte", typeof(sbyte).ToCSharpFriendlyTypeName());
+            Assert.Equal("short", typeof(short).ToCSharpFriendlyTypeName());
+            Assert.Equal("ushort", typeof(ushort).ToCSharpFriendlyTypeName());
+            Assert.Equal("int", typeof(int).ToCSharpFriendlyTypeName());
+            Assert.Equal("uint", typeof(uint).ToCSharpFriendlyTypeName());
+            Assert.Equal("long", typeof(long).ToCSharpFriendlyTypeName());
+            Assert.Equal("ulong", typeof(ulong).ToCSharpFriendlyTypeName());
+            Assert.Equal("void", typeof(void).ToCSharpFriendlyTypeName());
+            Assert.Equal("float", typeof(float).ToCSharpFriendlyTypeName());
+            Assert.Equal("decimal", typeof(decimal).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void SupportsSimpleExamples()
         {
-            Assert.Equal("DateTime", ObjectToCode.ToCSharpFriendlyTypeName(typeof(DateTime)));
-            Assert.Equal("Regex", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Regex)));
-            Assert.Equal("ExpressionToCode", ObjectToCode.ToCSharpFriendlyTypeName(typeof(ExpressionToCode)));
+            Assert.Equal("DateTime", typeof(DateTime).ToCSharpFriendlyTypeName());
+            Assert.Equal("Regex", typeof(Regex).ToCSharpFriendlyTypeName());
+            Assert.Equal("ExpressionToCode", typeof(ExpressionToCode).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void IntArray()
         {
-            Assert.Equal("int[]", ObjectToCode.ToCSharpFriendlyTypeName(typeof(int[])));
+            Assert.Equal("int[]", typeof(int[]).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void NullableValueType()
         {
-            Assert.Equal("ConsoleKey?", ObjectToCode.ToCSharpFriendlyTypeName(typeof(ConsoleKey?)));
+            Assert.Equal("ConsoleKey?", typeof(ConsoleKey?).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void GenericList()
         {
-            Assert.Equal("List<DateTime>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(List<DateTime>)));
+            Assert.Equal("List<DateTime>", typeof(List<DateTime>).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void MultiDimArray()
         {
-            Assert.Equal("string[,,]", ObjectToCode.ToCSharpFriendlyTypeName(typeof(string[,,])));
+            Assert.Equal("string[,,]", typeof(string[,,]).ToCSharpFriendlyTypeName());
         }
 
         [Fact] //Has always been broken
         public void MultiDimOfSingleDimArray()
         {
-            Assert.Equal("object[,][]", ObjectToCode.ToCSharpFriendlyTypeName(typeof(object[,][])));
+            Assert.Equal("object[,][]", typeof(object[,][]).ToCSharpFriendlyTypeName());
         }
 
         [Fact] //Has always been broken
         public void SingleDimOfMultiDimArray()
         {
-            Assert.Equal("object[][,]", ObjectToCode.ToCSharpFriendlyTypeName(typeof(object[][,])));
+            Assert.Equal("object[][,]", typeof(object[][,]).ToCSharpFriendlyTypeName());
         }
 
         [Fact] //Has always been broken
@@ -80,55 +80,55 @@ namespace ExpressionToCodeTest
             // ReSharper disable once RedundantArrayCreationExpression
             var v = new[] { new object[2, 3] };
 
-            Assert.Equal("object[][,]", ObjectToCode.ToCSharpFriendlyTypeName(v.GetType()));
+            Assert.Equal("object[][,]", v.GetType().ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void ArrayGenericsMessyMix()
         {
-            Assert.Equal("List<Tuple<int[], string[,]>[][]>[]", ObjectToCode.ToCSharpFriendlyTypeName(typeof(List<Tuple<int[], string[,]>[][]>[])));
+            Assert.Equal("List<Tuple<int[], string[,]>[][]>[]", typeof(List<Tuple<int[], string[,]>[][]>[]).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void NestedClasses()
         {
-            Assert.Equal("Outer<string, int>.Nested<DateTime>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Outer<string, int>.Nested<DateTime>)));
+            Assert.Equal("Outer<string, int>.Nested<DateTime>", typeof(Outer<string, int>.Nested<DateTime>).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void NestedNonGenericInGenericClasses()
         {
-            Assert.Equal("Outer<string, int>.Nested2", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Outer<string, int>.Nested2)));
+            Assert.Equal("Outer<string, int>.Nested2", typeof(Outer<string, int>.Nested2).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void NestedGenericInNonGenericClasses()
         {
-            Assert.Equal("Outer2.Nested3<Action>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Outer2.Nested3<Action>)));
+            Assert.Equal("Outer2.Nested3<Action>", typeof(Outer2.Nested3<Action>).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void RussianDolls()
         {
-            Assert.Equal("Tuple<List<int>, Tuple<List<string>>>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Tuple<List<int>, Tuple<List<string>>>)));
+            Assert.Equal("Tuple<List<int>, Tuple<List<string>>>", typeof(Tuple<List<int>, Tuple<List<string>>>).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void GenericArgumentTypes()
         {
-            Assert.Equal("Func<Z>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>).GetTypeInfo().GetMethod("Method").GetParameters()[0].ParameterType));
+            Assert.Equal("Func<Z>", typeof(Outer<,>.Nested<>).GetTypeInfo().GetMethod("Method").GetParameters()[0].ParameterType.ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void UnboundNested()
         {
-            Assert.Equal("Outer<X, Y>.Nested<Z>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(Outer<,>.Nested<>)));
+            Assert.Equal("Outer<X, Y>.Nested<Z>", typeof(Outer<,>.Nested<>).ToCSharpFriendlyTypeName());
         }
 
         [Fact]
         public void UnboundGenericList()
         {
-            Assert.Equal("List<T>", ObjectToCode.ToCSharpFriendlyTypeName(typeof(List<>)));
+            Assert.Equal("List<T>", typeof(List<>).ToCSharpFriendlyTypeName());
         }
 
         [Fact]

@@ -66,7 +66,7 @@ namespace ExpressionToCodeTest
             var inheritanceTypes = new[] { baseType }.OfType<Type>().Concat(interfaces);
             var suffix = !inheritanceTypes.Any() || type.GetTypeInfo().IsEnum ? "" : " : " + string.Join(", ", inheritanceTypes.Select(ObjectToCode.ToCSharpFriendlyTypeName));
 
-            var name = ObjectToCode.ToCSharpFriendlyTypeName(type);
+            var name = type.ToCSharpFriendlyTypeName();
 
             return prefix + " " + name + suffix;
         }
@@ -96,7 +96,7 @@ namespace ExpressionToCodeTest
 
         static object PrettyPrintField(FieldInfo fi) => "    "
             + (fi.IsLiteral ? "const " : (fi.IsStatic ? "static " : "") + (fi.IsInitOnly ? "readonly " : ""))
-            + ObjectToCode.ToCSharpFriendlyTypeName(fi.FieldType)
+            + fi.FieldType.ToCSharpFriendlyTypeName()
             + " " + fi.Name
             + (fi.IsLiteral ? " = " + ObjectToCode.ComplexObjectToPseudoCode(fi.GetRawConstantValue()) : "");
 
@@ -107,7 +107,7 @@ namespace ExpressionToCodeTest
                 mi.GetParameters()
                     .Select(
                         pi =>
-                            ObjectToCode.ToCSharpFriendlyTypeName(pi.ParameterType) + " " + pi.Name)) + ")";
+                            pi.ParameterType.ToCSharpFriendlyTypeName() + " " + pi.Name)) + ")";
         }
 
         static string PrettyPrintGenericArguments(MethodInfo mi)
