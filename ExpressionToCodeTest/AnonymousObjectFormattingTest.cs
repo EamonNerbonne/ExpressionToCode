@@ -11,14 +11,24 @@ namespace ExpressionToCodeTest
         [Fact]
         public void AnonymousObjectsRenderAsCode()
         {
-            Assert.Equal("new {\n  A = 1,\n  Foo = \"Bar\",\n}", ObjectToCode.ComplexObjectToPseudoCode(new { A = 1, Foo = "Bar", }));
+            Assert.Equal(@"new {
+    A = 1,
+    Foo = ""Bar"",
+}", ObjectToCode.ComplexObjectToPseudoCode(new { A = 1, Foo = "Bar", }));
         }
 
         [Fact]
         public void AnonymousObjectsInArray()
         {
             Assert.Equal(
-                "new[] {\n  new {\n          Val = 3,\n        },\n  new {\n          Val = 42,\n        },\n}",
+                @"new[] {
+    new {
+        Val = 3,
+    },
+    new {
+        Val = 42,
+    },
+}",
                 ObjectToCode.ComplexObjectToPseudoCode(new[] { new { Val = 3, }, new { Val = 42 } }));
         }
 
@@ -30,18 +40,38 @@ namespace ExpressionToCodeTest
             ApprovalTest.Verify(config.AnnotatedToCode(() => arr.Any()));
         }
 
+
+        [Fact]
+        public void MessyEnumerablesOfAnonymousObjects()
+        {
+            var foo = new
+            {
+                A_long_string = string.Join("##", Enumerable.Range(0, 100)) + "suffix",
+                A_short_string = "short",
+                A_long_enumerable = Enumerable.Range(0, 1000)
+            };
+            ApprovalTest.Verify(
+                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(new[] {
+                        foo, foo,
+                    }));
+        }
+
         [Fact]
         public void EnumerableInAnonymousObject()
         {
             Assert.Equal(
-                "new {\n  Nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...},\n}",
+                @"new {
+    Nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...},
+}",
                 ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(new { Nums = Enumerable.Range(1, 18) }));
         }
 
         [Fact]
         public void EnumInAnonymousObject()
         {
-            Assert.Equal("new {\n  Enum = ConsoleKey.A,\n}", ObjectToCode.ComplexObjectToPseudoCode(new { Enum = ConsoleKey.A }));
+            Assert.Equal(@"new {
+    Enum = ConsoleKey.A,
+}", ObjectToCode.ComplexObjectToPseudoCode(new { Enum = ConsoleKey.A }));
         }
     }
 }

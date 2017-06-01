@@ -63,6 +63,22 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
+        public void DealsOkWithEnumerablesOfAnonymousObjects()
+        {
+            var foo = new
+            {
+                A_long_string = string.Join("##", Enumerable.Range(0, 100)) + "suffix",
+                A_short_string = "short",
+                A_long_enumerable = Enumerable.Range(0, 1000)
+            };
+            ApprovalTest.Verify(
+                annotator.AnnotatedToCode(
+                    () => new[] {
+                        foo, foo,
+                    }));
+        }
+
+        [Fact]
         public void DealsOkWithObjectsContainingLongMultilineStrings()
         {
             var wallOfText =
@@ -71,7 +87,7 @@ namespace ExpressionToCodeTest
                         .Select(line =>
                             $"line {line}:".PadRight(10)
                                 + string.Join("",
-                                    Enumerable.Range(2, 20).Select(n =>$"{n * 10,9};")
+                                    Enumerable.Range(2, 20).Select(n => $"{n * 10,9};")
                                     ) + "\n"
                         )
                     );

@@ -2,7 +2,7 @@
   <PropertyGroup Label="Configuration">
     <AssemblyName>ExpressionToCodeLib</AssemblyName>
     <RootNamespace>ExpressionToCodeLib</RootNamespace>
-    <Version>2.3.0</Version>
+    <Version>2.4.0</Version>
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
     <Title>ExpressionToCode</Title>

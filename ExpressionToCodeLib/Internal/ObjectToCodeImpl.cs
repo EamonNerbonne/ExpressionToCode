@@ -18,7 +18,7 @@ namespace ExpressionToCodeLib.Internal
         {
             var retval = ObjectToCode.PlainObjectToCode(val);
             if (val is string) {
-                return ElidePossiblyMultilineString(config, retval, indent, valueSize);
+                return ElidePossiblyMultilineString(config, retval, indent, valueSize).Trim();
             } else if (retval != null) {
                 return ElideAfter(retval, valueSize);
             } else if (val is Array) {
@@ -36,7 +36,7 @@ namespace ExpressionToCodeLib.Internal
                             .GetProperties()
                             .Select(
                                 pi =>
-                                    "\n" + new string(' ', indent + 2) + pi.Name + " = "
+                                    "\n" + new string(' ', indent + 4) + pi.Name + " = "
                                         + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 4, valueSize - pi.Name.Length) + ",")
                         )
                     + "\n" + new string(' ', indent) + "}";
@@ -54,27 +54,26 @@ namespace ExpressionToCodeLib.Internal
         static string ElidePossiblyMultilineString(ExpressionToCodeConfiguration config, string val, int indent, int len)
         {
             var lines = val.Split(lineSeparators, StringSplitOptions.None);
+            var indentString = new string(' ', indent);
             if (lines.Length < 2) {
-                return ElideAfter(val, len);
+                return "\n" + indentString + ElideAfter(val, len);
             }
             if (config.Value.PrintedListLengthLimit is int limit && lines.Length > limit) {
                 lines = lines.Take(limit).Concat(new[] { "..." }).ToArray();
             }
-
-            var indentString = new string(' ', indent);
             var stringBoundaryPrefix = lines[0].StartsWith("@\"") ? 2 : lines[0].StartsWith("\"") ? 1 : 0;
-            return "\n" + indentString.Remove(Math.Max(0, indentString.Length - stringBoundaryPrefix)) 
-                + string.Join("\n" + indentString, lines.Select(s => ElideAfter(s, len - 1)));
+            var firstLineIndent = "\n" + indentString.Substring(0, Math.Max(0, indentString.Length - stringBoundaryPrefix));
+
+            return firstLineIndent + string.Join("\n" + indentString, lines.Select(s => ElideAfter(s, len - 1)));
         }
 
         static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list, int indent, int valueSize)
         {
             var contents = PrintListContents(config, list, indent).ToArray();
             if (contents.Sum(s => s.Length + 2) > Math.Min(valueSize, 120) || contents.Any(s => s.Any(c => c == '\n'))) {
-                var indentString = new string(' ', indent + 2);
-                return "{\n"
-                    + string.Join("", contents.Select(s => indentString + ElideAfter(s, valueSize - 3) + (s == "..." ? "" : ",") + "\n"))
-                    + new string(' ', indent)
+                return "{"
+                    + string.Join("", contents.Select(s => ElidePossiblyMultilineString(config, s, indent + 4, valueSize - 3) + (s == "..." ? "" : ",")))
+                    + "\n" + new string(' ', indent)
                     + "}";
             }
             return "{" + string.Join(", ", contents) + "}";
@@ -89,7 +88,7 @@ namespace ExpressionToCodeLib.Internal
                     yield return "...";
                     yield break;
                 } else {
-                    yield return ComplexObjectToPseudoCode(config, item, indent + 8);
+                    yield return ComplexObjectToPseudoCode(config, item, 0);
                 }
             }
         }

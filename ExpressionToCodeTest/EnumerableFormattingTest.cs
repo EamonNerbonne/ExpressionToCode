@@ -60,17 +60,17 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"{
-  ""12345000"",
-  ""12345001"",
-  ""12345002"",
-  ""12345003"",
-  ""12345004"",
-  ""12345005"",
-  ""12345006"",
-  ""12345007"",
-  ""12345008"",
-  ""12345009"",
-  ...
+    ""12345000"",
+    ""12345001"",
+    ""12345002"",
+    ""12345003"",
+    ""12345004"",
+    ""12345005"",
+    ""12345006"",
+    ""12345007"",
+    ""12345008"",
+    ""12345009"",
+    ...
 }",
                 ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithPrintedListLengthLimit(10).ComplexObjectToPseudoCode(
                     Enumerable.Range(12345000, 13).Select(i => i.ToString(CultureInfo.InvariantCulture))));
@@ -81,14 +81,14 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"{
-  new {
-          A = 3,
-          B = 'b',
-        },
-  new {
-          A = 3,
-          B = 'b',
-        },
+    new {
+        A = 3,
+        B = 'b',
+    },
+    new {
+        A = 3,
+        B = 'b',
+    },
 }",
                 ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Repeat(new { A = 3, B = 'b' }, 2)));
         }
@@ -97,9 +97,13 @@ namespace ExpressionToCodeTest
         public void NestedArraysUseProperConfig()
         {
             var config = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithPrintedListLengthLimit(3);
-            Assert.Equal(
-                "new[] {\n  null,\n  new {\n          A = 3,\n          B = new[] {1, 2, 3, ...},\n        },\n}",
-                config.ComplexObjectToPseudoCode(new[] { null, new { A = 3, B = new[] { 1, 2, 3, 4, 5 } } }));
+            ApprovalTest.Verify(config.ComplexObjectToPseudoCode(new[] {
+                null,
+                new {
+                    A = 3,
+                    B = new[] { 1, 2, 3, 4, 5 }
+                }
+            }));
         }
     }
 }
