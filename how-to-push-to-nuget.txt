@@ -1,5 +1,6 @@
 to publish, run the following commands in the library  directory:
     
+    dotnet clean
     dotnet pack -c release --include-symbols --include-source
     dotnet nuget push -s https://www.nuget.org/api/v2/package .\bin\Release\<package>.<version>.nupkg 
 
