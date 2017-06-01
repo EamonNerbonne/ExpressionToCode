@@ -48,7 +48,7 @@ namespace ExpressionToCodeLib
         /// </summary>
         public static readonly ExpressionToCodeConfiguration DefaultAssertionConfiguration =
             DefaultCodeGenConfiguration
-                .WithPrintedListLengthLimit(10)
+                .WithPrintedListLengthLimit(15)
                 .WithMaximumValueLength(80)
                 .WithOmitImplicitCasts(true)
             ;

@@ -1,8 +1,8 @@
 ﻿using System;
-using ExpressionToCodeLib;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using ExpressionToCodeLib;
 using Xunit;
 
 namespace ExpressionToCodeTest
@@ -37,7 +37,7 @@ namespace ExpressionToCodeTest
             ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
                     () => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture) == 3.5.ToString(CultureInfo.InvariantCulture)
-                ));
+                    ));
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace ExpressionToCodeTest
             ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
                     () => string.Join("##", Enumerable.Range(0, 100)) + "suffix"
-                ));
+                    ));
         }
 
         [Fact]
@@ -59,7 +59,31 @@ namespace ExpressionToCodeTest
                         A_short_string = "short",
                         A_long_enumerable = Enumerable.Range(0, 1000)
                     }
-                ));
+                    ));
+        }
+
+        [Fact]
+        public void DealsOkWithObjectsContainingLongMultilineStrings()
+        {
+            var wallOfText =
+                string.Join("",
+                    Enumerable.Range(0, 100)
+                        .Select(line =>
+                            $"line {line}:".PadRight(10)
+                                + string.Join("",
+                                    Enumerable.Range(2, 20).Select(n =>$"{n * 10,9};")
+                                    ) + "\n"
+                        )
+                    );
+
+            ApprovalTest.Verify(
+                annotator.AnnotatedToCode(
+                    () => new {
+                        A_wall_of_text = wallOfText,
+                        A_short_string = "short",
+                        A_long_enumerable = Enumerable.Range(0, 1000)
+                    }
+                    ));
         }
 
         [Fact]
@@ -69,7 +93,7 @@ namespace ExpressionToCodeTest
             ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
                     () => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
-                ));
+                    ));
         }
 
         [Fact]

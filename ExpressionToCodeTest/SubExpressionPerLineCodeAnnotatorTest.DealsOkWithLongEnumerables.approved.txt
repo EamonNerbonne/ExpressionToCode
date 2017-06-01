@@ -6,7 +6,7 @@ i
 "n" + i
      →   
 Enumerable.Range(0, 1000)
-     →   {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...}
+     →   {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, ...}
 Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)
      →   {
             [n0, 0],
@@ -19,6 +19,11 @@ Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)
             [n7, 7],
             [n8, 8],
             [n9, 9],
+            [n10, 10],
+            [n11, 11],
+            [n12, 12],
+            [n13, 13],
+            [n14, 14],
             ...
           }
 Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"]

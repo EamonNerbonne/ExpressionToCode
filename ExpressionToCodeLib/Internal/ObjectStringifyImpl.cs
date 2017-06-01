@@ -20,13 +20,12 @@ namespace ExpressionToCodeLib.Internal
         {
             if (val == null) {
                 return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
-            } else if (val is string) {
-                var useLiteralSyntax = ((string)val).Any(c => c < 32 || c == '\\')
-                    && ((string)val).All(c => c != '\n' && c != '\r' && c != '\t');
+            } else if (val is string str) {
+                var useLiteralSyntax = str.Count(c => c < 32 && c!='\r' || c == '\\') > 3;
                 if (useLiteralSyntax) {
-                    return "@\"" + ((string)val).Replace("\"", "\"\"") + "\"";
+                    return "@\"" + str.Replace("\"", "\"\"") + "\"";
                 } else {
-                    return "\"" + EscapeStringChars((string)val) + "\"";
+                    return "\"" + EscapeStringChars(str) + "\"";
                 }
             } else if (val is char) {
                 return "'" + EscapeStringChars(val.ToString()) + "'";

@@ -9,13 +9,17 @@ namespace ExpressionToCodeLib.Internal
 {
     static class ObjectToCodeImpl
     {
+        static readonly string[] lineSeparators = new[] { "\r\n", "\n" };
+
         public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent)
             => ComplexObjectToPseudoCode(config, val, indent, config.Value.MaximumValueLength ?? int.MaxValue);
 
         static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize)
         {
             var retval = ObjectToCode.PlainObjectToCode(val);
-            if (retval != null) {
+            if (val is string) {
+                return ElidePossiblyMultilineString(config, retval, indent, valueSize);
+            } else if (retval != null) {
                 return ElideAfter(retval, valueSize);
             } else if (val is Array) {
                 return "new[] " + FormatEnumerable(config, (IEnumerable)val, indent, valueSize - 6);
@@ -33,8 +37,8 @@ namespace ExpressionToCodeLib.Internal
                             .Select(
                                 pi =>
                                     "\n" + new string(' ', indent + 2) + pi.Name + " = "
-                                    + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 4, valueSize - pi.Name.Length) + ",")
-                    )
+                                        + ComplexObjectToPseudoCode(config, pi.GetValue(val, null), indent + 4, valueSize - pi.Name.Length) + ",")
+                        )
                     + "\n" + new string(' ', indent) + "}";
             } else {
                 return ElideAfter(val.ToString(), valueSize);
@@ -45,6 +49,22 @@ namespace ExpressionToCodeLib.Internal
         {
             var maxLength = Math.Max(10, len);
             return val.Length > maxLength ? val.Substring(0, maxLength) + " ..." : val;
+        }
+
+        static string ElidePossiblyMultilineString(ExpressionToCodeConfiguration config, string val, int indent, int len)
+        {
+            var lines = val.Split(lineSeparators, StringSplitOptions.None);
+            if (lines.Length < 2) {
+                return ElideAfter(val, len);
+            }
+            if (config.Value.PrintedListLengthLimit is int limit && lines.Length > limit) {
+                lines = lines.Take(limit).Concat(new[] { "..." }).ToArray();
+            }
+
+            var indentString = new string(' ', indent);
+            var stringBoundaryPrefix = lines[0].StartsWith("@\"") ? 2 : lines[0].StartsWith("\"") ? 1 : 0;
+            return "\n" + indentString.Remove(Math.Max(0, indentString.Length - stringBoundaryPrefix)) 
+                + string.Join("\n" + indentString, lines.Select(s => ElideAfter(s, len - 1)));
         }
 
         static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list, int indent, int valueSize)

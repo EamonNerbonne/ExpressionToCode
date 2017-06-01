@@ -23,22 +23,22 @@ namespace ExpressionToCodeTest
         public void LongEnumerablesBreakAfter10_InCodeGen()
         {
             Assert.Equal(
-                "{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}",
-                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 13)));
+                "{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18}",
+                ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 18)));
         }
 
         [Fact]
-        public void LongArraysBreakAfter10_InAssertions()
+        public void LongArraysBreakAfter15_InAssertions()
         {
             Assert.Equal(
-                "new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ...}",
-                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 13).ToArray()));
+                "new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ...}",
+                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 18).ToArray()));
         }
 
         [Fact]
-        public void LongArraysDoNotBreakAfter10_InCodeGen()
+        public void LongArraysDoNotBreakAfter15_InCodeGen()
         {
-            Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}", ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Range(1, 13).ToArray()));
+            Assert.Equal("new[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18}", ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Range(1, 18).ToArray()));
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace ExpressionToCodeTest
   ""12345009"",
   ...
 }",
-                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(
+                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithPrintedListLengthLimit(10).ComplexObjectToPseudoCode(
                     Enumerable.Range(12345000, 13).Select(i => i.ToString(CultureInfo.InvariantCulture))));
         }
 

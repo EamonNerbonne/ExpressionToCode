@@ -9,7 +9,7 @@ namespace ExpressionToCodeLib.Internal
     class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
         public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
-            => (msg == null ? "" : msg + "\n") + ExpressionWithSubExpressions.Create(config, expr, hideOutermostValue).ComposeToSingleString();
+            => (msg == null ? "" : msg + "\n\n") + ExpressionWithSubExpressions.Create(config, expr, hideOutermostValue).ComposeToSingleString();
 
         struct ExpressionWithSubExpressions
         {
