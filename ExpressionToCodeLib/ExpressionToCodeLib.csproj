@@ -4,8 +4,7 @@
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
     <Title>ExpressionToCode</Title>
-    <Description>Generates valid, readable C# from an expression tree, and can annotate that code with runtime values. Useful for e.g. code generation and unit testing assertions.
-</Description>
+    <Description>Generates valid, readable C# from an expression tree, and can annotate that code with runtime values. Useful for e.g. code generation and unit testing assertions.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>Improve formatting of multiline strings</PackageReleaseNotes>
     <PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
