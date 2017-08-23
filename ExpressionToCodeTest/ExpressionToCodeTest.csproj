@@ -1,8 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Label="Configuration">
-    <AssemblyName>ExpressionToCodeTest</AssemblyName>
-    <RootNamespace>ExpressionToCodeTest</RootNamespace>
-  </PropertyGroup>
   <PropertyGroup>
     <OutputType>library</OutputType>
     <TargetFrameworks>net462;netcoreapp1.1</TargetFrameworks>

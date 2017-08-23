@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Configuration">
-    <AssemblyName>ExpressionToCodeLib</AssemblyName>
-    <RootNamespace>ExpressionToCodeLib</RootNamespace>
     <Version>2.4.0</Version>
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
