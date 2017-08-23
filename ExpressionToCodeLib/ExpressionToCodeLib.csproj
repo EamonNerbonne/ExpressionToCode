@@ -13,6 +13,9 @@
     <TargetFrameworks>net452;netstandard1.6</TargetFrameworks>
     <RepositoryUrl>https://github.com/EamonNerbonne/ExpressionToCode</RepositoryUrl>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net47' or '$(TargetFramework)' == 'net452' ">
     <DefineConstants>dotnet_framework</DefineConstants>
