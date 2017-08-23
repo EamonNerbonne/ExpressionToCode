@@ -103,7 +103,7 @@ namespace ExpressionToCodeLib
         /// <returns></returns>
         /// <example>
         /// var example = "some text";
-        /// var name = toName( () => example);  // "example"
+        /// var name = GetNameIn( () => example);  // "example"
         /// </example>
         public static string GetNameIn<TResult>(Expression<Func<TResult>> expression)
             => GetNameIn((Expression)expression);
