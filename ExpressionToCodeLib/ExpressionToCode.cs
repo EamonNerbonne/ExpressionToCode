@@ -99,12 +99,13 @@ namespace ExpressionToCodeLib
         /// <summary>
         /// Gets property, variable or method name from lambda expression.
         /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
+        /// <param name="expression">Simple expression to obtain name from.</param>
+        /// <returns>The `name` of expression.</returns>
         /// <example>
         /// var example = "some text";
-        /// var name = GetNameIn( () => example);  // "example"
+        /// var name = ExpressionToCode.GetNameIn(() => example);  // "example"
         /// </example>
+        /// <exception cref="System.ArgumentException">Unsupported or unknown or complex expression to get `name` of it.</exception>
         public static string GetNameIn<TResult>(Expression<Func<TResult>> expression)
             => GetNameIn((Expression)expression);
 
