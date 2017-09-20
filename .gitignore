@@ -4,6 +4,7 @@ bin
 obj
 Debug
 Release
+.vs
 
 *.suo
 
