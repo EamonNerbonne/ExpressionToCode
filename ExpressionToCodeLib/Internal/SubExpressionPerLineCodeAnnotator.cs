@@ -72,7 +72,9 @@ namespace ExpressionToCodeLib.Internal
                     var subExprString = sb.Length <= maxSize
                         ? sb.ToString()
                         : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);
-                    subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
+                    if (valueString != "") {
+                        subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
+                    }
                 }
                 foreach (var kid in node.Children) {
                     if (kid.IsConceptualChild) {
