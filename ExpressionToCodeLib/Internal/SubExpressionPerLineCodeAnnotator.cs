@@ -66,13 +66,15 @@ namespace ExpressionToCodeLib.Internal
                 if (!hideOutermostValue && node.OptionalValue != null) {
                     var sb = new StringBuilder();
                     var ignoreInitialSpace = true;
-                    var valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10) ?? "";
+                    var valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10);
                     AppendNodeToStringBuilder(sb, subExprNode, ref ignoreInitialSpace);
                     var maxSize = 80;
                     var subExprString = sb.Length <= maxSize
                         ? sb.ToString()
                         : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);
-                    subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
+                    if (!string.IsNullOrEmpty(valueString)) {
+                        subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
+                    }
                 }
                 foreach (var kid in node.Children) {
                     if (kid.IsConceptualChild) {

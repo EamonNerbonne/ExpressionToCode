@@ -137,5 +137,12 @@ namespace ExpressionToCodeTest
             var nums = Enumerable.Range(10, 10).ToArray();
             ApprovalTest.Verify(annotator.AnnotatedToCode(() => a < b && nums[a + b] < 7 && b < 10));
         }
+
+        [Fact]
+        public void NodesThatAreUndescribableAreNotDescribed()
+        {
+            var list = new List<int> { 1, 2, 3, 3, 2, 1 };
+            ApprovalTest.Verify(annotator.AnnotatedToCode(() => list.Select(e => e + 1).Count() == 5));
+        }
     }
 }
