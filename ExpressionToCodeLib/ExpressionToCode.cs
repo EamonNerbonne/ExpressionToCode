@@ -83,7 +83,7 @@ namespace ExpressionToCodeLib
         /// ToRepr(() => toNameValueRepresentation); // "toNameValueRepresentation = Value"
         /// </example>
         /// <remarks>
-        /// Unlike <see cref="ExpressionToCode.ToCode"/>(which targets compilable output), this method is geared towards dumping simple objects into text, so may skip some C# issues for sake of readability.
+        /// Unlike <see cref="ExpressionToCode.ToCode(Expression)"/>(which targets compilable output), this method is geared towards dumping simple objects into text, so may skip some C# issues for sake of readability.
         /// </remarks>
         public static string ToValuedCode<TResult>(this Expression<Func<TResult>> expression)
         {
