@@ -69,7 +69,7 @@ namespace ExpressionToCodeLib.Internal
 
         static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list, int indent, int valueSize)
         {
-            var contents = PrintListContents(config, list, indent).ToArray();
+            var contents = PrintListContents(config, list).ToArray();
             if (contents.Sum(s => s.Length + 2) > Math.Min(valueSize, 120) || contents.Any(s => s.Any(c => c == '\n'))) {
                 return "{"
                     + string.Join("", contents.Select(s => ElidePossiblyMultilineString(config, s, indent + 4, valueSize - 3) + (s == "..." ? "" : ",")))
@@ -79,7 +79,7 @@ namespace ExpressionToCodeLib.Internal
             return "{" + string.Join(", ", contents) + "}";
         }
 
-        static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list, int indent)
+        static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list)
         {
             var count = 0;
             foreach (var item in list) {
@@ -110,7 +110,7 @@ namespace ExpressionToCodeLib.Internal
                     return "stringification throws " + e.GetType().FullName;
                 }
             } catch (TargetInvocationException tie) {
-                return "throws " + tie.InnerException.GetType().FullName;
+                return "throws " + tie.InnerException?.GetType().FullName;
             }
         }
     }

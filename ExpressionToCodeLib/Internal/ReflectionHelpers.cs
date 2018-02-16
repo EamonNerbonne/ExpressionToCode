@@ -22,6 +22,7 @@ namespace ExpressionToCodeLib.Internal
             if (pars.Length == 0) {
                 return mi.DeclaringType.GetTypeInfo().GetProperty(pName, bindingFlags);
             } else {
+                // ReSharper disable once PossibleNullReferenceException
                 foreach (var prop in mi.DeclaringType.GetProperties(bindingFlags)) {
                     if (prop.GetMethod == mi) {
                         return prop;

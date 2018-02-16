@@ -319,7 +319,7 @@ namespace ExpressionToCodeLib.Internal
             var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
             if (optPropertyInfo != null
                 && (optPropertyInfo.Name == "Item"
-                    || mce.Object.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
+                    || mce.Object?.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
                 kids.Add(NestExpression(mce.NodeType, mce.Object));
                 //indexers don't support ref/out; so we can use unprefixed arguments
                 kids.Add(ArgListDispatch(GetArgumentsForMethod(mce.Method, mce.Arguments), mce, "[", "]"));
@@ -335,7 +335,7 @@ namespace ExpressionToCodeLib.Internal
                 kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Method.Name == "CreateDelegate"
                 && mce.Arguments.Count == 2
-                && mce.Object.Type == typeof(MethodInfo)
+                && mce.Object?.Type == typeof(MethodInfo)
                 && mce.Object.NodeType == ExpressionType.Constant
                 && mce.Method.GetParameters()[1].ParameterType == typeof(object)
             ) {
@@ -349,7 +349,7 @@ namespace ExpressionToCodeLib.Internal
                 kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Object == null
                 && mce.Type.FullName == "System.FormattableString"
-                && mce.Method.DeclaringType.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
+                && mce.Method.DeclaringType?.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
                 && mce.Method.Name == "Create"
                 && mce.Arguments.Count == 2
                 && mce.Arguments[0].NodeType == ExpressionType.Constant

@@ -127,6 +127,7 @@ namespace ExpressionToCodeLib.Internal
                 var rankCommas = new string(',', type.GetArrayRank() - 1);
                 type = type.GetElementType();
                 arraySuffix = arraySuffix + "[" + rankCommas + "]";
+                // ReSharper disable once PossibleNullReferenceException
             } while (type.IsArray);
             var basename = GetTypeName(type);
             return basename + arraySuffix;
