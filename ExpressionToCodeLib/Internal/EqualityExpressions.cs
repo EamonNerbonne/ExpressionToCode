@@ -9,7 +9,7 @@ using System.Reflection;
 // ReSharper disable RedundantNameQualifier
 namespace ExpressionToCodeLib.Internal
 {
-    enum EqualityExpressionClass
+    public enum EqualityExpressionClass
     {
         None,
         EqualsOp,
@@ -22,7 +22,7 @@ namespace ExpressionToCodeLib.Internal
         StructuralEquals,
     }
 
-    static class EqualityExpressions
+    public static class EqualityExpressions
     {
         static readonly MethodInfo objEqualInstanceMethod = ((Func<object, bool>)new object().Equals).GetMethodInfo();
         static readonly MethodInfo objEqualStaticMethod = ((Func<object, object, bool>)object.Equals).GetMethodInfo();
