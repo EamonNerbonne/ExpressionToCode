@@ -32,7 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FastExpressionCompiler" Version="1.4.0" />
-    <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework)=='netstandard1.6' ">
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
