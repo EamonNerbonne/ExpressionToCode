@@ -14,6 +14,7 @@
     <RepositoryUrl>https://github.com/EamonNerbonne/ExpressionToCode</RepositoryUrl>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
