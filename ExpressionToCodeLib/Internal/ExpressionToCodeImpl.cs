@@ -357,6 +357,12 @@ namespace ExpressionToCodeLib.Internal
                 //string-interpolations are compiled into FormattableStringFactory.Create
                 var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
                 kids.Add(codeRepresentation);
+            } else if (mce.Object != null && mce.Method.Attributes.HasFlag(MethodAttributes.SpecialName) && mce.Method.Name == "get_Item") {
+                //.net 4.5.1 or older object indexer.
+
+                kids.Add(NestExpression(mce.NodeType, mce.Object));
+                kids.Add(ArgListDispatch(mce.Arguments.Select(a => new Argument { Expr = a, PrefixOrNull = null }), mce, "[", "]"));
+                return kids.Finish();
             } else {
                 var isExtensionMethod = mce.Method.IsStatic
                     && mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any()
