@@ -321,6 +321,7 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => new int[3, 4].Length == 1));
         }
 
+        [Fact]
         public void NewObject()
         {
             Assert.Equal(

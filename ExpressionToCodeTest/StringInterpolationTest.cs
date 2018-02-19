@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !dotnet_low
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -130,3 +131,4 @@ namespace ExpressionToCodeTest
         }
     }
 }
+#endif

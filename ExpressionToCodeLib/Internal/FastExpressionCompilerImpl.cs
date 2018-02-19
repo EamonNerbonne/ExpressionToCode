@@ -1,3 +1,4 @@
+#if !dotnet_low
 using System;
 using System.Linq.Expressions;
 
@@ -14,3 +15,4 @@ namespace ExpressionToCodeLib.Internal
             => FastExpressionCompiler.ExpressionCompiler.TryCompile<Delegate>(expression) ?? fallback.Compile(expression);
     }
 }
+#endif

@@ -18,6 +18,11 @@ namespace ExpressionToCodeLib
         /// Unsupported expressions fall-back to the builtin Expression.Compile methods.
         /// This compiler is relatively new, so if anything breaks, consider using the DotnetExpressionCompiler.
         /// </summary>
-        public static readonly IExpressionCompiler FastExpressionCompiler = new FastExpressionCompilerImpl();
+        public static readonly IExpressionCompiler FastExpressionCompiler =
+#if dotnet_low
+            new DotnetExpressionCompiler();
+#else
+            new FastExpressionCompilerImpl();
+#endif
     }
 }

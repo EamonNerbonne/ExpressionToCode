@@ -16,8 +16,6 @@ namespace ExpressionToCodeLib.Internal
         IObjectStringifier objectStringifier => config.Value.ObjectStringifier;
         bool alwaysUseExplicitTypeArguments => config.Value.AlwaysUseExplicitTypeArguments;
 
-
-
         [Pure]
         IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
         {
@@ -171,7 +169,7 @@ namespace ExpressionToCodeLib.Internal
             if (expr1nonnullableType.GetTypeInfo().IsEnum
                 && expr1nonnullableType.GetTypeInfo().GetEnumUnderlyingType() == expr2nonnullableType
                 || expr1nonnullableType == typeof(char) && expr2nonnullableType == typeof(int)
-            ) {
+                ) {
                 expr1 = expr1uncast;
 
                 if (expr2.NodeType == ExpressionType.Constant) {
@@ -268,7 +266,7 @@ namespace ExpressionToCodeLib.Internal
                     ? NestExpression(e.NodeType, le.Parameters.Single())
                     : ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe }))
                 //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
-            );
+                );
             kids.Add(" => ");
             kids.Add(NestExpression(le.NodeType, le.Body));
             return kids.Finish();
@@ -281,7 +279,7 @@ namespace ExpressionToCodeLib.Internal
 
         static bool isClosureRef(Expression e)
             => (
-                    e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
                     || e.NodeType == ExpressionType.MemberAccess
                 )
                 && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
@@ -308,7 +306,6 @@ namespace ExpressionToCodeLib.Internal
                 "CreateDelegate",
                 new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
 
-
         [Pure]
         public StringifiedExpression DispatchCall(Expression e)
         {
@@ -330,22 +327,22 @@ namespace ExpressionToCodeLib.Internal
                 var targetMethod = (MethodInfo)((ConstantExpression)mce.Arguments[2]).Value;
                 var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
-                        ? null
-                        : mce.Arguments[1];
+                    ? null
+                    : mce.Arguments[1];
                 kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Method.Name == "CreateDelegate"
                 && mce.Arguments.Count == 2
                 && mce.Object?.Type == typeof(MethodInfo)
                 && mce.Object.NodeType == ExpressionType.Constant
                 && mce.Method.GetParameters()[1].ParameterType == typeof(object)
-            ) {
+                ) {
                 //.net 4.5
                 //implicitly constructed delegate from method group.
                 var targetMethod = (MethodInfo)((ConstantExpression)mce.Object).Value;
                 var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
-                        ? null
-                        : mce.Arguments[1];
+                    ? null
+                    : mce.Arguments[1];
                 kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Object == null
                 && mce.Type.FullName == "System.FormattableString"
@@ -355,11 +352,17 @@ namespace ExpressionToCodeLib.Internal
                 && mce.Arguments[0].NodeType == ExpressionType.Constant
                 && mce.Arguments[1].NodeType == ExpressionType.NewArrayInit
                 && ((NewArrayExpression)mce.Arguments[1]).Expressions.Count == 0
-            ) {
+                ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
                 var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
                 kids.Add(codeRepresentation);
+            } else if (mce.Object != null && mce.Method.Attributes.HasFlag(MethodAttributes.SpecialName) && mce.Method.Name == "get_Item") {
+                //.net 4.5.1 or older object indexer.
+
+                kids.Add(NestExpression(mce.NodeType, mce.Object));
+                kids.Add(ArgListDispatch(mce.Arguments.Select(a => new Argument { Expr = a, PrefixOrNull = null }), mce, "[", "]"));
+                return kids.Finish();
             } else {
                 var isExtensionMethod = mce.Method.IsStatic
                     && mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any()
@@ -411,7 +414,7 @@ namespace ExpressionToCodeLib.Internal
             if (!alwaysUseExplicitTypeArguments) {
                 var genericMethodDefinition = method.GetGenericMethodDefinition();
                 var relevantBindingFlagsForOverloads =
-                        BindingFlags.Public
+                    BindingFlags.Public
                         | (!method.IsPublic ? BindingFlags.NonPublic : 0)
                         | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)
                     ;
@@ -421,8 +424,8 @@ namespace ExpressionToCodeLib.Internal
                     .Where(
                         otherMethod =>
                             otherMethod != genericMethodDefinition
-                            && otherMethod.Name == method.Name
-                            && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
+                                && otherMethod.Name == method.Name
+                                && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
                     );
 
                 if (!confusibleOverloads.Any()
@@ -494,7 +497,7 @@ namespace ExpressionToCodeLib.Internal
                     throw new ArgumentOutOfRangeException(
                         nameof(e),
                         "Can't print constant " + (const_Val?.ToString() ?? "<null>")
-                        + " in expr of type " + e.Type);
+                            + " in expr of type " + e.Type);
                 }
             } else {
                 kids.Add(codeRepresentation);
