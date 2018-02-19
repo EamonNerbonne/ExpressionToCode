@@ -18,6 +18,8 @@
     <DebugSymbols>true</DebugSymbols>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strongNamingWorkaround.snk</AssemblyOriginatorKeyFile>
+    <WarningsAsErrors>NU1605</WarningsAsErrors>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net47' or '$(TargetFramework)' == 'net452' ">
     <DefineConstants>dotnet_framework</DefineConstants>
