@@ -1,4 +1,16 @@
-﻿interface IAnnotatedToCode
+enum EqualityExpressionClass
+    int value__
+    const EqualityExpressionClass None = 0
+    const EqualityExpressionClass EqualsOp = 1
+    const EqualityExpressionClass NotEqualsOp = 2
+    const EqualityExpressionClass ObjectEquals = 3
+    const EqualityExpressionClass ObjectEqualsStatic = 4
+    const EqualityExpressionClass ObjectReferenceEquals = 5
+    const EqualityExpressionClass EquatableEquals = 6
+    const EqualityExpressionClass SequenceEqual = 7
+    const EqualityExpressionClass StructuralEquals = 8
+
+interface IAnnotatedToCode
     string inst.AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
 
 interface ICodeAnnotator
@@ -86,6 +98,10 @@ class ExpressionTreeAssertion
 class ExpressionTreeCompilers
     static readonly IExpressionCompiler DotnetExpressionCompiler
     static readonly IExpressionCompiler FastExpressionCompiler
+
+class EqualityExpressions
+    EqualityExpressionClass TYPE.CheckForEquality(Expression<Func<bool>> e)
+    IEnumerable<Tuple<EqualityExpressionClass, bool>> TYPE.DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
 
 class ObjectStringifierExtensions
     string TYPE.PlainObjectToCode(IObjectStringifier it, object val)
