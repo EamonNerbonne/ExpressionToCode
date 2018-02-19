@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Configuration">
-    <Version>2.6.0</Version>
+    <Version>2.6.0-signed</Version>
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
     <Title>ExpressionToCode</Title>
@@ -16,6 +16,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>strongNamingWorkaround.snk</AssemblyOriginatorKeyFile>
+    <WarningsAsErrors>NU1605</WarningsAsErrors>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net47' or '$(TargetFramework)' == 'net452' or '$(TargetFramework)' == 'net40'  ">
     <DefineConstants>dotnet_framework</DefineConstants>
@@ -34,10 +38,10 @@
     </None>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' != 'net40' ">
-    <PackageReference Include="FastExpressionCompiler" Version="1.4.0" />
+    <PackageReference Include="FastExpressionCompiler" Version="1.6.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.4" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework)=='netstandard1.6' ">
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="1.1.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
@@ -53,5 +57,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>
