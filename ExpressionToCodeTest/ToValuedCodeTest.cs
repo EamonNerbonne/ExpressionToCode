@@ -42,14 +42,14 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
-        public void TheMethod()
+        public void MethodCall()
         {
             var actual = ExpressionToCode.ToValuedCode(() => TheMethod(1, "2"));
             Assert.Equal("TheMethod(1, \"2\") = TheMethod 1 2", actual);
         }
 
         [Fact]
-        public void TheGenericMethod()
+        public void GenericMethodCall()
         {
             var actual = ExpressionToCode.ToValuedCode(() => TheGenericMethod<int>(2));
             Assert.Equal("TheGenericMethod<int>(2) = Return value is 4", actual);
