@@ -66,5 +66,11 @@ namespace ExpressionToCodeTest {
             Assert.True(expr.Compile()());
             PAssert.That(() => tuple.Equals(tuple2));
         }
+
+        [Fact]
+        public void ToCSharpFriendlyTypeNameSupportsTuples() { 
+            var actual = (1, "2", new[]{ 1,2,3});
+            Assert.Equal("(int, string, int[])", actual.GetType().ToCSharpFriendlyTypeName());
+        }
     }
 }
