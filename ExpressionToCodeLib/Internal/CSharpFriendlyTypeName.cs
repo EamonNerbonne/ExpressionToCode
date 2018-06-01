@@ -3,26 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace ExpressionToCodeLib.Internal
-{
-    struct CSharpFriendlyTypeName
-    {
+namespace ExpressionToCodeLib.Internal {
+    struct CSharpFriendlyTypeName {
         public bool UseFullName;
         public bool IncludeGenericTypeArgumentNames;
 
         public string GetTypeName(Type type)
             => AliasNameOrNull(type) ?? GetUnaliasedTypeName(type);
 
-        string GetUnaliasedTypeName(Type type)
-        {
+        string GetUnaliasedTypeName(Type type) {
             var typeNameWithoutNamespace =
                 GenericTypeName(type)
                 ?? NormalName(type);
             return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
         }
 
-        string AliasNameOrNull(Type type)
-        {
+        string AliasNameOrNull(Type type) {
             if (type == typeof(bool)) {
                 return "bool";
             } else if (type == typeof(byte)) {
@@ -64,8 +60,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        string NormalName(Type type)
-        {
+        string NormalName(Type type) {
             if (type.DeclaringType != null) {
                 var settingsWithoutUseFullname = this;
                 settingsWithoutUseFullname.UseFullName = false;
@@ -76,8 +71,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        string GenericTypeName(Type type)
-        {
+        string GenericTypeName(Type type) {
             if (!type.GetTypeInfo().IsGenericType) {
                 return null;
             }
@@ -117,8 +111,7 @@ namespace ExpressionToCodeLib.Internal
             return string.Join(".", revNestedTypeNames);
         }
 
-        string ArrayTypeNameOrNull(Type type)
-        {
+        string ArrayTypeNameOrNull(Type type) {
             if (!type.IsArray) {
                 return null;
             }
