@@ -97,6 +97,14 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
+        public void ToCSharpFriendlyTypeNameSupportsTrailingNestedTuplesAtPosition8() {
+            var actual = default((int, int, int, int, int, int, int, (int, int)));
+            var alt = default((int, int, int, int, int, int, int, int, int));
+            Assert.False(Equals(actual.GetType(), alt.GetType()));//non-obvious compiler-guarranteed precondition
+            Assert.Equal("(int, int, int, int, int, int, int, (int, int))", actual.GetType().ToCSharpFriendlyTypeName());
+        }
+
+        [Fact]
         public void ComplexObjectToPseudoCodeSupportsTuples() {
             var actual = (1, "2", new[] { 1, 2, 3 });
 
