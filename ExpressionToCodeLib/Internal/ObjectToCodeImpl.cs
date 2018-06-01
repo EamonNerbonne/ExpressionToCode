@@ -76,7 +76,7 @@ namespace ExpressionToCodeLib.Internal
                     + "\n" + new string(' ', indent)
                     + "}";
             }
-            return "{" + string.Join(", ", contents) + "}";
+            return "{ " + string.Join(", ", contents) + " }";
         }
 
         static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list)

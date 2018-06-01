@@ -6,7 +6,7 @@ b
 Math.Max(a, b)
      →   5
 new[] { 3, 8, 13, 4 }
-     →   new[] {3, 8, 13, 4}
+     →   new[] { 3, 8, 13, 4 }
 new[] { 3, 8, 13, 4 }.Average()
      →   7.0
 Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
