@@ -72,5 +72,12 @@ namespace ExpressionToCodeTest {
             var actual = (1, "2", new[] { 1, 2, 3 });
             Assert.Equal("(int, string, int[])", actual.GetType().ToCSharpFriendlyTypeName());
         }
+
+        [Fact]
+        public void ComplexObjectToPseudoCodeSupportsTuples() {
+            var actual = (1, "2", new[] { 1, 2, 3 });
+            
+            Assert.Equal("(1, \"2\", new[] { 1, 2, 3 })", ObjectToCode.ComplexObjectToPseudoCode(actual));
+        }
     }
 }
