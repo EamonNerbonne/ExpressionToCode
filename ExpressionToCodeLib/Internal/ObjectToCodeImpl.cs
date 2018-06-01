@@ -43,7 +43,6 @@ namespace ExpressionToCodeLib.Internal {
                 }
                 sb.Append(")");
                 return ElidePossiblyMultilineString(config, sb.ToString(), indent, valueSize).Trim();
-
             } else if (val.GetType().GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
                 var type = val.GetType();
                 return "new {" +
