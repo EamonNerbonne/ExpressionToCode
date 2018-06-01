@@ -55,10 +55,10 @@ namespace ExpressionToCodeLib.Internal
                 return "string";
             } else if (type == typeof(void)) {
                 return "void";
-            } else if (type.GetTypeInfo().IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
-                return GetTypeName(type.GetTypeInfo().GetGenericArguments().Single()) + "?";
             } else if (type.IsGenericParameter) {
                 return type.Name;
+            } else if (type.GetTypeInfo().IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+                return GetTypeName(type.GetTypeInfo().GetGenericArguments().Single()) + "?";
             } else {
                 return ArrayTypeName(type);
             }
