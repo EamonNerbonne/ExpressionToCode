@@ -8,25 +8,42 @@ using ExpressionToCodeLib;
 using Xunit;
 
 namespace ExpressionToCodeTest {
+    public struct MyValueTuple<T1, T2> {
+        public readonly T1 v1;
+        public readonly T2 v2;
+        public MyValueTuple((T1 v1, T2 v2) tuple) 
+            => (v1, v2) = tuple;
+
+        public bool Equals(MyValueTuple<T1, T2> other) => Equals(v1, other.v1) && Equals(v2, other.v2);
+    }
+
     public class ValueTupleTests {
+        static MyValueTuple<T1, T2> ToMyValueTuple<T1, T2>((T1, T2) tuple) => new MyValueTuple<T1, T2>(tuple);
+
         [Fact]
         public void ExpressionWithValueTupleEqualsCanCompile() {
-            var tuple = (1, 3);
-            var tuple2 = (1, "123".Length);
+            var tupleA = (1, 3);
+            var tupleB = (1, "123".Length);
 
-            Expression<Func<int>> ok1 = () => tuple.Item1;
-            Expression<Func<int>> ok2 = () => tuple.GetHashCode();
-            Expression<Func<Tuple<int, int>>> ok3 = () => tuple.ToTuple();
-            Expression<Func<bool>> ok4 = () => Equals(tuple, tuple2);
-            Expression<Func<int>> ok5 = () => Comparer<(int, int)>.Default.Compare(tuple, tuple2);
+
+            Expression<Func<int>> ok1 = () => tupleA.Item1;
+            Expression<Func<int>> ok2 = () => tupleA.GetHashCode();
+            Expression<Func<Tuple<int, int>>> ok3 = () => tupleA.ToTuple();
+            Expression<Func<bool>> ok4 = () => Equals(tupleA, tupleB);
+            Expression<Func<int>> ok5 = () => Comparer<(int, int)>.Default.Compare(tupleA, tupleB);
             ok1.Compile()();
             ok2.Compile()();
             ok3.Compile()();
             ok4.Compile()();
             ok5.Compile()();
 
-            Expression<Func<bool>> err1 = () => tuple.Equals(tuple2);//crash
-            Expression<Func<int>> err2 = () => tuple.CompareTo(tuple2);//crash
+            var myTupleA = ToMyValueTuple(tupleA);
+            var myTupleB = ToMyValueTuple(tupleB);
+            Expression<Func<bool>> ok6 = ()  => myTupleA.Equals(myTupleB);
+            ok6.Compile()();
+
+            Expression<Func<bool>> err1 = () => tupleA.Equals(tupleB);//crash
+            Expression<Func<int>> err2 = () => tupleA.CompareTo(tupleB);//crash
         }
 
         [Fact]
