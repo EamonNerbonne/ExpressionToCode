@@ -28,14 +28,19 @@
     <DefineConstants>dotnet_core</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Update="Internal\ExpressionTypeDispatch.Generated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
+    </Compile>
+
     <None Include="Internal\ExpressionTypeDispatch.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' != 'net40' ">
     <PackageReference Include="FastExpressionCompiler" Version="1.7.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework)=='netstandard1.6' ">
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
@@ -43,18 +48,5 @@
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
     <PackageReference Include="System.Runtime" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Contracts" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Internal\ExpressionTypeDispatch.Generated.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>
