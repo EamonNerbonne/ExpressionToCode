@@ -10,18 +10,27 @@ using Xunit;
 namespace ExpressionToCodeTest {
     public class ValueTupleTests {
         [Fact]
-        public void ExpressionCompileValueTupleEqualsWorks() {
+        public void ExpressionWithValueTupleEqualsCanCompile() {
             var tuple = (1, 3);
             var tuple2 = (1, "123".Length);
-            Expression<Func<bool>> expr = () => tuple.Equals(tuple2);
-            Assert.True(expr.Compile()());
+
+            Expression<Func<int>> ok1 = () => tuple.Item1;
+            Expression<Func<int>> ok2 = () => tuple.GetHashCode();
+            Expression<Func<Tuple<int, int>>> ok3 = () => tuple.ToTuple();
+            ok1.Compile();
+            ok2.Compile();
+            ok3.Compile();
+
+            Expression<Func<bool>> err1 = () => tuple.Equals(tuple2);
+            Expression<Func<int>> err2 = () => tuple.CompareTo(tuple2);
+            err1.Compile();//crash
+            err2.Compile();//crash
         }
 
         [Fact]
         public void FastExpressionCompileValueTupleEqualsWorks() {
             var tuple = (1, 3);
             (int, int Length) tuple2 = (1, "123".Length);
-            ValueTuple<int,int> x;
             var expr = FastExpressionCompiler.ExpressionCompiler.Compile(() => tuple.Equals(tuple2));
             Assert.True(expr());
         }
