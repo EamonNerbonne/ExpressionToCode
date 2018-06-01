@@ -8,7 +8,7 @@ using ExpressionToCodeLib;
 using Xunit;
 
 namespace ExpressionToCodeTest {
-    public struct MyValueTuple<T1, T2> {
+    public struct MyValueTuple<T1, T2> : IEquatable<MyValueTuple<T1, T2>> {
         public readonly T1 v1;
         public readonly T2 v2;
         public MyValueTuple((T1 v1, T2 v2) tuple)
