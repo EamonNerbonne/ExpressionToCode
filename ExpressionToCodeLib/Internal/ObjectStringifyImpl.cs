@@ -4,10 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace ExpressionToCodeLib.Internal
-{
-    class ObjectStringifyImpl : IObjectStringifier
-    {
+namespace ExpressionToCodeLib.Internal {
+    class ObjectStringifyImpl : IObjectStringifier {
         readonly bool fullTypeNames;
 
         public ObjectStringifyImpl(bool fullTypeNames = false)
@@ -16,12 +14,11 @@ namespace ExpressionToCodeLib.Internal
         public string TypeNameToCode(Type type)
             => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
 
-        string IObjectStringifier.PlainObjectToCode(object val, Type type)
-        {
+        public string PlainObjectToCode(object val, Type type) {
             if (val == null) {
                 return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
             } else if (val is string str) {
-                var useLiteralSyntax = str.Count(c => c < 32 && c!='\r' || c == '\\') > 3;
+                var useLiteralSyntax = str.Count(c => c < 32 && c != '\r' || c == '\\') > 3;
                 if (useLiteralSyntax) {
                     return "@\"" + str.Replace("\"", "\"\"") + "\"";
                 } else {
@@ -83,8 +80,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string EscapeCharForString(char c)
-        {
+        static string EscapeCharForString(char c) {
             if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) {
                 //this is a little too rigorous; but easier to read 
                 if (c == '\r') {
@@ -105,8 +101,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string EscapeStringChars(string str)
-        {
+        static string EscapeStringChars(string str) {
             var sb = new StringBuilder(str.Length);
             foreach (var c in str) {
                 sb.Append(EscapeCharForString(c));
@@ -114,8 +109,7 @@ namespace ExpressionToCodeLib.Internal
             return sb.ToString();
         }
 
-        static string DoubleToCode(double p)
-        {
+        static string DoubleToCode(double p) {
             if (double.IsNaN(p)) {
                 return "double.NaN";
             } else if (double.IsNegativeInfinity(p)) {
@@ -129,8 +123,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string FloatToCode(float p)
-        {
+        static string FloatToCode(float p) {
             if (float.IsNaN(p)) {
                 return "float.NaN";
             } else if (float.IsNegativeInfinity(p)) {
