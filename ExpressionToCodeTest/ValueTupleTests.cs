@@ -11,7 +11,7 @@ namespace ExpressionToCodeTest {
     public struct MyValueTuple<T1, T2> {
         public readonly T1 v1;
         public readonly T2 v2;
-        public MyValueTuple((T1 v1, T2 v2) tuple) 
+        public MyValueTuple((T1 v1, T2 v2) tuple)
             => (v1, v2) = tuple;
 
         public bool Equals(MyValueTuple<T1, T2> other) => Equals(v1, other.v1) && Equals(v2, other.v2);
@@ -39,9 +39,9 @@ namespace ExpressionToCodeTest {
 
             var myTupleA = ToMyValueTuple(tupleA);
             var myTupleB = ToMyValueTuple(tupleB);
-            Expression<Func<bool>> ok6 = ()  => myTupleA.Equals(myTupleB);
+            Expression<Func<bool>> ok6 = () => myTupleA.Equals(myTupleB);
             Expression<Func<bool>> ok7 = () => tupleA.ToTuple().Equals(tupleB.ToTuple());
-            Expression<Func<bool>> ok8 = ()  => ToMyValueTuple(tupleA).Equals(ToMyValueTuple(tupleB));
+            Expression<Func<bool>> ok8 = () => ToMyValueTuple(tupleA).Equals(ToMyValueTuple(tupleB));
             ok6.Compile()();
             ok7.Compile()();
             ok8.Compile()();
