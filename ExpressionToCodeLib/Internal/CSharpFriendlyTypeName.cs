@@ -18,7 +18,7 @@ namespace ExpressionToCodeLib.Internal {
             return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
         }
 
-        string AliasNameOrNull(Type type) {
+        static string AliasNameOrNull(Type type) {
             if (type == typeof(bool)) {
                 return "bool";
             } else if (type == typeof(byte)) {
