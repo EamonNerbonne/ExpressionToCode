@@ -68,8 +68,8 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void ToCSharpFriendlyTypeNameSupportsTuples() { 
-            var actual = (1, "2", new[]{ 1,2,3});
+        public void ToCSharpFriendlyTypeNameSupportsTuples() {
+            var actual = (1, "2", new[] { 1, 2, 3 });
             Assert.Equal("(int, string, int[])", actual.GetType().ToCSharpFriendlyTypeName());
         }
     }
