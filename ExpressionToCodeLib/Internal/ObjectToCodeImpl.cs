@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 
 namespace ExpressionToCodeLib.Internal {
     static class ObjectToCodeImpl {
@@ -24,6 +25,25 @@ namespace ExpressionToCodeLib.Internal {
                 return FormatEnumerable(config, (IEnumerable)val, indent, valueSize);
             } else if (val is Expression) {
                 return ElideAfter(config.GetExpressionToCode().ToCode((Expression)val), valueSize);
+            } else if (val is IStructuralEquatable tuple && val is IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
+                var tupleType = val.GetType();
+                var collector = new NastyHackyTupleCollector();
+                tuple.GetHashCode(collector);
+                var sb = new StringBuilder();
+                sb.Append("(");
+                for (var index = 0; index < collector.CollectedObjects.Count; index++) {
+                    var item = collector.CollectedObjects[index];
+                    var asString = ComplexObjectToPseudoCode(config, item, indent + 4, valueSize);
+                    if (asString == null) {
+                        return null;
+                    }
+                    if (index > 0)
+                        sb.Append(", ");
+                    sb.Append(asString);
+                }
+                sb.Append(")");
+                return ElidePossiblyMultilineString(config, sb.ToString(), indent, valueSize).Trim();
+
             } else if (val.GetType().GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
                 var type = val.GetType();
                 return "new {" +
@@ -39,6 +59,15 @@ namespace ExpressionToCodeLib.Internal {
                     + "\n" + new string(' ', indent) + "}";
             } else {
                 return ElideAfter(val.ToString(), valueSize);
+            }
+        }
+
+        class NastyHackyTupleCollector : IEqualityComparer {
+            public readonly List<object> CollectedObjects = new List<object>();
+            bool IEqualityComparer.Equals(object x, object y) => throw new NotImplementedException();
+            public int GetHashCode(object obj) {
+                CollectedObjects.Add(obj);
+                return 0;
             }
         }
 
