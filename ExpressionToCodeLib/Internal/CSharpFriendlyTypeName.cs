@@ -40,7 +40,7 @@ namespace ExpressionToCodeLib.Internal {
             return output.ToString();
         }
 
-        static bool IsValueTupleType(TypeInfo typeInfo)
+        public static bool IsValueTupleType(TypeInfo typeInfo)
             => typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && typeInfo.Namespace == "System" && typeInfo.Name.StartsWith("ValueTuple`", StringComparison.Ordinal);
 
         string GetUnaliasedTypeName(Type type) {
