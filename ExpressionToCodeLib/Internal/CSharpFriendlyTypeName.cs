@@ -11,7 +11,7 @@ namespace ExpressionToCodeLib.Internal
         public bool IncludeGenericTypeArgumentNames;
 
         public string GetTypeName(Type type)
-            => AliasName(type) ?? GetUnaliasedTypeName(type);
+            => AliasNameOrNull(type) ?? GetUnaliasedTypeName(type);
 
         string GetUnaliasedTypeName(Type type)
         {
@@ -21,7 +21,7 @@ namespace ExpressionToCodeLib.Internal
             return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
         }
 
-        string AliasName(Type type)
+        string AliasNameOrNull(Type type)
         {
             if (type == typeof(bool)) {
                 return "bool";
@@ -60,7 +60,7 @@ namespace ExpressionToCodeLib.Internal
             } else if (type.GetTypeInfo().IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
                 return GetTypeName(type.GetTypeInfo().GetGenericArguments().Single()) + "?";
             } else {
-                return ArrayTypeName(type);
+                return ArrayTypeNameOrNull(type);
             }
         }
 
@@ -117,7 +117,7 @@ namespace ExpressionToCodeLib.Internal
             return string.Join(".", revNestedTypeNames);
         }
 
-        string ArrayTypeName(Type type)
+        string ArrayTypeNameOrNull(Type type)
         {
             if (!type.IsArray) {
                 return null;
