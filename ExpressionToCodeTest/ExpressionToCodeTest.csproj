@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFrameworks>net451;net462;netcoreapp1.1</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net451'  ">
-    <DefineConstants>dotnet_low</DefineConstants>
+    <TargetFrameworks>net462;netcoreapp1.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExpressionToCodeLib\ExpressionToCodeLib.csproj" />
