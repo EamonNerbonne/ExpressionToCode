@@ -40,7 +40,11 @@ namespace ExpressionToCodeTest {
             var myTupleA = ToMyValueTuple(tupleA);
             var myTupleB = ToMyValueTuple(tupleB);
             Expression<Func<bool>> ok6 = ()  => myTupleA.Equals(myTupleB);
+            Expression<Func<bool>> ok7 = () => tupleA.ToTuple().Equals(tupleB.ToTuple());
+            Expression<Func<bool>> ok8 = ()  => ToMyValueTuple(tupleA).Equals(ToMyValueTuple(tupleB));
             ok6.Compile()();
+            ok7.Compile()();
+            ok8.Compile()();
 
             Expression<Func<bool>> err1 = () => tupleA.Equals(tupleB);//crash
             Expression<Func<int>> err2 = () => tupleA.CompareTo(tupleB);//crash
