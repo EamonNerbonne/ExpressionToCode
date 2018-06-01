@@ -13,3 +13,4 @@ Release
 *.orig
 *.nupkg
 *.received.txt
+*.csproj.user
