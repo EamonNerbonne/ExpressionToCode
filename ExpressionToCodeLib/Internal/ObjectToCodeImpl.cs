@@ -5,17 +5,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace ExpressionToCodeLib.Internal
-{
-    static class ObjectToCodeImpl
-    {
+namespace ExpressionToCodeLib.Internal {
+    static class ObjectToCodeImpl {
         static readonly string[] lineSeparators = new[] { "\r\n", "\n" };
 
         public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent)
             => ComplexObjectToPseudoCode(config, val, indent, config.Value.MaximumValueLength ?? int.MaxValue);
 
-        static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize)
-        {
+        static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize) {
             var retval = ObjectToCode.PlainObjectToCode(val);
             if (val is string) {
                 return ElidePossiblyMultilineString(config, retval, indent, valueSize).Trim();
@@ -45,14 +42,12 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string ElideAfter(string val, int len)
-        {
+        static string ElideAfter(string val, int len) {
             var maxLength = Math.Max(10, len);
             return val.Length > maxLength ? val.Substring(0, maxLength) + " ..." : val;
         }
 
-        static string ElidePossiblyMultilineString(ExpressionToCodeConfiguration config, string val, int indent, int len)
-        {
+        static string ElidePossiblyMultilineString(ExpressionToCodeConfiguration config, string val, int indent, int len) {
             var lines = val.Split(lineSeparators, StringSplitOptions.None);
             var indentString = new string(' ', indent);
             if (lines.Length < 2) {
@@ -67,8 +62,7 @@ namespace ExpressionToCodeLib.Internal
             return firstLineIndent + string.Join("\n" + indentString, lines.Select(s => ElideAfter(s, len - 1)));
         }
 
-        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list, int indent, int valueSize)
-        {
+        static string FormatEnumerable(ExpressionToCodeConfiguration config, IEnumerable list, int indent, int valueSize) {
             var contents = PrintListContents(config, list).ToArray();
             if (contents.Sum(s => s.Length + 2) > Math.Min(valueSize, 120) || contents.Any(s => s.Any(c => c == '\n'))) {
                 return "{"
@@ -79,8 +73,7 @@ namespace ExpressionToCodeLib.Internal
             return "{ " + string.Join(", ", contents) + " }";
         }
 
-        static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list)
-        {
+        static IEnumerable<string> PrintListContents(ExpressionToCodeConfiguration config, IEnumerable list) {
             var count = 0;
             foreach (var item in list) {
                 count++;
@@ -93,8 +86,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent)
-        {
+        public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent) {
             try {
                 Delegate lambda;
                 try {
