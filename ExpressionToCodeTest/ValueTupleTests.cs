@@ -74,9 +74,32 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
+        public void ToCSharpFriendlyTypeNameSupportsLooongTuples() {
+            var actual = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+            Assert.Equal("(int, int, int, int, int, int, int, int, int, int)", actual.GetType().ToCSharpFriendlyTypeName());
+        }
+
+        [Fact]
+        public void ToCSharpFriendlyTypeNameSupportsNestedTuples() {
+            var actual = (1, 2, ((3, 4), 5), 6, 7, 8);
+            Assert.Equal("(int, int, ((int, int), int), int, int, int)", actual.GetType().ToCSharpFriendlyTypeName());
+        }
+
+        [Fact]
+        public void ToCSharpFriendlyTypeNameSupportsNestedNullableTuples() {
+            var actual = default((int, int, ((int, int), int), (int, int)?, int, int));
+            Assert.Equal("(int, int, ((int, int), int), (int, int)?, int, int)", actual.GetType().ToCSharpFriendlyTypeName());
+        }
+        [Fact]
+        public void ToCSharpFriendlyTypeNameSupportsTrailingNestedTuples() {
+            var actual = default((int, int, ((int, int), int)));
+            Assert.Equal("(int, int, ((int, int), int))", actual.GetType().ToCSharpFriendlyTypeName());
+        }
+
+        [Fact]
         public void ComplexObjectToPseudoCodeSupportsTuples() {
             var actual = (1, "2", new[] { 1, 2, 3 });
-            
+
             Assert.Equal("(1, \"2\", new[] { 1, 2, 3 })", ObjectToCode.ComplexObjectToPseudoCode(actual));
         }
     }
