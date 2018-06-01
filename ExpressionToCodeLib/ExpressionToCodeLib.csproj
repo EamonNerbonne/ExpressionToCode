@@ -28,7 +28,6 @@
     <DefineConstants>dotnet_core</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="ExpressionToCodeLib.nuspec" />
     <None Include="Internal\ExpressionTypeDispatch.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
