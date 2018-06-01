@@ -25,10 +25,10 @@ namespace ExpressionToCodeLib.Internal {
                 return FormatEnumerable(config, (IEnumerable)val, indent, valueSize);
             } else if (val is Expression) {
                 return ElideAfter(config.GetExpressionToCode().ToCode((Expression)val), valueSize);
-            } else if (val is IStructuralEquatable tuple && val is IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
+            } else if (val is IStructuralComparable tuple && val is IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
                 var tupleType = val.GetType();
                 var collector = new NastyHackyTupleCollector();
-                tuple.GetHashCode(collector);
+                tuple.CompareTo(tuple, collector);
                 var sb = new StringBuilder();
                 sb.Append("(");
                 for (var index = 0; index < collector.CollectedObjects.Count; index++) {
@@ -58,11 +58,22 @@ namespace ExpressionToCodeLib.Internal {
             }
         }
 
-        class NastyHackyTupleCollector : IEqualityComparer {
+        class NastyHackyTupleCollector : IComparer {
+            //hack assumptions:
+            // - A structural ordering comparer must in some way iterate over its contents.
+            // - a tuple is defined to consider the order of its earlier members over that of its later members
+            // - if earlier members are equal in order (compare==0), then it must call later members
+            // - if everything is equal, it must call compareto on everything
+            // - it would be inefficient to call compareto unnecessarily, so any tuple implementation is *likely* to call compareto in tuple-member-order, so it can exit early on non-zero comparison.
+
             public readonly List<object> CollectedObjects = new List<object>();
-            bool IEqualityComparer.Equals(object x, object y) => throw new NotImplementedException();
-            public int GetHashCode(object obj) {
-                CollectedObjects.Add(obj);
+            int nesting = 1;
+            public int Compare(object x, object y) {
+                if (CollectedObjects.Count == nesting * 7 && x is IStructuralComparable tuple && tuple is IComparable && CSharpFriendlyTypeName.IsValueTupleType(tuple.GetType().GetTypeInfo())) {
+                    nesting++;
+                    return tuple.CompareTo(tuple, this);
+                }
+                CollectedObjects.Add(x);
                 return 0;
             }
         }
