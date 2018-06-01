@@ -90,6 +90,7 @@ namespace ExpressionToCodeTest {
             var actual = default((int, int, ((int, int), int), (int, int)?, int, int));
             Assert.Equal("(int, int, ((int, int), int), (int, int)?, int, int)", actual.GetType().ToCSharpFriendlyTypeName());
         }
+
         [Fact]
         public void ToCSharpFriendlyTypeNameSupportsTrailingNestedTuples() {
             var actual = default((int, int, ((int, int), int)));
