@@ -61,7 +61,7 @@ namespace ExpressionToCodeTest {
     ""12345008"",
     ""12345009"",
     ...
-}",
+}".Replace("\r", ""),
                 ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithPrintedListLengthLimit(10).ComplexObjectToPseudoCode(
                     Enumerable.Range(12345000, 13).Select(i => i.ToString(CultureInfo.InvariantCulture))));
         }
@@ -78,7 +78,7 @@ namespace ExpressionToCodeTest {
         A = 3,
         B = 'b',
     },
-}",
+}".Replace("\r", ""),
                 ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Repeat(new { A = 3, B = 'b' }, 2)));
         }
 
