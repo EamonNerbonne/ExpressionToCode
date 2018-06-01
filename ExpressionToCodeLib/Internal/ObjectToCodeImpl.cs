@@ -34,9 +34,6 @@ namespace ExpressionToCodeLib.Internal {
                 for (var index = 0; index < collector.CollectedObjects.Count; index++) {
                     var item = collector.CollectedObjects[index];
                     var asString = ComplexObjectToPseudoCode(config, item, indent + 4, valueSize);
-                    if (asString == null) {
-                        return null;
-                    }
                     if (index > 0)
                         sb.Append(", ");
                     sb.Append(asString);
