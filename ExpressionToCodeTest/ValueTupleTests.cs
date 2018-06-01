@@ -114,8 +114,13 @@ namespace ExpressionToCodeTest {
         [Fact]
         public void ComplexObjectToPseudoCodeSupportsComplexTuples() {
             var actual = (1, ("2", new[] { "2b" }), new[] { 3 }, 4, default(string), 6, 7, 8, 9);
-            Assert.Equal("((\"2\", new[] { \"2b\" }), new[] { 3 }, 4, null, 6, 7, 8, 9)", ObjectToCode.ComplexObjectToPseudoCode(actual));
+            Assert.Equal("(1, (\"2\", new[] { \"2b\" }), new[] { 3 }, 4, null, 6, 7, 8, 9)", ObjectToCode.ComplexObjectToPseudoCode(actual));
         }
 
+        [Fact]
+        public void ComplexObjectToPseudoCodeSupportsTuplesWithTrailingTuples() {
+            var actual = (1, 2, 3, 4, 5, 6, 7, (8, 9, 10));
+            Assert.Equal("(1, 2, 3, 4, 5, 6, 7, (8, 9, 10))", ObjectToCode.ComplexObjectToPseudoCode(actual));
+        }
     }
 }
