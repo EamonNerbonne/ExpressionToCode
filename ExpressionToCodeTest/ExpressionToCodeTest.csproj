@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFrameworks>net462;netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>net462;net471;netcoreapp1.1;netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExpressionToCodeLib\ExpressionToCodeLib.csproj" />
