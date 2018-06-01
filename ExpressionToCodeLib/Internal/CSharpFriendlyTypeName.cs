@@ -9,7 +9,7 @@ namespace ExpressionToCodeLib.Internal {
         public bool IncludeGenericTypeArgumentNames;
 
         public string GetTypeName(Type type)
-            => AliasNameOrNull(type) ?? GetUnaliasedTypeName(type);
+            => AliasNameOrNull(type) ?? NullableTypeNameOrNull(type.GetTypeInfo()) ?? ArrayTypeNameOrNull(type) ?? GetUnaliasedTypeName(type);
 
         string GetUnaliasedTypeName(Type type) {
             var typeNameWithoutNamespace =
@@ -53,12 +53,13 @@ namespace ExpressionToCodeLib.Internal {
                 return "void";
             } else if (type.IsGenericParameter) {
                 return type.Name;
-            } else if (type.GetTypeInfo().IsGenericType && type != typeof(Nullable<>) && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
-                return GetTypeName(type.GetTypeInfo().GetGenericArguments().Single()) + "?";
             } else {
-                return ArrayTypeNameOrNull(type);
+                return null;
             }
         }
+
+        string NullableTypeNameOrNull(TypeInfo typeInfo)
+            => typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>) ? GetTypeName(typeInfo.GetGenericArguments().Single()) + "?" : null;
 
         string NormalName(Type type) {
             if (type.DeclaringType != null) {
