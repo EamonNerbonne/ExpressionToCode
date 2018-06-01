@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace ExpressionToCodeLib.Internal {
     struct CSharpFriendlyTypeName {
@@ -9,7 +10,38 @@ namespace ExpressionToCodeLib.Internal {
         public bool IncludeGenericTypeArgumentNames;
 
         public string GetTypeName(Type type)
-            => AliasNameOrNull(type) ?? NullableTypeNameOrNull(type.GetTypeInfo()) ?? ArrayTypeNameOrNull(type) ?? GetUnaliasedTypeName(type);
+            => AliasNameOrNull(type) ?? NullableTypeNameOrNull(type.GetTypeInfo()) ?? ArrayTypeNameOrNull(type) ?? ValueTupleTypeNameOrNull(type) ?? GetUnaliasedTypeName(type);
+
+        string ValueTupleTypeNameOrNull(Type type) {
+            if (!IsValueTupleType(type.GetTypeInfo())) {
+                return null;
+            }
+            var output = new StringBuilder();
+            output.Append("(");
+            var genericArguments = type.GetTypeInfo().GetGenericArguments();
+            var nextIdx = 0;
+            while (nextIdx < genericArguments.Length) {
+                var typePar = genericArguments[nextIdx];
+                if (nextIdx + 1 == genericArguments.Length) {
+                    if (nextIdx == 7 && IsValueTupleType(typePar.GetTypeInfo())) {
+                        genericArguments = typePar.GetTypeInfo().GetGenericArguments();
+                        nextIdx = 0;
+                    } else {
+                        output.Append(GetTypeName(typePar));
+                        break;
+                    }
+                } else {
+                    output.Append(GetTypeName(typePar));
+                    output.Append(", ");
+                    nextIdx++;
+                }
+            }
+            output.Append(")");
+            return output.ToString();
+        }
+
+        static bool IsValueTupleType(TypeInfo typeInfo)
+            => typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && typeInfo.Namespace == "System" && typeInfo.Name.StartsWith("ValueTuple`", StringComparison.Ordinal);
 
         string GetUnaliasedTypeName(Type type) {
             var typeNameWithoutNamespace =
