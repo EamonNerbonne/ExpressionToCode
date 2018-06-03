@@ -13,7 +13,7 @@ namespace ExpressionToCodeTest
             => str;
 
         [Fact]
-        public void InterpolationWithArgumentsIsJustAString()
+        public void InterpolationWithoutArgumentsIsJustAString()
         {
             Assert.Equal(
                 @"() => ""abc""",
