@@ -10,11 +10,9 @@ namespace ExpressionToCodeTest
     {
         [Fact]
         public void CharNoCast()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => ""abc""[1] == 'b'",
                 ExpressionToCode.ToCode(() => "abc"[1] == 'b'));
-        }
 
         [Fact]
         public void CharComp()
@@ -55,12 +53,10 @@ namespace ExpressionToCodeTest
 
         [Fact(Skip = "Not yet implemented")]
         public void AvoidsImplicitBoxingWhenTargetTypeIsAGenericArgument()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
-            );
-        }
+                );
 
         [Fact(Skip = "Not yet implemented")]
         public void AvoidsImplicitCastWhenTargetTypeIsAGenericArgument()
@@ -71,7 +67,7 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
-            );
+                );
         }
     }
 }
