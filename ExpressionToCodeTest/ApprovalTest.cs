@@ -9,7 +9,7 @@ namespace ExpressionToCodeTest
         public static void Verify(string text, [CallerFilePath] string filepath = null, [CallerMemberName] string membername = null)
         {
             var filename = Path.GetFileNameWithoutExtension(filepath);
-            var filedir = Path.GetDirectoryName(filepath);
+            var filedir = Path.GetDirectoryName(filepath) ?? throw new InvalidOperationException("path " + filepath + " has no directory");
             var config = new Configuration().UsingNamer(new Assent.Namers.FixedNamer(Path.Combine(filedir, filename + "." + membername)));
             "bla".Assent(text, config, membername, filepath);
             //var writer = WriterFactory.CreateTextWriter(text);
