@@ -53,7 +53,7 @@ namespace ExpressionToCodeTest
         public void FormattableStringFactory_NonInlineArrayIsNoInterpolation()
         {
             var arr = new object[0];
-            ;
+            
             Assert.Equal(
                 @"() => Interpolation(FormattableStringFactory.Create(""abc"", arr))",
                 ExpressionToCode.ToCode(
