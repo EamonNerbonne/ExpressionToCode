@@ -180,15 +180,19 @@ namespace ExpressionToCodeLib
             => it.AnnotatedToCode(e, null, false);
 
         public static string AnnotatedToCode<T, T1, T2, T3>(this IAnnotatedToCode it, Expression<Func<T, T1, T2, T3>> e, string msg, bool hideOutermostValue)
+            // ReSharper disable once RedundantCast
             => it.AnnotatedToCode((Expression)e, msg, hideOutermostValue);
 
         public static string AnnotatedToCode<T, T1, T2>(this IAnnotatedToCode it, Expression<Func<T, T1, T2>> e, string msg, bool hideOutermostValue)
+            // ReSharper disable once RedundantCast
             => it.AnnotatedToCode((Expression)e, msg, hideOutermostValue);
 
         public static string AnnotatedToCode<T, T1>(this IAnnotatedToCode it, Expression<Func<T, T1>> e, string msg, bool hideOutermostValue)
+            // ReSharper disable once RedundantCast
             => it.AnnotatedToCode((Expression)e, msg, hideOutermostValue);
 
         public static string AnnotatedToCode<T>(this IAnnotatedToCode it, Expression<Func<T>> e, string msg, bool hideOutermostValue)
+            // ReSharper disable once RedundantCast
             => it.AnnotatedToCode((Expression)e, msg, hideOutermostValue);
     }
 }
