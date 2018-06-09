@@ -65,6 +65,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"() => new object() as string == default(string)",
+                // ReSharper disable once TryCastAndCheckForNull.0
                 ExpressionToCode.ToCode(() => new object() as string == null));
         }
 
@@ -156,6 +157,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"() => 1.23m.ToString()",
+                // ReSharper disable once SpecifyACultureInStringConversionExplicitly
                 ExpressionToCode.ToCode(() => 1.23m.ToString()));
             Assert.Equal(
                 @"() => AttributeTargets.All.HasFlag((Enum)AttributeTargets.Assembly)",
@@ -277,10 +279,13 @@ namespace ExpressionToCodeTest
             );
         }
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         bool Fizz(Func<int, bool> a) => a(42);
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         bool Buzz(Func<int, bool> a) => a(42);
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         bool Fizz(Func<string, bool> a) => a("42");
 
         [Fact]
@@ -412,6 +417,7 @@ namespace ExpressionToCodeTest
         {
             Assert.Equal(
                 @"() => object.Equals(this, (object)3)",
+                // ReSharper disable once SuspiciousTypeConversion.Global
                 ExpressionToCode.ToCode(() => object.Equals(this, 3)));
         }
 
@@ -464,7 +470,10 @@ namespace ExpressionToCodeTest
             var x = "X";
             Assert.Equal(
                 @"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true",
+                // ReSharper disable once SimplifyConditionalTernaryExpression
+#pragma warning disable 162
                 ExpressionToCode.ToCode(() => (("a\n\\b" ?? x) + x).Length == 2 ? false : true));
+#pragma warning restore 162
         }
 
         [Fact]
