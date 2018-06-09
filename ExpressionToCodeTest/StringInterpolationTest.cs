@@ -9,7 +9,7 @@ namespace ExpressionToCodeTest
 {
     public class StringInterpolationTest
     {
-        FormattableString Interpolation(FormattableString str)
+        static FormattableString Interpolation(FormattableString str)
             => str;
 
         [Fact]
