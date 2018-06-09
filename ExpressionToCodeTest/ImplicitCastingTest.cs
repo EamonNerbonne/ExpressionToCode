@@ -29,6 +29,7 @@ namespace ExpressionToCodeTest
             var i = 1;
             Assert.Equal(
                 @"() => (1m + -i > 0 || false)",
+                // ReSharper disable once RedundantLogicalConditionalExpressionOperand
                 ExpressionToCode.ToCode(() => 1m + -i > 0 || false));
         }
 

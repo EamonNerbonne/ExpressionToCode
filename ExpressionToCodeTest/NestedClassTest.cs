@@ -10,13 +10,16 @@ namespace ExpressionToCodeTest
     {
         public class Nested { }
 
+        // ReSharper disable once UnusedTypeParameter
         public class NestedGen<T> { }
     }
 
+    // ReSharper disable once UnusedTypeParameter
     public class ParentGen<T>
     {
         public class Nested { }
 
+        // ReSharper disable once UnusedTypeParameter
         public class NestedGen<T2> { }
     }
 

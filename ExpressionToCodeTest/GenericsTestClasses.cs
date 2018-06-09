@@ -225,6 +225,7 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => MakeMe<Cake, string>(() => new Cake())));
         }
 
+        // ReSharper disable once UnusedTypeParameter
         T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) => maker();
 
         [Fact]

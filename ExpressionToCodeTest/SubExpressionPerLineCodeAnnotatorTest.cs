@@ -108,6 +108,7 @@ namespace ExpressionToCodeTest
             var hmm = "1234567890";
             ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
+                    // ReSharper disable once RedundantLogicalConditionalExpressionOperand
                     () => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
                     ));
         }

@@ -46,7 +46,9 @@ namespace ExpressionToCodeTest {
             ok7.Compile()();
             ok8.Compile()();
 
+            // ReSharper disable once UnusedVariable
             Expression<Func<bool>> err1 = () => tupleA.Equals(tupleB);//crash
+            // ReSharper disable once UnusedVariable
             Expression<Func<int>> err2 = () => tupleA.CompareTo(tupleB);//crash
         }
 
