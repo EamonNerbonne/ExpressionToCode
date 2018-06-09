@@ -211,7 +211,7 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => StaticTestClass.IsType<int, int>(3)",
                 ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithAlwaysUseExplicitTypeArguments(true)
-                    .WithObjectStringifier(false ? ObjectStringify.WithFullTypeNames : ObjectStringify.Default)
+                    .WithObjectStringifier(ObjectStringify.Default)
                     .GetExpressionToCode()
                     .ToCode(() => StaticTestClass.IsType<int, int>(3))
             );
