@@ -1,19 +1,19 @@
 ﻿() => Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
-a
-     →   2
-
-b
-     →   5
-
-Math.Max(a, b)
-     →   5
-
-new[] { 3, 8, 13, 4 }
-     →   new[] { 3, 8, 13, 4 }
+Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
+     →   false
 
 new[] { 3, 8, 13, 4 }.Average()
      →   7.0
 
-Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
-     →   false
+new[] { 3, 8, 13, 4 }
+     →   new[] { 3, 8, 13, 4 }
+
+Math.Max(a, b)
+     →   5
+
+b
+     →   5
+
+a
+     →   2
 

@@ -101,8 +101,8 @@ namespace ExpressionToCodeLib.Internal
                     + string.Join(
                         "",
                         maxLineLength <= 80 && maxExprLength <= 30 && !containsANewline
-                            ? SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLength) + spacedArrow + sub.ValueAsString + "\n")
-                            : SubExpressions.Select(sub => sub.SubExpression + "\n  " + spacedArrow + sub.ValueAsString + "\n\n")
+                            ? SubExpressions.AsEnumerable().Reverse().Select(sub => sub.SubExpression.PadLeft(maxExprLength) + spacedArrow + sub.ValueAsString + "\n")
+                            : SubExpressions.AsEnumerable().Reverse().Select(sub => sub.SubExpression + "\n  " + spacedArrow + sub.ValueAsString + "\n\n")
                     );
             }
         }

@@ -1,34 +1,34 @@
 ﻿() => a < b && (c > -a || c > b) && b < 10
-a
-     →   2
-
-b
-     →   5
-
-a < b
-     →   true
-
-c
-     →   3.45
-
--a
-     →   -2
-
-c > -a
-     →   true
-
-c > b
-     →   false
-
-c > -a || c > b
-     →   true
-
-a < b && (c > -a || c > b)
+a < b && (c > -a || c > b) && b < 10
      →   true
 
 b < 10
      →   true
 
-a < b && (c > -a || c > b) && b < 10
+a < b && (c > -a || c > b)
      →   true
+
+c > -a || c > b
+     →   true
+
+c > b
+     →   false
+
+c > -a
+     →   true
+
+-a
+     →   -2
+
+c
+     →   3.45
+
+a < b
+     →   true
+
+b
+     →   5
+
+a
+     →   2
 
