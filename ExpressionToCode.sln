@@ -3,17 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCodeLib", "ExpressionToCodeLib\ExpressionToCodeLib.csproj", "{2472FFFC-E2F9-4043-8CA6-EB65D4059A0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionToCodeLib", "ExpressionToCodeLib\ExpressionToCodeLib.csproj", "{2472FFFC-E2F9-4043-8CA6-EB65D4059A0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCodeTest", "ExpressionToCodeTest\ExpressionToCodeTest.csproj", "{404475DF-91DC-40B2-A933-1C4A3C9B7710}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionToCodeTest", "ExpressionToCodeTest\ExpressionToCodeTest.csproj", "{404475DF-91DC-40B2-A933-1C4A3C9B7710}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA5B9979-2CAD-4D93-9591-128F5F8BA053}"
 	ProjectSection(SolutionItems) = preProject
 		how-to-push-to-nuget.txt = how-to-push-to-nuget.txt
 		LICENSE = LICENSE
 		README.md = README.md
-		VisualStudioTextEditor.vssettings = VisualStudioTextEditor.vssettings
-		VsMacroForCodingStyle.txt = VsMacroForCodingStyle.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3FA226A6-D138-487E-96FB-41FFACBD74B8}"
@@ -21,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{3FA226
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionToCode.Benchmarks", "ExpressionToCode.Benchmarks\ExpressionToCode.Benchmarks.csproj", "{DE1DC107-D465-46B6-9198-5BB887E91619}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressionToCode.Benchmarks", "ExpressionToCode.Benchmarks\ExpressionToCode.Benchmarks.csproj", "{DE1DC107-D465-46B6-9198-5BB887E91619}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,5 +42,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AE4D304A-FE54-49CE-8998-CBD4E9757CDA}
 	EndGlobalSection
 EndGlobal
