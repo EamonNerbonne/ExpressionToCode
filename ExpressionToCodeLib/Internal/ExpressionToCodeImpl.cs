@@ -329,7 +329,7 @@ namespace ExpressionToCodeLib.Internal
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
                         ? null
                         : mce.Arguments[1];
-                kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
+                kids.Add(StringifyMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Method.Name == "CreateDelegate"
                 && mce.Arguments.Count == 2
                 && mce.Object?.Type == typeof(MethodInfo)
@@ -343,7 +343,7 @@ namespace ExpressionToCodeLib.Internal
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
                         ? null
                         : mce.Arguments[1];
-                kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
+                kids.Add(StringifyMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Object == null
                 && mce.Type.FullName == "System.FormattableString"
                 && mce.Method.DeclaringType?.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
@@ -368,7 +368,7 @@ namespace ExpressionToCodeLib.Internal
                     && mce.Method.GetCustomAttributes(typeof(ExtensionAttribute), false).Any() && mce.Arguments.Any()
                     && mce.Object == null;
                 var objectExpr = isExtensionMethod ? mce.Arguments.First() : mce.Object;
-                kids.Add(SinkMethodName(mce, mce.Method, objectExpr));
+                kids.Add(StringifyMethodName(mce, mce.Method, objectExpr));
                 var args = GetArgumentsForMethod(mce.Method, mce.Arguments);
 
                 kids.Add(ArgListDispatch(isExtensionMethod ? args.Skip(1) : args));
@@ -387,7 +387,7 @@ namespace ExpressionToCodeLib.Internal
         }
 
         [Pure]
-        StringifiedExpression SinkMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr)
+        StringifiedExpression StringifyMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr)
         {
             var kids = KidsBuilder.Create();
 
