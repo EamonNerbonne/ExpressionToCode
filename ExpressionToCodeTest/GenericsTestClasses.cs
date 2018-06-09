@@ -55,12 +55,10 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void TypeParameters3()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new[] { 1, 2, 3 }.Cast<int>()",
                 ExpressionToCode.ToCode(() => new[] { 1, 2, 3 }.Cast<int>())
-            ); //should not remove type parameters where these cannot be inferred!
-        }
+            );
 
         [Fact]
         public void GenericConstructor()
@@ -116,21 +114,17 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void StraightforwardInference()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => StaticTestClass.Identity(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.Identity(3))
             );
-        }
 
         [Fact]
         public void CannotInferOneParam()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => StaticTestClass.IsType<int, int>(3)",
                 ExpressionToCode.ToCode(() => StaticTestClass.IsType<int, int>(3))
             );
-        }
 
         [Fact]
         public void CannotInferWithoutTParam()
@@ -207,40 +201,32 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void GenericMethodCall_WhenSomeNotInferredTypeArguments_ShouldExplicitlySpecifyTypeArguments()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => StaticTestClass.IsType<int, int>(3)",
                 ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithAlwaysUseExplicitTypeArguments(true)
                     .WithObjectStringifier(ObjectStringify.Default)
                     .GetExpressionToCode()
                     .ToCode(() => StaticTestClass.IsType<int, int>(3))
             );
-        }
 
         [Fact]
         public void GenericMethodCall_ShouldExplicitlySpecifyTypeArguments()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 "() => MakeMe<Cake, string>(() => new Cake())",
                 ExpressionToCode.ToCode(() => MakeMe<Cake, string>(() => new Cake())));
-        }
 
         // ReSharper disable once UnusedTypeParameter
-        T MakeMe<T, TNotInferredFromArgument>(Func<T> maker) => maker();
+        T MakeMe<T, TNotInferredFromArgument>(Func<T> maker)
+            => maker();
 
         [Fact]
         public void UsesBoundTypeNamesEvenInGenericMethod()
-        {
-            AssertInGenericMethodWithIntArg<int>();
-        }
+            => AssertInGenericMethodWithIntArg<int>();
 
         void AssertInGenericMethodWithIntArg<T>()
-        {
-            //The expression no longer has any reference to the unbound argument T, so we can't generate the exactly correct code here.
-            Assert.Equal(
+            => Assert.Equal(
                 "() => new List<int>()",
                 ExpressionToCode.ToCode(() => new List<T>()));
-        }
     }
 
     class Cake { }
@@ -249,34 +235,42 @@ namespace ExpressionToCodeTest
     {
         T val;
 
-        public GenericClass(T pVal) => val = pVal;
+        public GenericClass(T pVal)
+            => val = pVal;
 
-        public GenericClass() => val = default(T);
+        public GenericClass()
+            => val = default(T);
 
         public T Value => val;
 
         public void Reset(T pVal)
-        {
-            val = pVal;
-        }
+            => val = pVal;
 
         public void Reset()
-        {
-            val = default(T);
-        }
+            => val = default(T);
 
-        public bool IsSet() => Equals(default(T), val);
-        public static T GetDefault() => default(T);
+        public bool IsSet()
+            => Equals(default(T), val);
 
-        public static bool IsEnumerableOfType<U>(IEnumerable<U> x) => typeof(T).GetTypeInfo().IsAssignableFrom(typeof(U));
-        public static bool IsFuncOfType<U>(Func<U> x) => typeof(T).IsAssignableFrom(typeof(U));
-        public static bool IsFunc2OfType<U>(Func<U, U> x) => typeof(T).IsAssignableFrom(typeof(U));
+        public static T GetDefault()
+            => default(T);
+
+        public static bool IsEnumerableOfType<U>(IEnumerable<U> x)
+            => typeof(T).GetTypeInfo().IsAssignableFrom(typeof(U));
+
+        public static bool IsFuncOfType<U>(Func<U> x)
+            => typeof(T).IsAssignableFrom(typeof(U));
+
+        public static bool IsFunc2OfType<U>(Func<U, U> x)
+            => typeof(T).IsAssignableFrom(typeof(U));
 
         public bool IsSubClass<U>()
-            where U : T => val is U;
+            where U : T
+            => val is U;
 
         public bool IsSubEqual<U>(U other)
-            where U : T, IEquatable<T> => other.Equals(val);
+            where U : T, IEquatable<T>
+            => other.Equals(val);
     }
 
     class GenericSubClass<T, U> : GenericClass<T>
@@ -290,13 +284,28 @@ namespace ExpressionToCodeTest
 
     public static class StaticTestClass
     {
-        public static T Identity<T>(T val) => val;
-        public static bool IsType<T, U>(T val) => val is U;
-        public static bool TEqualsInt<T>(int val) => val is T;
-        public static bool TwoArgsOneGeneric<T>(int val, T other) => val.Equals(other);
-        public static bool TwoArgsTwoGeneric<T>(T val, T other) => val.Equals(other);
-        public static int Consume<T>(T val) => 42;
-        public static int Consume(int val) => 1337;
-        public static int IndirectConsume<T>(T val) => Consume(val);
+        public static T Identity<T>(T val)
+            => val;
+
+        public static bool IsType<T, U>(T val)
+            => val is U;
+
+        public static bool TEqualsInt<T>(int val)
+            => val is T;
+
+        public static bool TwoArgsOneGeneric<T>(int val, T other)
+            => val.Equals(other);
+
+        public static bool TwoArgsTwoGeneric<T>(T val, T other)
+            => val.Equals(other);
+
+        public static int Consume<T>(T val)
+            => 42;
+
+        public static int Consume(int val)
+            => 1337;
+
+        public static int IndirectConsume<T>(T val)
+            => Consume(val);
     }
 }

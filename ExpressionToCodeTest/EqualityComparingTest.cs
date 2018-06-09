@@ -82,9 +82,7 @@ namespace ExpressionToCodeTest
         }
 
         static Tuple<EqualityExpressionClass, bool>[] eqclasses(params EqualityExpressionClass[] classes)
-        {
-            return classes.Select(eqClass => Tuple.Create(eqClass, false)).ToArray();
-        }
+            => classes.Select(eqClass => Tuple.Create(eqClass, false)).ToArray();
 
         [Fact]
         public void StringEqDisagreement()
@@ -109,9 +107,9 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void DtRefEqDisagreement()
-        {
-            Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration,
+            => Assert.Equal(
+                EqualityExpressions.DisagreeingEqualities(
+                        ExpressionToCodeConfiguration.DefaultAssertionConfiguration,
                         // ReSharper disable ReferenceEqualsWithValueType
                         () => ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17)))
                     .ToArray(),
@@ -121,15 +119,11 @@ namespace ExpressionToCodeTest
                     EqualityExpressionClass.ObjectEqualsStatic,
                     EqualityExpressionClass.StructuralEquals
                 ));
-            //EqualityExpressionClass.EqualsOp, EqualityExpressionClass.NotEqualsOp, EqualityExpressionClass.EquatableEquals: these are equivalent because syntax-type sensitive.
-        }
 
         [Fact]
         public void DtEqDisagreement()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17))).ToArray(),
                 eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
-        }
     }
 }

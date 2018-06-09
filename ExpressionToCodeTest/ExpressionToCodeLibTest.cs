@@ -23,9 +23,7 @@ namespace ExpressionToCodeTest
     {
         [Fact]
         public void ComplexObjectToCodeAlsoSupportsExpressions()
-        {
-            Assert.Equal("() => 42", ObjectToCode.ComplexObjectToPseudoCode((Expression<Func<int>>)(() => 42)));
-        }
+            => Assert.Equal("() => 42", ObjectToCode.ComplexObjectToPseudoCode((Expression<Func<int>>)(() => 42)));
 
         [Fact]
         public void AddOperator()
@@ -38,52 +36,40 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void AnonymousClasses()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new { X = 3, A = ""a"" } == new { X = 3, A = ""a"" }",
                 ExpressionToCode.ToCode(() => new { X = 3, A = "a" } == new { X = 3, A = "a" }));
-        }
 
         [Fact]
         public void ArrayIndex()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3L)] == 3",
                 ExpressionToCode.ToCode(() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3)] == 3));
-        }
 
         [Fact]
         public void ArrayLengthAndDoubles()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new[] { 1.0, 2.01, 3.5 }.Concat(new[] { 1.0, 2.0 }).ToArray().Length == 0",
                 ExpressionToCode.ToCode(() => new[] { 1.0, 2.01, 3.5 }.Concat(new[] { 1.0, 2.0 }).ToArray().Length == 0));
-        }
 
         [Fact]
         public void AsOperator()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new object() as string == default(string)",
                 // ReSharper disable once TryCastAndCheckForNull.0
                 ExpressionToCode.ToCode(() => new object() as string == null));
-        }
 
         [Fact]
         public void ComplexGenericName()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => ((Func<int, bool>)(x => x > 0))(0)",
                 ExpressionToCode.ToCode(() => ((Func<int, bool>)(x => x > 0))(0)));
-        }
 
         [Fact]
         public void DefaultValue()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new TimeSpan(1, 2, 3) == default(TimeSpan)",
                 ExpressionToCode.ToCode(() => new TimeSpan(1, 2, 3) == default(TimeSpan)));
-        }
 
         [Fact]
         public void IndexerAccess()
@@ -96,61 +82,47 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void IsOperator()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new object() is string",
                 ExpressionToCode.ToCode(() => new object() is string));
-        }
 
         [Fact]
         public void ArrayOfFuncInitializer()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new Func<int>[] { () => 1, () => 2 }",
                 ExpressionToCode.ToCode(() => new Func<int>[] { () => 1, () => 2 }));
-        }
 
         [Fact]
         public void ArrayOfFuncInitializer_FullNames()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new System.Func<int>[] { () => 1, () => 2 }",
                 ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
                     .GetExpressionToCode()
                     .ToCode(() => new Func<int>[] { () => 1, () => 2 }));
-        }
 
         [Fact]
         public void ListInitializer()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",
                 ExpressionToCode.ToCode(() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3));
-        }
 
         [Fact]
         public void ListInitializer2()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new List<int>(50) { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int>(50) { 1, 2, 3 }.Count == 3));
-        }
 
         [Fact]
         public void ListInitializer3()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new List<int> { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int> { 1, 2, 3 }.Count == 3));
-        }
 
         [Fact]
         public void LiteralCharAndProperty()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new string(' ', 3).Length == 1",
                 ExpressionToCode.ToCode(() => new string(' ', 3).Length == 1));
-        }
 
         [Fact]
         public void MembersBuiltin()
@@ -199,9 +171,7 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void MembersThis()
-        {
-            new ClassA().DoAssert();
-        }
+            => new ClassA().DoAssert();
 
         [Fact]
         public void MethodGroupAsExtensionMethod()
@@ -233,19 +203,15 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void MultipleCasts()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => 1 == (int)(object)1",
                 ExpressionToCode.ToCode(() => 1 == (int)(object)1));
-        }
 
         [Fact]
         public void MultipleDots()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => 3.ToString().ToString().Length > 0",
                 ExpressionToCode.ToCode(() => 3.ToString().ToString().Length > 0));
-        }
 
         [Fact]
         public void NestedLambda_NoParameters()
@@ -304,44 +270,34 @@ namespace ExpressionToCodeTest
 
         [Fact(Skip = "issue 14")]
         public void NestedLambda_UncertainOverload()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => Fizz((int x) => true)",
                 ExpressionToCode.ToCode(() => Fizz((int x) => true))
-            ); //hard case!
-        }
+            );
 
         [Fact]
         public void NewArrayAndExtensionMethod()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })",
                 ExpressionToCode.ToCode(() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })));
-        }
 
         [Fact]
         public void NewMultiDimArray()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new int[3, 4].Length == 1",
                 ExpressionToCode.ToCode(() => new int[3, 4].Length == 1));
-        }
 
         [Fact]
         public void NewObject()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new object()",
                 ExpressionToCode.ToCode(() => new object()));
-        }
 
         [Fact]
         public void NewObjectNotEqualsNewObject()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new object() != new object()",
                 ExpressionToCode.ToCode(() => new object() != new object()));
-        }
 
         [Fact]
         public void NotOperator()
@@ -375,77 +331,59 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void Quoted()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => (Expression<Func<int, string, string>>)((n, s) => s + n.ToString()) != null",
                 ExpressionToCode.ToCode(() => (Expression<Func<int, string, string>>)((n, s) => s + n.ToString()) != null));
-        }
 
         [Fact]
         public void Quoted2()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => ExpressionToCode.ToCode(() => true).Length > 5",
                 ExpressionToCode.ToCode(() => ExpressionToCode.ToCode(() => true).Length > 5));
-        }
 
         [Fact]
         public void QuotedWithAnonymous()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new[] { new { X = ""a"", Y = ""b"" } }.Select(o => o.X + o.Y).Single()",
                 ExpressionToCode.ToCode(() => new[] { new { X = "a", Y = "b" } }.Select(o => o.X + o.Y).Single()));
-        }
 
         [Fact]
         public void StaticCall()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => object.Equals((object)3, (object)0)",
                 ExpressionToCode.ToCode(() => Equals(3, 0)));
-        }
 
         [Fact]
         public void ThisCall()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => !Equals((object)3)",
                 ExpressionToCode.ToCode(() => !Equals(3)));
-        }
 
         [Fact]
         public void ThisExplicit()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => object.Equals(this, (object)3)",
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 ExpressionToCode.ToCode(() => object.Equals(this, 3)));
-        }
 
         [Fact]
         public void TypedConstant()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new[] { typeof(int), typeof(string) }",
                 ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string) }));
-        }
 
         [Fact]
         public void StaticCallImplicitCast()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => object.Equals((object)3, (object)0)",
                 ExpressionToCode.ToCode(() => Equals(3, 0)));
-        }
 
         [Fact]
         public void StaticMembers()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => (DateTime.Now > DateTime.Now + TimeSpan.FromMilliseconds(10.001)).ToString() == ""False""",
                 ExpressionToCode.ToCode(
                     () => (DateTime.Now > DateTime.Now + TimeSpan.FromMilliseconds(10.001)).ToString() == "False"));
-        }
 
         [Fact]
         public void Strings2()
@@ -459,11 +397,9 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void StringAccessor()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => ""abc""[1] == 'b'",
                 ExpressionToCode.ToCode(() => "abc"[1] == 'b'));
-        }
 
         [Fact]
         public void StringConcat()
@@ -502,9 +438,7 @@ namespace ExpressionToCodeTest
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
         T MethodWithOutParam<T>(ref T input, out T output)
-        {
-            return output = input;
-        }
+            => output = input;
 
         [Fact]
         public void StaticMethodWithRefAndOutModifiers()
@@ -549,47 +483,37 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void LambdaInvocation_Func_int()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 "() => new Func<int>(() => 1)()",
                 ExpressionToCode.ToCode(() => new Func<int>(() => 1)()));
-        }
 
         [Fact]
         public void LambdaInvocation_CustomDelegate()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 "() => new CustomDelegate(n => n + 1)(1)",
                 ExpressionToCode.ToCode(() => new CustomDelegate(n => n + 1)(1)));
-        }
 
         [Fact]
         public void FullTypeName_IfCorrespondingRuleSpecified()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 "() => new ExpressionToCodeTest.ClassA()",
                 ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
                     .GetExpressionToCode()
                     .ToCode(() => new ClassA()));
-        }
 
         [Fact]
         public void FullTypeName_WhenRequestedEvenForMessyGenerics()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 "() => typeof(ExpressionToCodeTest.Outer<int, int>.Nested<string>)",
                 ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
                     .GetExpressionToCode()
                     .ToCode(() => typeof(Outer<int, int>.Nested<string>)));
-        }
 
         [Fact]
         public void PlainTypeName_WhenRequestedEvenForMessyGenerics()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 "() => typeof(Outer<int, int>.Nested<string>)",
                 ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.GetExpressionToCode().ToCode(() => typeof(Outer<int, int>.Nested<string>)));
-        }
 
         [Fact]
         public void PlainTypeName_WhenFullTypeNameRequestedForUnboundTypeArgument()
@@ -613,9 +537,7 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void ThisPropertyAccess()
-        {
-            Assert.Equal("() => TheProperty", ExpressionToCode.ToCode(() => TheProperty));
-        }
+            => Assert.Equal("() => TheProperty", ExpressionToCode.ToCode(() => TheProperty));
 
         [Fact]
         public void ThisProtectedPropertyAccess()
@@ -703,9 +625,7 @@ namespace ExpressionToCodeTest
     static class StaticHelperClass
     {
         public static long AnExtensionMethod(this DateTime date, ref int tickOffset, int dayOffset, out long alternateOut)
-        {
-            return alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
-        }
+            => alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
     }
 
     class ClassA

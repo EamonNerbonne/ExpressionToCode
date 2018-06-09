@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using FastExpressionCompiler;
 
 namespace ExpressionToCodeLib.Internal
 {
@@ -8,9 +9,9 @@ namespace ExpressionToCodeLib.Internal
         static readonly DotnetExpressionCompiler fallback = new DotnetExpressionCompiler();
 
         public Func<T> Compile<T>(Expression<Func<T>> expression)
-            => FastExpressionCompiler.ExpressionCompiler.TryCompile<Func<T>>(expression) ?? fallback.Compile(expression);
+            => ExpressionCompiler.TryCompile<Func<T>>(expression) ?? fallback.Compile(expression);
 
         public Delegate Compile(LambdaExpression expression)
-            => FastExpressionCompiler.ExpressionCompiler.TryCompile<Delegate>(expression) ?? fallback.Compile(expression);
+            => ExpressionCompiler.TryCompile<Delegate>(expression) ?? fallback.Compile(expression);
     }
 }

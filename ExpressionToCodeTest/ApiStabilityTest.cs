@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using ExpressionToCodeLib;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace ExpressionToCodeTest
@@ -35,20 +35,23 @@ namespace ExpressionToCodeTest
             ApprovalTest.Verify(PrettyPrintTypes(unstableTypes));
         }
 
-        static string PrettyPrintTypes(IEnumerable<Type> types) => string.Join("", types.Select(PrettyPrintTypeDescription));
-        static string PrettyPrintTypeDescription(Type o) => PrettyPrintTypeHeader(o) + "\n" + PrettyPrintTypeContents(o);
+        static string PrettyPrintTypes(IEnumerable<Type> types)
+            => string.Join("", types.Select(PrettyPrintTypeDescription));
+
+        static string PrettyPrintTypeDescription(Type o)
+            => PrettyPrintTypeHeader(o) + "\n" + PrettyPrintTypeContents(o);
 
         static string PrettyPrintTypeContents(Type type)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                .OrderBy(mi => mi.MetadataToken)
-                .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
+                    .OrderBy(mi => mi.MetadataToken)
+                    .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
                 ;
 
             var methodBlock = string.Join("", methods.Select(mi => PrettyPrintMethod(mi) + "\n"));
 
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
+                    .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
                 ;
 
             var fieldBlock = string.Join("", fields.Select(fi => PrettyPrintField(fi) + "\n"));
@@ -91,32 +94,33 @@ namespace ExpressionToCodeTest
                 + PrettyPrintParameterList(mi);
         }
 
-        static object PrettyPrintField(FieldInfo fi) => "    "
-            + (fi.IsLiteral ? "const " : (fi.IsStatic ? "static " : "") + (fi.IsInitOnly ? "readonly " : ""))
-            + fi.FieldType.ToCSharpFriendlyTypeName()
-            + " " + fi.Name
-            + (fi.IsLiteral ? " = " + ObjectToCode.ComplexObjectToPseudoCode(fi.GetRawConstantValue()) : "");
+        static object PrettyPrintField(FieldInfo fi)
+            => "    "
+                + (fi.IsLiteral ? "const " : (fi.IsStatic ? "static " : "") + (fi.IsInitOnly ? "readonly " : ""))
+                + fi.FieldType.ToCSharpFriendlyTypeName()
+                + " " + fi.Name
+                + (fi.IsLiteral ? " = " + ObjectToCode.ComplexObjectToPseudoCode(fi.GetRawConstantValue()) : "");
 
         static string PrettyPrintParameterList(MethodInfo mi)
-        {
-            return "(" + string.Join(
+            => "(" + string.Join(
                 ", ",
                 mi.GetParameters()
                     .Select(
                         pi =>
                             pi.ParameterType.ToCSharpFriendlyTypeName() + " " + pi.Name)) + ")";
-        }
 
         static string PrettyPrintGenericArguments(MethodInfo mi)
         {
             if (!mi.IsGenericMethodDefinition) {
                 return "";
             }
+
             return "<"
                 + string.Join(", ", mi.GetGenericArguments().Select(ObjectToCode.ToCSharpFriendlyTypeName))
                 + ">";
         }
 
-        static bool IsPublic(Type type) => type.GetTypeInfo().IsPublic || type.GetTypeInfo().IsNestedPublic && IsPublic(type.DeclaringType);
+        static bool IsPublic(Type type)
+            => type.GetTypeInfo().IsPublic || type.GetTypeInfo().IsNestedPublic && IsPublic(type.DeclaringType);
     }
 }

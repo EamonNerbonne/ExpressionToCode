@@ -9,7 +9,6 @@ namespace ExpressionToCodeTest
     class HasIndexers
     {
         public object this[string s] => null;
-
         public object this[int i] => null;
     }
 
@@ -17,11 +16,9 @@ namespace ExpressionToCodeTest
     {
         [Fact]
         public void CanPrettyPrintVariousIndexers()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 "() => new HasIndexers()[3] == new HasIndexers()[\"three\"]",
                 ExpressionToCode.ToCode(() => new HasIndexers()[3] == new HasIndexers()["three"])
             );
-        }
     }
 }

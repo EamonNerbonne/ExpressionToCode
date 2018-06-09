@@ -3,11 +3,11 @@ using System.Linq.Expressions;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
-
 namespace ExpressionToCodeLib
 {
     /// <summary>
-    /// If you wish to override some formatting aspects of these methods, set ExpressionToCodeConfiguration.GlobalCodeGetConfiguration.
+    ///     If you wish to override some formatting aspects of these methods, set
+    ///     ExpressionToCodeConfiguration.GlobalCodeGetConfiguration.
     /// </summary>
     public static class ExpressionToCode
     {
@@ -74,15 +74,16 @@ namespace ExpressionToCodeLib
         public static string AnnotatedToCode(this ExpressionToCodeConfiguration config, Expression expr)
             => config.Value.CodeAnnotator.AnnotateExpressionTree(config, expr, null, false);
 
-        ///<summary>
-        /// Converts expression to variable/property/method C# like representation adding it's string value.
-        ///</summary>
+        /// <summary>
+        ///     Converts expression to variable/property/method C# like representation adding it's string value.
+        /// </summary>
         /// <example>
-        /// string toNameValueRepresentation = "Value";
-        /// ToRepr(() => toNameValueRepresentation); // "toNameValueRepresentation = Value"
+        ///     string toNameValueRepresentation = "Value";
+        ///     ToRepr(() => toNameValueRepresentation); // "toNameValueRepresentation = Value"
         /// </example>
         /// <remarks>
-        /// Unlike <see cref="ExpressionToCode.ToCode(Expression)"/>(which targets compilable output), this method is geared towards dumping simple objects into text, so may skip some C# issues for sake of readability.
+        ///     Unlike <see cref="ExpressionToCode.ToCode(Expression)" />(which targets compilable output), this method is geared
+        ///     towards dumping simple objects into text, so may skip some C# issues for sake of readability.
         /// </remarks>
         public static string ToValuedCode<TResult>(this Expression<Func<TResult>> expression)
         {
@@ -92,17 +93,18 @@ namespace ExpressionToCodeLib
             } catch (Exception ex) {
                 throw new InvalidOperationException("Cannon get return value of expression when it throws error", ex);
             }
+
             return ToCode(expression.Body) + " = " + retValue;
         }
 
         /// <summary>
-        /// Gets property, variable or method name from lambda expression.
+        ///     Gets property, variable or method name from lambda expression.
         /// </summary>
         /// <param name="expression">Simple expression to obtain name from.</param>
         /// <returns>The `name` of expression.</returns>
         /// <example>
-        /// var example = "some text";
-        /// var name = ExpressionToCode.GetNameIn(() => example);  // "example"
+        ///     var example = "some text";
+        ///     var name = ExpressionToCode.GetNameIn(() => example);  // "example"
         /// </example>
         /// <exception cref="System.ArgumentException">Unsupported or unknown or complex expression to get `name` of it.</exception>
         public static string GetNameIn<TResult>(Expression<Func<TResult>> expression)

@@ -57,7 +57,7 @@ namespace ExpressionToCodeTest
             => Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
-                );
+            );
 
         [Fact(Skip = "Not yet implemented")]
         public void AvoidsImplicitCastWhenTargetTypeIsAGenericArgument()
@@ -68,7 +68,7 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
-                );
+            );
         }
     }
 }

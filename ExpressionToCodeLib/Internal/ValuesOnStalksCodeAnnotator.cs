@@ -33,6 +33,7 @@ namespace ExpressionToCodeLib.Internal
                 for (var prevI = 0; prevI < nodeI; prevI++) {
                     stalkLine[splitLine.Nodes[prevI].Location] = '\u2502'; //light vertical lines
                 }
+
                 exprWithStalkedValues.AppendLine((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
             }
 
@@ -76,6 +77,7 @@ namespace ExpressionToCodeLib.Internal
                     }
                 }
             }
+
             foreach (var kid in node.Children) {
                 AppendTo(config, sb, nodeInfos, kid, ref ignoreInitialSpace, showTopExpressionValue || kid.IsConceptualChild);
             }

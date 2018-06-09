@@ -1,28 +1,35 @@
 ﻿using System;
+using ExpressionToCodeLib;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using ExpressionToCodeLib;
+using FastExpressionCompiler;
 using Xunit;
 
-namespace ExpressionToCodeTest {
-    public struct MyValueTuple<T1, T2> : IEquatable<MyValueTuple<T1, T2>> {
+namespace ExpressionToCodeTest
+{
+    public struct MyValueTuple<T1, T2> : IEquatable<MyValueTuple<T1, T2>>
+    {
         public readonly T1 v1;
         public readonly T2 v2;
+
         public MyValueTuple((T1 v1, T2 v2) tuple)
             => (v1, v2) = tuple;
 
-        public bool Equals(MyValueTuple<T1, T2> other) => Equals(v1, other.v1) && Equals(v2, other.v2);
+        public bool Equals(MyValueTuple<T1, T2> other)
+            => Equals(v1, other.v1) && Equals(v2, other.v2);
     }
 
-    public class ValueTupleTests {
-        static MyValueTuple<T1, T2> ToMyValueTuple<T1, T2>((T1, T2) tuple) => new MyValueTuple<T1, T2>(tuple);
+    public class ValueTupleTests
+    {
+        static MyValueTuple<T1, T2> ToMyValueTuple<T1, T2>((T1, T2) tuple)
+            => new MyValueTuple<T1, T2>(tuple);
 
         [Fact(Skip = "https://github.com/dotnet/roslyn/issues/27322")]
-        public void ExpressionWithValueTupleEqualsCanCompile() {
+        public void ExpressionWithValueTupleEqualsCanCompile()
+        {
             var tupleA = (1, 3);
             var tupleB = (1, "123".Length);
-
 
             Expression<Func<int>> ok1 = () => tupleA.Item1;
             Expression<Func<int>> ok2 = () => tupleA.GetHashCode();
@@ -45,21 +52,23 @@ namespace ExpressionToCodeTest {
             ok8.Compile()();
 
             // ReSharper disable once UnusedVariable
-            Expression<Func<bool>> err1 = () => tupleA.Equals(tupleB);//crash
+            Expression<Func<bool>> err1 = () => tupleA.Equals(tupleB); //crash
             // ReSharper disable once UnusedVariable
-            Expression<Func<int>> err2 = () => tupleA.CompareTo(tupleB);//crash
+            Expression<Func<int>> err2 = () => tupleA.CompareTo(tupleB); //crash
         }
 
         [Fact(Skip = "https://github.com/dotnet/roslyn/issues/27322")]
-        public void FastExpressionCompileValueTupleEqualsWorks() {
+        public void FastExpressionCompileValueTupleEqualsWorks()
+        {
             var tuple = (1, 3);
             (int, int Length) tuple2 = (1, "123".Length);
-            var expr = FastExpressionCompiler.ExpressionCompiler.Compile(() => tuple.Equals(tuple2));
+            var expr = ExpressionCompiler.Compile(() => tuple.Equals(tuple2));
             Assert.True(expr());
         }
 
         [Fact(Skip = "https://github.com/dotnet/roslyn/issues/27322")]
-        public void AssertingOnValueTupleEqualsWorks() {
+        public void AssertingOnValueTupleEqualsWorks()
+        {
             var tuple = (1, 3);
             var tuple2 = (1, "123".Length);
             Expression<Func<bool>> expr = () => tuple.Equals(tuple2);
@@ -68,57 +77,66 @@ namespace ExpressionToCodeTest {
         }
 
         [Fact]
-        public void ToCSharpFriendlyTypeNameSupportsTuples() {
+        public void ToCSharpFriendlyTypeNameSupportsTuples()
+        {
             var actual = (1, "2", new[] { 1, 2, 3 });
             Assert.Equal("(int, string, int[])", actual.GetType().ToCSharpFriendlyTypeName());
         }
 
         [Fact]
-        public void ToCSharpFriendlyTypeNameSupportsLooongTuples() {
+        public void ToCSharpFriendlyTypeNameSupportsLooongTuples()
+        {
             var actual = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
             Assert.Equal("(int, int, int, int, int, int, int, int, int, int)", actual.GetType().ToCSharpFriendlyTypeName());
         }
 
         [Fact]
-        public void ToCSharpFriendlyTypeNameSupportsNestedTuples() {
+        public void ToCSharpFriendlyTypeNameSupportsNestedTuples()
+        {
             var actual = (1, 2, ((3, 4), 5), 6, 7, 8);
             Assert.Equal("(int, int, ((int, int), int), int, int, int)", actual.GetType().ToCSharpFriendlyTypeName());
         }
 
         [Fact]
-        public void ToCSharpFriendlyTypeNameSupportsNestedNullableTuples() {
+        public void ToCSharpFriendlyTypeNameSupportsNestedNullableTuples()
+        {
             var actual = default((int, int, ((int, int), int), (int, int)?, int, int));
             Assert.Equal("(int, int, ((int, int), int), (int, int)?, int, int)", actual.GetType().ToCSharpFriendlyTypeName());
         }
 
         [Fact]
-        public void ToCSharpFriendlyTypeNameSupportsTrailingNestedTuples() {
+        public void ToCSharpFriendlyTypeNameSupportsTrailingNestedTuples()
+        {
             var actual = default((int, int, ((int, int), int)));
             Assert.Equal("(int, int, ((int, int), int))", actual.GetType().ToCSharpFriendlyTypeName());
         }
 
         [Fact]
-        public void ToCSharpFriendlyTypeNameSupportsTrailingNestedTuplesAtPosition8() {
+        public void ToCSharpFriendlyTypeNameSupportsTrailingNestedTuplesAtPosition8()
+        {
             var actual = default((int, int, int, int, int, int, int, (int, int)));
             var alt = default((int, int, int, int, int, int, int, int, int));
-            Assert.False(Equals(actual.GetType(), alt.GetType()));//non-obvious compiler-guarranteed precondition
+            Assert.False(Equals(actual.GetType(), alt.GetType())); //non-obvious compiler-guarranteed precondition
             Assert.Equal("(int, int, int, int, int, int, int, (int, int))", actual.GetType().ToCSharpFriendlyTypeName());
         }
 
         [Fact]
-        public void ComplexObjectToPseudoCodeSupportsTuples() {
+        public void ComplexObjectToPseudoCodeSupportsTuples()
+        {
             var actual = (1, "2", new[] { 1, 2, 3 });
             Assert.Equal("(1, \"2\", new[] { 1, 2, 3 })", ObjectToCode.ComplexObjectToPseudoCode(actual));
         }
 
         [Fact]
-        public void ComplexObjectToPseudoCodeSupportsComplexTuples() {
+        public void ComplexObjectToPseudoCodeSupportsComplexTuples()
+        {
             var actual = (1, ("2", new[] { "2b" }), new[] { 3 }, 4, default(string), 6, 7, 8, 9);
             Assert.Equal("(1, (\"2\", new[] { \"2b\" }), new[] { 3 }, 4, null, 6, 7, 8, 9)", ObjectToCode.ComplexObjectToPseudoCode(actual));
         }
 
         [Fact]
-        public void ComplexObjectToPseudoCodeSupportsTuplesWithTrailingTuples() {
+        public void ComplexObjectToPseudoCodeSupportsTuplesWithTrailingTuples()
+        {
             var actual = (1, 2, 3, 4, 5, 6, 7, (8, 9, 10));
             Assert.Equal("(1, 2, 3, 4, 5, 6, 7, (8, 9, 10))", ObjectToCode.ComplexObjectToPseudoCode(actual));
         }

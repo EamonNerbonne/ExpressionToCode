@@ -27,11 +27,9 @@ namespace ExpressionToCodeTest
     {
         [Fact]
         public void PlainNested()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 "() => null as Parent.Nested",
                 ExpressionToCode.ToCode(() => null as Parent.Nested));
-        }
 
         [Fact]
         public void GenericNested()

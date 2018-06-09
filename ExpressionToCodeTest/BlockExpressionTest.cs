@@ -89,15 +89,11 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void BlockReturnTest()
-        {
-            Assert.Equal(@"{ return 1; }", ExpressionToCode.ToCode(Expression.Block(typeof(int), Expression.Constant(1))));
-        }
+            => Assert.Equal(@"{ return 1; }", ExpressionToCode.ToCode(Expression.Block(typeof(int), Expression.Constant(1))));
 
         [Fact]
         public void VoidReturnBlockTest()
-        {
-            Assert.Equal(@"{ 1; }", ExpressionToCode.ToCode(Expression.Block(typeof(void), Expression.Constant(1))));
-        }
+            => Assert.Equal(@"{ 1; }", ExpressionToCode.ToCode(Expression.Block(typeof(void), Expression.Constant(1))));
 
         [Fact]
         public void MultipleStatementsBlockTest()

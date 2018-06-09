@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 #if dotnet_framework
 using System.Runtime.Serialization;
+
 #endif
 
 namespace ExpressionToCodeLib

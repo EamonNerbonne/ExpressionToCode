@@ -1,7 +1,7 @@
 ﻿using System;
+using ExpressionToCodeLib;
 using System.Collections.Generic;
 using System.Linq;
-using ExpressionToCodeLib;
 using Xunit;
 
 namespace ExpressionToCodeTest
@@ -26,11 +26,9 @@ namespace ExpressionToCodeTest
     {
         [Fact]
         public void EnumConstant()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new object().Equals((object)MidpointRounding.ToEven)",
                 ExpressionToCode.ToCode(() => new object().Equals(MidpointRounding.ToEven)));
-        }
 
         [Fact]
         public void EnumVariables()

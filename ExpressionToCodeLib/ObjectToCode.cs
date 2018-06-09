@@ -6,7 +6,8 @@ using ExpressionToCodeLib.Internal;
 namespace ExpressionToCodeLib
 {
     /// <summary>
-    /// If you wish to override some formatting aspects of these methods, set ExpressionToCodeConfiguration.GlobalCodeGetConfiguration.
+    ///     If you wish to override some formatting aspects of these methods, set
+    ///     ExpressionToCodeConfiguration.GlobalCodeGetConfiguration.
     /// </summary>
     public static class ObjectToCode
     {

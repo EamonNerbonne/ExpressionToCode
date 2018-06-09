@@ -1,21 +1,25 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
-namespace ExpressionToCodeLib.Internal {
-    struct CSharpFriendlyTypeName {
+namespace ExpressionToCodeLib.Internal
+{
+    struct CSharpFriendlyTypeName
+    {
         public bool UseFullName;
         public bool IncludeGenericTypeArgumentNames;
 
         public string GetTypeName(Type type)
             => AliasNameOrNull(type) ?? NullableTypeNameOrNull(type.GetTypeInfo()) ?? ArrayTypeNameOrNull(type) ?? ValueTupleTypeNameOrNull(type) ?? GetUnaliasedTypeName(type);
 
-        string ValueTupleTypeNameOrNull(Type type) {
+        string ValueTupleTypeNameOrNull(Type type)
+        {
             if (!IsValueTupleType(type.GetTypeInfo())) {
                 return null;
             }
+
             var output = new StringBuilder();
             output.Append("(");
             var genericArguments = type.GetTypeInfo().GetGenericArguments();
@@ -36,6 +40,7 @@ namespace ExpressionToCodeLib.Internal {
                     nextIdx++;
                 }
             }
+
             output.Append(")");
             return output.ToString();
         }
@@ -43,14 +48,16 @@ namespace ExpressionToCodeLib.Internal {
         public static bool IsValueTupleType(TypeInfo typeInfo)
             => typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && typeInfo.Namespace == "System" && typeInfo.Name.StartsWith("ValueTuple`", StringComparison.Ordinal);
 
-        string GetUnaliasedTypeName(Type type) {
+        string GetUnaliasedTypeName(Type type)
+        {
             var typeNameWithoutNamespace =
                 GenericTypeName(type)
                 ?? NormalName(type);
             return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
         }
 
-        static string AliasNameOrNull(Type type) {
+        static string AliasNameOrNull(Type type)
+        {
             if (type == typeof(bool)) {
                 return "bool";
             } else if (type == typeof(byte)) {
@@ -93,7 +100,8 @@ namespace ExpressionToCodeLib.Internal {
         string NullableTypeNameOrNull(TypeInfo typeInfo)
             => typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>) ? GetTypeName(typeInfo.GetGenericArguments().Single()) + "?" : null;
 
-        string NormalName(Type type) {
+        string NormalName(Type type)
+        {
             if (type.DeclaringType != null) {
                 var settingsWithoutUseFullname = this;
                 settingsWithoutUseFullname.UseFullName = false;
@@ -104,7 +112,8 @@ namespace ExpressionToCodeLib.Internal {
             }
         }
 
-        string GenericTypeName(Type type) {
+        string GenericTypeName(Type type)
+        {
             if (!type.GetTypeInfo().IsGenericType) {
                 return null;
             }
@@ -125,6 +134,7 @@ namespace ExpressionToCodeLib.Internal {
                     if (afterArgCountIdx == -1) {
                         afterArgCountIdx = name.Length;
                     }
+
                     var thisTypeArgCount = int.Parse(name.Substring(backtickIdx + 1, afterArgCountIdx - backtickIdx - 1));
                     if (renderAsGenericTypeDefinition) {
                         typeArgIdx -= thisTypeArgCount;
@@ -134,20 +144,25 @@ namespace ExpressionToCodeLib.Internal {
                         for (var i = typeArgIdx - thisTypeArgCount; i < typeArgIdx; i++) {
                             argNames.Add(GetTypeName(typeArgs[i]));
                         }
+
                         typeArgIdx -= thisTypeArgCount;
                         revNestedTypeNames.Add(name.Substring(0, backtickIdx) + "<" + string.Join(", ", argNames) + ">");
                     }
                 }
+
                 type = type.DeclaringType;
             }
+
             revNestedTypeNames.Reverse();
             return string.Join(".", revNestedTypeNames);
         }
 
-        string ArrayTypeNameOrNull(Type type) {
+        string ArrayTypeNameOrNull(Type type)
+        {
             if (!type.IsArray) {
                 return null;
             }
+
             string arraySuffix = null;
             do {
                 var rankCommas = new string(',', type.GetArrayRank() - 1);
@@ -155,6 +170,7 @@ namespace ExpressionToCodeLib.Internal {
                 arraySuffix = arraySuffix + "[" + rankCommas + "]";
                 // ReSharper disable once PossibleNullReferenceException
             } while (type.IsArray);
+
             var basename = GetTypeName(type);
             return basename + arraySuffix;
         }

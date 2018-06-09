@@ -1,10 +1,10 @@
 ﻿using System;
+using ExpressionToCodeLib;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using ExpressionToCodeLib;
 using JetBrains.Annotations;
 
 namespace ExpressionToCode.Benchmarks
@@ -12,9 +12,7 @@ namespace ExpressionToCode.Benchmarks
     public class Program
     {
         public static void Main(string[] args)
-        {
-            BenchmarkRunner.Run<BenchmarkPAssert>();
-        }
+            => BenchmarkRunner.Run<BenchmarkPAssert>();
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
@@ -49,44 +47,30 @@ namespace ExpressionToCode.Benchmarks
 
         [Benchmark]
         public void JustCompile()
-        {
-            testExpr.Compile();
-        }
+            => testExpr.Compile();
 
         [Benchmark]
         public void CompileAndRun()
-        {
-            RunAssertion(testExpr.Compile());
-        }
+            => RunAssertion(testExpr.Compile());
 
         [Benchmark]
         public void JustFastCompile()
-        {
-            ExpressionTreeCompilers.FastExpressionCompiler.Compile(testExpr);
-        }
+            => ExpressionTreeCompilers.FastExpressionCompiler.Compile(testExpr);
 
         [Benchmark]
         public void FastCompileAndRun()
-        {
-            RunAssertion(ExpressionTreeCompilers.FastExpressionCompiler.Compile(testExpr));
-        }
+            => RunAssertion(ExpressionTreeCompilers.FastExpressionCompiler.Compile(testExpr));
 
         [Benchmark]
         public void PAssertWithCompile()
-        {
-            baseLineConfiguration.Assert(GetExpression());
-        }
+            => baseLineConfiguration.Assert(GetExpression());
 
         [Benchmark]
         public void PAssertWithFastCompile()
-        {
-            withOptimizationConfiguration.Assert(GetExpression());
-        }
+            => withOptimizationConfiguration.Assert(GetExpression());
 
         [Benchmark]
         public void BaseLinePlainLambdaExec()
-        {
-            RunAssertion(GetFunc());
-        }
+            => RunAssertion(GetFunc());
     }
 }

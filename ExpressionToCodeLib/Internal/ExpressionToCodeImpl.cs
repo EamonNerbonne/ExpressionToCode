@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace ExpressionToCodeLib.Internal
@@ -11,7 +11,9 @@ namespace ExpressionToCodeLib.Internal
     class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {
         #region General Helpers
-        public ExpressionToCodeImpl(ExpressionToCodeConfiguration config) => this.config = config;
+        public ExpressionToCodeImpl(ExpressionToCodeConfiguration config)
+            => this.config = config;
+
         readonly ExpressionToCodeConfiguration config;
         IObjectStringifier objectStringifier => config.Value.ObjectStringifier;
         bool alwaysUseExplicitTypeArguments => config.Value.AlwaysUseExplicitTypeArguments;
@@ -26,9 +28,11 @@ namespace ExpressionToCodeLib.Internal
             if (needsParens) {
                 yield return StringifiedExpression.TextOnly("(");
             }
+
             foreach (var grandchild in RawChildDispatch(child)) {
                 yield return grandchild;
             }
+
             if (needsParens) {
                 yield return StringifiedExpression.TextOnly(")");
             }
@@ -44,6 +48,7 @@ namespace ExpressionToCodeLib.Internal
             if (child.PrefixOrNull != null) {
                 yield return StringifiedExpression.TextOnly(child.PrefixOrNull);
             }
+
             yield return this.ExpressionDispatch(child.Expr).MarkAsConceptualChild();
         }
 
@@ -55,9 +60,11 @@ namespace ExpressionToCodeLib.Internal
                 if (!isFirst) {
                     yield return StringifiedExpression.TextOnly(joiner);
                 }
+
                 foreach (var grandchild in childVisitor(child)) {
                     yield return grandchild;
                 }
+
                 isFirst = false;
             }
         }
@@ -85,9 +92,11 @@ namespace ExpressionToCodeLib.Internal
             } else {
                 yield return StringifiedExpression.TextOnly(open);
             }
+
             foreach (var o in JoinDispatch(arguments, joiner)) {
                 yield return o;
             }
+
             yield return StringifiedExpression.TextOnly(close);
         }
 
@@ -103,24 +112,16 @@ namespace ExpressionToCodeLib.Internal
                 => new KidsBuilder(new List<StringifiedExpression>());
 
             public void Add(StringifiedExpression node)
-            {
-                kids.Add(node);
-            }
+                => kids.Add(node);
 
             public void Add(IEnumerable<StringifiedExpression> nodes)
-            {
-                kids.AddRange(nodes);
-            }
+                => kids.AddRange(nodes);
 
             public void Add(string text, Expression value)
-            {
-                kids.Add(StringifiedExpression.TextAndExpr(text, value));
-            }
+                => kids.Add(StringifiedExpression.TextAndExpr(text, value));
 
             public void Add(string text)
-            {
-                kids.Add(StringifiedExpression.TextOnly(text));
-            }
+                => kids.Add(StringifiedExpression.TextOnly(text));
 
             public StringifiedExpression Finish()
                 => StringifiedExpression.WithChildren(kids.ToArray());
@@ -167,7 +168,7 @@ namespace ExpressionToCodeLib.Internal
             if (expr1nonnullableType.GetTypeInfo().IsEnum
                 && expr1nonnullableType.GetTypeInfo().GetEnumUnderlyingType() == expr2nonnullableType
                 || expr1nonnullableType == typeof(char) && expr2nonnullableType == typeof(int)
-                ) {
+            ) {
                 expr1 = expr1uncast;
 
                 if (expr2.NodeType == ExpressionType.Constant) {
@@ -209,6 +210,7 @@ namespace ExpressionToCodeLib.Internal
                     kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")", e);
                 }
             }
+
             kids.Add(NestExpression(ue.NodeType, ue.Operand));
             return kids.Finish();
         }
@@ -264,7 +266,7 @@ namespace ExpressionToCodeLib.Internal
                     ? NestExpression(e.NodeType, le.Parameters.Single())
                     : ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe }))
                 //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
-                );
+            );
             kids.Add(" => ");
             kids.Add(NestExpression(le.NodeType, le.Body));
             return kids.Finish();
@@ -277,7 +279,7 @@ namespace ExpressionToCodeLib.Internal
 
         static bool isClosureRef(Expression e)
             => (
-                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
+                    e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
                     || e.NodeType == ExpressionType.MemberAccess
                 )
                 && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
@@ -325,22 +327,22 @@ namespace ExpressionToCodeLib.Internal
                 var targetMethod = (MethodInfo)((ConstantExpression)mce.Arguments[2]).Value;
                 var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
-                    ? null
-                    : mce.Arguments[1];
+                        ? null
+                        : mce.Arguments[1];
                 kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Method.Name == "CreateDelegate"
                 && mce.Arguments.Count == 2
                 && mce.Object?.Type == typeof(MethodInfo)
                 && mce.Object.NodeType == ExpressionType.Constant
                 && mce.Method.GetParameters()[1].ParameterType == typeof(object)
-                ) {
+            ) {
                 //.net 4.5
                 //implicitly constructed delegate from method group.
                 var targetMethod = (MethodInfo)((ConstantExpression)mce.Object).Value;
                 var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
                     && ((ConstantExpression)mce.Arguments[1]).Value == null
-                    ? null
-                    : mce.Arguments[1];
+                        ? null
+                        : mce.Arguments[1];
                 kids.Add(SinkMethodName(mce, targetMethod, targetExpr));
             } else if (mce.Object == null
                 && mce.Type.FullName == "System.FormattableString"
@@ -350,7 +352,7 @@ namespace ExpressionToCodeLib.Internal
                 && mce.Arguments[0].NodeType == ExpressionType.Constant
                 && mce.Arguments[1].NodeType == ExpressionType.NewArrayInit
                 && ((NewArrayExpression)mce.Arguments[1]).Expressions.Count == 0
-                ) {
+            ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
                 var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
@@ -371,6 +373,7 @@ namespace ExpressionToCodeLib.Internal
 
                 kids.Add(ArgListDispatch(isExtensionMethod ? args.Skip(1) : args));
             }
+
             return kids.Finish();
         }
 
@@ -396,6 +399,7 @@ namespace ExpressionToCodeLib.Internal
             } else if (method.IsStatic) {
                 kids.Add(objectStringifier.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
             }
+
             var methodName = method.Name;
 
             methodName += CreateGenericArgumentsIfNecessary(method);
@@ -412,7 +416,7 @@ namespace ExpressionToCodeLib.Internal
             if (!alwaysUseExplicitTypeArguments) {
                 var genericMethodDefinition = method.GetGenericMethodDefinition();
                 var relevantBindingFlagsForOverloads =
-                    BindingFlags.Public
+                        BindingFlags.Public
                         | (!method.IsPublic ? BindingFlags.NonPublic : 0)
                         | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)
                     ;
@@ -422,8 +426,8 @@ namespace ExpressionToCodeLib.Internal
                     .Where(
                         otherMethod =>
                             otherMethod != genericMethodDefinition
-                                && otherMethod.Name == method.Name
-                                && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
+                            && otherMethod.Name == method.Name
+                            && otherMethod.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(method.GetParameters().Select(pi => pi.ParameterType))
                     );
 
                 if (!confusibleOverloads.Any()
@@ -471,6 +475,7 @@ namespace ExpressionToCodeLib.Internal
             if (ie.Expression.NodeType == ExpressionType.Lambda) {
                 kids.Add("new " + objectStringifier.TypeNameToCode(ie.Expression.Type));
             }
+
             kids.Add(NestExpression(ie.NodeType, ie.Expression));
             var invokeMethod = ie.Expression.Type.GetTypeInfo().GetMethod("Invoke");
             var args = GetArgumentsForMethod(invokeMethod, ie.Arguments);
@@ -495,11 +500,12 @@ namespace ExpressionToCodeLib.Internal
                     throw new ArgumentOutOfRangeException(
                         nameof(e),
                         "Can't print constant " + (const_Val?.ToString() ?? "<null>")
-                            + " in expr of type " + e.Type);
+                        + " in expr of type " + e.Type);
                 }
             } else {
                 kids.Add(codeRepresentation);
             }
+
             return kids.Finish();
         }
 
@@ -564,6 +570,7 @@ namespace ExpressionToCodeLib.Internal
             } else {
                 throw new NotImplementedException("Member binding of unknown type: " + mb.GetType());
             }
+
             return new[] { kids.Finish() };
         }
 
@@ -600,10 +607,12 @@ namespace ExpressionToCodeLib.Internal
                     throw new InvalidOperationException(
                         "Constructor params for anonymous type don't match it's properties!");
                 }
+
                 if (!parms.Select(p => p.ParameterType).SequenceEqual(ne.Arguments.Select(argE => argE.Type))) {
                     throw new InvalidOperationException(
                         "Constructor Arguments for anonymous type don't match it's type signature!");
                 }
+
                 kids.Add("new { ");
                 for (var i = 0; i < props.Length; i++) {
                     kids.Add(props[i].Name + " = ");
@@ -612,11 +621,13 @@ namespace ExpressionToCodeLib.Internal
                         kids.Add(", ");
                     }
                 }
+
                 kids.Add(" }");
             } else {
                 kids.Add("new " + objectStringifier.TypeNameToCode(ne.Type), ne);
                 kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor, ne.Arguments)));
             }
+
             //TODO: deal with anonymous types.
             return kids.Finish();
         }

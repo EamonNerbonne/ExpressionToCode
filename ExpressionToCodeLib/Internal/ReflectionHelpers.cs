@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace ExpressionToCodeLib.Internal
@@ -15,6 +15,7 @@ namespace ExpressionToCodeLib.Internal
             if (!mi.IsSpecialName || !supposedGetter) {
                 return null;
             }
+
             var pName = mi.Name.Substring(4);
             const BindingFlags bindingFlags =
                 BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
@@ -28,6 +29,7 @@ namespace ExpressionToCodeLib.Internal
                         return prop;
                     }
                 }
+
                 return null;
             }
         }
@@ -96,6 +98,7 @@ namespace ExpressionToCodeLib.Internal
             if (typeInfo.IsArray) {
                 return TypeClass.BuiltinType;
             }
+
             var compilerGenerated = typeInfo.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
             var name = type.Name;
             var name_StartWithLessThan = name.StartsWith("<");

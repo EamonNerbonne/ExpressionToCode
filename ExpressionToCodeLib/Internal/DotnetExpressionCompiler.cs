@@ -11,7 +11,6 @@ namespace ExpressionToCodeLib.Internal
 #else
             => expression.Compile();
 #endif
-
         public Delegate Compile(LambdaExpression expression)
 #if dotnet_core
             => expression.Compile(true);

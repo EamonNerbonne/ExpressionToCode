@@ -76,11 +76,13 @@ namespace ExpressionToCodeLib.Internal
                         subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
                     }
                 }
+
                 foreach (var kid in node.Children) {
                     if (kid.IsConceptualChild) {
                         FindSubExpressionValues(config, kid, kid, subExpressionValues, false);
                     }
                 }
+
                 foreach (var kid in node.Children) {
                     if (!kid.IsConceptualChild) {
                         FindSubExpressionValues(config, kid, subExprNode, subExpressionValues, hideOutermostValue);

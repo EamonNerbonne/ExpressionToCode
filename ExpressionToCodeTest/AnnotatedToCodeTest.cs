@@ -1,4 +1,5 @@
 ﻿using System;
+using ExpressionToCodeLib;
 using Xunit;
 
 namespace ExpressionToCodeTest
@@ -11,7 +12,7 @@ namespace ExpressionToCodeTest
             var a = 1;
             var b = a + 1;
 
-            var code = ExpressionToCodeLib.ExpressionToCode.AnnotatedToCode(() => a + b);
+            var code = ExpressionToCode.AnnotatedToCode(() => a + b);
 
             Assert.Contains("a", code);
             Assert.Contains("+", code);

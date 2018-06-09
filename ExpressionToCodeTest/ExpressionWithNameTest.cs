@@ -66,11 +66,12 @@ namespace ExpressionToCodeTest
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
         void TheSimpleMethod() { }
-
         static string TheProperty => "TheValue";
 
-        static string TheComplexMethod(int parameter1, string parameter2) => "TheMethod " + parameter1 + " " + parameter2;
+        static string TheComplexMethod(int parameter1, string parameter2)
+            => "TheMethod " + parameter1 + " " + parameter2;
 
-        static string TheGenericMethod<T>(int two) => "Return value is " + two * two + typeof(T).Name;
+        static string TheGenericMethod<T>(int two)
+            => "Return value is " + two * two + typeof(T).Name;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
+using ExpressionToCodeLib;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using ExpressionToCodeLib;
 using Xunit;
 
 namespace ExpressionToCodeTest
@@ -33,40 +33,33 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void DealsOkWithLongEnumerables()
-        {
-            ApprovalTest.Verify(
+            => ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
                     () => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture) == 3.5.ToString(CultureInfo.InvariantCulture)
-                    ));
-        }
+                ));
 
         [Fact]
         public void DealsOkWithLongStrings()
-        {
-            ApprovalTest.Verify(
+            => ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
                     () => string.Join("##", Enumerable.Range(0, 100)) + "suffix"
-                    ));
-        }
+                ));
 
         [Fact]
         public void DealsOkWithObjectsContainingLongStrings()
-        {
-            ApprovalTest.Verify(
+            => ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
                     () => new {
                         A_long_string = string.Join("##", Enumerable.Range(0, 100)) + "suffix",
                         A_short_string = "short",
                         A_long_enumerable = Enumerable.Range(0, 1000)
                     }
-                    ));
-        }
+                ));
 
         [Fact]
         public void DealsOkWithEnumerablesOfAnonymousObjects()
         {
-            var foo = new
-            {
+            var foo = new {
                 A_long_string = string.Join("##", Enumerable.Range(0, 100)) + "suffix",
                 A_short_string = "short",
                 A_long_enumerable = Enumerable.Range(0, 1000)
@@ -74,7 +67,8 @@ namespace ExpressionToCodeTest
             ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
                     () => new[] {
-                        foo, foo,
+                        foo,
+                        foo,
                     }));
         }
 
@@ -82,15 +76,18 @@ namespace ExpressionToCodeTest
         public void DealsOkWithObjectsContainingLongMultilineStrings()
         {
             var wallOfText =
-                string.Join("",
+                string.Join(
+                    "",
                     Enumerable.Range(0, 100)
-                        .Select(line =>
-                            $"line {line}:".PadRight(10)
-                                + string.Join("",
+                        .Select(
+                            line =>
+                                $"line {line}:".PadRight(10)
+                                + string.Join(
+                                    "",
                                     Enumerable.Range(2, 20).Select(n => $"{n * 10,9};")
-                                    ) + "\n"
+                                ) + "\n"
                         )
-                    );
+                );
 
             ApprovalTest.Verify(
                 annotator.AnnotatedToCode(
@@ -99,7 +96,7 @@ namespace ExpressionToCodeTest
                         A_short_string = "short",
                         A_long_enumerable = Enumerable.Range(0, 1000)
                     }
-                    ));
+                ));
         }
 
         [Fact]
@@ -110,7 +107,7 @@ namespace ExpressionToCodeTest
                 annotator.AnnotatedToCode(
                     // ReSharper disable once RedundantLogicalConditionalExpressionOperand
                     () => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
-                    ));
+                ));
         }
 
         [Fact]
