@@ -1,4 +1,4 @@
-() => list.Select(e => e + 1).Count() == 5
+﻿() => list.Select(e => e + 1).Count() == 5
 list
      →   { 1, 2, 3, 3, 2, 1 }
 list.Select(e => e + 1)

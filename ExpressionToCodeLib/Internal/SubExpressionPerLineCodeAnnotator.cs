@@ -13,6 +13,7 @@ namespace ExpressionToCodeLib.Internal
 
         struct ExpressionWithSubExpressions
         {
+            const string spacedArrow = "   →   ";
             string ExpressionString;
             SubExpressionValue[] SubExpressions;
 
@@ -92,15 +93,16 @@ namespace ExpressionToCodeLib.Internal
 
             public string ComposeToSingleString()
             {
-                var maxExprLen = SubExpressions.Max(sub => (int?)sub.SubExpression.Length) ?? 0;
+                var maxLineLength = SubExpressions.Max(sub => sub.SubExpression.Length + spacedArrow.Length + sub.ValueAsString.Length as int?) ?? 0;
+                var maxExprLength = SubExpressions.Max(sub => sub.SubExpression.Length as int?) ?? 0;
 
-                if (maxExprLen < 30) {
-                    return ExpressionString + "\n" + string.Join(
+                return ExpressionString + "\n"// + spacedArrow + StringifiedValue + " (caused assertion failure)\n\n"
+                    + string.Join(
                         "",
-                        SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLen) + "   →   " + sub.ValueAsString + "\n"));
-                }
-
-                return ExpressionString + "\n" + string.Join("", SubExpressions.Select(sub => sub.SubExpression + "\n     →   " + sub.ValueAsString + "\n"));
+                        maxLineLength <= 80 && maxExprLength <= 30
+                            ? SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLength) + spacedArrow + sub.ValueAsString + "\n")
+                            : SubExpressions.Select(sub => sub.SubExpression + "\n  " + spacedArrow + sub.ValueAsString + "\n")
+                    );
             }
         }
     }

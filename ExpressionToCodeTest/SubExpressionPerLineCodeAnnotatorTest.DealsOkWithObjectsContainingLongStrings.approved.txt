@@ -1,4 +1,4 @@
-() => new { A_long_string = string.Join("##", Enumerable.Range(0, 100)) + "suffix", A_short_string = "short", A_long_enumerable = Enumerable.Range(0, 1000) }
+﻿() => new { A_long_string = string.Join("##", Enumerable.Range(0, 100)) + "suffix", A_short_string = "short", A_long_enumerable = Enumerable.Range(0, 1000) }
 Enumerable.Range(0, 100)
      →   { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, ... }
 string.Join("##", Enumerable.Range(0, 100))
