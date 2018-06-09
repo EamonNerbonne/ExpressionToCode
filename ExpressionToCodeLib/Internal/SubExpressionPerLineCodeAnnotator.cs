@@ -101,7 +101,7 @@ namespace ExpressionToCodeLib.Internal
                         "",
                         maxLineLength <= 80 && maxExprLength <= 30
                             ? SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLength) + spacedArrow + sub.ValueAsString + "\n")
-                            : SubExpressions.Select(sub => sub.SubExpression + "\n  " + spacedArrow + sub.ValueAsString + "\n")
+                            : SubExpressions.Select(sub => sub.SubExpression + "\n  " + spacedArrow + sub.ValueAsString + "\n\n")
                     );
             }
         }
