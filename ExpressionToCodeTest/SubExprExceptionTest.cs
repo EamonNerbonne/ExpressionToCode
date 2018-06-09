@@ -26,6 +26,7 @@ namespace ExpressionToCodeTest
                 @"() => FailingClass.SomeWrappedFunction()
 FailingClass.SomeWrappedFunction()
      →   throws System.Exception
+
 ".Replace("\r\n", "\n"),
                 ExpressionToCode.AnnotatedToCode(() => FailingClass.SomeWrappedFunction()));
     }

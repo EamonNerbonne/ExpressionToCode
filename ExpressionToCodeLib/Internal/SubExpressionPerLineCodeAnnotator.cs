@@ -95,11 +95,12 @@ namespace ExpressionToCodeLib.Internal
             {
                 var maxLineLength = SubExpressions.Max(sub => sub.SubExpression.Length + spacedArrow.Length + sub.ValueAsString.Length as int?) ?? 0;
                 var maxExprLength = SubExpressions.Max(sub => sub.SubExpression.Length as int?) ?? 0;
+                var containsANewline = SubExpressions.Any(sub => sub.SubExpression.Contains("\n") || sub.ValueAsString.Contains("\n"));
 
                 return ExpressionString + "\n"// + spacedArrow + StringifiedValue + " (caused assertion failure)\n\n"
                     + string.Join(
                         "",
-                        maxLineLength <= 80 && maxExprLength <= 30
+                        maxLineLength <= 80 && maxExprLength <= 30 && !containsANewline
                             ? SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLength) + spacedArrow + sub.ValueAsString + "\n")
                             : SubExpressions.Select(sub => sub.SubExpression + "\n  " + spacedArrow + sub.ValueAsString + "\n\n")
                     );
