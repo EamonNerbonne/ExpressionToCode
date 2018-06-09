@@ -41,14 +41,14 @@ namespace ExpressionToCodeTest
         static string PrettyPrintTypeContents(Type type)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                    .OrderBy(mi => mi.MetadataToken)
-                    .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
+                .OrderBy(mi => mi.MetadataToken)
+                .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
                 ;
 
             var methodBlock = string.Join("", methods.Select(mi => PrettyPrintMethod(mi) + "\n"));
 
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                    .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
+                .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
                 ;
 
             var fieldBlock = string.Join("", fields.Select(fi => PrettyPrintField(fi) + "\n"));
