@@ -59,15 +59,12 @@ namespace ExpressionToCodeTest
         static string PrettyPrintTypeHeader(Type type)
         {
             var prefix = TypePrefix(type);
-
-            var baseType = type.GetTypeInfo().BaseType == typeof(object) ? null : type.GetTypeInfo().BaseType;
-            var allInterfaces = type.GetInterfaces();
-            var interfaces = baseType == null ? allInterfaces : allInterfaces.Except(baseType.GetInterfaces());
-            var inheritanceTypes = new[] { baseType }.OfType<Type>().Concat(interfaces);
+            var baseType = type.GetTypeInfo().BaseType;
+            var inheritanceTypes = baseType == typeof(object) || baseType == null
+                ? type.GetInterfaces()
+                : new[] { baseType }.Concat(type.GetInterfaces().Except(baseType.GetInterfaces()));
             var suffix = !inheritanceTypes.Any() || type.GetTypeInfo().IsEnum ? "" : " : " + string.Join(", ", inheritanceTypes.Select(ObjectToCode.ToCSharpFriendlyTypeName));
-
             var name = type.ToCSharpFriendlyTypeName();
-
             return prefix + " " + name + suffix;
         }
 
