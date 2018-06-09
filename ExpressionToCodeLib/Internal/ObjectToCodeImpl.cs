@@ -26,7 +26,6 @@ namespace ExpressionToCodeLib.Internal {
             } else if (val is Expression) {
                 return ElideAfter(config.GetExpressionToCode().ToCode((Expression)val), valueSize);
             } else if (val is IStructuralComparable tuple && val is IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
-                var tupleType = val.GetType();
                 var collector = new NastyHackyTupleCollector();
                 tuple.CompareTo(tuple, collector);
                 var sb = new StringBuilder();
