@@ -41,7 +41,7 @@ TimeSpan.FromMilliseconds(10.0).CompareTo(TimeSpan.FromMinutes(1.0)) > 0  :  ass
                     ));
             Assert.Contains("failed", msgLines[0]);
             Assert.Contains("Equals", msgLines[0]);
-            Assert.Equal(1, msgLines.Length);
+            Assert.Single(msgLines);
         }
 
         [Fact]
