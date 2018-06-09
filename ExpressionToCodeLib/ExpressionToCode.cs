@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
+
 namespace ExpressionToCodeLib
 {
     /// <summary>
@@ -11,7 +12,7 @@ namespace ExpressionToCodeLib
     public static class ExpressionToCode
     {
         public static string ToCode<T, T1, T2, T3>(Expression<Func<T, T1, T2, T3>> e)
-            => ToCode((Expression) e);
+            => ToCode((Expression)e);
 
         public static string ToCode<T, T1, T2>(Expression<Func<T, T1, T2>> e)
             => ToCode((Expression)e);
@@ -39,7 +40,6 @@ namespace ExpressionToCodeLib
 
         public static string AnnotatedToCode(Expression expr)
             => AnnotatedToCode(ExpressionToCodeConfiguration.GlobalCodeGenConfiguration, expr);
-
 
         public static string ToCode<T, T1, T2, T3>(this ExpressionToCodeConfiguration config, Expression<Func<T, T1, T2, T3>> e)
             => config.GetExpressionToCode().ToCode(e);
@@ -73,7 +73,6 @@ namespace ExpressionToCodeLib
 
         public static string AnnotatedToCode(this ExpressionToCodeConfiguration config, Expression expr)
             => config.Value.CodeAnnotator.AnnotateExpressionTree(config, expr, null, false);
-
 
         ///<summary>
         /// Converts expression to variable/property/method C# like representation adding it's string value.
