@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,8 +33,9 @@ namespace ExpressionToCodeLib.Internal {
                 for (var index = 0; index < collector.CollectedObjects.Count; index++) {
                     var item = collector.CollectedObjects[index];
                     var asString = ComplexObjectToPseudoCode(config, item, indent + 4, valueSize);
-                    if (index > 0)
+                    if (index > 0) {
                         sb.Append(", ");
+                    }
                     sb.Append(asString);
                 }
                 sb.Append(")");
