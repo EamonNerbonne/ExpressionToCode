@@ -272,21 +272,22 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void NestedLambda_TwoParameters()
-        {
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => new[] { 37, 42 }.Select((x, i) => x * 2)",
                 ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select((x, i) => x * 2))
             );
-        }
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        bool Fizz(Func<int, bool> a) => a(42);
+        bool Fizz(Func<int, bool> a)
+            => a(42);
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        bool Buzz(Func<int, bool> a) => a(42);
+        bool Buzz(Func<int, bool> a)
+            => a(42);
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        bool Fizz(Func<string, bool> a) => a("42");
+        bool Fizz(Func<string, bool> a)
+            => a("42");
 
         [Fact]
         public void NestedLambda_MultipleOverloads()
@@ -486,7 +487,8 @@ namespace ExpressionToCodeTest
         }
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        T MethodWithRefParam<T>(ref T input) => input;
+        T MethodWithRefParam<T>(ref T input)
+            => input;
 
         [Fact]
         public void ArgumentWithOutModifier()
@@ -682,6 +684,7 @@ namespace ExpressionToCodeTest
                 foreach (var closedVariable in arr) {
                     return ExpressionToCode.ToCode(() => someValue + closedVariable + " " + argument);
                 }
+
                 throw new Exception();
             }
         }
@@ -716,7 +719,8 @@ namespace ExpressionToCodeTest
         int x;
         public ClassA() { }
 
-        public ClassA(ref int something, out int output) => output = x = something;
+        public ClassA(ref int something, out int output)
+            => output = x = something;
 
         public void DoAssert()
         {
@@ -732,7 +736,10 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
         }
 
-        int C() => x + 5;
-        bool MyEquals(ClassA other) => other != null && x == other.x;
+        int C()
+            => x + 5;
+
+        bool MyEquals(ClassA other)
+            => other != null && x == other.x;
     }
 }
