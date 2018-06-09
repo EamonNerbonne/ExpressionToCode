@@ -149,22 +149,4 @@ namespace ExpressionToCodeTest
             Assert.Equal("() => typeof(Outer<,>.Nested<>)", ExpressionToCode.ToCode(() => typeof(Outer<,>.Nested<>)));
         }
     }
-
-    public class Outer<X, Y>
-    {
-        public class Nested<Z>
-        {
-            public void Method(Func<Z> arg) { }
-        }
-
-        public class Nested2 { }
-    }
-
-    public class Outer2
-    {
-        public class Nested3<Z>
-        {
-            public void Method(Func<Z> arg) { }
-        }
-    }
 }
