@@ -114,27 +114,23 @@ namespace ExpressionToCodeLib
 
         public static string GetNameIn(Expression expr)
         {
-            var methodCall = expr as MethodCallExpression;
-            if (methodCall != null) {
-                return methodCall.Method.Name;
+            if (expr is MethodCallExpression callExpr) {
+                return callExpr.Method.Name;
             }
 
-            var memberAccess = expr as MemberExpression;
-            if (memberAccess != null) {
-                return memberAccess.Member.Name;
+            if (expr is MemberExpression accessExpr) {
+                return accessExpr.Member.Name;
             }
 
             if (expr.NodeType == ExpressionType.ArrayLength) {
                 return "Length";
             }
 
-            var lambda = expr as LambdaExpression;
-            if (lambda != null) {
-                return GetNameIn(lambda.Body);
+            if (expr is LambdaExpression lambdaExpr) {
+                return GetNameIn(lambdaExpr.Body);
             }
 
-            var unary = expr as UnaryExpression;
-            if (unary != null) {
+            if (expr is UnaryExpression unary) {
                 return GetNameIn(unary.Operand);
             }
 
