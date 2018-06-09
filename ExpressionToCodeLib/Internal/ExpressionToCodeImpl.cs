@@ -131,9 +131,7 @@ namespace ExpressionToCodeLib.Internal
         {
             var kids = KidsBuilder.Create();
             var be = (BinaryExpression)e;
-            Expression left,
-                right;
-            UnwrapEnumOp(be, out left, out right);
+            UnwrapEnumOp(be, out var left, out var right);
             kids.Add(NestExpression(be.NodeType, left));
             kids.Add(" " + op + " ", e);
             kids.Add(NestExpression(be.NodeType, right, true));
