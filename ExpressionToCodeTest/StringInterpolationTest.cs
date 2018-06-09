@@ -9,7 +9,8 @@ namespace ExpressionToCodeTest
 {
     public class StringInterpolationTest
     {
-        static FormattableString Interpolation(FormattableString str)
+        // ReSharper disable once MemberCanBeMadeStatic.Local
+        FormattableString Interpolation(FormattableString str)
             => str;
 
         [Fact]
