@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Assent;
 using Assent.Namers;
 
@@ -12,7 +13,17 @@ namespace ExpressionToCodeTest
         {
             var filename = Path.GetFileNameWithoutExtension(filepath);
             var filedir = Path.GetDirectoryName(filepath) ?? throw new InvalidOperationException("path " + filepath + " has no directory");
-            var config = new Configuration().UsingNamer(new FixedNamer(Path.Combine(filedir, filename + "." + membername)));
+            var baseName = Path.Combine(filedir, filename + "." + membername);
+            var config = new Configuration().UsingNamer(new FixedNamer(baseName))
+                .UsingReporter(
+                    (received, approved) => {
+                        var newText = File.ReadAllText(received, Encoding.UTF8);
+                        var oldText = File.ReadAllText(approved, Encoding.UTF8);
+                        File.WriteAllText(approved, newText, Encoding.UTF8);
+                        if (newText != oldText) {
+                            throw new Exception("difference detected!");
+                        }
+                    });
             // ReSharper disable once ExplicitCallerInfoArgument
             "bla".Assent(text, config, membername, filepath);
             //var writer = WriterFactory.CreateTextWriter(text);
