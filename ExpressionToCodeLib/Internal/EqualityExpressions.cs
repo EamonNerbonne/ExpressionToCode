@@ -37,8 +37,7 @@ namespace ExpressionToCodeLib.Internal
         static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression e)
         {
             if (e.Type == typeof(bool)) {
-                if (e is BinaryExpression) {
-                    var binExpr = (BinaryExpression)e;
+                if (e is BinaryExpression binExpr) {
                     if (binExpr.NodeType == ExpressionType.Equal) {
                         return Tuple.Create(EqualityExpressionClass.EqualsOp, binExpr.Left, binExpr.Right);
                     } else if (e.NodeType == ExpressionType.NotEqual) {

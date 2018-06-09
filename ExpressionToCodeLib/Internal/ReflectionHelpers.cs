@@ -38,8 +38,7 @@ namespace ExpressionToCodeLib.Internal
                 return ((FieldInfo)mi).IsStatic;
             } else if (mi is MethodInfo) {
                 return (((MethodInfo)mi).Attributes & MethodAttributes.Static) == MethodAttributes.Static;
-            } else if (mi is PropertyInfo) {
-                var pi = (PropertyInfo)mi;
+            } else if (mi is PropertyInfo pi) {
                 return (pi.GetGetMethod(true) ?? pi.GetSetMethod(true)).IsStatic;
             } else if (mi.MemberType == MemberTypes.NestedType) {
                 return true;

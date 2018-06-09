@@ -553,13 +553,11 @@ namespace ExpressionToCodeLib.Internal
             var kids = KidsBuilder.Create();
 
             kids.Add(mb.Member.Name + " = ");
-            if (mb is MemberMemberBinding) {
-                var mmb = (MemberMemberBinding)mb;
+            if (mb is MemberMemberBinding mmb) {
                 kids.Add("{ ");
                 kids.Add(JoinDispatch(mmb.Bindings, ", ", DispatchMemberBinding));
                 kids.Add(" }");
-            } else if (mb is MemberListBinding) {
-                var mlb = (MemberListBinding)mb;
+            } else if (mb is MemberListBinding mlb) {
                 kids.Add("{ ");
                 kids.Add(JoinDispatch(mlb.Initializers, ", ", DispatchElementInit));
                 kids.Add(" }");
