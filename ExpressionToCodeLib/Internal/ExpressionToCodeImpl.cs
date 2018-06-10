@@ -352,13 +352,15 @@ namespace ExpressionToCodeLib.Internal
                 && mce.Method.DeclaringType?.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
                 && mce.Method.Name == "Create"
                 && mce.Arguments.Count == 2
-                && mce.Arguments[0].NodeType == ExpressionType.Constant
-                && mce.Arguments[1].NodeType == ExpressionType.NewArrayInit
-                && ((NewArrayExpression)mce.Arguments[1]).Expressions.Count == 0
+                && mce.Arguments[0] is ConstantExpression formatStringExpr
+                && mce.Arguments[1] is NewArrayExpression interpolationArguments
+                && interpolationArguments.Expressions.Count == 0
             ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
-                var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
+                var formatString = (string)formatStringExpr.Value;
+                //var interpolationArgumentsExpr = interpolationArguments.Expressions;
+                var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(formatString, typeof(string));
                 kids.Add(codeRepresentation);
             } else if (mce.Object != null && mce.Method.Attributes.HasFlag(MethodAttributes.SpecialName) && mce.Method.Name == "get_Item") {
                 //.net 4.5.1 or older object indexer.
