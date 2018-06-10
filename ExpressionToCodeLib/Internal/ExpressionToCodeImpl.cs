@@ -40,7 +40,10 @@ namespace ExpressionToCodeLib.Internal
 
         [Pure]
         IEnumerable<StringifiedExpression> RawChildDispatch(Expression child)
-            => RawChildDispatch(new Argument { Expr = child });
+            => new[] { SingleChildDispatch(child) };
+
+        StringifiedExpression SingleChildDispatch(Expression child)
+            => this.ExpressionDispatch(child).MarkAsConceptualChild();
 
         [Pure]
         IEnumerable<StringifiedExpression> RawChildDispatch(Argument child)
