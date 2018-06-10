@@ -29,18 +29,12 @@ namespace ExpressionToCodeLib.Internal
                 yield return StringifiedExpression.TextOnly("(");
             }
 
-            foreach (var grandchild in RawChildDispatch(child)) {
-                yield return grandchild;
-            }
+            yield return SingleChildDispatch(child);
 
             if (needsParens) {
                 yield return StringifiedExpression.TextOnly(")");
             }
         }
-
-        [Pure]
-        IEnumerable<StringifiedExpression> RawChildDispatch(Expression child)
-            => new[] { SingleChildDispatch(child) };
 
         StringifiedExpression SingleChildDispatch(Expression child)
             => this.ExpressionDispatch(child).MarkAsConceptualChild();
@@ -552,7 +546,7 @@ namespace ExpressionToCodeLib.Internal
             if (elemInit.Arguments.Count != 1) {
                 return ArgListDispatch(elemInit.Arguments.Select(ae => new Argument { Expr = ae }), null, "{ ", " }"); //??
             } else {
-                return RawChildDispatch(elemInit.Arguments.Single());
+                return new[] { SingleChildDispatch(elemInit.Arguments.Single()) };
             }
         }
 
@@ -570,8 +564,8 @@ namespace ExpressionToCodeLib.Internal
                 kids.Add("{ ");
                 kids.Add(JoinDispatch(mlb.Initializers, ", ", DispatchElementInit));
                 kids.Add(" }");
-            } else if (mb is MemberAssignment) {
-                kids.Add(RawChildDispatch(((MemberAssignment)mb).Expression));
+            } else if (mb is MemberAssignment assignment) {
+                kids.Add(SingleChildDispatch(assignment.Expression));
             } else {
                 throw new NotImplementedException("Member binding of unknown type: " + mb.GetType());
             }
@@ -621,7 +615,7 @@ namespace ExpressionToCodeLib.Internal
                 kids.Add("new { ");
                 for (var i = 0; i < props.Length; i++) {
                     kids.Add(props[i].Name + " = ");
-                    kids.Add(RawChildDispatch(ne.Arguments[i]));
+                    kids.Add(SingleChildDispatch(ne.Arguments[i]));
                     if (i + 1 < props.Length) {
                         kids.Add(", ");
                     }
