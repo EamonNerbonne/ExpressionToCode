@@ -63,6 +63,12 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => Interpolation($"abc {3f}")));
 
         [Fact]
+        public void NonForcedInterpolationWithOneArg()
+            => Assert.Equal(
+                @"() => Interpolation($""abc {3.0f}"")",
+                ExpressionToCode.ToCode(() => $"abc {3f}"));
+
+        [Fact]
         public void ForcedInterpolationWithNestedString()
             => Assert.Equal(
                 @"() => Interpolation($""abc {""def""}"")",
