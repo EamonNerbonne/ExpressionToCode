@@ -43,7 +43,7 @@ namespace ExpressionToCodeLib.Internal
             => StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly(prefix), this.ExpressionDispatch(child)}).MarkAsConceptualChild();
 
         [Pure]
-        static IEnumerable<StringifiedExpression> JoinDispatch<T>(IEnumerable<T> children, string joiner, Func<T, StringifiedExpression> childVisitor)
+        static IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<StringifiedExpression> children, string joiner)
         {
             var isFirst = true;
             foreach (var child in children) {
@@ -51,15 +51,11 @@ namespace ExpressionToCodeLib.Internal
                     yield return StringifiedExpression.TextOnly(joiner);
                 }
 
-                yield return childVisitor(child);
+                yield return child;
 
                 isFirst = false;
             }
         }
-
-        [Pure]
-        static IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<StringifiedExpression> children, string joiner)
-            => JoinDispatch(children, joiner, x => x);
 
         [Pure]
         static IEnumerable<StringifiedExpression> ArgListDispatch(
@@ -516,7 +512,7 @@ namespace ExpressionToCodeLib.Internal
             }
 
             kids.Add(" { ");
-            kids.Add(JoinDispatch(lie.Initializers, ", ", DispatchElementInit));
+            kids.Add(JoinDispatch(lie.Initializers.Select(DispatchElementInit), ", "));
             kids.Add(" }");
             return kids.Finish();
         }
@@ -539,11 +535,11 @@ namespace ExpressionToCodeLib.Internal
             kids.Add(mb.Member.Name + " = ");
             if (mb is MemberMemberBinding mmb) {
                 kids.Add("{ ");
-                kids.Add(JoinDispatch(mmb.Bindings, ", ", DispatchMemberBinding));
+                kids.Add(JoinDispatch(mmb.Bindings.Select(DispatchMemberBinding), ", "));
                 kids.Add(" }");
             } else if (mb is MemberListBinding mlb) {
                 kids.Add("{ ");
-                kids.Add(JoinDispatch(mlb.Initializers, ", ", DispatchElementInit));
+                kids.Add(JoinDispatch(mlb.Initializers.Select(DispatchElementInit), ", "));
                 kids.Add(" }");
             } else if (mb is MemberAssignment assignment) {
                 kids.Add(SingleChildDispatch(assignment.Expression));
@@ -567,7 +563,7 @@ namespace ExpressionToCodeLib.Internal
             }
 
             kids.Add(" { ");
-            kids.Add(JoinDispatch(mie.Bindings, ", ", DispatchMemberBinding));
+            kids.Add(JoinDispatch(mie.Bindings.Select(DispatchMemberBinding), ", "));
             kids.Add(" }");
             return kids.Finish();
         }
