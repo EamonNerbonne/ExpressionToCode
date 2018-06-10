@@ -83,7 +83,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static bool PreferLiteralSyntax(string str1)
+        internal static bool PreferLiteralSyntax(string str1)
         {
             var count = 0;
             foreach (var c in str1) {
@@ -120,7 +120,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string EscapeStringChars(string str)
+        internal static string EscapeStringChars(string str)
         {
             var sb = new StringBuilder(str.Length);
             foreach (var c in str) {
