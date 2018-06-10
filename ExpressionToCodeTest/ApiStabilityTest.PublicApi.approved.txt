@@ -1,4 +1,4 @@
-enum EqualityExpressionClass
+﻿enum EqualityExpressionClass
     int value__
     const EqualityExpressionClass None = 0
     const EqualityExpressionClass EqualsOp = 1
@@ -98,6 +98,14 @@ class ExpressionTreeAssertion
 class ExpressionTreeCompilers
     static readonly IExpressionCompiler DotnetExpressionCompiler
     static readonly IExpressionCompiler FastExpressionCompiler
+
+class FormatStringParser
+    (FormatStringParser.Segment[], string) TYPE.ParseFormatString(string formatString, object[] formatArguments)
+
+struct FormatStringParser.Segment : ValueType
+    string StringPart
+    object FollowedByValue
+    string WithFormatString
 
 class EqualityExpressions
     EqualityExpressionClass TYPE.CheckForEquality(Expression<Func<bool>> e)
