@@ -20,7 +20,7 @@ namespace ExpressionToCodeLib.Internal
         /// </summary>
         public readonly bool IsConceptualChild;
 
-        static readonly StringifiedExpression[] empty = new StringifiedExpression[0];
+        static readonly StringifiedExpression[] empty = { };
         public StringifiedExpression[] Children => children ?? empty;
 
         StringifiedExpression(string text, StringifiedExpression[] children, Expression optionalValue, bool isConceptualChild)
@@ -51,7 +51,7 @@ namespace ExpressionToCodeLib.Internal
 
         [Pure]
         public override string ToString()
-            => Text ?? string.Join("", children);
+            => Text ?? string.Join("", Children);
 
         public StringifiedExpression MarkAsConceptualChild()
             => new StringifiedExpression(Text, children, OptionalValue, true);

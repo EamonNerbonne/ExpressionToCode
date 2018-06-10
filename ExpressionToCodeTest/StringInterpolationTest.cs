@@ -56,39 +56,40 @@ namespace ExpressionToCodeTest
                 ));
         }
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ForcedInterpolationWithOneArg()
             => Assert.Equal(
-                @"() => Interpolation($""abc {3f}"")",
+                @"() => Interpolation($""abc {3.0f}"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {3f}")));
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ForcedInterpolationWithNestedString()
             => Assert.Equal(
                 @"() => Interpolation($""abc {""def""}"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {"def"}")));
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ForcedInterpolationWithNestedInterpolation()
             => Assert.Equal(
-                @"() => Interpolation($""abc {Interpolation($""abc {""def""}"")}""))",
+                @"() => Interpolation($""abc {Interpolation($""abc {""def""}"")}"")",
                 ExpressionToCode.ToCode(
-                    () => Interpolation($"abc {Interpolation($"abc {"def"}")}"))
+                    () => Interpolation($"abc {Interpolation($"abc {"def"}")}")
+                    )
             );
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ForcedInterpolationWithTwoArguments()
             => Assert.Equal(
-                @"() => Interpolation($""abc {3f} X {'a'} Y"")",
+                @"() => Interpolation($""abc {3.0f} X {'a'} Y"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {3f} X {'a'} Y")));
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ForcedInterpolationWithAdditionInArgument()
             => Assert.Equal(
-                @"() => Interpolation($""abc {3f + Math.PI} Z"")",
-                ExpressionToCode.ToCode(() => Interpolation($"abc {3f + Math.PI} Z")));
+                @"() => Interpolation($""abc {""abc"".Length + 3.5} Z"")",
+                ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithOmitImplicitCasts(true).ToCode(() => Interpolation($"abc {"abc".Length + 3.5} Z")));
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ForcedInterpolationWithTernaryArgumentNeedsParens()
         {
             var aBoolean = true;
@@ -98,10 +99,10 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => Interpolation($"abc {(aBoolean ? 1 : 2)} Z")));
         }
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ForcedInterpolationWithFormatSpecifier()
             => Assert.Equal(
-                @"() => Interpolation($""abc {DateTime.Now:somespecifier, yep!} Z"")",
+                @"() => Interpolation($""abc {DateTime.Now:somespecifier: yep!} Z"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {DateTime.Now:somespecifier: yep!} Z")));
 
         [Fact]

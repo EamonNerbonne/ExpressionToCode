@@ -333,7 +333,15 @@ namespace ExpressionToCodeLib.Internal
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
                 var formatString = (string)formatStringExpr.Value;
-                var interpolationArgumentsStringified = interpolationArguments.Expressions.Select(
+                var interpolationArgumentsStringified = interpolationArguments.Expressions
+                    .Select(expr=>
+                        expr.NodeType == ExpressionType.Convert 
+                            && expr.Type == typeof(object)
+                            && expr is UnaryExpression unaryExpr
+                                ? unaryExpr.Operand
+                                : expr
+                    )
+                    .Select(
                     child =>
                         child.NodeType == ExpressionType.Conditional
                             ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
@@ -349,7 +357,7 @@ namespace ExpressionToCodeLib.Internal
                     foreach (var segment in parsed.segments) {
                         kids.Add(segment.InitialStringPart.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "{");
                         kids.Add((StringifiedExpression)segment.FollowedByValue);
-                        if (segment.WithFormatString.Length > 0) {
+                        if (segment.WithFormatString != null) {
                             kids.Add(":" + segment.WithFormatString + "}");
                         } else {
                             kids.Add("}");
@@ -362,7 +370,7 @@ namespace ExpressionToCodeLib.Internal
                     foreach (var segment in parsed.segments) {
                         kids.Add(ObjectStringifyImpl.EscapeStringChars(segment.InitialStringPart.Replace("{", "{{").Replace("}", "}}")) + "{");
                         kids.Add((StringifiedExpression)segment.FollowedByValue);
-                        if (segment.WithFormatString.Length > 0) {
+                        if (segment.WithFormatString != null) {
                             kids.Add(":" + segment.WithFormatString + "}");
                         } else {
                             kids.Add("}");
