@@ -39,18 +39,11 @@ namespace ExpressionToCodeLib.Internal
         StringifiedExpression SingleChildDispatch(Expression child)
             => this.ExpressionDispatch(child).MarkAsConceptualChild();
 
-        [Pure]
-        IEnumerable<StringifiedExpression> RawChildDispatch(Argument child)
-        {
-            if (child.PrefixOrNull != null) {
-                yield return StringifiedExpression.TextOnly(child.PrefixOrNull);
-            }
-
-            yield return this.ExpressionDispatch(child.Expr).MarkAsConceptualChild();
-        }
+        StringifiedExpression SingleChildDispatch(string prefix, Expression child)
+            => StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly(prefix), this.ExpressionDispatch(child)}).MarkAsConceptualChild();
 
         [Pure]
-        static IEnumerable<StringifiedExpression> JoinDispatch<T>(IEnumerable<T> children, string joiner, Func<T, IEnumerable<StringifiedExpression>> childVisitor)
+        static IEnumerable<StringifiedExpression> JoinDispatch<T>(IEnumerable<T> children, string joiner, Func<T, StringifiedExpression> childVisitor)
         {
             var isFirst = true;
             foreach (var child in children) {
@@ -58,27 +51,19 @@ namespace ExpressionToCodeLib.Internal
                     yield return StringifiedExpression.TextOnly(joiner);
                 }
 
-                foreach (var grandchild in childVisitor(child)) {
-                    yield return grandchild;
-                }
+                yield return childVisitor(child);
 
                 isFirst = false;
             }
         }
 
         [Pure]
-        IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<Argument> children, string joiner)
-            => JoinDispatch(children, joiner, RawChildDispatch);
-
-        struct Argument
-        {
-            public Expression Expr;
-            public string PrefixOrNull;
-        }
+        static IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<StringifiedExpression> children, string joiner)
+            => JoinDispatch(children, joiner, x => x);
 
         [Pure]
-        IEnumerable<StringifiedExpression> ArgListDispatch(
-            IEnumerable<Argument> arguments,
+        static IEnumerable<StringifiedExpression> ArgListDispatch(
+            IEnumerable<StringifiedExpression> arguments,
             Expression value = null,
             string open = "(",
             string close = ")",
@@ -261,7 +246,7 @@ namespace ExpressionToCodeLib.Internal
             kids.Add(
                 le.Parameters.Count == 1
                     ? NestExpression(e.NodeType, le.Parameters.Single())
-                    : ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe }))
+                    : ArgListDispatch(le.Parameters.Select(SingleChildDispatch))
                 //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
             );
             kids.Add(" => ");
@@ -360,7 +345,7 @@ namespace ExpressionToCodeLib.Internal
                 //.net 4.5.1 or older object indexer.
 
                 kids.Add(NestExpression(mce.NodeType, mce.Object));
-                kids.Add(ArgListDispatch(mce.Arguments.Select(a => new Argument { Expr = a, PrefixOrNull = null }), mce, "[", "]"));
+                kids.Add(ArgListDispatch(mce.Arguments.Select(SingleChildDispatch), mce, "[", "]"));
                 return kids.Finish();
             } else {
                 var isExtensionMethod = mce.Method.IsStatic
@@ -376,13 +361,13 @@ namespace ExpressionToCodeLib.Internal
             return kids.Finish();
         }
 
-        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs)
+        IEnumerable<StringifiedExpression> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs)
             => GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
 
-        static IEnumerable<Argument> GetArgumentsForMethod(ParameterInfo[] parameters, IEnumerable<Expression> argValueExprs)
+        IEnumerable<StringifiedExpression> GetArgumentsForMethod(ParameterInfo[] parameters, IEnumerable<Expression> argValueExprs)
         {
             var argPrefixes = parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
-            return argValueExprs.Zip(argPrefixes, (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
+            return argValueExprs.Zip(argPrefixes, (expr, prefix) => SingleChildDispatch(prefix, expr));
         }
 
         [Pure]
@@ -454,11 +439,7 @@ namespace ExpressionToCodeLib.Internal
             kids.Add(NestExpression(ie.NodeType, ie.Object));
 
             var args = ie.Indexer == null
-                ? ie.Arguments.Select(
-                    a => new Argument {
-                        Expr = a,
-                        PrefixOrNull = null
-                    })
+                ? ie.Arguments.Select(SingleChildDispatch)
                 : GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
 
             kids.Add(ArgListDispatch(args, ie, "[", "]"));
@@ -541,17 +522,17 @@ namespace ExpressionToCodeLib.Internal
         }
 
         [Pure]
-        IEnumerable<StringifiedExpression> DispatchElementInit(ElementInit elemInit)
+        StringifiedExpression DispatchElementInit(ElementInit elemInit)
         {
             if (elemInit.Arguments.Count != 1) {
-                return ArgListDispatch(elemInit.Arguments.Select(ae => new Argument { Expr = ae }), null, "{ ", " }"); //??
+                return StringifiedExpression.WithChildren(ArgListDispatch(elemInit.Arguments.Select(SingleChildDispatch), null, "{ ", " }").ToArray()); //??
             } else {
-                return new[] { SingleChildDispatch(elemInit.Arguments.Single()) };
+                return SingleChildDispatch(elemInit.Arguments.Single());
             }
         }
 
         [Pure]
-        IEnumerable<StringifiedExpression> DispatchMemberBinding(MemberBinding mb)
+        StringifiedExpression DispatchMemberBinding(MemberBinding mb)
         {
             var kids = KidsBuilder.Create();
 
@@ -570,7 +551,7 @@ namespace ExpressionToCodeLib.Internal
                 throw new NotImplementedException("Member binding of unknown type: " + mb.GetType());
             }
 
-            return new[] { kids.Finish() };
+            return kids.Finish();
         }
 
         [Pure]
@@ -642,7 +623,7 @@ namespace ExpressionToCodeLib.Internal
             var implicitTypeOK = !isDelegate && nae.Expressions.Any()
                 && nae.Expressions.All(expr => expr.Type == arrayElemType);
             kids.Add("new" + (implicitTypeOK ? "" : " " + objectStringifier.TypeNameToCode(arrayElemType)) + "[] ", nae);
-            kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "{ ", " }"));
+            kids.Add(ArgListDispatch(nae.Expressions.Select(SingleChildDispatch), null, "{ ", " }"));
             return kids.Finish();
         }
 
@@ -654,7 +635,7 @@ namespace ExpressionToCodeLib.Internal
             var nae = (NewArrayExpression)e;
             var arrayElemType = nae.Type.GetElementType();
             kids.Add("new " + objectStringifier.TypeNameToCode(arrayElemType), nae);
-            kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]"));
+            kids.Add(ArgListDispatch(nae.Expressions.Select(SingleChildDispatch), null, "[", "]"));
             return kids.Finish();
         }
 
@@ -694,7 +675,7 @@ namespace ExpressionToCodeLib.Internal
 
             kids.Add("Math.Pow", e);
             var binaryExpression = (BinaryExpression)e;
-            kids.Add(ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(e1 => new Argument { Expr = e1 })));
+            kids.Add(ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(SingleChildDispatch)));
             return kids.Finish();
         }
 
