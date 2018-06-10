@@ -109,7 +109,7 @@ namespace ExpressionToCodeTest
 2
 3
 4
-"", J = 1 }} Z"")".Replace("\r",""),
+"", J = 1 }} Z"")",
                 ExpressionToCode.ToCode(
                     () => Interpolation($@"abc {new { I = @"1
 2
