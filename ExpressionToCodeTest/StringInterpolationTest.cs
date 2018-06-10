@@ -100,6 +100,27 @@ namespace ExpressionToCodeTest
         }
 
         [Fact]
+        public void ForcedInterpolationWithNewlinesInSubExprIsLiteral()
+        {
+            var aBoolean = true;
+
+            Assert.Equal(
+                @"() => Interpolation($@""abc {new { I = @""1
+2
+3
+4
+"", J = 1 }} Z"")".Replace("\r",""),
+                ExpressionToCode.ToCode(
+                    () => Interpolation($@"abc {new { I = @"1
+2
+3
+4
+", J = 1 }} Z")
+                ));
+        }
+
+
+        [Fact]
         public void ForcedInterpolationWithFormatSpecifier()
             => Assert.Equal(
                 @"() => Interpolation($""abc {DateTime.Now:somespecifier: yep!} Z"")",
