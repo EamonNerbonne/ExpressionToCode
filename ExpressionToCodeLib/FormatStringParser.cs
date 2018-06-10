@@ -9,7 +9,7 @@ namespace ExpressionToCodeLib
     {
         public struct Segment
         {
-            public string StringPart;
+            public string InitialStringPart;
             public object FollowedByValue;
             public string WithFormatString;
         }
@@ -43,7 +43,7 @@ namespace ExpressionToCodeLib
             {
                 Segments.Add(
                     new Segment {
-                        StringPart = sb.ToString(),
+                        InitialStringPart = sb.ToString(),
                         FollowedByValue = arg,
                         WithFormatString = format,
                     });

@@ -103,7 +103,7 @@ class FormatStringParser
     (FormatStringParser.Segment[], string) TYPE.ParseFormatString(string formatString, object[] formatArguments)
 
 struct FormatStringParser.Segment : ValueType
-    string StringPart
+    string InitialStringPart
     object FollowedByValue
     string WithFormatString
 

@@ -40,7 +40,7 @@ namespace ExpressionToCodeLib.Internal
             => this.ExpressionDispatch(child).MarkAsConceptualChild();
 
         StringifiedExpression SingleChildDispatch(string prefix, Expression child)
-            => StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly(prefix), this.ExpressionDispatch(child)}).MarkAsConceptualChild();
+            => StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly(prefix), this.ExpressionDispatch(child) }).MarkAsConceptualChild();
 
         [Pure]
         static IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<StringifiedExpression> children, string joiner)
@@ -329,14 +329,48 @@ namespace ExpressionToCodeLib.Internal
                 && mce.Arguments.Count == 2
                 && mce.Arguments[0] is ConstantExpression formatStringExpr
                 && mce.Arguments[1] is NewArrayExpression interpolationArguments
-                && interpolationArguments.Expressions.Count == 0
             ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
                 var formatString = (string)formatStringExpr.Value;
-                //var interpolationArgumentsExpr = interpolationArguments.Expressions;
-                var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(formatString, typeof(string));
-                kids.Add(codeRepresentation);
+                var interpolationArgumentsStringified = interpolationArguments.Expressions.Select(
+                    child =>
+                        child.NodeType == ExpressionType.Conditional
+                            ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
+                            : this.ExpressionDispatch(child)
+                ).ToArray();
+                var useLiteralSyntax = ObjectStringifyImpl.PreferLiteralSyntax(formatString)
+                    || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
+
+                var parsed = FormatStringParser.ParseFormatString(formatString, interpolationArgumentsStringified.Cast<object>().ToArray());
+
+                if (useLiteralSyntax) {
+                    kids.Add("$@\"");
+                    foreach (var segment in parsed.segments) {
+                        kids.Add(segment.InitialStringPart.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "{");
+                        kids.Add((StringifiedExpression)segment.FollowedByValue);
+                        if (segment.WithFormatString.Length > 0) {
+                            kids.Add(":" + segment.WithFormatString + "}");
+                        } else {
+                            kids.Add("}");
+                        }
+                    }
+
+                    kids.Add(parsed.Tail.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "\"");
+                } else {
+                    kids.Add("$\"");
+                    foreach (var segment in parsed.segments) {
+                        kids.Add(ObjectStringifyImpl.EscapeStringChars(segment.InitialStringPart.Replace("{", "{{").Replace("}", "}}")) + "{");
+                        kids.Add((StringifiedExpression)segment.FollowedByValue);
+                        if (segment.WithFormatString.Length > 0) {
+                            kids.Add(":" + segment.WithFormatString + "}");
+                        } else {
+                            kids.Add("}");
+                        }
+                    }
+
+                    kids.Add(ObjectStringifyImpl.EscapeStringChars(parsed.Tail.Replace("{", "{{").Replace("}", "}}")) + "\"");
+                }
             } else if (mce.Object != null && mce.Method.Attributes.HasFlag(MethodAttributes.SpecialName) && mce.Method.Name == "get_Item") {
                 //.net 4.5.1 or older object indexer.
 
