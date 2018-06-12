@@ -333,52 +333,8 @@ namespace ExpressionToCodeLib.Internal
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
                 var formatString = (string)formatStringExpr.Value;
-                var interpolationArgumentsStringified = interpolationArguments.Expressions
-                    .Select(expr=>
-                        expr.NodeType == ExpressionType.Convert 
-                            && expr.Type == typeof(object)
-                            && expr is UnaryExpression unaryExpr
-                                ? unaryExpr.Operand
-                                : expr
-                    )
-                    .Select(
-                    child =>
-                        child.NodeType == ExpressionType.Conditional
-                            ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
-                            : this.ExpressionDispatch(child)
-                ).ToArray();
-                var useLiteralSyntax = ObjectStringifyImpl.PreferLiteralSyntax(formatString)
-                    || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
-
-                var parsed = FormatStringParser.ParseFormatString(formatString, interpolationArgumentsStringified.Cast<object>().ToArray());
-
-                if (useLiteralSyntax) {
-                    kids.Add("$@\"");
-                    foreach (var segment in parsed.segments) {
-                        kids.Add(segment.InitialStringPart.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "{");
-                        kids.Add((StringifiedExpression)segment.FollowedByValue);
-                        if (segment.WithFormatString != null) {
-                            kids.Add(":" + segment.WithFormatString + "}");
-                        } else {
-                            kids.Add("}");
-                        }
-                    }
-
-                    kids.Add(parsed.Tail.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "\"");
-                } else {
-                    kids.Add("$\"");
-                    foreach (var segment in parsed.segments) {
-                        kids.Add(ObjectStringifyImpl.EscapeStringChars(segment.InitialStringPart.Replace("{", "{{").Replace("}", "}}")) + "{");
-                        kids.Add((StringifiedExpression)segment.FollowedByValue);
-                        if (segment.WithFormatString != null) {
-                            kids.Add(":" + segment.WithFormatString + "}");
-                        } else {
-                            kids.Add("}");
-                        }
-                    }
-
-                    kids.Add(ObjectStringifyImpl.EscapeStringChars(parsed.Tail.Replace("{", "{{").Replace("}", "}}")) + "\"");
-                }
+                var arguments = interpolationArguments.Expressions;
+                kids = AddStringInterpolation(kids, formatString, arguments);
             } else if (mce.Object != null && mce.Method.Attributes.HasFlag(MethodAttributes.SpecialName) && mce.Method.Name == "get_Item") {
                 //.net 4.5.1 or older object indexer.
 
@@ -397,6 +353,58 @@ namespace ExpressionToCodeLib.Internal
             }
 
             return kids.Finish();
+        }
+
+        KidsBuilder AddStringInterpolation(KidsBuilder kids, string formatString, IEnumerable<Expression> arguments)
+        {
+            var interpolationArgumentsStringified = arguments
+                .Select(expr =>
+                    expr.NodeType == ExpressionType.Convert
+                        && expr.Type == typeof(object)
+                        && expr is UnaryExpression unaryExpr
+                            ? unaryExpr.Operand
+                            : expr
+                )
+                .Select(
+                child =>
+                    child.NodeType == ExpressionType.Conditional
+                        ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), (this).ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
+                        : (this).ExpressionDispatch(child)
+            ).ToArray();
+            var useLiteralSyntax = ObjectStringifyImpl.PreferLiteralSyntax(formatString)
+                || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
+
+            var parsed = FormatStringParser.ParseFormatString(formatString, interpolationArgumentsStringified.Cast<object>().ToArray());
+
+            if (useLiteralSyntax) {
+                kids.Add("$@\"");
+                foreach (var segment in parsed.segments) {
+                    kids.Add(segment.InitialStringPart.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "{");
+                    kids.Add((StringifiedExpression)segment.FollowedByValue);
+                    if (segment.WithFormatString != null) {
+                        kids.Add(":" + segment.WithFormatString + "}");
+                    } else {
+                        kids.Add("}");
+                    }
+                }
+
+                kids.Add(parsed.Tail.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "\"");
+            } else {
+                kids.Add("$\"");
+                foreach (var segment in parsed.segments) {
+                    kids.Add(ObjectStringifyImpl.EscapeStringChars(segment.InitialStringPart.Replace("{", "{{").Replace("}", "}}")) + "{");
+                    kids.Add((StringifiedExpression)segment.FollowedByValue);
+                    if (segment.WithFormatString != null) {
+                        kids.Add(":" + segment.WithFormatString + "}");
+                    } else {
+                        kids.Add("}");
+                    }
+                }
+
+                kids.Add(ObjectStringifyImpl.EscapeStringChars(parsed.Tail.Replace("{", "{{").Replace("}", "}}")) + "\"");
+            }
+
+            return kids;
         }
 
         IEnumerable<StringifiedExpression> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs)
