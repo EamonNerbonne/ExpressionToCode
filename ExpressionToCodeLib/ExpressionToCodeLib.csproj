@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Configuration">
-    <Version>3.0.0-alpha1</Version>
+    <Version>3.0.0-alpha2</Version>
     <Authors>Eamon Nerbonne</Authors>
     <Owners>Eamon Nerbonne</Owners>
     <Title>ExpressionToCode</Title>
     <Description>Generates valid, readable C# from an expression tree, and can annotate that code with runtime values. Useful for e.g. code generation and unit testing assertions.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>Remove dependency on Jetbrains.Annotations; include a first few doccomments in the package.</PackageReleaseNotes>
+    <PackageReleaseNotes>Support C# integrated tuples and string interpolation expressions</PackageReleaseNotes>
     <PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/EamonNerbonne/ExpressionToCode</PackageProjectUrl>
