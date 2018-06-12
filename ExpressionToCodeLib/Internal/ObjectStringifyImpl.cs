@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Reflection;
 using System.Linq;
@@ -21,7 +21,7 @@ namespace ExpressionToCodeLib.Internal
             if (val == null) {
                 return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
             } else if (val is string str) {
-                var useLiteralSyntax = str.Count(c => c < 32 && c != '\r' || c == '\\') > 3;
+                var useLiteralSyntax = PreferLiteralSyntax(str);
                 if (useLiteralSyntax) {
                     return "@\"" + str.Replace("\"", "\"\"") + "\"";
                 } else {
@@ -83,6 +83,21 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
+        internal static bool PreferLiteralSyntax(string str1)
+        {
+            var count = 0;
+            foreach (var c in str1) {
+                if (c < 32 && c != '\r' || c == '\\') {
+                    count++;
+                    if (count > 3) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         static string EscapeCharForString(char c)
         {
             if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) {
@@ -105,7 +120,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        static string EscapeStringChars(string str)
+        internal static string EscapeStringChars(string str)
         {
             var sb = new StringBuilder(str.Length);
             foreach (var c in str) {

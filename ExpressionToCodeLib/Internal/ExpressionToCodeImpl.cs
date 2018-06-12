@@ -29,31 +29,21 @@ namespace ExpressionToCodeLib.Internal
                 yield return StringifiedExpression.TextOnly("(");
             }
 
-            foreach (var grandchild in RawChildDispatch(child)) {
-                yield return grandchild;
-            }
+            yield return SingleChildDispatch(child);
 
             if (needsParens) {
                 yield return StringifiedExpression.TextOnly(")");
             }
         }
 
-        [Pure]
-        IEnumerable<StringifiedExpression> RawChildDispatch(Expression child)
-            => RawChildDispatch(new Argument { Expr = child });
+        StringifiedExpression SingleChildDispatch(Expression child)
+            => this.ExpressionDispatch(child).MarkAsConceptualChild();
+
+        StringifiedExpression SingleChildDispatch(string prefix, Expression child)
+            => StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly(prefix), this.ExpressionDispatch(child) }).MarkAsConceptualChild();
 
         [Pure]
-        IEnumerable<StringifiedExpression> RawChildDispatch(Argument child)
-        {
-            if (child.PrefixOrNull != null) {
-                yield return StringifiedExpression.TextOnly(child.PrefixOrNull);
-            }
-
-            yield return this.ExpressionDispatch(child.Expr).MarkAsConceptualChild();
-        }
-
-        [Pure]
-        static IEnumerable<StringifiedExpression> JoinDispatch<T>(IEnumerable<T> children, string joiner, Func<T, IEnumerable<StringifiedExpression>> childVisitor)
+        static IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<StringifiedExpression> children, string joiner)
         {
             var isFirst = true;
             foreach (var child in children) {
@@ -61,27 +51,15 @@ namespace ExpressionToCodeLib.Internal
                     yield return StringifiedExpression.TextOnly(joiner);
                 }
 
-                foreach (var grandchild in childVisitor(child)) {
-                    yield return grandchild;
-                }
+                yield return child;
 
                 isFirst = false;
             }
         }
 
         [Pure]
-        IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<Argument> children, string joiner)
-            => JoinDispatch(children, joiner, RawChildDispatch);
-
-        struct Argument
-        {
-            public Expression Expr;
-            public string PrefixOrNull;
-        }
-
-        [Pure]
-        IEnumerable<StringifiedExpression> ArgListDispatch(
-            IEnumerable<Argument> arguments,
+        static IEnumerable<StringifiedExpression> ArgListDispatch(
+            IEnumerable<StringifiedExpression> arguments,
             Expression value = null,
             string open = "(",
             string close = ")",
@@ -264,7 +242,7 @@ namespace ExpressionToCodeLib.Internal
             kids.Add(
                 le.Parameters.Count == 1
                     ? NestExpression(e.NodeType, le.Parameters.Single())
-                    : ArgListDispatch(le.Parameters.Select(pe => new Argument { Expr = pe }))
+                    : ArgListDispatch(le.Parameters.Select(SingleChildDispatch))
                 //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
             );
             kids.Add(" => ");
@@ -349,19 +327,48 @@ namespace ExpressionToCodeLib.Internal
                 && mce.Method.DeclaringType?.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
                 && mce.Method.Name == "Create"
                 && mce.Arguments.Count == 2
-                && mce.Arguments[0].NodeType == ExpressionType.Constant
-                && mce.Arguments[1].NodeType == ExpressionType.NewArrayInit
-                && ((NewArrayExpression)mce.Arguments[1]).Expressions.Count == 0
+                && mce.Arguments[0] is ConstantExpression formattableStringFormat
+                && mce.Arguments[1] is NewArrayExpression formattableStringArguments
             ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
-                var codeRepresentation = "$" + objectStringifier.PlainObjectToCode(((ConstantExpression)mce.Arguments[0]).Value, typeof(string));
-                kids.Add(codeRepresentation);
+                var formatString = (string)formattableStringFormat.Value;
+                var arguments = formattableStringArguments.Expressions;
+                kids = AddStringInterpolation(kids, formatString, arguments);
+            } else if (mce.Object == null
+                && mce.Type == typeof(string)
+                && mce.Method.DeclaringType == typeof(string)
+                && mce.Method.Name == "Format"
+                && mce.Arguments.Count == 2
+                && mce.Arguments[0] is ConstantExpression formatStringExpr
+                && formatStringExpr.Type == typeof(string)
+                && mce.Arguments[1] .Type == typeof(object[]) 
+                && mce.Arguments[1] is NewArrayExpression interpolationArguments
+            ) {
+                //.net 4.6
+                //string-interpolations are compiled into FormattableStringFactory.Create
+                var formatString = (string)formatStringExpr.Value;
+                var arguments = interpolationArguments.Expressions;
+                kids = AddStringInterpolation(kids, formatString, arguments);
+            } else if (mce.Object == null
+                && mce.Type == typeof(string)
+                && mce.Method.DeclaringType == typeof(string)
+                && mce.Method.Name == "Format"
+                && mce.Arguments.Count >= 2
+                && mce.Arguments[0] is ConstantExpression formatString2Expr
+                && formatString2Expr.Type == typeof(string)
+                && mce.Method.GetParameters().Skip(1).All(pi=>pi.ParameterType == typeof(object))
+            ) {
+                //.net 4.6
+                //string-interpolations are compiled into FormattableStringFactory.Create
+                var formatString = (string)formatString2Expr.Value;
+                var arguments = mce.Arguments.Skip(1);
+                kids = AddStringInterpolation(kids, formatString, arguments);
             } else if (mce.Object != null && mce.Method.Attributes.HasFlag(MethodAttributes.SpecialName) && mce.Method.Name == "get_Item") {
                 //.net 4.5.1 or older object indexer.
 
                 kids.Add(NestExpression(mce.NodeType, mce.Object));
-                kids.Add(ArgListDispatch(mce.Arguments.Select(a => new Argument { Expr = a, PrefixOrNull = null }), mce, "[", "]"));
+                kids.Add(ArgListDispatch(mce.Arguments.Select(SingleChildDispatch), mce, "[", "]"));
                 return kids.Finish();
             } else {
                 var isExtensionMethod = mce.Method.IsStatic
@@ -377,13 +384,65 @@ namespace ExpressionToCodeLib.Internal
             return kids.Finish();
         }
 
-        static IEnumerable<Argument> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs)
+        KidsBuilder AddStringInterpolation(KidsBuilder kids, string formatString, IEnumerable<Expression> arguments)
+        {
+            var interpolationArgumentsStringified = arguments
+                .Select(expr =>
+                    expr.NodeType == ExpressionType.Convert
+                        && expr.Type == typeof(object)
+                        && expr is UnaryExpression unaryExpr
+                            ? unaryExpr.Operand
+                            : expr
+                )
+                .Select(
+                child =>
+                    child.NodeType == ExpressionType.Conditional
+                        ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), (this).ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
+                        : (this).ExpressionDispatch(child)
+            ).ToArray();
+            var useLiteralSyntax = ObjectStringifyImpl.PreferLiteralSyntax(formatString)
+                || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
+
+            var parsed = FormatStringParser.ParseFormatString(formatString, interpolationArgumentsStringified.Cast<object>().ToArray());
+
+            if (useLiteralSyntax) {
+                kids.Add("$@\"");
+                foreach (var segment in parsed.segments) {
+                    kids.Add(segment.InitialStringPart.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "{");
+                    kids.Add((StringifiedExpression)segment.FollowedByValue);
+                    if (segment.WithFormatString != null) {
+                        kids.Add(":" + segment.WithFormatString + "}");
+                    } else {
+                        kids.Add("}");
+                    }
+                }
+
+                kids.Add(parsed.Tail.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "\"");
+            } else {
+                kids.Add("$\"");
+                foreach (var segment in parsed.segments) {
+                    kids.Add(ObjectStringifyImpl.EscapeStringChars(segment.InitialStringPart.Replace("{", "{{").Replace("}", "}}")) + "{");
+                    kids.Add((StringifiedExpression)segment.FollowedByValue);
+                    if (segment.WithFormatString != null) {
+                        kids.Add(":" + segment.WithFormatString + "}");
+                    } else {
+                        kids.Add("}");
+                    }
+                }
+
+                kids.Add(ObjectStringifyImpl.EscapeStringChars(parsed.Tail.Replace("{", "{{").Replace("}", "}}")) + "\"");
+            }
+
+            return kids;
+        }
+
+        IEnumerable<StringifiedExpression> GetArgumentsForMethod(MethodBase methodInfo, IEnumerable<Expression> argValueExprs)
             => GetArgumentsForMethod(methodInfo.GetParameters(), argValueExprs);
 
-        static IEnumerable<Argument> GetArgumentsForMethod(ParameterInfo[] parameters, IEnumerable<Expression> argValueExprs)
+        IEnumerable<StringifiedExpression> GetArgumentsForMethod(ParameterInfo[] parameters, IEnumerable<Expression> argValueExprs)
         {
             var argPrefixes = parameters.Select(p => p.IsOut ? "out " : p.ParameterType.IsByRef ? "ref " : null).ToArray();
-            return argValueExprs.Zip(argPrefixes, (expr, prefix) => new Argument { Expr = expr, PrefixOrNull = prefix });
+            return argValueExprs.Zip(argPrefixes, (expr, prefix) => SingleChildDispatch(prefix, expr));
         }
 
         [Pure]
@@ -455,11 +514,7 @@ namespace ExpressionToCodeLib.Internal
             kids.Add(NestExpression(ie.NodeType, ie.Object));
 
             var args = ie.Indexer == null
-                ? ie.Arguments.Select(
-                    a => new Argument {
-                        Expr = a,
-                        PrefixOrNull = null
-                    })
+                ? ie.Arguments.Select(SingleChildDispatch)
                 : GetArgumentsForMethod(ie.Indexer.GetIndexParameters(), ie.Arguments);
 
             kids.Add(ArgListDispatch(args, ie, "[", "]"));
@@ -536,42 +591,42 @@ namespace ExpressionToCodeLib.Internal
             }
 
             kids.Add(" { ");
-            kids.Add(JoinDispatch(lie.Initializers, ", ", DispatchElementInit));
+            kids.Add(JoinDispatch(lie.Initializers.Select(DispatchElementInit), ", "));
             kids.Add(" }");
             return kids.Finish();
         }
 
         [Pure]
-        IEnumerable<StringifiedExpression> DispatchElementInit(ElementInit elemInit)
+        StringifiedExpression DispatchElementInit(ElementInit elemInit)
         {
             if (elemInit.Arguments.Count != 1) {
-                return ArgListDispatch(elemInit.Arguments.Select(ae => new Argument { Expr = ae }), null, "{ ", " }"); //??
+                return StringifiedExpression.WithChildren(ArgListDispatch(elemInit.Arguments.Select(SingleChildDispatch), null, "{ ", " }").ToArray()); //??
             } else {
-                return RawChildDispatch(elemInit.Arguments.Single());
+                return SingleChildDispatch(elemInit.Arguments.Single());
             }
         }
 
         [Pure]
-        IEnumerable<StringifiedExpression> DispatchMemberBinding(MemberBinding mb)
+        StringifiedExpression DispatchMemberBinding(MemberBinding mb)
         {
             var kids = KidsBuilder.Create();
 
             kids.Add(mb.Member.Name + " = ");
             if (mb is MemberMemberBinding mmb) {
                 kids.Add("{ ");
-                kids.Add(JoinDispatch(mmb.Bindings, ", ", DispatchMemberBinding));
+                kids.Add(JoinDispatch(mmb.Bindings.Select(DispatchMemberBinding), ", "));
                 kids.Add(" }");
             } else if (mb is MemberListBinding mlb) {
                 kids.Add("{ ");
-                kids.Add(JoinDispatch(mlb.Initializers, ", ", DispatchElementInit));
+                kids.Add(JoinDispatch(mlb.Initializers.Select(DispatchElementInit), ", "));
                 kids.Add(" }");
-            } else if (mb is MemberAssignment) {
-                kids.Add(RawChildDispatch(((MemberAssignment)mb).Expression));
+            } else if (mb is MemberAssignment assignment) {
+                kids.Add(SingleChildDispatch(assignment.Expression));
             } else {
                 throw new NotImplementedException("Member binding of unknown type: " + mb.GetType());
             }
 
-            return new[] { kids.Finish() };
+            return kids.Finish();
         }
 
         [Pure]
@@ -587,7 +642,7 @@ namespace ExpressionToCodeLib.Internal
             }
 
             kids.Add(" { ");
-            kids.Add(JoinDispatch(mie.Bindings, ", ", DispatchMemberBinding));
+            kids.Add(JoinDispatch(mie.Bindings.Select(DispatchMemberBinding), ", "));
             kids.Add(" }");
             return kids.Finish();
         }
@@ -616,7 +671,7 @@ namespace ExpressionToCodeLib.Internal
                 kids.Add("new { ");
                 for (var i = 0; i < props.Length; i++) {
                     kids.Add(props[i].Name + " = ");
-                    kids.Add(RawChildDispatch(ne.Arguments[i]));
+                    kids.Add(SingleChildDispatch(ne.Arguments[i]));
                     if (i + 1 < props.Length) {
                         kids.Add(", ");
                     }
@@ -643,7 +698,7 @@ namespace ExpressionToCodeLib.Internal
             var implicitTypeOK = !isDelegate && nae.Expressions.Any()
                 && nae.Expressions.All(expr => expr.Type == arrayElemType);
             kids.Add("new" + (implicitTypeOK ? "" : " " + objectStringifier.TypeNameToCode(arrayElemType)) + "[] ", nae);
-            kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "{ ", " }"));
+            kids.Add(ArgListDispatch(nae.Expressions.Select(SingleChildDispatch), null, "{ ", " }"));
             return kids.Finish();
         }
 
@@ -655,7 +710,7 @@ namespace ExpressionToCodeLib.Internal
             var nae = (NewArrayExpression)e;
             var arrayElemType = nae.Type.GetElementType();
             kids.Add("new " + objectStringifier.TypeNameToCode(arrayElemType), nae);
-            kids.Add(ArgListDispatch(nae.Expressions.Select(e1 => new Argument { Expr = e1 }), null, "[", "]"));
+            kids.Add(ArgListDispatch(nae.Expressions.Select(SingleChildDispatch), null, "[", "]"));
             return kids.Finish();
         }
 
@@ -695,7 +750,7 @@ namespace ExpressionToCodeLib.Internal
 
             kids.Add("Math.Pow", e);
             var binaryExpression = (BinaryExpression)e;
-            kids.Add(ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(e1 => new Argument { Expr = e1 })));
+            kids.Add(ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(SingleChildDispatch)));
             return kids.Finish();
         }
 
