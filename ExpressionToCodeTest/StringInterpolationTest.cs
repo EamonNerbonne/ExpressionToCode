@@ -137,5 +137,33 @@ namespace ExpressionToCodeTest
             => Assert.Equal(
                 @"() => Interpolation($""abc {{!}}"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {{!}}")));
+
+
+        [Fact]
+        public void InterpolationWithTwoArgs()
+            => Assert.Equal(
+                @"() => $""abc {3.0f}""",
+                ExpressionToCode.ToCode(() => $"abc {42} def {"ghi"}"));
+
+        [Fact]
+        public void InterpolationWithThreeArgs()
+        {
+            var jkl = 123;
+            Assert.Equal(
+                           @"() => $""abc {3.0f}""",
+                           ExpressionToCode.ToCode(() => $"abc {37} def {null} ghi {jkl} mno"));
+        }
+
+        [Fact]
+        public void InterpolationWithFourArgs()
+        {
+            var jkl = 123;
+            var p=2;
+            var q=3;
+            var r= 4;
+            Assert.Equal(
+                           @"() => $""abc {3.0f}""",
+                           ExpressionToCode.ToCode(() => $"abc {37} def {null} ghi {jkl} mno {p + q + r} stu"));
+        }
     }
 }
