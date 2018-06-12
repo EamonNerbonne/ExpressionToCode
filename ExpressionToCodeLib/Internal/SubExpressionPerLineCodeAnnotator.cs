@@ -79,14 +79,14 @@ namespace ExpressionToCodeLib.Internal
                 }
 
                 foreach (var kid in node.Children) {
-                    if (kid.IsConceptualChild) {
-                        FindSubExpressionValues(config, kid, kid, subExpressionValues, false);
+                    if (!kid.IsConceptualChild) {
+                        FindSubExpressionValues(config, kid, subExprNode, subExpressionValues, hideOutermostValue);
                     }
                 }
 
                 foreach (var kid in node.Children) {
-                    if (!kid.IsConceptualChild) {
-                        FindSubExpressionValues(config, kid, subExprNode, subExpressionValues, hideOutermostValue);
+                    if (kid.IsConceptualChild) {
+                        FindSubExpressionValues(config, kid, kid, subExpressionValues, false);
                     }
                 }
             }
@@ -101,8 +101,8 @@ namespace ExpressionToCodeLib.Internal
                     + string.Join(
                         "",
                         maxLineLength <= 80 && maxExprLength <= 30 && !containsANewline
-                            ? SubExpressions.AsEnumerable().Reverse().Select(sub => sub.SubExpression.PadLeft(maxExprLength) + spacedArrow + sub.ValueAsString + "\n")
-                            : SubExpressions.AsEnumerable().Reverse().Select(sub => sub.SubExpression + "\n  " + spacedArrow + sub.ValueAsString + "\n\n")
+                            ? SubExpressions.Select(sub => sub.SubExpression.PadLeft(maxExprLength) + spacedArrow + sub.ValueAsString + "\n")
+                            : SubExpressions.Select(sub => sub.SubExpression + "\n  " + spacedArrow + sub.ValueAsString + "\n\n")
                     );
             }
         }

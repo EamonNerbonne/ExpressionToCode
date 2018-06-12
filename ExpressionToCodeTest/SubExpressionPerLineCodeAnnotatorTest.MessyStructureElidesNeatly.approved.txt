@@ -5,8 +5,23 @@ hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
 hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())]
      →   false
 
+hmm[1] == hmm[2]
+     →   false
+
+hmm[1]
+     →   '2'
+
+hmm
+     →   "1234567890"
+
+hmm[2]
+     →   '3'
+
 hmm[4] == hmm[int.Parse(hmm[8].ToString())]
      →   false
+
+hmm[4]
+     →   '5'
 
 hmm[int.Parse(hmm[8].ToString())]
      →   '0'
@@ -19,19 +34,4 @@ hmm[8].ToString()
 
 hmm[8]
      →   '9'
-
-hmm[4]
-     →   '5'
-
-hmm[1] == hmm[2]
-     →   false
-
-hmm[2]
-     →   '3'
-
-hmm[1]
-     →   '2'
-
-hmm
-     →   "1234567890"
 
