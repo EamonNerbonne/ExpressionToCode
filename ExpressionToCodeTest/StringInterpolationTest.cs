@@ -61,13 +61,7 @@ namespace ExpressionToCodeTest
             => Assert.Equal(
                 @"() => Interpolation($""abc {3.0f}"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {3f}")));
-
-        [Fact]
-        public void NonForcedInterpolationWithOneArg()
-            => Assert.Equal(
-                @"() => Interpolation($""abc {3.0f}"")",
-                ExpressionToCode.ToCode(() => $"abc {3f}"));
-
+        
         [Fact]
         public void ForcedInterpolationWithNestedString()
             => Assert.Equal(
@@ -125,7 +119,6 @@ namespace ExpressionToCodeTest
                 ));
         }
 
-
         [Fact]
         public void ForcedInterpolationWithFormatSpecifier()
             => Assert.Equal(
@@ -138,11 +131,16 @@ namespace ExpressionToCodeTest
                 @"() => Interpolation($""abc {{!}}"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {{!}}")));
 
+        [Fact]
+        public void InterpolationWithOneArg()
+            => Assert.Equal(
+                @"() => $""abc {3.0f}""",
+                ExpressionToCode.ToCode(() => $"abc {3f}"));
 
         [Fact]
         public void InterpolationWithTwoArgs()
             => Assert.Equal(
-                @"() => $""abc {3.0f}""",
+                @"() => $""abc {42} def {""ghi""}""",
                 ExpressionToCode.ToCode(() => $"abc {42} def {"ghi"}"));
 
         [Fact]
@@ -150,7 +148,7 @@ namespace ExpressionToCodeTest
         {
             var jkl = 123;
             Assert.Equal(
-                           @"() => $""abc {3.0f}""",
+                           @"() => $""abc {37} def {null} ghi {jkl} mno""",
                            ExpressionToCode.ToCode(() => $"abc {37} def {null} ghi {jkl} mno"));
         }
 
@@ -162,7 +160,7 @@ namespace ExpressionToCodeTest
             var q=3;
             var r= 4;
             Assert.Equal(
-                           @"() => $""abc {3.0f}""",
+                           @"() => $""abc {37} def {null} ghi {jkl} mno {p + q + r} stu""",
                            ExpressionToCode.ToCode(() => $"abc {37} def {null} ghi {jkl} mno {p + q + r} stu"));
         }
     }
