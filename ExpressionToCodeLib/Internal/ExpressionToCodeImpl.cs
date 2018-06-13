@@ -503,7 +503,11 @@ namespace ExpressionToCodeLib.Internal
         static bool ContainsInferableType(Type haystack, Type needle)
             => haystack == needle
                 || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
-                || haystack.GetTypeInfo().IsGenericType && haystack.GetTypeInfo().GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
+                || haystack.GetTypeInfo().IsGenericType
+                    && !(typeof(Delegate).IsAssignableFrom(haystack)
+                        && haystack.GetTypeInfo().GetMethod("Invoke").GetParameters().Any(pi=>pi.ParameterType == needle)
+                    )
+                    && haystack.GetTypeInfo().GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
         [Pure]
         public StringifiedExpression DispatchIndex(Expression e)

@@ -173,7 +173,7 @@ namespace ExpressionToCodeTest
             );
         }
 
-        [Fact(Skip = "issue 14")]
+        [Fact]
         public void CanInferIndirect()
         {
             Assert.True(GenericClass<int>.IsEnumerableOfType(new[] { 3, 4 }));
@@ -195,7 +195,7 @@ namespace ExpressionToCodeTest
             );
             Assert.Equal(
                 @"() => GenericClass<int>.IsFunc2OfType((int x) => x)",
-                ExpressionToCode.ToCode(() => GenericClass<int>.IsFunc2OfType((int x) => x))
+                ExpressionToCode.ToCode(() => GenericClass<int>.IsFunc2OfType<int>(x => x))
             );
         }
 
