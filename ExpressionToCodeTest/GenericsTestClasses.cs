@@ -161,14 +161,14 @@ namespace ExpressionToCodeTest
             );
 
             Assert.Equal(
-                @"() => StaticTestClass.TwoArgsTwoGeneric((object)3, new object())",
+                @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
             );
 
             var x = 37;
             var y = 42.0;
             Assert.Equal(
-                @"() => StaticTestClass.TwoArgsTwoGeneric((double)x, y)",
+                @"() => StaticTestClass.TwoArgsTwoGeneric(x, y)",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(x, y))
             );
         }
@@ -194,7 +194,7 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => !GenericClass<int>.IsFuncOfType(() => 3.0))
             );
             Assert.Equal(
-                @"() => GenericClass<int>.IsFunc2OfType((int x) => x)",
+                @"() => GenericClass<int>.IsFunc2OfType<int>(x => x)",
                 ExpressionToCode.ToCode(() => GenericClass<int>.IsFunc2OfType<int>(x => x))
             );
         }
