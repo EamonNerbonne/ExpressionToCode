@@ -193,7 +193,13 @@ namespace ExpressionToCodeLib.Internal
                 } else {
                     kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")", e);
                 }
+                if (operand.NodeType == ExpressionType.Convert) {
+                    var nestedConvert = (UnaryExpression)operand;
+                    kids.Add("(" + objectStringifier.TypeNameToCode(operand.Type) + ")");
+                    kids.Add(NestExpression(nestedConvert.NodeType, nestedConvert.Operand));
+                } else {
                     kids.Add(NestExpression(ue.NodeType, operand));
+                }
             } else {
                 kids.Add(NestExpression(ue.NodeType, operand));
             }
