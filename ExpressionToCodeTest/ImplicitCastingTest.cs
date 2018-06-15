@@ -33,17 +33,17 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => 1m + -i > 0m || false));
         }
 
-        [Fact(Skip = "issue 4")]
+        [Fact]
         public void StringImplicitConcat()
         {
             var i = 1;
             var x = "X";
             Assert.Equal(
-                @"() => 1m + x + ""!!"" + i)",
+                @"() => 1m + x + ""!!"" + i",
                 ExpressionToCode.ToCode(() => 1m + x + "!!" + i));
         }
 
-        [Fact(Skip = "issue 4")]
+        [Fact]
         public void NotImplicitCast()
         {
             byte z = 42;
@@ -52,14 +52,14 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => ~z == 0));
         }
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void AvoidsImplicitBoxingWhenTargetTypeIsAGenericArgument()
             => Assert.Equal(
                 @"() => StaticTestClass.TwoArgsTwoGeneric(3, new object())",
                 ExpressionToCode.ToCode(() => StaticTestClass.TwoArgsTwoGeneric(3, new object()))
             );
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void AvoidsImplicitCastWhenTargetTypeIsAGenericArgument()
         {
             var x = 37;
