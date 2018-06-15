@@ -306,7 +306,7 @@ namespace ExpressionToCodeTest
             var y = 3;
             byte z = 42;
             Assert.Equal(
-                @"() => ~(int)z == 0",
+                @"() => ~z == 0",
                 ExpressionToCode.ToCode(() => ~(int)z == 0));
             Assert.Equal(
                 @"() => ~y == 0",
@@ -350,21 +350,21 @@ namespace ExpressionToCodeTest
         [Fact]
         public void StaticCall()
             => Assert.Equal(
-                @"() => object.Equals((object)3, (object)0)",
+                @"() => object.Equals(3, 0)",
                 ExpressionToCode.ToCode(() => Equals(3, 0)));
 
         [Fact]
         public void ThisCall()
             => Assert.Equal(
-                @"() => !Equals((object)3)",
+                @"() => !Equals(3)",
                 ExpressionToCode.ToCode(() => !Equals(3)));
 
         [Fact]
         public void ThisExplicit()
             => Assert.Equal(
-                @"() => object.Equals(this, (object)3)",
+                @"() => object.Equals(this, 3)",
                 // ReSharper disable once SuspiciousTypeConversion.Global
-                ExpressionToCode.ToCode(() => object.Equals(this, 3)));
+                ExpressionToCode.ToCode(() => Equals(this, 3)));
 
         [Fact]
         public void TypedConstant()
