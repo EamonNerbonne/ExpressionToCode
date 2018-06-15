@@ -243,7 +243,7 @@ namespace ExpressionToCodeLib.Internal
                 le.Parameters.Count == 1
                     ? NestExpression(e.NodeType, le.Parameters.Single())
                     : ArgListDispatch(le.Parameters.Select(SingleChildDispatch))
-                //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
+            //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
             );
             kids.Add(" => ");
             kids.Add(NestExpression(le.NodeType, le.Body));
@@ -342,7 +342,7 @@ namespace ExpressionToCodeLib.Internal
                 && mce.Arguments.Count == 2
                 && mce.Arguments[0] is ConstantExpression formatStringExpr
                 && formatStringExpr.Type == typeof(string)
-                && mce.Arguments[1] .Type == typeof(object[]) 
+                && mce.Arguments[1].Type == typeof(object[])
                 && mce.Arguments[1] is NewArrayExpression interpolationArguments
             ) {
                 //.net 4.6
@@ -357,7 +357,7 @@ namespace ExpressionToCodeLib.Internal
                 && mce.Arguments.Count >= 2
                 && mce.Arguments[0] is ConstantExpression formatString2Expr
                 && formatString2Expr.Type == typeof(string)
-                && mce.Method.GetParameters().Skip(1).All(pi=>pi.ParameterType == typeof(object))
+                && mce.Method.GetParameters().Skip(1).All(pi => pi.ParameterType == typeof(object))
             ) {
                 //.net 4.6
                 //string-interpolations are compiled into FormattableStringFactory.Create
@@ -505,7 +505,7 @@ namespace ExpressionToCodeLib.Internal
                 || (haystack.IsArray || haystack.IsByRef) && ContainsInferableType(haystack.GetElementType(), needle)
                 || haystack.GetTypeInfo().IsGenericType
                     && !(typeof(Delegate).IsAssignableFrom(haystack)
-                        && haystack.GetTypeInfo().GetMethod("Invoke").GetParameters().Any(pi=>pi.ParameterType == needle)
+                        && haystack.GetTypeInfo().GetMethod("Invoke").GetParameters().Any(pi => pi.ParameterType == needle)
                     )
                     && haystack.GetTypeInfo().GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
