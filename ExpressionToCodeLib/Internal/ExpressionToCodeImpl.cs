@@ -180,16 +180,24 @@ namespace ExpressionToCodeLib.Internal
         {
             var kids = KidsBuilder.Create();
             var ue = (UnaryExpression)e;
-            if (!config.Value.OmitImplicitCasts || !ReflectionHelpers.CanImplicitlyCast(ue.Operand.Type, e.Type) || typeof(Delegate).IsAssignableFrom(ue.Operand.Type) && e.NodeType == ExpressionType.Lambda) {
-                if (e.Type.GetTypeInfo().IsAssignableFrom(ue.Operand.Type)) // base class, basically; don't re-print identical values.
+            var operand = ue.Operand;
+            if (!config.Value.OmitImplicitCasts
+                || !ReflectionHelpers.CanImplicitlyCast(operand.Type, e.Type)
+                || typeof(Delegate).IsAssignableFrom(operand.Type) && operand.NodeType == ExpressionType.Lambda
+                || typeof(Expression).IsAssignableFrom(operand.Type) && operand.NodeType == ExpressionType.Quote
+                ) {
+
+                if (e.Type.GetTypeInfo().IsAssignableFrom(operand.Type)) // base class, basically; don't re-print identical values.
                 {
                     kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")");
                 } else {
                     kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")", e);
                 }
+                    kids.Add(NestExpression(ue.NodeType, operand));
+            } else {
+                kids.Add(NestExpression(ue.NodeType, operand));
             }
 
-            kids.Add(NestExpression(ue.NodeType, ue.Operand));
             return kids.Finish();
         }
 
