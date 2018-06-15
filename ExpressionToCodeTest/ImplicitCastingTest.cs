@@ -23,14 +23,14 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => c == 'b'));
         }
 
-        [Fact(Skip = "issue 4")]
+        [Fact]
         public void DecimalImplicitCast()
         {
             var i = 1;
             Assert.Equal(
-                @"() => (1m + -i > 0 || false)",
+                @"() => 1m + -i > 0m || false",
                 // ReSharper disable once RedundantLogicalConditionalExpressionOperand
-                ExpressionToCode.ToCode(() => 1m + -i > 0 || false));
+                ExpressionToCode.ToCode(() => 1m + -i > 0m || false));
         }
 
         [Fact(Skip = "issue 4")]
