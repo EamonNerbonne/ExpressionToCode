@@ -373,12 +373,6 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string) }));
 
         [Fact]
-        public void StaticCallImplicitCast()
-            => Assert.Equal(
-                @"() => object.Equals((object)3, (object)0)",
-                ExpressionToCode.ToCode(() => Equals(3, 0)));
-
-        [Fact]
         public void StaticMembers()
             => Assert.Equal(
                 @"() => (DateTime.Now > DateTime.Now + TimeSpan.FromMilliseconds(10.001)).ToString() == ""False""",
