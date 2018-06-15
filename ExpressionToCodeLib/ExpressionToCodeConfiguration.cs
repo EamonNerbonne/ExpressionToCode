@@ -40,7 +40,7 @@ namespace ExpressionToCodeLib
                     ExpressionCompiler = ExpressionTreeCompilers.DotnetExpressionCompiler,
                     ObjectStringifier = ObjectStringify.Default,
                     AlwaysUseExplicitTypeArguments = false,
-                    OmitImplicitCasts = false,
+                    OmitImplicitCasts = true,
                 });
 
         /// <summary>

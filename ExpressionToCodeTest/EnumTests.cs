@@ -27,7 +27,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void EnumConstant()
             => Assert.Equal(
-                @"() => new object().Equals((object)MidpointRounding.ToEven)",
+                @"() => new object().Equals(MidpointRounding.ToEven)",
                 ExpressionToCode.ToCode(() => new object().Equals(MidpointRounding.ToEven)));
 
         [Fact]

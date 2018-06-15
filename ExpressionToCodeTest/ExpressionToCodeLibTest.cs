@@ -132,8 +132,8 @@ namespace ExpressionToCodeTest
                 // ReSharper disable once SpecifyACultureInStringConversionExplicitly
                 ExpressionToCode.ToCode(() => 1.23m.ToString()));
             Assert.Equal(
-                @"() => AttributeTargets.All.HasFlag((Enum)AttributeTargets.Assembly)",
-                ExpressionToCode.ToCode(() => AttributeTargets.All.HasFlag((Enum)AttributeTargets.Assembly)));
+                @"() => AttributeTargets.All.HasFlag(AttributeTargets.Assembly)",
+                ExpressionToCode.ToCode(() => AttributeTargets.All.HasFlag(AttributeTargets.Assembly)));
             Assert.Equal(
                 @"() => ""abc"".Length == 3",
                 ExpressionToCode.ToCode(() => "abc".Length == 3));
@@ -593,7 +593,7 @@ namespace ExpressionToCodeTest
             var expr = new ClassWithClosure {
                 someValue = "test "
             }.GetExpression(DayOfWeek.Friday);
-            Assert.Equal(@"() => someValue + (object)closedVariable + "" "" + (object)argument", expr);
+            Assert.Equal(@"() => someValue + closedVariable + "" "" + argument", expr);
         }
 
         class ClassWithClosure
