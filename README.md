@@ -34,7 +34,7 @@ Enumerable.Range(0, 1000).ToDictionary(i => "n" + (object)i)["n3"].ToString() ==
              {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...}
 ```
 
-ExpressionToCode was inspired by [Power Asssert.NET](http://powerassert.codeplex.com/).  It differs from PowerAssert.NET by supporting a larger portion of the lambda syntax and that the generated C# is more frequently valid; the aim is to generate valid C# for *all* expression trees created from lambda's.  Currently supported:
+ExpressionToCode was inspired by [Power Asssert.NET](https://github.com/PowerAssert/PowerAssert.Net).  It differs from PowerAssert.NET by supporting a larger portion of the lambda syntax and that the generated C# is more frequently valid; the aim is to generate valid C# for *all* expression trees created from lambda's.  Currently supported:
 
 Expression tree support
 ---
