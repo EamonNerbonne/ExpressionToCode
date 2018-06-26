@@ -8,8 +8,8 @@ namespace ExpressionToCodeLib.Internal
 {
     class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
-            => (msg == null ? "" : msg + "\n\n") + ExpressionWithSubExpressions.Create(config, expr, hideOutermostValue).ComposeToSingleString();
+        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool outerValueIsAssertionFailure)
+            => (msg == null ? "" : msg + "\n\n") + ExpressionWithSubExpressions.Create(config, expr, outerValueIsAssertionFailure).ComposeToSingleString();
 
         struct ExpressionWithSubExpressions
         {
@@ -32,7 +32,7 @@ namespace ExpressionToCodeLib.Internal
                     => SubExpression == val.SubExpression && ValueAsString == val.ValueAsString;
             }
 
-            public static ExpressionWithSubExpressions Create(ExpressionToCodeConfiguration config, Expression e, bool hideOutermostValue)
+            public static ExpressionWithSubExpressions Create(ExpressionToCodeConfiguration config, Expression e, bool outerValueIsAssertionFailure)
             {
                 var sb = new StringBuilder();
                 var ignoreInitialSpace = true;
@@ -40,8 +40,37 @@ namespace ExpressionToCodeLib.Internal
                 AppendNodeToStringBuilder(sb, node, ref ignoreInitialSpace);
                 var fullExprText = sb.ToString();
                 var subExpressionValues = new List<SubExpressionValue>();
-                FindSubExpressionValues(config, node, node, subExpressionValues, hideOutermostValue);
-                return new ExpressionWithSubExpressions { ExpressionString = fullExprText, SubExpressions = subExpressionValues.Distinct().ToArray() };
+                FindSubExpressionValues(config, node, node, subExpressionValues, outerValueIsAssertionFailure);
+                var assertionValue = outerValueIsAssertionFailure? OutermostValue(config, node) : null;
+                return new ExpressionWithSubExpressions { 
+                    ExpressionString = fullExprText
+                    + (assertionValue != null ? "\n"+ spacedArrow + assertionValue + " (caused assertion failure)\n" :""),
+                    SubExpressions = subExpressionValues.Distinct().ToArray() 
+                    };
+            }
+
+            static string OutermostValue(ExpressionToCodeConfiguration config, StringifiedExpression node)
+            {
+                if(node.OptionalValue!=null) {
+                    return ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10);
+                }
+                foreach (var kid in node.Children) {
+                    if (!kid.IsConceptualChild) {
+                        var value = OutermostValue(config, kid);
+                        if(value!=null) {
+                            return value;
+                        }
+                    }
+                }
+                foreach (var kid in node.Children) {
+                    if (kid.IsConceptualChild) {
+                        var value = OutermostValue(config, kid);
+                        if(value != null) {
+                            return value;
+                        }
+                    }
+                }
+                return null;
             }
 
             static void AppendNodeToStringBuilder(StringBuilder sb, StringifiedExpression node, ref bool ignoreInitialSpace)
@@ -62,14 +91,14 @@ namespace ExpressionToCodeLib.Internal
                 StringifiedExpression node,
                 StringifiedExpression subExprNode,
                 List<SubExpressionValue> subExpressionValues,
-                bool hideOutermostValue)
+                bool outerValueIsAssertionFailure)
             {
-                if (!hideOutermostValue && node.OptionalValue != null) {
+                if (!outerValueIsAssertionFailure && node.OptionalValue != null) {
                     var sb = new StringBuilder();
                     var ignoreInitialSpace = true;
                     var valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10);
                     AppendNodeToStringBuilder(sb, subExprNode, ref ignoreInitialSpace);
-                    var maxSize = 80;
+                    var maxSize = Math.Max(40, config.Value.MaximumValueLength ?? 200);
                     var subExprString = sb.Length <= maxSize
                         ? sb.ToString()
                         : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);
@@ -80,7 +109,7 @@ namespace ExpressionToCodeLib.Internal
 
                 foreach (var kid in node.Children) {
                     if (!kid.IsConceptualChild) {
-                        FindSubExpressionValues(config, kid, subExprNode, subExpressionValues, hideOutermostValue);
+                        FindSubExpressionValues(config, kid, subExprNode, subExpressionValues, outerValueIsAssertionFailure);
                     }
                 }
 
@@ -97,7 +126,7 @@ namespace ExpressionToCodeLib.Internal
                 var maxExprLength = SubExpressions.Max(sub => sub.SubExpression.Length as int?) ?? 0;
                 var containsANewline = SubExpressions.Any(sub => sub.SubExpression.Contains("\n") || sub.ValueAsString.Contains("\n"));
 
-                return ExpressionString + "\n"// + spacedArrow + StringifiedValue + " (caused assertion failure)\n\n"
+                return ExpressionString + "\n"
                     + string.Join(
                         "",
                         maxLineLength <= 80 && maxExprLength <= 30 && !containsANewline

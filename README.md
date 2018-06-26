@@ -1,4 +1,4 @@
-ExpressionToCode
+﻿ExpressionToCode
 ================
 ExpressionToCode generates valid, readable C# from an Expression Tree. (nuget: [ExpressionToCodeLib](http://nuget.org/packages/ExpressionToCodeLib/))
 ------
@@ -13,7 +13,7 @@ ExpressionToCode generates valid, readable C# from an Expression Tree. (nuget: [
 == "() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })"
 ```
 
-ExpressionToCode also provides a clone of Groovy's [Power Assert](http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/) which includes the code of the failing assertion's expression and the values of its subexpressions.  This functionality is particularly useful in a unit testing framework such as [NUnit](http://www.nunit.org/) or [xUnit.NET](http://xunit.github.io/).  When you execute the following (failing) assertion:
+ExpressionToCode also provides something like Groovy's [Power Assert](http://dontmindthelanguage.wordpress.com/2009/12/11/groovy-1-7-power-assert/) which includes the code of the failing assertion's expression and the values of its subexpressions.  This functionality is particularly useful in a unit testing framework such as [NUnit](http://www.nunit.org/) or [xUnit.NET](http://xunit.github.io/).  When you execute the following (failing) assertion:
 
 ```C#
 PAssert.That(()=>Enumerable.Range(0,1000).ToDictionary(i=>"n"+i)["n3"].ToString()==(3.5).ToString());
@@ -22,17 +22,78 @@ PAssert.That(()=>Enumerable.Range(0,1000).ToDictionary(i=>"n"+i)["n3"].ToString(
 The assertion fails with the following message:
 
 ```
-PAssert.That failed for:
+assertion failed
 
-Enumerable.Range(0, 1000).ToDictionary(i => "n" + (object)i)["n3"].ToString() == 3.5.ToString()
-             |                 |                            |         |        |        |
-             |                 |                            |         |        |        "3.5"
-             |                 |                            |         |        false
-             |                 |                            |         "3"
-             |                 |                            3
-             |                 {[n0, 0], [n1, 1], [n2, 2], [n3, 3], [n4, 4], [n5, 5], [n6, 6], [n7, 7], [n8, 8], [n9, 9], ...}
-             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, ...}
+Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture) == 3.5.ToString(CultureInfo.InvariantCulture)
+   →   false (caused assertion failure)
+
+Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture)
+     →   "3"
+
+Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"]
+     →   3
+
+Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)
+     →   {
+              [n0, 0],
+              [n1, 1],
+              [n2, 2],
+              [n3, 3],
+              [n4, 4],
+              [n5, 5],
+              [n6, 6],
+              [n7, 7],
+              [n8, 8],
+              [n9, 9],
+              [n10, 10],
+              [n11, 11],
+              [n12, 12],
+              [n13, 13],
+              [n14, 14],
+              [n15, 15],
+              [n16, 16],
+              [n17, 17],
+              [n18, 18],
+              [n19, 19],
+              [n20, 20],
+              [n21, 21],
+              [n22, 22],
+              [n23, 23],
+              [n24, 24],
+              [n25, 25],
+              [n26, 26],
+              [n27, 27],
+              [n28, 28],
+              [n29, 29],
+              ...
+          }
+
+Enumerable.Range(0, 1000)
+     →   { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, ... }
+
+3.5.ToString(CultureInfo.InvariantCulture)
+     →   "3.5"
 ```
+
+ExpressionToCode's output is configurable in various ways. For expressions with small values, a values-on-stalks rendering might instead be used:
+```C#
+var a = 2;
+var b = 5;
+ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithAnnotator(CodeAnnotators.ValuesOnStalksCodeAnnotator)
+    .Assert(() => Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average() );
+ ```
+ 
+```
+Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()  :  assertion failed
+      │  │  │       │                     │
+      │  │  │       │                     7.0
+      │  │  │       new[] { 3, 8, 13, 4 }
+      │  │  5
+      │  2
+      5
+```
+
+Note that the default configuration for asserts (i.e. `PAssert.That`) limits the length of sequences and strings; the default configuration of code-generation does not.
 
 ExpressionToCode was inspired by [Power Asssert.NET](https://github.com/PowerAssert/PowerAssert.Net).  It differs from PowerAssert.NET by supporting a larger portion of the lambda syntax and that the generated C# is more frequently valid; the aim is to generate valid C# for *all* expression trees created from lambda's.  Currently supported:
 
@@ -48,14 +109,14 @@ Expression tree support
  * Uses the same spacing rules Visual Studio does by default
  * Supports nested Lambdas
  * Expands generic type instances and nullable types into normal C# (e.g. `Func<int, bool>` and `int?`)
- * Recognizes references to `this` and omits the keyword where possible ([#5](/../../issues/5))  
+ * Recognizes references to `this` and omits the keyword where possible ([#5](/../../issues/5))
+ * Recognizes closed-over variables and prints something plausible, rather than the crypic compiler-generated names.
+ * Omits most implicit casts (e.g. `object.Equals(3, 4)` instead of `object.Equals((object)3, (object)4)`) - user defined implicit cast operators are not elided ([#4](/../../issues/4))
+ * Detects when type parameters to methods are superfluous ([#13](/../../issues/13)).
 
 **Not implemented (yet?):**
-
- * Omit implicit casts (e.g. `object.Equals((object)3, (object)4)`) - issue [#4](/../../issues/4).
  * Use LINQ query syntax where possible - issue [#6](/../../issues/6).
- * Detect when type parameters to methods are superfluous - issue [#13](/../../issues/13).
- * Detect when nested lambda parameters require type annotation - issue [#14](/../../issues/14).
+ * Explicitly cast otherwise inferable lambda when required due to ambiguous overloads - issue [#14](/../../issues/14).
  * Warn when `==` differs from `.Equals` or `.SequenceEquals`, as Power Assert.NET does (issue [#2](/../../issues/2)).
  * See all [open issues](https://github.com/EamonNerbonne/ExpressionToCode/issues).
 
@@ -78,9 +139,13 @@ Two public helper classes exist:
    * `ObjectToCode.PlainObjectToCode` renders simple objects that can be parsed by the C# compiler.  This includes strings, chars, decimals, floats, doubles, all the integer types, booleans, enums, nulls, and default struct values.
    * `ObjectToCode.ComplexObjectToPseudoCode` renders as best it can anything thrown at it; but the resultant rendering is not necessarily compilable.  This is used to display the values of subexpressions.
 
-Dependencies
+A complete listing of the public api is [here](ExpressionToCodeTest/ApiStabilityTest.PublicApi.approved.txt)
+
+Supported platforms
+
 ---
-Requires .NET 4.0 (.NET 3.5 could be supported by omitting support for newer expression types, this would require a few simple source changes).
+
+Requires .NET 4.5.2 or .net standard 1.6 (previous versions support older platforms)
 
 ---
 

@@ -1,4 +1,8 @@
-﻿() => a + b
+﻿assertion failed
+
+a + b > 3
+   →   true (caused assertion failure)
+
 a + b   →   7
     a   →   2
     b   →   5

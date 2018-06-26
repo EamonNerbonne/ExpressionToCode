@@ -1,0 +1,5 @@
+﻿list.Select(e => e + 1).Count() == 5  :  assertion failed
+  │     │                 │
+  │     │                 6
+  │     { 2, 3, 4, 4, 3, 2 }
+  { 1, 2, 3, 3, 2, 1 }

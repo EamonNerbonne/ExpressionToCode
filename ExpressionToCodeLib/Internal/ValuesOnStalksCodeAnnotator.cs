@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,9 +8,9 @@ namespace ExpressionToCodeLib.Internal
 {
     class ValuesOnStalksCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
+        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool outerValueIsAssertionFailure)
         {
-            var splitLine = ExpressionToStringWithValues(config, expr, hideOutermostValue);
+            var splitLine = ExpressionToStringWithValues(config, expr, outerValueIsAssertionFailure);
 
             var exprWithStalkedValues = new StringBuilder();
             if (msg == null) {
@@ -46,13 +46,13 @@ namespace ExpressionToCodeLib.Internal
             return idxAfterNewline > 0 && idxAfterNewline < msg.Length;
         }
 
-        static SplitExpressionLine ExpressionToStringWithValues(ExpressionToCodeConfiguration config, Expression e, bool hideOutermostValue)
+        static SplitExpressionLine ExpressionToStringWithValues(ExpressionToCodeConfiguration config, Expression e, bool outerValueIsAssertionFailure)
         {
             var nodeInfos = new List<SubExpressionInfo>();
             var sb = new StringBuilder();
             var ignoreInitialSpace = true;
             var node = new ExpressionToCodeImpl(config).ExpressionDispatch(e);
-            AppendTo(config, sb, nodeInfos, node, ref ignoreInitialSpace, !hideOutermostValue);
+            AppendTo(config, sb, nodeInfos, node, ref ignoreInitialSpace, !outerValueIsAssertionFailure);
             nodeInfos.Add(new SubExpressionInfo { Location = sb.Length, Value = null });
             return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };
         }

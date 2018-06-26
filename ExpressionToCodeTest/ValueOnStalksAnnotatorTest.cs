@@ -8,10 +8,10 @@ using System.Linq.Expressions;
 
 namespace ExpressionToCodeTest
 {
-    public class SubExpressionPerLineCodeAnnotatorTest
+    public class ValueOnStalksAnnotatorTest
     {
         static readonly ExpressionToCodeConfiguration config =
-            ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithAnnotator(CodeAnnotators.SubExpressionPerLineCodeAnnotator);
+            ExpressionToCodeConfiguration.DefaultAssertionConfiguration.WithAnnotator(CodeAnnotators.ValuesOnStalksCodeAnnotator);
 
         static readonly IAnnotatedToCode annotator = config.GetAnnotatedToCode();
 

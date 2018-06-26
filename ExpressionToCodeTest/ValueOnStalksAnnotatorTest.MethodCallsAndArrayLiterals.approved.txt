@@ -1,0 +1,7 @@
+﻿Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()  :  assertion failed
+      │  │  │       │                     │
+      │  │  │       │                     7.0
+      │  │  │       new[] { 3, 8, 13, 4 }
+      │  │  5
+      │  2
+      5

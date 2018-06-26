@@ -11,10 +11,10 @@
     const EqualityExpressionClass StructuralEquals = 8
 
 interface IAnnotatedToCode
-    string inst.AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
+    string inst.AnnotatedToCode(Expression e, string msg, bool outerValueIsAssertionFailure)
 
 interface ICodeAnnotator
-    string inst.AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue)
+    string inst.AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool outerValueIsAssertionFailure)
 
 interface IExpressionCompiler
     Func<T> inst.Compile<T>(Expression<Func<T>> expression)
@@ -33,10 +33,10 @@ class AnnotatedToCodeExtensions
     string TYPE.AnnotatedToCode<T, T1, T2>(IAnnotatedToCode it, Expression<Func<T, T1, T2>> e)
     string TYPE.AnnotatedToCode<T, T1>(IAnnotatedToCode it, Expression<Func<T, T1>> e)
     string TYPE.AnnotatedToCode<T>(IAnnotatedToCode it, Expression<Func<T>> e)
-    string TYPE.AnnotatedToCode<T, T1, T2, T3>(IAnnotatedToCode it, Expression<Func<T, T1, T2, T3>> e, string msg, bool hideOutermostValue)
-    string TYPE.AnnotatedToCode<T, T1, T2>(IAnnotatedToCode it, Expression<Func<T, T1, T2>> e, string msg, bool hideOutermostValue)
-    string TYPE.AnnotatedToCode<T, T1>(IAnnotatedToCode it, Expression<Func<T, T1>> e, string msg, bool hideOutermostValue)
-    string TYPE.AnnotatedToCode<T>(IAnnotatedToCode it, Expression<Func<T>> e, string msg, bool hideOutermostValue)
+    string TYPE.AnnotatedToCode<T, T1, T2, T3>(IAnnotatedToCode it, Expression<Func<T, T1, T2, T3>> e, string msg, bool outerValueIsAssertionFailure)
+    string TYPE.AnnotatedToCode<T, T1, T2>(IAnnotatedToCode it, Expression<Func<T, T1, T2>> e, string msg, bool outerValueIsAssertionFailure)
+    string TYPE.AnnotatedToCode<T, T1>(IAnnotatedToCode it, Expression<Func<T, T1>> e, string msg, bool outerValueIsAssertionFailure)
+    string TYPE.AnnotatedToCode<T>(IAnnotatedToCode it, Expression<Func<T>> e, string msg, bool outerValueIsAssertionFailure)
 
 class CodeAnnotators
     static readonly ICodeAnnotator ValuesOnStalksCodeAnnotator

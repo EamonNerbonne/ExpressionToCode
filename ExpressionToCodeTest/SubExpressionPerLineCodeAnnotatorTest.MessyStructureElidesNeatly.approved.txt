@@ -1,6 +1,7 @@
-﻿() => hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
+﻿assertion failed
+
 hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())] || false
-     →   false
+   →   false (caused assertion failure)
 
 hmm[1] == hmm[2] || hmm[4] == hmm[int.Parse(hmm[8].ToString())]
      →   false

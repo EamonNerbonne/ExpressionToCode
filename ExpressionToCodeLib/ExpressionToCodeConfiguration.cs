@@ -132,8 +132,8 @@ namespace ExpressionToCodeLib
             public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config)
                 => this.config = config;
 
-            public string AnnotatedToCode(Expression e, string msg, bool hideOutermostValue)
-                => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, hideOutermostValue);
+            public string AnnotatedToCode(Expression e, string msg, bool outerValueIsAssertionFailure)
+                => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, outerValueIsAssertionFailure);
         }
 
         sealed class ExpressionToCodeWrapper : IExpressionToCode
@@ -150,7 +150,7 @@ namespace ExpressionToCodeLib
 
     public interface ICodeAnnotator
     {
-        string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool hideOutermostValue);
+        string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool outerValueIsAssertionFailure);
     }
 
     public interface IExpressionCompiler

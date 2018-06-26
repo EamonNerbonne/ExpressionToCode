@@ -1,6 +1,7 @@
-﻿() => Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
+﻿assertion failed
+
 Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()
-     →   false
+   →   false (caused assertion failure)
 
 Math.Max(a, b)
      →   5

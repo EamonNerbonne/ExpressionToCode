@@ -1,8 +1,9 @@
-﻿() => Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture) == 3.5.ToString(CultureInfo.InvariantCulture)
-Enumerable.Range(0, 1000).ToDictionary(  …  .ToString(CultureInfo.InvariantCulture)
-     →   false
+﻿assertion failed
 
-Enumerable.Range(0, 1000).ToDictionary(  …  .ToString(CultureInfo.InvariantCulture)
+Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture) == 3.5.ToString(CultureInfo.InvariantCulture)
+   →   false (caused assertion failure)
+
+Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture)
      →   "3"
 
 Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"]
