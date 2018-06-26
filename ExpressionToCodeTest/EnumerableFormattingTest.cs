@@ -22,14 +22,14 @@ namespace ExpressionToCodeTest
                 ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 18)));
 
         [Fact]
-        public void LongArraysBreakAfter15_InAssertions()
+        public void LongArraysBreakAfter30_InAssertions()
             => Assert.Equal(
-                "new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, ... }",
-                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 18).ToArray()));
+                "new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, ... }",
+                ExpressionToCodeConfiguration.DefaultAssertionConfiguration.ComplexObjectToPseudoCode(Enumerable.Range(1, 31).ToArray()));
 
         [Fact]
-        public void LongArraysDoNotBreakAfter15_InCodeGen()
-            => Assert.Equal("new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }", ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Range(1, 18).ToArray()));
+        public void LongArraysDoNotBreakAfter30_InCodeGen()
+            => Assert.Equal("new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 }", ObjectToCode.ComplexObjectToPseudoCode(Enumerable.Range(1, 32).ToArray()));
 
         [Fact]
         public void LongArraysDoNotBreakIfSoConfigured()

@@ -100,7 +100,6 @@ class ExpressionTreeCompilers
     static readonly IExpressionCompiler FastExpressionCompiler
 
 class FormatStringParser
-    (FormatStringParser.Segment[], string) TYPE.ParseFormatString(FormattableString formattableString)
     (FormatStringParser.Segment[], string) TYPE.ParseFormatString(string formatString, object[] formatArguments)
 
 struct FormatStringParser.Segment : ValueType
