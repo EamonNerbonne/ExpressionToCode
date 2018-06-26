@@ -1,4 +1,4 @@
-to publish, run the following commands in the library  directory:
+to publish, run the following commands in the library directory:
     
     dotnet clean
     dotnet pack -c release --include-symbols --include-source
