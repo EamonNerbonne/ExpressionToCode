@@ -1,7 +1,7 @@
 ﻿() => nums[a + b] < 7
+nums[a + b] < 7   →   false
+    nums[a + b]   →   17
            nums   →   new[] { 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 }
+          a + b   →   7
               a   →   2
               b   →   5
-          a + b   →   7
-    nums[a + b]   →   17
-nums[a + b] < 7   →   false
