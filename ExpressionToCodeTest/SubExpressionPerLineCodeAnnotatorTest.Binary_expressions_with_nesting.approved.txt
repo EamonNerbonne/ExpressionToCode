@@ -1,11 +1,23 @@
 ﻿() => a < b && (c > -a || c > b) && b < 10
+a < b && (c > -a || c > b) && b < 10
+     →   true
+
+a < b && (c > -a || c > b)
+     →   true
+
+a < b
+     →   true
+
 a
      →   2
 
 b
      →   5
 
-a < b
+c > -a || c > b
+     →   true
+
+c > -a
      →   true
 
 c
@@ -14,21 +26,9 @@ c
 -a
      →   -2
 
-c > -a
-     →   true
-
 c > b
      →   false
 
-c > -a || c > b
-     →   true
-
-a < b && (c > -a || c > b)
-     →   true
-
 b < 10
-     →   true
-
-a < b && (c > -a || c > b) && b < 10
      →   true
 
