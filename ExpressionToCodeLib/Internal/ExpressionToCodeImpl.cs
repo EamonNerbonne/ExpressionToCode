@@ -813,7 +813,9 @@ namespace ExpressionToCodeLib.Internal
 
         [Pure]
         public StringifiedExpression DispatchCoalesce(Expression e)
-            => BinaryDispatch("??", e);
+            =>  ((BinaryExpression)e).Left is ConstantExpression ce && ((BinaryExpression)e).Right is ConstantExpression && ce.Type == e.Type &&ce.Type == typeof(string) && ce.Value!=null 
+                ? this.ExpressionDispatch(ce) //for some weird reason the compile sometimes generates redundant null-coalescing operators.  Get rid of em!
+                : BinaryDispatch("??", e);
 
         [Pure]
         public StringifiedExpression DispatchConvert(Expression e)
