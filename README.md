@@ -34,37 +34,37 @@ Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"]
      →   3
 
 Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)
-     →   {
-              [n0, 0],
-              [n1, 1],
-              [n2, 2],
-              [n3, 3],
-              [n4, 4],
-              [n5, 5],
-              [n6, 6],
-              [n7, 7],
-              [n8, 8],
-              [n9, 9],
-              [n10, 10],
-              [n11, 11],
-              [n12, 12],
-              [n13, 13],
-              [n14, 14],
-              [n15, 15],
-              [n16, 16],
-              [n17, 17],
-              [n18, 18],
-              [n19, 19],
-              [n20, 20],
-              [n21, 21],
-              [n22, 22],
-              [n23, 23],
-              [n24, 24],
-              [n25, 25],
-              [n26, 26],
-              [n27, 27],
-              [n28, 28],
-              [n29, 29],
+     →   new Dictionary<string, int> {
+              ["n0"] = 0,
+              ["n1"] = 1,
+              ["n2"] = 2,
+              ["n3"] = 3,
+              ["n4"] = 4,
+              ["n5"] = 5,
+              ["n6"] = 6,
+              ["n7"] = 7,
+              ["n8"] = 8,
+              ["n9"] = 9,
+              ["n10"] = 10,
+              ["n11"] = 11,
+              ["n12"] = 12,
+              ["n13"] = 13,
+              ["n14"] = 14,
+              ["n15"] = 15,
+              ["n16"] = 16,
+              ["n17"] = 17,
+              ["n18"] = 18,
+              ["n19"] = 19,
+              ["n20"] = 20,
+              ["n21"] = 21,
+              ["n22"] = 22,
+              ["n23"] = 23,
+              ["n24"] = 24,
+              ["n25"] = 25,
+              ["n26"] = 26,
+              ["n27"] = 27,
+              ["n28"] = 28,
+              ["n29"] = 29,
               ...
           }
 
@@ -73,6 +73,7 @@ Enumerable.Range(0, 1000)
 
 3.5.ToString(CultureInfo.InvariantCulture)
      →   "3.5"
+
 ```
 
 ExpressionToCode's output is configurable in various ways. For expressions with small values, a values-on-stalks rendering might instead be used:
