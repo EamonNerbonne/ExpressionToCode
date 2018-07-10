@@ -1,8 +1,9 @@
-﻿using System;
+﻿#if formattable_string
+using System;
+using ExpressionToCodeLib;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using ExpressionToCodeLib;
 using Xunit;
 
 namespace ExpressionToCodeTest
@@ -61,7 +62,7 @@ namespace ExpressionToCodeTest
             => Assert.Equal(
                 @"() => Interpolation($""abc {3.0f}"")",
                 ExpressionToCode.ToCode(() => Interpolation($"abc {3f}")));
-        
+
         [Fact]
         public void ForcedInterpolationWithNestedString()
             => Assert.Equal(
@@ -74,7 +75,7 @@ namespace ExpressionToCodeTest
                 @"() => Interpolation($""abc {Interpolation($""abc {""def""}"")}"")",
                 ExpressionToCode.ToCode(
                     () => Interpolation($"abc {Interpolation($"abc {"def"}")}")
-                    )
+                )
             );
 
         [Fact]
@@ -101,23 +102,20 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void ForcedInterpolationWithNewlinesInSubExprIsLiteral()
-        {
-            var aBoolean = true;
-
-            Assert.Equal(
+            => Assert.Equal(
                 @"() => Interpolation($@""abc {new { I = @""1
 2
 3
 4
 "", J = 1 }} Z"")",
                 ExpressionToCode.ToCode(
-                    () => Interpolation($@"abc {new { I = @"1
+                    () => Interpolation(
+                        $@"abc {new { I = @"1
 2
 3
 4
 ", J = 1 }} Z")
                 ));
-        }
 
         [Fact]
         public void ForcedInterpolationWithFormatSpecifier()
@@ -148,20 +146,21 @@ namespace ExpressionToCodeTest
         {
             var jkl = 123;
             Assert.Equal(
-                           @"() => $""abc {37} def {null} ghi {jkl} mno""",
-                           ExpressionToCode.ToCode(() => $"abc {37} def {null} ghi {jkl} mno"));
+                @"() => $""abc {37} def {null} ghi {jkl} mno""",
+                ExpressionToCode.ToCode(() => $"abc {37} def {null} ghi {jkl} mno"));
         }
 
         [Fact]
         public void InterpolationWithFourArgs()
         {
             var jkl = 123;
-            var p=2;
-            var q=3;
-            var r= 4;
+            var p = 2;
+            var q = 3;
+            var r = 4;
             Assert.Equal(
-                           @"() => $""abc {37} def {null} ghi {jkl} mno {p + q + r} stu""",
-                           ExpressionToCode.ToCode(() => $"abc {37} def {null} ghi {jkl} mno {p + q + r} stu"));
+                @"() => $""abc {37} def {null} ghi {jkl} mno {p + q + r} stu""",
+                ExpressionToCode.ToCode(() => $"abc {37} def {null} ghi {jkl} mno {p + q + r} stu"));
         }
     }
 }
+#endif

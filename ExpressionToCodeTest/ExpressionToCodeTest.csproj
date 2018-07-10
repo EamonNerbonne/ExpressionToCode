@@ -1,8 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFrameworks>net462;net471;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net452;net462;net47;net471;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
+  <PropertyGroup Condition="!('$(TargetFramework)' == 'net452' or '$(TargetFramework)' == 'net462')">
+    <DefineConstants>formattable_string</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ExpressionToCodeLib\ExpressionToCodeLib.csproj" />
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
