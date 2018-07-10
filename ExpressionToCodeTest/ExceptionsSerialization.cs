@@ -1,11 +1,10 @@
-﻿#if dotnet_framework
+﻿#if binary_serialization
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using ExpressionToCodeLib;
-using ExpressionToCodeLib.Internal.Internal;
 using Xunit;
 
 namespace ExpressionToCodeTest
@@ -14,27 +13,11 @@ namespace ExpressionToCodeTest
     {
         [MethodImpl(MethodImplOptions.NoInlining)]
         static void IntentionallyFailingMethod()
-        {
-            PAssert.That(() => false);
-        }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        static void IntentionallyFailingMethod2()
-        {
-            throw UnitTestingInternalsAccess.CreateException("Hello World!");
-        }
-
-        [Fact(Skip = "XUnit 2.10 exceptions don't appear to be serializable anymore... ?")]
-        public void XUnitExceptionIsSerializable()
-        {
-            AssertMethodFailsWithSerializableException(IntentionallyFailingMethod);
-        }
+            => PAssert.That(() => false);
 
         [Fact]
         public void PAssertExceptionIsSerializable()
-        {
-            AssertMethodFailsWithSerializableException(IntentionallyFailingMethod2);
-        }
+            => AssertMethodFailsWithSerializableException(IntentionallyFailingMethod);
 
         static void AssertMethodFailsWithSerializableException(Action intentionallyFailingMethod)
         {

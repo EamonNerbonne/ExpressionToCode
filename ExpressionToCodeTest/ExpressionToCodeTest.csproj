@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <TargetFrameworks>net452;net462;net47;net471;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net461;net47;net472;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
   </PropertyGroup>
-  <PropertyGroup Condition="!('$(TargetFramework)' == 'net452' or '$(TargetFramework)' == 'net462')">
-    <DefineConstants>formattable_string</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'net47'or '$(TargetFramework)' == 'net472'  ">
+    <DefineConstants>binary_serialization</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
