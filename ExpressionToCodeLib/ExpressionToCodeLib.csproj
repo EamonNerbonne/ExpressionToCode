@@ -10,19 +10,27 @@
     <PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <RepositoryUrl>https://github.com/EamonNerbonne/ExpressionToCode</RepositoryUrl>
     <PackageProjectUrl>https://github.com/EamonNerbonne/ExpressionToCode</PackageProjectUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
     <SignAssembly>true</SignAssembly>
     <WarningsAsErrors>NU1605</WarningsAsErrors>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
+  
+	<PropertyGroup>
+		<!-- Source link: -->
+		<DebugType>portable</DebugType>
+		<DebugSymbols>True</DebugSymbols>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+  
+  
   <ItemGroup>
     <Compile Update="Internal\ExpressionTypeDispatch.Generated.cs">
       <DesignTime>True</DesignTime>
@@ -35,7 +43,7 @@
     </None>
     <PackageReference Include="FastExpressionCompiler" Version="1.8.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63102-01" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All"/>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 </Project>
