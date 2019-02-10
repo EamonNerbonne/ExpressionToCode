@@ -10,7 +10,7 @@ namespace ExpressionToCodeLib.Internal
     {
         public static PropertyInfo GetPropertyIfGetter(MethodInfo mi)
         {
-            var supposedGetter = mi.Name.StartsWith("get_");
+            var supposedGetter = mi.Name.StartsWith("get_", StringComparison.Ordinal);
 
             if (!mi.IsSpecialName || !supposedGetter) {
                 return null;
@@ -101,7 +101,7 @@ namespace ExpressionToCodeLib.Internal
 
             var compilerGenerated = typeInfo.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
             var name = type.Name;
-            var name_StartWithLessThan = name.StartsWith("<");
+            var name_StartWithLessThan = name.StartsWith("<", StringComparison.Ordinal);
             var isBuiltin = typeInfo.IsPrimitive || typeInfo.IsEnum || type == typeof(decimal) || type == typeof(string)
                 || typeof(Type).GetTypeInfo().IsAssignableFrom(type);
 

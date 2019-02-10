@@ -62,7 +62,7 @@ namespace ExpressionToCodeTest
         {
             var tuple = (1, 3);
             (int, int Length) tuple2 = (1, "123".Length);
-            var expr = ExpressionCompiler.Compile(() => tuple.Equals(tuple2));
+            var expr = ExpressionCompiler.CompileFast(() => tuple.Equals(tuple2));
             Assert.True(expr());
         }
 

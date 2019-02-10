@@ -122,7 +122,7 @@ namespace ExpressionToCodeLib.Internal
                 lines = lines.Take(limit).Concat(new[] { "..." }).ToArray();
             }
 
-            var stringBoundaryPrefix = lines[0].StartsWith("@\"") ? 2 : lines[0].StartsWith("\"") ? 1 : 0;
+            var stringBoundaryPrefix = lines[0].StartsWith("@\"", StringComparison.Ordinal) ? 2 : lines[0].StartsWith("\"", StringComparison.Ordinal) ? 1 : 0;
             var firstLineIndent = "\n" + indentString.Substring(0, Math.Max(0, indentString.Length - stringBoundaryPrefix));
 
             return firstLineIndent + string.Join("\n" + indentString, lines.Select(s => ElideAfter(s, len - 1)));

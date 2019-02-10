@@ -22,7 +22,7 @@ namespace ExpressionToCodeLib
         public static (Segment[] segments, string Tail) ParseFormatString(string formatString, object[] formatArguments)
             => new FormattableStringParser(formatString, formatArguments).Finish();
 
-        class FormattableStringParser : IFormatProvider, ICustomFormatter
+        sealed class FormattableStringParser : IFormatProvider, ICustomFormatter
         {
             //Format strings have exceptions for stuff like double curly braces
             //There are also corner-cases that non-compiler generated format strings might hit

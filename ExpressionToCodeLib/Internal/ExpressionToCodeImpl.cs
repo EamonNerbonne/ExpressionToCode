@@ -411,8 +411,8 @@ namespace ExpressionToCodeLib.Internal
                 .Select(
                 child =>
                     child.NodeType == ExpressionType.Conditional
-                        ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), (this).ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
-                        : (this).ExpressionDispatch(child)
+                        ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
+                        : this.ExpressionDispatch(child)
             ).ToArray();
             var useLiteralSyntax = ObjectStringifyImpl.PreferLiteralSyntax(formatString)
                 || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
@@ -813,7 +813,7 @@ namespace ExpressionToCodeLib.Internal
 
         [Pure]
         public StringifiedExpression DispatchCoalesce(Expression e)
-            =>  ((BinaryExpression)e).Left is ConstantExpression ce && ((BinaryExpression)e).Right is ConstantExpression && ce.Type == e.Type &&ce.Type == typeof(string) && ce.Value!=null 
+            =>  ((BinaryExpression)e).Left is ConstantExpression ce && ((BinaryExpression)e).Right is ConstantExpression && ce.Type == e.Type &&ce.Type == typeof(string) && ce.Value!=null
                 ? this.ExpressionDispatch(ce) //for some weird reason the compile sometimes generates redundant null-coalescing operators.  Get rid of em!
                 : BinaryDispatch("??", e);
 

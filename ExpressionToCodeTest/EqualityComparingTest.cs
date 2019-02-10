@@ -45,7 +45,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void NoneDetected()
         {
-            Assert.Equal(EqualityExpressionClass.None, EqualityExpressions.CheckForEquality(() => bla.StartsWith("bla")));
+            Assert.Equal(EqualityExpressionClass.None, EqualityExpressions.CheckForEquality(() => bla.StartsWith("bla", StringComparison.Ordinal)));
             Assert.Equal(EqualityExpressionClass.None, EqualityExpressions.CheckForEquality(() => !(bla == bla2object)));
             Assert.Equal(EqualityExpressionClass.None, EqualityExpressions.CheckForEquality(() => DateTime.Equals(new DateTime(2011, 05, 17), DateTime.Today)));
             // no match since specific method

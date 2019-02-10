@@ -125,7 +125,7 @@ namespace ExpressionToCodeLib
         public IAnnotatedToCode GetAnnotatedToCode()
             => new AnnotatedToCodeWrapper(this);
 
-        class AnnotatedToCodeWrapper : IAnnotatedToCode
+        sealed class AnnotatedToCodeWrapper : IAnnotatedToCode
         {
             readonly ExpressionToCodeConfiguration config;
 

@@ -31,10 +31,10 @@ namespace ExpressionToCodeLib.Internal
                 return "'" + EscapeStringChars(val.ToString()) + "'";
             } else if (val is decimal) {
                 return Convert.ToString(val, CultureInfo.InvariantCulture) + "m";
-            } else if (val is float) {
-                return FloatToCode((float)val);
-            } else if (val is double) {
-                return DoubleToCode((double)val);
+            } else if (val is float floatVal) {
+                return FloatToCode(floatVal);
+            } else if (val is double doubleVal) {
+                return DoubleToCode(doubleVal);
             } else if (val is byte) {
                 return "((byte)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
             } else if (val is sbyte) {
