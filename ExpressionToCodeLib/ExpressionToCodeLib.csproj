@@ -8,7 +8,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>Upgrade dependencies</PackageReleaseNotes>
     <PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <RepositoryUrl>https://github.com/EamonNerbonne/ExpressionToCode</RepositoryUrl>
