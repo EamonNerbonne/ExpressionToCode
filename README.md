@@ -96,7 +96,7 @@ Math.Max(a, b) > new[] { 3, 8, 13, 4 }.Average()  :  assertion failed
 
 Note that the default configuration for asserts (i.e. `PAssert.That`) limits the length of sequences and strings; the default configuration of code-generation does not.
 
-ExpressionToCode was inspired by [Power Asssert.NET](https://github.com/PowerAssert/PowerAssert.Net).  It differs from PowerAssert.NET by supporting a larger portion of the lambda syntax and that the generated C# is more frequently valid; the aim is to generate valid C# for *all* expression trees created from lambda's.  Currently supported:
+ExpressionToCode was inspired by [Power Assert.NET](https://github.com/PowerAssert/PowerAssert.Net).  It differs from PowerAssert.NET by supporting a larger portion of the lambda syntax and that the generated C# is more frequently valid; the aim is to generate valid C# for *all* expression trees created from lambda's.  Currently supported:
 
 Expression tree support
 ---
