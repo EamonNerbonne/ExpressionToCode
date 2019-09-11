@@ -60,8 +60,8 @@ namespace ExpressionToCodeLib.Internal
                     return TypeNameToCode(enumVal.GetType()) + "." + enumVal;
                 } else {
                     var longVal = ((IConvertible)enumVal).ToInt64(null);
-                    var toString = enumVal.ToString(CultureInfo.InvariantCulture);
-                    if (toString == longVal.ToString(CultureInfo.InvariantCulture)) {
+                    var toString = enumVal.ToString();
+                    if (toString == longVal.ToString()) {
                         return "((" + TypeNameToCode(enumVal.GetType()) + ")" + longVal + ")";
                     } else {
                         var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
