@@ -50,12 +50,12 @@ namespace ExpressionToCodeLib.Internal
                 return boolVal ? "true" : "false";
             } else if (val is Enum enumVal) {
                 return EnumValueToCode(val, enumVal);
-            } else if (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
-                return "default(" + TypeNameToCode(val.GetType()) + ")";
             } else if (val is Type typeVal) {
                 return "typeof(" + TypeNameToCode(typeVal) + ")";
             } else if (val is MethodInfo methodInfoVal) {
                 return TypeNameToCode(methodInfoVal.DeclaringType) + "." + methodInfoVal.Name;
+            } else if (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
+                return "default(" + TypeNameToCode(val.GetType()) + ")";
             } else {
                 return null;
             }
