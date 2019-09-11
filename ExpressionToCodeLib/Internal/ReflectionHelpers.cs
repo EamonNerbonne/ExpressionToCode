@@ -48,7 +48,7 @@ namespace ExpressionToCodeLib.Internal
                 return ((EventInfo)mi).GetAddMethod(true).IsStatic;
             } else {
                 throw new ArgumentOutOfRangeException(
-                    "mi",
+                    nameof(mi),
                     "Expression represents a member access for member" + mi.Name + " of membertype " + mi.MemberType
                     + " that is unsupported");
             }
