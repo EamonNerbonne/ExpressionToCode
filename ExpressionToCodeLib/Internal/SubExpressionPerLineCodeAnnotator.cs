@@ -42,10 +42,10 @@ namespace ExpressionToCodeLib.Internal
                 var subExpressionValues = new List<SubExpressionValue>();
                 FindSubExpressionValues(config, node, node, subExpressionValues, outerValueIsAssertionFailure);
                 var assertionValue = outerValueIsAssertionFailure? OutermostValue(config, node) : null;
-                return new ExpressionWithSubExpressions { 
+                return new ExpressionWithSubExpressions {
                     ExpressionString = fullExprText
                     + (assertionValue != null ? "\n"+ spacedArrow + assertionValue + " (caused assertion failure)\n" :""),
-                    SubExpressions = subExpressionValues.Distinct().ToArray() 
+                    SubExpressions = subExpressionValues.Distinct().ToArray()
                     };
             }
 

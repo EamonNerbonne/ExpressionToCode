@@ -79,7 +79,7 @@ namespace ExpressionToCodeLib.Internal
         static string EscapeCharForString(char c)
         {
             if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) {
-                //this is a little too rigorous; but easier to read 
+                //this is a little too rigorous; but easier to read
                 if (c == '\r') {
                     return "\\r";
                 } else if (c == '\t') {
