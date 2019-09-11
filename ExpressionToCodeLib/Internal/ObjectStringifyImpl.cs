@@ -36,7 +36,8 @@ namespace ExpressionToCodeLib.Internal
                 Enum enumVal => EnumValueToCode(val, enumVal),
                 Type typeVal => ("typeof(" + TypeNameToCode(typeVal) + ")"),
                 MethodInfo methodInfoVal => (TypeNameToCode(methodInfoVal.DeclaringType) + "." + methodInfoVal.Name),
-                _ => (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val) ? "default(" + TypeNameToCode(val.GetType()) + ")" : null)
+                _ when val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val) => "default(" + TypeNameToCode(val.GetType()) + ")",
+                _ => null
             };
 
         string EnumValueToCode(object val, Enum enumVal)
