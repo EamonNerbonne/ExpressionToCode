@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Xunit;
-using Assert = Xunit.Assert;
 // ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable ConvertToConstant.Local
