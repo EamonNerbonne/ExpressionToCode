@@ -116,7 +116,7 @@ namespace ExpressionToCodeTest
         {
             var actual = default((int, int, int, int, int, int, int, (int, int)));
             var alt = default((int, int, int, int, int, int, int, int, int));
-            Assert.False(Equals(actual.GetType(), alt.GetType())); //non-obvious compiler-guarranteed precondition
+            Assert.False(actual.GetType() == alt.GetType()); //non-obvious compiler-guarranteed precondition
             Assert.Equal("(int, int, int, int, int, int, int, (int, int))", actual.GetType().ToCSharpFriendlyTypeName());
         }
 
