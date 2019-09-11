@@ -36,16 +36,16 @@ namespace ExpressionToCodeLib.Internal
 
         public static bool IsMemberInfoStatic(MemberInfo mi)
         {
-            if (mi is FieldInfo) {
-                return ((FieldInfo)mi).IsStatic;
-            } else if (mi is MethodInfo) {
-                return (((MethodInfo)mi).Attributes & MethodAttributes.Static) == MethodAttributes.Static;
+            if (mi is FieldInfo fieldInfo) {
+                return fieldInfo.IsStatic;
+            } else if (mi is MethodInfo methodInfo) {
+                return (methodInfo.Attributes & MethodAttributes.Static) == MethodAttributes.Static;
             } else if (mi is PropertyInfo pi) {
                 return (pi.GetGetMethod(true) ?? pi.GetSetMethod(true)).IsStatic;
             } else if (mi.MemberType == MemberTypes.NestedType) {
                 return true;
-            } else if (mi is EventInfo) {
-                return ((EventInfo)mi).GetAddMethod(true).IsStatic;
+            } else if (mi is EventInfo eventInfo) {
+                return eventInfo.GetAddMethod(true).IsStatic;
             } else {
                 throw new ArgumentOutOfRangeException(
                     nameof(mi),
