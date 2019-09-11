@@ -19,7 +19,7 @@ using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest
 {
-    public class ExpressionToCodeLibTest
+    public sealed class ExpressionToCodeLibTest
     {
         [Fact]
         public void ComplexObjectToCodeAlsoSupportsExpressions()
