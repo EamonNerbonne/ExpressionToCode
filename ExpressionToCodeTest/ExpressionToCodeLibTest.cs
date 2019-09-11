@@ -605,11 +605,19 @@ namespace ExpressionToCodeTest
             }
         }
 
-        public string this[int index] => "TheIndexedValue";
-        public string TheProperty => "TheValue";
-        protected string TheProtectedProperty => "TheValue";
-        static string ThePrivateStaticProperty => "TheValue";
-        protected string TheProtectedWithPrivateSetterProperty { private get; set; }
+        public string this[int index]
+            => "TheIndexedValue";
+
+        public string TheProperty
+            => "TheValue";
+
+        string TheProtectedProperty
+            => "TheValue";
+
+        static string ThePrivateStaticProperty
+            => "TheValue";
+
+        string TheProtectedWithPrivateSetterProperty { private get; set; }
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
