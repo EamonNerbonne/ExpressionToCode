@@ -16,6 +16,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SignAssembly>true</SignAssembly>
+    <LangVersion>8.0</LangVersion>
     <WarningsAsErrors>NU1605</WarningsAsErrors>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
