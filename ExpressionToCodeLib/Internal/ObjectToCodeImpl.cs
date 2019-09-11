@@ -81,7 +81,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        class NastyHackyTupleCollector : IComparer
+        sealed class NastyHackyTupleCollector : IComparer
         {
             //hack assumptions:
             // - A structural ordering comparer must in some way iterate over its contents.

@@ -527,7 +527,7 @@ namespace ExpressionToCodeTest
             Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()", code);
         }
 
-        class B { }
+        sealed class B { }
 
         [Fact]
         public void ThisPropertyAccess()
@@ -590,7 +590,7 @@ namespace ExpressionToCodeTest
             Assert.Equal(@"() => someValue + closedVariable + "" "" + argument", expr);
         }
 
-        class ClassWithClosure
+        sealed class ClassWithClosure
         {
             public string someValue;
 
