@@ -21,11 +21,7 @@ namespace ExpressionToCodeLib.Internal
             if (val == null) {
                 return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
             } else if (val is string str) {
-                if (PreferLiteralSyntax(str)) {
-                    return "@\"" + str.Replace("\"", "\"\"") + "\"";
-                } else {
-                    return "\"" + EscapeStringChars(str) + "\"";
-                }
+                return PreferLiteralSyntax(str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"";
             } else if (val is char charVal) {
                 return "'" + EscapeCharForString(charVal) + "'";
             } else if (val is decimal) {
