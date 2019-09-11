@@ -18,7 +18,8 @@ namespace ExpressionToCodeLib.Internal
 
         public string PlainObjectToCode(object val, Type type)
             => val switch {
-                null => (type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")"),
+                null when type == null || type == typeof(object) => "null",
+                null => "default(" + TypeNameToCode(type) + ")",
                 string str => PreferLiteralSyntax(str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"",
                 char charVal => "'" + EscapeCharForString(charVal) + "'",
                 decimal _ => Convert.ToString(val, CultureInfo.InvariantCulture) + "m",
