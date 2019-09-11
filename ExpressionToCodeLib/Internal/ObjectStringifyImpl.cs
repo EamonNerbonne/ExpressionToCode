@@ -21,48 +21,45 @@ namespace ExpressionToCodeLib.Internal
             if (val == null) {
                 return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
             } else if (val is string str) {
-                var useLiteralSyntax = PreferLiteralSyntax(str);
-                if (useLiteralSyntax) {
+                if (PreferLiteralSyntax(str)) {
                     return "@\"" + str.Replace("\"", "\"\"") + "\"";
                 } else {
                     return "\"" + EscapeStringChars(str) + "\"";
                 }
-            } else if (val is char) {
-                return "'" + EscapeStringChars(val.ToString()) + "'";
+            } else if (val is char charVal) {
+                return "'" + EscapeCharForString(charVal) + "'";
             } else if (val is decimal) {
                 return Convert.ToString(val, CultureInfo.InvariantCulture) + "m";
             } else if (val is float floatVal) {
                 return FloatToCode(floatVal);
             } else if (val is double doubleVal) {
                 return DoubleToCode(doubleVal);
-            } else if (val is byte) {
-                return "((byte)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
-            } else if (val is sbyte) {
-                return "((sbyte)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
-            } else if (val is short) {
-                return "((short)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
-            } else if (val is ushort) {
-                return "((ushort)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
-            } else if (val is int) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture);
-            } else if (val is uint) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "U";
-            } else if (val is long) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "L";
-            } else if (val is ulong) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "UL";
-            } else if (val is bool && val.Equals(true)) {
-                return "true";
-            } else if (val is bool && val.Equals(false)) {
-                return "false";
+            } else if (val is byte byteVal) {
+                return "((byte)" + byteVal + ")";
+            } else if (val is sbyte sbyteVal) {
+                return "((sbyte)" + sbyteVal + ")";
+            } else if (val is short shortVal) {
+                return "((short)" + shortVal + ")";
+            } else if (val is ushort ushortVal) {
+                return "((ushort)" + ushortVal + ")";
+            } else if (val is int intVal) {
+                return intVal.ToString();
+            } else if (val is uint uintVal) {
+                return uintVal + "U";
+            } else if (val is long longVal) {
+                return longVal + "L";
+            } else if (val is ulong ulongVal) {
+                return ulongVal + "UL";
+            } else if (val is bool boolVal) {
+                return boolVal ? "true" : "false";
             } else if (val is Enum enumVal) {
                 if (Enum.IsDefined(enumVal.GetType(), enumVal)) {
                     return TypeNameToCode(enumVal.GetType()) + "." + enumVal;
                 } else {
-                    var longVal = ((IConvertible)enumVal).ToInt64(null);
+                    var enumAsLong = ((IConvertible)enumVal).ToInt64(null);
                     var toString = enumVal.ToString();
-                    if (toString == longVal.ToString()) {
-                        return "((" + TypeNameToCode(enumVal.GetType()) + ")" + longVal + ")";
+                    if (toString == enumAsLong.ToString()) {
+                        return "((" + TypeNameToCode(enumVal.GetType()) + ")" + enumAsLong + ")";
                     } else {
                         var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
                         return components.Length == 0
@@ -74,10 +71,10 @@ namespace ExpressionToCodeLib.Internal
                 }
             } else if (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
                 return "default(" + TypeNameToCode(val.GetType()) + ")";
-            } else if (val is Type) {
-                return "typeof(" + TypeNameToCode((Type)val) + ")";
-            } else if (val is MethodInfo) {
-                return TypeNameToCode(((MethodInfo)val).DeclaringType) + "." + ((MethodInfo)val).Name;
+            } else if (val is Type typeVal) {
+                return "typeof(" + TypeNameToCode(typeVal) + ")";
+            } else if (val is MethodInfo methodInfoVal) {
+                return TypeNameToCode(methodInfoVal.DeclaringType) + "." + methodInfoVal.Name;
             } else {
                 return null;
             }
