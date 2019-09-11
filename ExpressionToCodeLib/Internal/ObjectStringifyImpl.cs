@@ -55,20 +55,20 @@ namespace ExpressionToCodeLib.Internal
                 return "true";
             } else if (val is bool && val.Equals(false)) {
                 return "false";
-            } else if (val is Enum) {
-                if (Enum.IsDefined(val.GetType(), val)) {
-                    return TypeNameToCode(val.GetType()) + "." + val;
+            } else if (val is Enum enumVal) {
+                if (Enum.IsDefined(enumVal.GetType(), enumVal)) {
+                    return TypeNameToCode(enumVal.GetType()) + "." + enumVal;
                 } else {
-                    var longVal = ((IConvertible)val).ToInt64(null);
-                    var toString = ((IConvertible)val).ToString(CultureInfo.InvariantCulture);
+                    var longVal = ((IConvertible)enumVal).ToInt64(null);
+                    var toString = enumVal.ToString(CultureInfo.InvariantCulture);
                     if (toString == longVal.ToString(CultureInfo.InvariantCulture)) {
-                        return "((" + TypeNameToCode(val.GetType()) + ")" + longVal + ")";
+                        return "((" + TypeNameToCode(enumVal.GetType()) + ")" + longVal + ")";
                     } else {
                         var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
                         return components.Length == 0
-                            ? "default(" + TypeNameToCode(val.GetType()) + ")"
+                            ? "default(" + TypeNameToCode(enumVal.GetType()) + ")"
                             : components.Length == 1
-                                ? TypeNameToCode(val.GetType()) + "." + components[0]
+                                ? TypeNameToCode(enumVal.GetType()) + "." + components[0]
                                 : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
                     }
                 }
