@@ -49,22 +49,7 @@ namespace ExpressionToCodeLib.Internal
             } else if (val is bool boolVal) {
                 return boolVal ? "true" : "false";
             } else if (val is Enum enumVal) {
-                if (Enum.IsDefined(enumVal.GetType(), enumVal)) {
-                    return TypeNameToCode(enumVal.GetType()) + "." + enumVal;
-                } else {
-                    var enumAsLong = ((IConvertible)enumVal).ToInt64(null);
-                    var toString = enumVal.ToString();
-                    if (toString == enumAsLong.ToString()) {
-                        return "((" + TypeNameToCode(enumVal.GetType()) + ")" + enumAsLong + ")";
-                    } else {
-                        var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
-                        return components.Length == 0
-                            ? "default(" + TypeNameToCode(enumVal.GetType()) + ")"
-                            : components.Length == 1
-                                ? TypeNameToCode(enumVal.GetType()) + "." + components[0]
-                                : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
-                    }
-                }
+                return EnumValueToCode(val, enumVal);
             } else if (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
                 return "default(" + TypeNameToCode(val.GetType()) + ")";
             } else if (val is Type typeVal) {
@@ -73,6 +58,26 @@ namespace ExpressionToCodeLib.Internal
                 return TypeNameToCode(methodInfoVal.DeclaringType) + "." + methodInfoVal.Name;
             } else {
                 return null;
+            }
+        }
+
+        string EnumValueToCode(object val, Enum enumVal)
+        {
+            if (Enum.IsDefined(enumVal.GetType(), enumVal)) {
+                return TypeNameToCode(enumVal.GetType()) + "." + enumVal;
+            } else {
+                var enumAsLong = ((IConvertible)enumVal).ToInt64(null);
+                var toString = enumVal.ToString();
+                if (toString == enumAsLong.ToString()) {
+                    return "((" + TypeNameToCode(enumVal.GetType()) + ")" + enumAsLong + ")";
+                } else {
+                    var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                    return components.Length == 0
+                        ? "default(" + TypeNameToCode(enumVal.GetType()) + ")"
+                        : components.Length == 1
+                            ? TypeNameToCode(enumVal.GetType()) + "." + components[0]
+                            : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
+                }
             }
         }
 
