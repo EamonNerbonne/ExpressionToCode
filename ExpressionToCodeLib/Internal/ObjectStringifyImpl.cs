@@ -17,49 +17,27 @@ namespace ExpressionToCodeLib.Internal
             => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
 
         public string PlainObjectToCode(object val, Type type)
-        {
-            if (val == null) {
-                return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
-            } else if (val is string str) {
-                return PreferLiteralSyntax(str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"";
-            } else if (val is char charVal) {
-                return "'" + EscapeCharForString(charVal) + "'";
-            } else if (val is decimal) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "m";
-            } else if (val is float floatVal) {
-                return FloatToCode(floatVal);
-            } else if (val is double doubleVal) {
-                return DoubleToCode(doubleVal);
-            } else if (val is byte byteVal) {
-                return "((byte)" + byteVal + ")";
-            } else if (val is sbyte sbyteVal) {
-                return "((sbyte)" + sbyteVal + ")";
-            } else if (val is short shortVal) {
-                return "((short)" + shortVal + ")";
-            } else if (val is ushort ushortVal) {
-                return "((ushort)" + ushortVal + ")";
-            } else if (val is int intVal) {
-                return intVal.ToString();
-            } else if (val is uint uintVal) {
-                return uintVal + "U";
-            } else if (val is long longVal) {
-                return longVal + "L";
-            } else if (val is ulong ulongVal) {
-                return ulongVal + "UL";
-            } else if (val is bool boolVal) {
-                return boolVal ? "true" : "false";
-            } else if (val is Enum enumVal) {
-                return EnumValueToCode(val, enumVal);
-            } else if (val is Type typeVal) {
-                return "typeof(" + TypeNameToCode(typeVal) + ")";
-            } else if (val is MethodInfo methodInfoVal) {
-                return TypeNameToCode(methodInfoVal.DeclaringType) + "." + methodInfoVal.Name;
-            } else if (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
-                return "default(" + TypeNameToCode(val.GetType()) + ")";
-            } else {
-                return null;
-            }
-        }
+            => val switch {
+                null => (type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")"),
+                string str => (PreferLiteralSyntax(str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\""),
+                char charVal => ("'" + EscapeCharForString(charVal) + "'"),
+                decimal _ => (Convert.ToString(val, CultureInfo.InvariantCulture) + "m"),
+                float floatVal => FloatToCode(floatVal),
+                double doubleVal => DoubleToCode(doubleVal),
+                byte byteVal => ("((byte)" + byteVal + ")"),
+                sbyte sbyteVal => ("((sbyte)" + sbyteVal + ")"),
+                short shortVal => ("((short)" + shortVal + ")"),
+                ushort ushortVal => ("((ushort)" + ushortVal + ")"),
+                int intVal => intVal.ToString(),
+                uint uintVal => (uintVal + "U"),
+                long longVal => (longVal + "L"),
+                ulong ulongVal => (ulongVal + "UL"),
+                bool boolVal => (boolVal ? "true" : "false"),
+                Enum enumVal => EnumValueToCode(val, enumVal),
+                Type typeVal => ("typeof(" + TypeNameToCode(typeVal) + ")"),
+                MethodInfo methodInfoVal => (TypeNameToCode(methodInfoVal.DeclaringType) + "." + methodInfoVal.Name),
+                _ => (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val) ? "default(" + TypeNameToCode(val.GetType()) + ")" : null)
+            };
 
         string EnumValueToCode(object val, Enum enumVal)
         {
