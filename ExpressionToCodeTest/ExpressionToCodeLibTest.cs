@@ -180,7 +180,6 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 "() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any",
                 actual);
-            Console.WriteLine(actual);
         }
 
         [Fact]
