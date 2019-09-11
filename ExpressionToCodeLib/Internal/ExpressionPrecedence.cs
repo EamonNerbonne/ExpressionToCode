@@ -18,205 +18,109 @@ namespace ExpressionToCodeLib.Internal
             => UnaryDashSym(a) && UnaryDashSym(b) || UnaryPlusSym(a) && UnaryPlusSym(b);
 
         public static int Rank(ExpressionType exprType)
-        {
-            switch (exprType) {
+            => exprType switch {
                 //brackets make no sense:
-                case ExpressionType.Block:
-                    return -1;
-                case ExpressionType.Goto:
-                    return -1;
-                case ExpressionType.Loop:
-                    return -1;
-                case ExpressionType.Switch:
-                    return -1;
-                case ExpressionType.Throw:
-                    return -1;
-                case ExpressionType.Try:
-                    return -1;
-                case ExpressionType.Label:
-                    return -1;
-
+                ExpressionType.Block => -1,
+                ExpressionType.Goto => -1,
+                ExpressionType.Loop => -1,
+                ExpressionType.Switch => -1,
+                ExpressionType.Throw => -1,
+                ExpressionType.Try => -1,
+                ExpressionType.Label => -1,
                 //brackets built-in; thus unnecesary (for params only!).
-                case ExpressionType.MemberInit:
-                    return 1;
-                case ExpressionType.ArrayIndex:
-                    return 1;
-                case ExpressionType.Call:
-                    return 1;
-                case ExpressionType.Invoke:
-                    return 1;
-                case ExpressionType.New:
-                    return 1;
-                case ExpressionType.NewArrayInit:
-                    return 1;
-                case ExpressionType.NewArrayBounds:
-                    return 1;
-                case ExpressionType.ListInit:
-                    return 1;
-                case ExpressionType.Power:
-                    return 1; //non-native, uses Call.
-
+                ExpressionType.MemberInit => 1,
+                ExpressionType.ArrayIndex => 1,
+                ExpressionType.Call => 1,
+                ExpressionType.Invoke => 1,
+                ExpressionType.New => 1,
+                ExpressionType.NewArrayInit => 1,
+                ExpressionType.NewArrayBounds => 1,
+                ExpressionType.ListInit => 1,
+                ExpressionType.Power => 1 //non-native, uses Call.
+                ,
                 //other primary expressions
-                case ExpressionType.Constant:
-                    return 1;
-                case ExpressionType.Parameter:
-                    return 1;
-                case ExpressionType.MemberAccess:
-                    return 1;
-                case ExpressionType.ArrayLength:
-                    return 1;
-                case ExpressionType.Index:
-                    return 1;
-                case ExpressionType.Default:
-                    return 1;
-                case ExpressionType.PostIncrementAssign:
-                    return 1;
-                case ExpressionType.PostDecrementAssign:
-                    return 1;
-
+                ExpressionType.Constant => 1,
+                ExpressionType.Parameter => 1,
+                ExpressionType.MemberAccess => 1,
+                ExpressionType.ArrayLength => 1,
+                ExpressionType.Index => 1,
+                ExpressionType.Default => 1,
+                ExpressionType.PostIncrementAssign => 1,
+                ExpressionType.PostDecrementAssign => 1,
                 //unary prefixes
-                case ExpressionType.UnaryPlus:
-                    return 2;
-                case ExpressionType.Negate:
-                    return 2;
-                case ExpressionType.NegateChecked:
-                    return 2;
-                case ExpressionType.Convert:
-                    return 2;
-                case ExpressionType.ConvertChecked:
-                    return 2;
-                case ExpressionType.Not:
-                    return 2; //bitwise OR numeric!
-                case ExpressionType.OnesComplement:
-                    return 2; //numeric
-                case ExpressionType.IsTrue:
-                    return 2; //maybe?
-                case ExpressionType.IsFalse:
-                    return 2; //maybe?
-                case ExpressionType.PreIncrementAssign:
-                    return 2;
-                case ExpressionType.PreDecrementAssign:
-                    return 2;
-
+                ExpressionType.UnaryPlus => 2,
+                ExpressionType.Negate => 2,
+                ExpressionType.NegateChecked => 2,
+                ExpressionType.Convert => 2,
+                ExpressionType.ConvertChecked => 2,
+                ExpressionType.Not => 2 //bitwise OR numeric!
+                ,
+                ExpressionType.OnesComplement => 2 //numeric
+                ,
+                ExpressionType.IsTrue => 2 //maybe?
+                ,
+                ExpressionType.IsFalse => 2 //maybe?
+                ,
+                ExpressionType.PreIncrementAssign => 2,
+                ExpressionType.PreDecrementAssign => 2,
                 //binary multiplicative
-                case ExpressionType.Modulo:
-                    return 3;
-                case ExpressionType.Multiply:
-                    return 3;
-                case ExpressionType.MultiplyChecked:
-                    return 3;
-                case ExpressionType.Divide:
-                    return 3;
-
+                ExpressionType.Modulo => 3,
+                ExpressionType.Multiply => 3,
+                ExpressionType.MultiplyChecked => 3,
+                ExpressionType.Divide => 3,
                 //binary addition
-                case ExpressionType.Add:
-                    return 4;
-                case ExpressionType.AddChecked:
-                    return 4;
-                case ExpressionType.Subtract:
-                    return 4;
-                case ExpressionType.SubtractChecked:
-                    return 4;
-                case ExpressionType.Decrement:
-                    return 4; //nonnative; uses ... - 1
-                case ExpressionType.Increment:
-                    return 4; //nonnative; uses ... - 1
-
+                ExpressionType.Add => 4,
+                ExpressionType.AddChecked => 4,
+                ExpressionType.Subtract => 4,
+                ExpressionType.SubtractChecked => 4,
+                ExpressionType.Decrement => 4 //nonnative; uses ... - 1
+                ,
+                ExpressionType.Increment => 4 //nonnative; uses ... - 1
+                ,
                 //binary shift
-                case ExpressionType.LeftShift:
-                    return 5;
-                case ExpressionType.RightShift:
-                    return 5;
-
+                ExpressionType.LeftShift => 5,
+                ExpressionType.RightShift => 5,
                 //relational excl. equals
-                case ExpressionType.LessThan:
-                    return 6;
-                case ExpressionType.LessThanOrEqual:
-                    return 6;
-                case ExpressionType.GreaterThan:
-                    return 6;
-                case ExpressionType.GreaterThanOrEqual:
-                    return 6;
-                case ExpressionType.TypeAs:
-                    return 6;
-                case ExpressionType.TypeIs:
-                    return 6;
-
+                ExpressionType.LessThan => 6,
+                ExpressionType.LessThanOrEqual => 6,
+                ExpressionType.GreaterThan => 6,
+                ExpressionType.GreaterThanOrEqual => 6,
+                ExpressionType.TypeAs => 6,
+                ExpressionType.TypeIs => 6,
                 //equality
-                case ExpressionType.NotEqual:
-                    return 7;
-                case ExpressionType.Equal:
-                    return 7;
-
+                ExpressionType.NotEqual => 7,
+                ExpressionType.Equal => 7,
                 //bitwise/eager
-                case ExpressionType.And:
-                    return 8;
-                case ExpressionType.ExclusiveOr:
-                    return 9;
-                case ExpressionType.Or:
-                    return 10;
-
+                ExpressionType.And => 8,
+                ExpressionType.ExclusiveOr => 9,
+                ExpressionType.Or => 10,
                 //logical/shortcircuit:
-                case ExpressionType.AndAlso:
-                    return 11;
-                case ExpressionType.OrElse:
-                    return 12;
-
+                ExpressionType.AndAlso => 11,
+                ExpressionType.OrElse => 12,
                 //null-coalesce
-                case ExpressionType.Coalesce:
-                    return 13;
-
+                ExpressionType.Coalesce => 13,
                 //ternary ? :
-                case ExpressionType.Conditional:
-                    return 14;
-
+                ExpressionType.Conditional => 14,
                 //assignments & lamba's
-                case ExpressionType.Lambda:
-                    return 15;
-                case ExpressionType.Quote:
-                    return 15; //maybe?
-                case ExpressionType.Assign:
-                    return 15;
-                case ExpressionType.AddAssign:
-                    return 15;
-                case ExpressionType.AndAssign:
-                    return 15;
-                case ExpressionType.DivideAssign:
-                    return 15;
-                case ExpressionType.ExclusiveOrAssign:
-                    return 15;
-                case ExpressionType.LeftShiftAssign:
-                    return 15;
-                case ExpressionType.ModuloAssign:
-                    return 15;
-                case ExpressionType.MultiplyAssign:
-                    return 15;
-                case ExpressionType.OrAssign:
-                    return 15;
-                case ExpressionType.PowerAssign:
-                    return 15;
-                case ExpressionType.RightShiftAssign:
-                    return 15;
-                case ExpressionType.SubtractAssign:
-                    return 15;
-                case ExpressionType.AddAssignChecked:
-                    return 15;
-                case ExpressionType.MultiplyAssignChecked:
-                    return 15;
-                case ExpressionType.SubtractAssignChecked:
-                    return 15;
-
-                //Can't deal with these:
-                //case ExpressionType.Dynamic: return 0;//hmm...
-                //case ExpressionType.Extension: return 0;
-                //case ExpressionType.DebugInfo: return 0;//hmm...
-                //case ExpressionType.RuntimeVariables: return 0;//hmm...
-                //case ExpressionType.TypeEqual: return 0;//hmm...
-                //case ExpressionType.Unbox: return 0;//hmm...
-
-                default:
-                    throw new ArgumentOutOfRangeException("Unsupported enum value:" + exprType);
-            }
-        }
+                ExpressionType.Lambda => 15,
+                ExpressionType.Quote => 15 //maybe?
+                ,
+                ExpressionType.Assign => 15,
+                ExpressionType.AddAssign => 15,
+                ExpressionType.AndAssign => 15,
+                ExpressionType.DivideAssign => 15,
+                ExpressionType.ExclusiveOrAssign => 15,
+                ExpressionType.LeftShiftAssign => 15,
+                ExpressionType.ModuloAssign => 15,
+                ExpressionType.MultiplyAssign => 15,
+                ExpressionType.OrAssign => 15,
+                ExpressionType.PowerAssign => 15,
+                ExpressionType.RightShiftAssign => 15,
+                ExpressionType.SubtractAssign => 15,
+                ExpressionType.AddAssignChecked => 15,
+                ExpressionType.MultiplyAssignChecked => 15,
+                ExpressionType.SubtractAssignChecked => 15,
+                _ => throw new ArgumentOutOfRangeException("Unsupported enum value:" + exprType)
+            };
     }
 }
