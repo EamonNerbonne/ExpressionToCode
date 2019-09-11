@@ -56,6 +56,7 @@ namespace ExpressionToCodeTest
             => Assert.Equal(
                 @"() => new object() as string == default(string)",
                 // ReSharper disable once TryCastAndCheckForNull.0
+                // ReSharper disable once SafeCastIsUsedAsTypeCheck
                 ExpressionToCode.ToCode(() => new object() as string == null));
 
         [Fact]
@@ -588,7 +589,8 @@ namespace ExpressionToCodeTest
             Assert.Equal(@"() => someValue + closedVariable + "" "" + argument", expr);
         }
 
-        sealed class ClassWithClosure
+        // ReSharper disable once ClassCanBeSealed.Local
+        class ClassWithClosure
         {
             public string someValue;
 
@@ -603,19 +605,24 @@ namespace ExpressionToCodeTest
             }
         }
 
+        // ReSharper disable once UnusedParameter.Global
         public string this[int index]
             => "TheIndexedValue";
 
         public string TheProperty
             => "TheValue";
 
+        // ReSharper disable once MemberCanBeMadeStatic.Local
         string TheProtectedProperty
             => "TheValue";
 
         static string ThePrivateStaticProperty
             => "TheValue";
 
-        string TheProtectedWithPrivateSetterProperty { private get; set; }
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+#pragma warning disable 628
+        protected string TheProtectedWithPrivateSetterProperty { get; private set; }
+#pragma warning restore 628
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
@@ -628,7 +635,7 @@ namespace ExpressionToCodeTest
             => alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
     }
 
-    class ClassA
+    sealed class ClassA
     {
         public static int MethodWithOutAndRefParam<T>(ref T input, out object output, int x)
         {
