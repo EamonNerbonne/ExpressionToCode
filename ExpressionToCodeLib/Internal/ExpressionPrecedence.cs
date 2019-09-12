@@ -36,8 +36,7 @@ namespace ExpressionToCodeLib.Internal
                 ExpressionType.NewArrayInit => 1,
                 ExpressionType.NewArrayBounds => 1,
                 ExpressionType.ListInit => 1,
-                ExpressionType.Power => 1 //non-native, uses Call.
-                ,
+                ExpressionType.Power => 1, //non-native, uses Call.
                 //other primary expressions
                 ExpressionType.Constant => 1,
                 ExpressionType.Parameter => 1,
@@ -53,14 +52,10 @@ namespace ExpressionToCodeLib.Internal
                 ExpressionType.NegateChecked => 2,
                 ExpressionType.Convert => 2,
                 ExpressionType.ConvertChecked => 2,
-                ExpressionType.Not => 2 //bitwise OR numeric!
-                ,
-                ExpressionType.OnesComplement => 2 //numeric
-                ,
-                ExpressionType.IsTrue => 2 //maybe?
-                ,
-                ExpressionType.IsFalse => 2 //maybe?
-                ,
+                ExpressionType.Not => 2, //bitwise OR numeric!
+                ExpressionType.OnesComplement => 2, //numeric
+                ExpressionType.IsTrue => 2, //maybe?
+                ExpressionType.IsFalse => 2, //maybe?
                 ExpressionType.PreIncrementAssign => 2,
                 ExpressionType.PreDecrementAssign => 2,
                 //binary multiplicative
@@ -73,10 +68,8 @@ namespace ExpressionToCodeLib.Internal
                 ExpressionType.AddChecked => 4,
                 ExpressionType.Subtract => 4,
                 ExpressionType.SubtractChecked => 4,
-                ExpressionType.Decrement => 4 //nonnative; uses ... - 1
-                ,
-                ExpressionType.Increment => 4 //nonnative; uses ... - 1
-                ,
+                ExpressionType.Decrement => 4, //nonnative; uses ... - 1
+                ExpressionType.Increment => 4, //nonnative; uses ... - 1
                 //binary shift
                 ExpressionType.LeftShift => 5,
                 ExpressionType.RightShift => 5,
@@ -103,8 +96,7 @@ namespace ExpressionToCodeLib.Internal
                 ExpressionType.Conditional => 14,
                 //assignments & lamba's
                 ExpressionType.Lambda => 15,
-                ExpressionType.Quote => 15 //maybe?
-                ,
+                ExpressionType.Quote => 15, //maybe?
                 ExpressionType.Assign => 15,
                 ExpressionType.AddAssign => 15,
                 ExpressionType.AndAssign => 15,
