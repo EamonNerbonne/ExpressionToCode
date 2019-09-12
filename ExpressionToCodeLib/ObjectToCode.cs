@@ -20,12 +20,12 @@ namespace ExpressionToCodeLib
         public static string ComplexObjectToPseudoCode(this ExpressionToCodeConfiguration config, object val)
             => ObjectToCodeImpl.ComplexObjectToPseudoCode(config, val, 0);
 
-        public static string PlainObjectToCode(object val)
+        public static string PlainObjectToCode(object? val)
             => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.Value.ObjectStringifier.PlainObjectToCode(
                 val,
                 val?.GetType());
 
-        public static string PlainObjectToCode(object val, Type type)
+        public static string PlainObjectToCode(object? val, Type type)
             => ExpressionToCodeConfiguration.GlobalCodeGenConfiguration.Value.ObjectStringifier.PlainObjectToCode(
                 val,
                 type);

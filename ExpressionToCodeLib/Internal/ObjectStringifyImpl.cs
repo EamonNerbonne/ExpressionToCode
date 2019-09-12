@@ -16,7 +16,7 @@ namespace ExpressionToCodeLib.Internal
         public string TypeNameToCode(Type type)
             => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
 
-        public string PlainObjectToCode(object val, Type type)
+        public string? PlainObjectToCode(object? val, Type? type)
             => val switch {
                 null when type == null || type == typeof(object) => "null",
                 null => "default(" + TypeNameToCode(type) + ")",

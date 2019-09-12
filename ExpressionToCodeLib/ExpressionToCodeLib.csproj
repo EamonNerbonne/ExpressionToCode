@@ -17,6 +17,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SignAssembly>true</SignAssembly>
     <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
     <WarningsAsErrors>NU1605</WarningsAsErrors>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>

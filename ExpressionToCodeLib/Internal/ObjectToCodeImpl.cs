@@ -13,10 +13,10 @@ namespace ExpressionToCodeLib.Internal
     {
         static readonly string[] lineSeparators = { "\r\n", "\n" };
 
-        public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent)
+        public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object? val, int indent)
             => ComplexObjectToPseudoCode(config, val, indent, config.Value.MaximumValueLength ?? int.MaxValue);
 
-        static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize)
+        static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object? val, int indent, int valueSize)
         {
             var retval = ObjectToCode.PlainObjectToCode(val);
             if (val is string) {
@@ -198,7 +198,7 @@ namespace ExpressionToCodeLib.Internal
                 => PrintInitializerContents(config, (IEnumerable<KeyValuePair<TKey, TValue>>)list);
         }
 
-        public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent)
+        public static string? ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent)
         {
             try {
                 Delegate lambda;
