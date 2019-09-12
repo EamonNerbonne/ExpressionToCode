@@ -29,47 +29,47 @@ namespace ExpressionToCodeLib.Internal
         static readonly MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>)ReferenceEquals).GetMethodInfo();
 
         public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e)
-            => ExtractEqualityType(e).Item1;
+            => ExtractEqualityType(e).kind;
 
-        static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression<Func<bool>> e)
+        static (EqualityExpressionClass kind, Expression?, Expression?) ExtractEqualityType(Expression<Func<bool>> e)
             => ExtractEqualityType(e.Body);
 
-        static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression e)
+        static (EqualityExpressionClass kind, Expression?, Expression?) ExtractEqualityType(Expression e)
         {
             if (e.Type == typeof(bool)) {
                 if (e is BinaryExpression binExpr) {
                     if (binExpr.NodeType == ExpressionType.Equal) {
-                        return Tuple.Create(EqualityExpressionClass.EqualsOp, binExpr.Left, binExpr.Right);
+                        return (EqualityExpressionClass.EqualsOp, binExpr.Left, binExpr.Right);
                     } else if (e.NodeType == ExpressionType.NotEqual) {
-                        return Tuple.Create(EqualityExpressionClass.NotEqualsOp, binExpr.Left, binExpr.Right);
+                        return (EqualityExpressionClass.NotEqualsOp, binExpr.Left, binExpr.Right);
                     }
                 } else if (e.NodeType == ExpressionType.Call) {
                     var mce = (MethodCallExpression)e;
                     if (mce.Method.Equals(((Func<object, bool>)new object().Equals).GetMethodInfo())) {
-                        return Tuple.Create(EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
+                        return (EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
                     } else if (mce.Method.Equals(objEqualStaticMethod)) {
-                        return Tuple.Create(
+                        return (
                             EqualityExpressionClass.ObjectEqualsStatic,
                             mce.Arguments.First(),
                             mce.Arguments.Skip(1).Single());
                     } else if (mce.Method.Equals(objEqualReferenceMethod)) {
-                        return Tuple.Create(
+                        return (
                             EqualityExpressionClass.ObjectReferenceEquals,
                             mce.Arguments.First(),
                             mce.Arguments.Skip(1).Single());
                     } else if (IsImplementationOfGenericInterfaceMethod(mce.Method, typeof(IEquatable<>), "Equals")) {
-                        return Tuple.Create(EqualityExpressionClass.EquatableEquals, mce.Object, mce.Arguments.Single());
+                        return (EqualityExpressionClass.EquatableEquals, mce.Object, mce.Arguments.Single());
                     } else if (IsImplementationOfInterfaceMethod(mce.Method, typeof(IStructuralEquatable), "Equals")) {
-                        return Tuple.Create(EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
+                        return (EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
                     } else if (HaveSameGenericDefinition(
                         mce.Method,
                         ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).GetMethodInfo())) {
-                        return Tuple.Create(EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
+                        return (EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
                     }
                 }
             }
 
-            return Tuple.Create(EqualityExpressionClass.None, default(Expression), default(Expression));
+            return (EqualityExpressionClass.None, default(Expression), default(Expression));
         }
 
         static ConstantExpression ToConstantExpr(ExpressionToCodeConfiguration config, Expression e)
