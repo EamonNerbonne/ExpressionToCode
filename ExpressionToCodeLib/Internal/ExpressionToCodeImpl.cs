@@ -60,7 +60,7 @@ namespace ExpressionToCodeLib.Internal
         [Pure]
         static IEnumerable<StringifiedExpression> ArgListDispatch(
             IEnumerable<StringifiedExpression> arguments,
-            Expression value = null,
+            Expression? value = null,
             string open = "(",
             string close = ")",
             string joiner = ", ")

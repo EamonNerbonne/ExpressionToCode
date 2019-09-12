@@ -145,6 +145,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void MembersDefault()
         {
+#pragma warning disable CS8602 // Dereference of a possibly null reference. - these are false positives, because the code isn't executed, it's stringified.
             Assert.Equal(
                 @"() => default(DateTime).Ticks == 0L",
                 ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0L));
@@ -167,6 +168,7 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => default(List<int>).AsReadOnly()",
                 ExpressionToCode.ToCode(() => default(List<int>).AsReadOnly()));
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
 
         [Fact]
@@ -194,7 +196,7 @@ namespace ExpressionToCodeTest
                 @"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)set.Add)",
                 ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
 
-            Func<Func<object, object, bool>, bool> sink = f => f(null, null);
+            Func<Func<object?, object?, bool>, bool> sink = f => f(null, null);
             Assert.Equal(
                 @"() => sink((Func<object, object, bool>)object.Equals)",
                 ExpressionToCode.ToCode(() => sink(int.Equals)));

@@ -6,13 +6,13 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    class HasIndexers
+    sealed class HasIndexers
     {
-        public object this[string s] => null;
-        public object this[int i] => null;
+        public object? this[string s] => null;
+        public object? this[int i] => null;
     }
 
-    public class MultipleIndexerTest
+    public sealed class MultipleIndexerTest
     {
         [Fact]
         public void CanPrettyPrintVariousIndexers()

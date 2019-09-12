@@ -121,6 +121,7 @@ namespace ExpressionToCodeTest
         }
 
         static bool IsPublic(Type type)
-            => type.GetTypeInfo().IsPublic || type.GetTypeInfo().IsNestedPublic && IsPublic(type.DeclaringType);
+            // ReSharper disable once ConstantNullCoalescingCondition
+            => type.GetTypeInfo().IsPublic || type.GetTypeInfo().IsNestedPublic && IsPublic(type.DeclaringType ?? throw new InvalidOperationException("A nested public type has no declaring type" + type));
     }
 }

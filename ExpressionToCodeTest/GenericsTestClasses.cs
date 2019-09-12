@@ -11,7 +11,7 @@ using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest
 {
-    public class TestGenerics
+    public sealed class TestGenerics
     {
         [Fact]
         public void TypeParameters()
@@ -64,8 +64,8 @@ namespace ExpressionToCodeTest
         public void GenericConstructor()
         {
             Assert.Equal(
-                @"() => new GenericClass<int>()",
-                ExpressionToCode.ToCode(() => new GenericClass<int>())
+                @"() => new List<int>()",
+                ExpressionToCode.ToCode(() => new List<int>())
             );
             Assert.Equal(
                 @"() => new GenericClass<int>(3)",
@@ -81,8 +81,8 @@ namespace ExpressionToCodeTest
         public void MethodInGenericClass()
         {
             Assert.Equal(
-                @"() => new GenericClass<int>().IsSet()",
-                ExpressionToCode.ToCode(() => new GenericClass<int>().IsSet())
+                @"() => new GenericClass<int>(3).IsSet(3)",
+                ExpressionToCode.ToCode(() => new GenericClass<int>(3).IsSet(3))
             );
             Assert.Equal(
                 @"() => GenericClass<int>.GetDefault()",
@@ -238,22 +238,16 @@ namespace ExpressionToCodeTest
         public GenericClass(T pVal)
             => val = pVal;
 
-        public GenericClass()
-            => val = default(T);
-
         public T Value => val;
 
         public void Reset(T pVal)
             => val = pVal;
 
-        public void Reset()
-            => val = default(T);
-
-        public bool IsSet()
-            => Equals(default(T), val);
+        public bool IsSet(T pVal)
+            => Equals(pVal, val);
 
         public static T GetDefault()
-            => default(T);
+            => default!;
 
         public static bool IsEnumerableOfType<U>(IEnumerable<U> x)
             => typeof(T).GetTypeInfo().IsAssignableFrom(typeof(U));
