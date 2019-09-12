@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Internal
 {
-    class ObjectStringifyImpl : IObjectStringifier
+    sealed class ObjectStringifyImpl : IObjectStringifier
     {
         readonly bool fullTypeNames;
 
