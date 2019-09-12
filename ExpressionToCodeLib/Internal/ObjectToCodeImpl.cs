@@ -26,24 +26,7 @@ namespace ExpressionToCodeLib.Internal
             } else if (val is Array arrayVal) {
                 return "new[] " + FormatEnumerable(config, arrayVal, indent, valueSize - 6);
             } else if (val is IEnumerable enumerableVal) {
-                var type = val.GetType();
-                if (type.GetConstructor(Type.EmptyTypes) is ConstructorInfo ci && ci.IsPublic) {
-                    foreach (var pi in type.GetProperties()) {
-                        if (
-                            pi.Name == "Item"
-                            && pi.CanWrite
-                            && pi.GetIndexParameters() is ParameterInfo[] indexPars
-                            && indexPars.Length == 1
-                            && typeof(IEnumerable<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(indexPars[0].ParameterType, pi.PropertyType)) is Type keyEnumerableType
-                            && keyEnumerableType.IsAssignableFrom(type)
-                        ) {
-                            var typeName = type.ToCSharpFriendlyTypeName();
-                            return "new " + typeName + " " + PrintInitializerContents(config, enumerableVal, indexPars[0].ParameterType, pi.PropertyType, indent, valueSize - typeName.Length);
-                        }
-                    }
-                }
-
-                return FormatEnumerable(config, enumerableVal, indent, valueSize);
+                return FormatTypeWithListInitializerOrNull(config, val, indent, valueSize, enumerableVal) ?? FormatEnumerable(config, enumerableVal, indent, valueSize);
             } else if (val is Expression exprVal) {
                 return ElideAfter(config.GetExpressionToCode().ToCode(exprVal), valueSize);
             } else if (val is IStructuralComparable tuple && val is IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
@@ -79,6 +62,28 @@ namespace ExpressionToCodeLib.Internal
             } else {
                 return ElideAfter(val.ToString(), valueSize);
             }
+        }
+
+        static string? FormatTypeWithListInitializerOrNull(ExpressionToCodeConfiguration config, object val, int indent, int valueSize, IEnumerable enumerableVal)
+        {
+            var type = val.GetType();
+            if (!(type.GetConstructor(Type.EmptyTypes) is ConstructorInfo ci) || !ci.IsPublic) {
+                return null;
+            }
+            foreach (var pi in type.GetProperties()) {
+                if (
+                    pi.Name == "Item"
+                    && pi.CanWrite
+                    && pi.GetIndexParameters() is ParameterInfo[] indexPars
+                    && indexPars.Length == 1
+                    && typeof(IEnumerable<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(indexPars[0].ParameterType, pi.PropertyType)) is Type keyEnumerableType
+                    && keyEnumerableType.IsAssignableFrom(type)
+                ) {
+                    var typeName = type.ToCSharpFriendlyTypeName();
+                    return "new " + typeName + " " + PrintInitializerContents(config, enumerableVal, indexPars[0].ParameterType, pi.PropertyType, indent, valueSize - typeName.Length);
+                }
+            }
+            return null;
         }
 
         sealed class NastyHackyTupleCollector : IComparer
