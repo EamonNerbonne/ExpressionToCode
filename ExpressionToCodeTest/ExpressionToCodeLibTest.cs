@@ -146,6 +146,7 @@ namespace ExpressionToCodeTest
         public void MembersDefault()
         {
 #pragma warning disable CS8602 // Dereference of a possibly null reference. - these are false positives, because the code isn't executed, it's stringified.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type. - these are false positives, because the code isn't executed, it's stringified.
             Assert.Equal(
                 @"() => default(DateTime).Ticks == 0L",
                 ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0L));
@@ -169,6 +170,7 @@ namespace ExpressionToCodeTest
                 @"() => default(List<int>).AsReadOnly()",
                 ExpressionToCode.ToCode(() => default(List<int>).AsReadOnly()));
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Fact]
@@ -439,7 +441,7 @@ namespace ExpressionToCodeTest
         public void StaticMethodWithRefAndOutModifiers()
         {
             var x = "a";
-            object y;
+            object? y;
             Assert.Equal(
                 @"() => ClassA.MethodWithOutAndRefParam(ref x, out y, 3)",
                 ExpressionToCode.ToCode(() => ClassA.MethodWithOutAndRefParam(ref x, out y, 3)));
@@ -594,7 +596,7 @@ namespace ExpressionToCodeTest
         // ReSharper disable once ClassCanBeSealed.Local
         class ClassWithClosure
         {
-            public string someValue;
+            public string? someValue;
 
             public string GetExpression(DayOfWeek argument)
             {
@@ -639,9 +641,9 @@ namespace ExpressionToCodeTest
 
     sealed class ClassA
     {
-        public static int MethodWithOutAndRefParam<T>(ref T input, out object output, int x)
+        public static int MethodWithOutAndRefParam<T>(ref T input, out object? output, int x)
         {
-            output = x == 4 ? default(object) : input;
+            output = x == 4 ? default(object?) : input;
             return x;
         }
 
@@ -662,13 +664,13 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => !ReferenceEquals(this, new ClassA())));
             Assert.Equal(
                 @"() => MyEquals(this) && !MyEquals(default(ClassA))",
-                ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
+                ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default)));
         }
 
         int C()
             => x + 5;
 
-        bool MyEquals(ClassA other)
+        bool MyEquals(ClassA? other)
             => other != null && x == other.x;
     }
 }

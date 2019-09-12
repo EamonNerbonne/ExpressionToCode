@@ -14,7 +14,7 @@ namespace ExpressionToCodeTest
         {
             var publicTypes = typeof(ExpressionToCode).GetTypeInfo().Assembly.GetTypes()
                 .Where(IsPublic)
-                .Where(type => !type.Namespace.Contains("Unstable"))
+                .Where(type => !type.Namespace!.Contains("Unstable"))
                 .OrderByDescending(type => type.GetTypeInfo().IsEnum)
                 .ThenByDescending(type => type.GetTypeInfo().IsInterface)
                 .ThenBy(type => type.FullName);
@@ -27,7 +27,7 @@ namespace ExpressionToCodeTest
         {
             var unstableTypes = typeof(ExpressionToCode).GetTypeInfo().Assembly.GetTypes()
                 .Where(IsPublic)
-                .Where(type => type.Namespace.Contains("Unstable"))
+                .Where(type => type.Namespace!.Contains("Unstable"))
                 .OrderByDescending(type => type.GetTypeInfo().IsEnum)
                 .ThenByDescending(type => type.GetTypeInfo().IsInterface)
                 .ThenBy(type => type.FullName);
@@ -45,13 +45,13 @@ namespace ExpressionToCodeTest
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
                     .OrderBy(mi => mi.MetadataToken)
-                    .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
+                    .Where(mi => mi.DeclaringType!.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
                 ;
 
             var methodBlock = string.Join("", methods.Select(mi => PrettyPrintMethod(mi) + "\n"));
 
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
-                    .Where(mi => mi.DeclaringType.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
+                    .Where(mi => mi.DeclaringType!.GetTypeInfo().Assembly != typeof(object).GetTypeInfo().Assembly) //exclude noise
                 ;
 
             var fieldBlock = string.Join("", fields.Select(fi => PrettyPrintField(fi) + "\n"));

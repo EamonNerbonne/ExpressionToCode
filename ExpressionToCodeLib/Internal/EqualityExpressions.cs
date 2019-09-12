@@ -106,7 +106,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        public static IEnumerable<(EqualityExpressionClass equalityKind, bool isDeterminate)>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
+        public static IEnumerable<Tuple<EqualityExpressionClass, bool>>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
         {
             var currEquals = ExtractEqualityType(e);
             if (currEquals == null) {
@@ -118,13 +118,19 @@ namespace ExpressionToCodeLib.Internal
                 return null;
             }
 
-            return DisagreeingEqualities(config, currEquals.Value.left, currEquals.Value.right, currVal.Value);
+            return DisagreeingEqualities(config, currEquals.Value.left, currEquals.Value.right, currVal.Value)
+                .Select(o=>o.ToTuple())//purely to avoid breaking API changes
+                ;
         }
 
-        static IEnumerable<(EqualityExpressionClass equalityKind, bool isDeterminate)> DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression left, Expression right, bool shouldBeEqual)
+        static IEnumerable<(EqualityExpressionClass equalityKind, bool isDeterminate)>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression left, Expression right, bool shouldBeEqual)
         {
             var leftC = ToConstantExpr(config, left);
             var rightC = ToConstantExpr(config, right);
+
+            if(leftC==null || rightC==null) {
+                return null;
+            }
 
             (EqualityExpressionClass, bool) ReportIfError(EqualityExpressionClass eqClass, bool? itsVal)
                 => shouldBeEqual == itsVal ? default : (eqClass, !itsVal.HasValue);

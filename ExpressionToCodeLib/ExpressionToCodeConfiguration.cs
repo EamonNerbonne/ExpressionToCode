@@ -132,7 +132,7 @@ namespace ExpressionToCodeLib
             public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config)
                 => this.config = config;
 
-            public string AnnotatedToCode(Expression e, string msg, bool outerValueIsAssertionFailure)
+            public string AnnotatedToCode(Expression e, string? msg, bool outerValueIsAssertionFailure)
                 => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, outerValueIsAssertionFailure);
         }
 

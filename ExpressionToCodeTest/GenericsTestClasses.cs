@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExpressionToCodeLib;
+// ReSharper disable UnusedParameter.Global
 
 namespace ExpressionToCodeTest
 {
@@ -229,7 +230,8 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => new List<T>()));
     }
 
-    class Cake { }
+    // ReSharper disable MemberCanBeProtected.Global
+    sealed class Cake { }
 
     class GenericClass<T>
     {
@@ -238,8 +240,10 @@ namespace ExpressionToCodeTest
         public GenericClass(T pVal)
             => val = pVal;
 
-        public T Value => val;
+        public T Value
+            => val;
 
+        // ReSharper disable once UnusedMember.Global
         public void Reset(T pVal)
             => val = pVal;
 
@@ -267,13 +271,15 @@ namespace ExpressionToCodeTest
             => other.Equals(val);
     }
 
-    class GenericSubClass<T, U> : GenericClass<T>
+    sealed class GenericSubClass<T, U> : GenericClass<T>
         where T : IEnumerable<U>
     {
         public GenericSubClass(T val)
             : base(val) { }
 
-        public bool IsEmpty => !Value.Any();
+        // ReSharper disable once UnusedMember.Global
+        public bool IsEmpty
+            => !Value.Any();
     }
 
     public static class StaticTestClass
@@ -291,7 +297,7 @@ namespace ExpressionToCodeTest
             => val.Equals(other);
 
         public static bool TwoArgsTwoGeneric<T>(T val, T other)
-            => val.Equals(other);
+            => val!.Equals(other);
 
         public static int Consume<T>(T val)
             => 42;
