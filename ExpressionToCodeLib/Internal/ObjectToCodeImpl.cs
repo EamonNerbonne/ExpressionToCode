@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Collections.Concurrent;
 
 namespace ExpressionToCodeLib.Internal
 {
@@ -36,7 +36,7 @@ namespace ExpressionToCodeLib.Internal
                             && indexPars.Length == 1
                             && typeof(IEnumerable<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(indexPars[0].ParameterType, pi.PropertyType)) is Type keyEnumerableType
                             && keyEnumerableType.IsAssignableFrom(type)
-                            ) {
+                        ) {
                             var typeName = type.ToCSharpFriendlyTypeName();
                             return "new " + typeName + " " + PrintInitializerContents(config, enumerableVal, indexPars[0].ParameterType, pi.PropertyType, indent, valueSize - typeName.Length);
                         }
@@ -188,11 +188,10 @@ namespace ExpressionToCodeLib.Internal
                     }
                 }
             }
+
             public IEnumerable<string> PrintInitializerContents(ExpressionToCodeConfiguration config, IEnumerable list)
                 => PrintInitializerContents(config, (IEnumerable<KeyValuePair<TKey, TValue>>)list);
         }
-
-
 
         public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent)
         {
