@@ -8,7 +8,7 @@ namespace ExpressionToCodeLib.Internal
 {
     class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool outerValueIsAssertionFailure)
+        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string? msg, bool outerValueIsAssertionFailure)
             => (msg == null ? "" : msg + "\n\n") + ExpressionWithSubExpressions.Create(config, expr, outerValueIsAssertionFailure).ComposeToSingleString();
 
         struct ExpressionWithSubExpressions
@@ -41,23 +41,23 @@ namespace ExpressionToCodeLib.Internal
                 var fullExprText = sb.ToString();
                 var subExpressionValues = new List<SubExpressionValue>();
                 FindSubExpressionValues(config, node, node, subExpressionValues, outerValueIsAssertionFailure);
-                var assertionValue = outerValueIsAssertionFailure? OutermostValue(config, node) : null;
-                return new ExpressionWithSubExpressions { 
+                var assertionValue = outerValueIsAssertionFailure ? OutermostValue(config, node) : null;
+                return new ExpressionWithSubExpressions {
                     ExpressionString = fullExprText
-                    + (assertionValue != null ? "\n"+ spacedArrow + assertionValue + " (caused assertion failure)\n" :""),
-                    SubExpressions = subExpressionValues.Distinct().ToArray() 
-                    };
+                        + (assertionValue != null ? "\n" + spacedArrow + assertionValue + " (caused assertion failure)\n" : ""),
+                    SubExpressions = subExpressionValues.Distinct().ToArray()
+                };
             }
 
-            static string OutermostValue(ExpressionToCodeConfiguration config, StringifiedExpression node)
+            static string? OutermostValue(ExpressionToCodeConfiguration config, StringifiedExpression node)
             {
-                if(node.OptionalValue!=null) {
+                if (node.OptionalValue != null) {
                     return ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10);
                 }
                 foreach (var kid in node.Children) {
                     if (!kid.IsConceptualChild) {
                         var value = OutermostValue(config, kid);
-                        if(value!=null) {
+                        if (value != null) {
                             return value;
                         }
                     }
@@ -65,7 +65,7 @@ namespace ExpressionToCodeLib.Internal
                 foreach (var kid in node.Children) {
                     if (kid.IsConceptualChild) {
                         var value = OutermostValue(config, kid);
-                        if(value != null) {
+                        if (value != null) {
                             return value;
                         }
                     }
@@ -102,7 +102,8 @@ namespace ExpressionToCodeLib.Internal
                     var subExprString = sb.Length <= maxSize
                         ? sb.ToString()
                         : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);
-                    if (!string.IsNullOrEmpty(valueString)) {
+                    // ReSharper disable once ReplaceWithStringIsNullOrEmpty - for nullability analysis
+                    if (valueString != null && valueString != "") {
                         subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
                     }
                 }

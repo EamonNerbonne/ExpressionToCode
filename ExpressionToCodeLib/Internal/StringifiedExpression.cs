@@ -7,11 +7,11 @@ namespace ExpressionToCodeLib.Internal
     struct StringifiedExpression
     {
         //a node cannot have children and text.  If it has neither, it is considered empty.
-        public readonly string Text;
-        readonly StringifiedExpression[] children;
+        public readonly string? Text;
+        readonly StringifiedExpression[]? children;
 
         //can only have a value it it has text.
-        public readonly Expression OptionalValue;
+        public readonly Expression? OptionalValue;
 
         /// <summary>
         ///     The expression tree contains many symbols that are not themselves "real" expressions, e.g. the "." in "obj.field".
@@ -23,7 +23,7 @@ namespace ExpressionToCodeLib.Internal
         static readonly StringifiedExpression[] empty = { };
         public StringifiedExpression[] Children => children ?? empty;
 
-        StringifiedExpression(string text, StringifiedExpression[] children, Expression optionalValue, bool isConceptualChild)
+        StringifiedExpression(string? text, StringifiedExpression[]? children, Expression? optionalValue, bool isConceptualChild)
         {
             Text = text;
             this.children = children;
@@ -32,7 +32,7 @@ namespace ExpressionToCodeLib.Internal
         }
 
         [Pure]
-        public static StringifiedExpression TextOnly(string text)
+        public static StringifiedExpression TextOnly(string? text)
             => new StringifiedExpression(text, null, null, false);
 
         [Pure]

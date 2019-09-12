@@ -29,50 +29,42 @@ namespace ExpressionToCodeLib.Internal
         static readonly MethodInfo objEqualReferenceMethod = ((Func<object, object, bool>)ReferenceEquals).GetMethodInfo();
 
         public static EqualityExpressionClass CheckForEquality(Expression<Func<bool>> e)
-            => ExtractEqualityType(e).Item1;
+            => ExtractEqualityType(e)?.equalityKind ?? EqualityExpressionClass.None;
 
-        static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression<Func<bool>> e)
+        static (EqualityExpressionClass equalityKind, Expression left, Expression right)? ExtractEqualityType(Expression<Func<bool>> e)
             => ExtractEqualityType(e.Body);
 
-        static Tuple<EqualityExpressionClass, Expression, Expression> ExtractEqualityType(Expression e)
+        static (EqualityExpressionClass kind, Expression left, Expression right)? ExtractEqualityType(Expression e)
         {
             if (e.Type == typeof(bool)) {
                 if (e is BinaryExpression binExpr) {
                     if (binExpr.NodeType == ExpressionType.Equal) {
-                        return Tuple.Create(EqualityExpressionClass.EqualsOp, binExpr.Left, binExpr.Right);
+                        return (EqualityExpressionClass.EqualsOp, binExpr.Left, binExpr.Right);
                     } else if (e.NodeType == ExpressionType.NotEqual) {
-                        return Tuple.Create(EqualityExpressionClass.NotEqualsOp, binExpr.Left, binExpr.Right);
+                        return (EqualityExpressionClass.NotEqualsOp, binExpr.Left, binExpr.Right);
                     }
                 } else if (e.NodeType == ExpressionType.Call) {
                     var mce = (MethodCallExpression)e;
                     if (mce.Method.Equals(((Func<object, bool>)new object().Equals).GetMethodInfo())) {
-                        return Tuple.Create(EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
+                        return (EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
                     } else if (mce.Method.Equals(objEqualStaticMethod)) {
-                        return Tuple.Create(
-                            EqualityExpressionClass.ObjectEqualsStatic,
-                            mce.Arguments.First(),
-                            mce.Arguments.Skip(1).Single());
+                        return (EqualityExpressionClass.ObjectEqualsStatic, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
                     } else if (mce.Method.Equals(objEqualReferenceMethod)) {
-                        return Tuple.Create(
-                            EqualityExpressionClass.ObjectReferenceEquals,
-                            mce.Arguments.First(),
-                            mce.Arguments.Skip(1).Single());
+                        return (EqualityExpressionClass.ObjectReferenceEquals, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
                     } else if (IsImplementationOfGenericInterfaceMethod(mce.Method, typeof(IEquatable<>), "Equals")) {
-                        return Tuple.Create(EqualityExpressionClass.EquatableEquals, mce.Object, mce.Arguments.Single());
+                        return (EqualityExpressionClass.EquatableEquals, mce.Object, mce.Arguments.Single());
                     } else if (IsImplementationOfInterfaceMethod(mce.Method, typeof(IStructuralEquatable), "Equals")) {
-                        return Tuple.Create(EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
-                    } else if (HaveSameGenericDefinition(
-                        mce.Method,
-                        ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).GetMethodInfo())) {
-                        return Tuple.Create(EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
+                        return (EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
+                    } else if (HaveSameGenericDefinition(mce.Method, ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).GetMethodInfo())) {
+                        return (EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
                     }
                 }
             }
 
-            return Tuple.Create(EqualityExpressionClass.None, default(Expression), default(Expression));
+            return null;
         }
 
-        static ConstantExpression ToConstantExpr(ExpressionToCodeConfiguration config, Expression e)
+        static ConstantExpression? ToConstantExpr(ExpressionToCodeConfiguration config, Expression e)
         {
             try {
                 var func = config.Value.ExpressionCompiler.Compile(Expression.Lambda(e));
@@ -114,10 +106,10 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        public static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
+        public static IEnumerable<Tuple<EqualityExpressionClass, bool>>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
         {
             var currEquals = ExtractEqualityType(e);
-            if (currEquals.Item1 == EqualityExpressionClass.None) {
+            if (currEquals == null) {
                 return null;
             }
 
@@ -126,20 +118,22 @@ namespace ExpressionToCodeLib.Internal
                 return null;
             }
 
-            return DisagreeingEqualities(config, currEquals.Item2, currEquals.Item3, currVal.Value);
+            return DisagreeingEqualities(config, currEquals.Value.left, currEquals.Value.right, currVal.Value)
+                .Select(o=>o.ToTuple())//purely to avoid breaking API changes
+                ;
         }
 
-        static IEnumerable<Tuple<EqualityExpressionClass, bool>> DisagreeingEqualities(
-            ExpressionToCodeConfiguration config,
-            Expression left,
-            Expression right,
-            bool shouldBeEqual)
+        static IEnumerable<(EqualityExpressionClass equalityKind, bool isDeterminate)>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression left, Expression right, bool shouldBeEqual)
         {
             var leftC = ToConstantExpr(config, left);
             var rightC = ToConstantExpr(config, right);
 
-            Tuple<EqualityExpressionClass, bool> ReportIfError(EqualityExpressionClass eqClass, bool? itsVal)
-                => shouldBeEqual == itsVal ? null : Tuple.Create(eqClass, !itsVal.HasValue);
+            if(leftC==null || rightC==null) {
+                return null;
+            }
+
+            (EqualityExpressionClass, bool) ReportIfError(EqualityExpressionClass eqClass, bool? itsVal)
+                => shouldBeEqual == itsVal ? default : (eqClass, !itsVal.HasValue);
 
             var ienumerableTypes =
                 GetGenericInterfaceImplementation(leftC.Type, typeof(IEnumerable<>))
@@ -195,7 +189,7 @@ namespace ExpressionToCodeLib.Internal
                                     config,
                                     Expression.Call(seqEqualsMethod.MakeGenericMethod(elemType), leftC, rightC))))
                 );
-            return errs.Where(err => err != null).Distinct().ToArray();
+            return errs.Where(err => err.Item1 != EqualityExpressionClass.None).Distinct().ToArray();
         }
 
         static bool HaveSameGenericDefinition(MethodInfo a, MethodInfo b)

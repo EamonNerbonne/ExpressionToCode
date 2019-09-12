@@ -8,7 +8,7 @@ namespace ExpressionToCodeLib.Internal
 {
     static class ReflectionHelpers
     {
-        public static PropertyInfo GetPropertyIfGetter(MethodInfo mi)
+        public static PropertyInfo? GetPropertyIfGetter(MethodInfo mi)
         {
             var supposedGetter = mi.Name.StartsWith("get_", StringComparison.Ordinal);
 
@@ -35,24 +35,14 @@ namespace ExpressionToCodeLib.Internal
         }
 
         public static bool IsMemberInfoStatic(MemberInfo mi)
-        {
-            if (mi is FieldInfo) {
-                return ((FieldInfo)mi).IsStatic;
-            } else if (mi is MethodInfo) {
-                return (((MethodInfo)mi).Attributes & MethodAttributes.Static) == MethodAttributes.Static;
-            } else if (mi is PropertyInfo pi) {
-                return (pi.GetGetMethod(true) ?? pi.GetSetMethod(true)).IsStatic;
-            } else if (mi.MemberType == MemberTypes.NestedType) {
-                return true;
-            } else if (mi is EventInfo) {
-                return ((EventInfo)mi).GetAddMethod(true).IsStatic;
-            } else {
-                throw new ArgumentOutOfRangeException(
-                    "mi",
-                    "Expression represents a member access for member" + mi.Name + " of membertype " + mi.MemberType
-                    + " that is unsupported");
-            }
-        }
+            => mi switch {
+                FieldInfo fieldInfo => fieldInfo.IsStatic,
+                MethodInfo methodInfo => (methodInfo.Attributes & MethodAttributes.Static) == MethodAttributes.Static,
+                PropertyInfo pi => (pi.GetGetMethod(true) ?? pi.GetSetMethod(true)).IsStatic,
+                EventInfo eventInfo => eventInfo.GetAddMethod(true).IsStatic,
+                { MemberType: MemberTypes.NestedType } => true,
+                _ => throw new ArgumentOutOfRangeException(nameof(mi), "Expression represents a member access for member" + mi.Name + " of membertype " + mi.MemberType + " that is unsupported")
+            };
 
         public static bool HasBuiltinConversion(Type from, Type to)
             => from == typeof(sbyte)

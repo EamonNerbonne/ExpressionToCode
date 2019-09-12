@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Globalization;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace ExpressionToCodeLib.Internal
 {
-    class ObjectStringifyImpl : IObjectStringifier
+    sealed class ObjectStringifyImpl : IObjectStringifier
     {
         readonly bool fullTypeNames;
 
@@ -16,70 +16,48 @@ namespace ExpressionToCodeLib.Internal
         public string TypeNameToCode(Type type)
             => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
 
-        public string PlainObjectToCode(object val, Type type)
+        public string? PlainObjectToCode(object? val, Type? type)
+            => val switch {
+                null when type == null || type == typeof(object) => "null",
+                null => "default(" + TypeNameToCode(type) + ")",
+                string str => PreferLiteralSyntax(str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"",
+                char charVal => "'" + EscapeCharForString(charVal) + "'",
+                decimal _ => Convert.ToString(val, CultureInfo.InvariantCulture) + "m",
+                float floatVal => FloatToCode(floatVal),
+                double doubleVal => DoubleToCode(doubleVal),
+                byte byteVal => "((byte)" + byteVal + ")",
+                sbyte sbyteVal => "((sbyte)" + sbyteVal + ")",
+                short shortVal => "((short)" + shortVal + ")",
+                ushort ushortVal => "((ushort)" + ushortVal + ")",
+                int intVal => intVal.ToString(),
+                uint uintVal => uintVal + "U",
+                long longVal => longVal + "L",
+                ulong ulongVal => ulongVal + "UL",
+                bool boolVal => boolVal ? "true" : "false",
+                Enum enumVal => EnumValueToCode(val, enumVal),
+                Type typeVal => "typeof(" + TypeNameToCode(typeVal) + ")",
+                MethodInfo methodInfoVal => TypeNameToCode(methodInfoVal.DeclaringType) + "." + methodInfoVal.Name,
+                _ when val is ValueType && Activator.CreateInstance(val.GetType()).Equals(val) => "default(" + TypeNameToCode(val.GetType()) + ")",
+                _ => null
+            };
+
+        string EnumValueToCode(object val, Enum enumVal)
         {
-            if (val == null) {
-                return type == null || type == typeof(object) ? "null" : "default(" + TypeNameToCode(type) + ")";
-            } else if (val is string str) {
-                var useLiteralSyntax = PreferLiteralSyntax(str);
-                if (useLiteralSyntax) {
-                    return "@\"" + str.Replace("\"", "\"\"") + "\"";
-                } else {
-                    return "\"" + EscapeStringChars(str) + "\"";
-                }
-            } else if (val is char) {
-                return "'" + EscapeStringChars(val.ToString()) + "'";
-            } else if (val is decimal) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "m";
-            } else if (val is float floatVal) {
-                return FloatToCode(floatVal);
-            } else if (val is double doubleVal) {
-                return DoubleToCode(doubleVal);
-            } else if (val is byte) {
-                return "((byte)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
-            } else if (val is sbyte) {
-                return "((sbyte)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
-            } else if (val is short) {
-                return "((short)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
-            } else if (val is ushort) {
-                return "((ushort)" + Convert.ToString(val, CultureInfo.InvariantCulture) + ")";
-            } else if (val is int) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture);
-            } else if (val is uint) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "U";
-            } else if (val is long) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "L";
-            } else if (val is ulong) {
-                return Convert.ToString(val, CultureInfo.InvariantCulture) + "UL";
-            } else if (val is bool && val.Equals(true)) {
-                return "true";
-            } else if (val is bool && val.Equals(false)) {
-                return "false";
-            } else if (val is Enum) {
-                if (Enum.IsDefined(val.GetType(), val)) {
-                    return TypeNameToCode(val.GetType()) + "." + val;
-                } else {
-                    var longVal = ((IConvertible)val).ToInt64(null);
-                    var toString = ((IConvertible)val).ToString(CultureInfo.InvariantCulture);
-                    if (toString == longVal.ToString(CultureInfo.InvariantCulture)) {
-                        return "((" + TypeNameToCode(val.GetType()) + ")" + longVal + ")";
-                    } else {
-                        var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
-                        return components.Length == 0
-                            ? "default(" + TypeNameToCode(val.GetType()) + ")"
-                            : components.Length == 1
-                                ? TypeNameToCode(val.GetType()) + "." + components[0]
-                                : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
-                    }
-                }
-            } else if (val.GetType().GetTypeInfo().IsValueType && Activator.CreateInstance(val.GetType()).Equals(val)) {
-                return "default(" + TypeNameToCode(val.GetType()) + ")";
-            } else if (val is Type) {
-                return "typeof(" + TypeNameToCode((Type)val) + ")";
-            } else if (val is MethodInfo) {
-                return TypeNameToCode(((MethodInfo)val).DeclaringType) + "." + ((MethodInfo)val).Name;
+            if (Enum.IsDefined(enumVal.GetType(), enumVal)) {
+                return TypeNameToCode(enumVal.GetType()) + "." + enumVal;
             } else {
-                return null;
+                var enumAsLong = ((IConvertible)enumVal).ToInt64(null);
+                var toString = enumVal.ToString();
+                if (toString == enumAsLong.ToString()) {
+                    return "((" + TypeNameToCode(enumVal.GetType()) + ")" + enumAsLong + ")";
+                } else {
+                    var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                    return components.Length == 0
+                        ? "default(" + TypeNameToCode(enumVal.GetType()) + ")"
+                        : components.Length == 1
+                            ? TypeNameToCode(enumVal.GetType()) + "." + components[0]
+                            : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
+                }
             }
         }
 
@@ -101,7 +79,7 @@ namespace ExpressionToCodeLib.Internal
         static string EscapeCharForString(char c)
         {
             if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) {
-                //this is a little too rigorous; but easier to read 
+                //this is a little too rigorous; but easier to read
                 if (c == '\r') {
                     return "\\r";
                 } else if (c == '\t') {

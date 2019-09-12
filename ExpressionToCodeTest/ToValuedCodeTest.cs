@@ -6,16 +6,18 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    public class ToValuedCodeTest
+    public sealed class ToValuedCodeTest
     {
         [Fact]
         public void ToValuedCode_ofNull_fails()
         {
-            ExpressionToCodeLibTest obj = null;
+            ExpressionToCodeLibTest? obj = null;
 
             Assert.ThrowsAny<InvalidOperationException>(
-                () =>
-                    ExpressionToCode.ToValuedCode(() => obj.TheProperty));
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                () => ExpressionToCode.ToValuedCode(() => obj.TheProperty)
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            );
         }
 
         [Fact]
@@ -78,10 +80,12 @@ namespace ExpressionToCodeTest
             Assert.Equal("ToValuedCodeTest.StaticReturnZero() = 0", code);
         }
 
-        static string TheProperty => "TheValue";
+        static string TheProperty
+            => "TheValue";
 
         // ReSharper disable once UnusedParameter.Local
-        string this[int index] => "TheIndexedValue";
+        string this[int index]
+            => "TheIndexedValue";
 
         static int StaticReturnZero()
             => 0;
