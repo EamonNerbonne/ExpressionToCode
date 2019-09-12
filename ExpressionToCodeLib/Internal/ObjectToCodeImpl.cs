@@ -23,6 +23,8 @@ namespace ExpressionToCodeLib.Internal
                 return ElidePossiblyMultilineString(config, retval, indent, valueSize).Trim();
             } else if (retval != null) {
                 return ElideAfter(retval, valueSize);
+            } else if (val == null) {
+                throw new Exception("Impossible: if val is null, retval cannot be");
             } else if (val is Array arrayVal) {
                 return "new[] " + FormatEnumerable(config, arrayVal, indent, valueSize - 6);
             } else if (val is IEnumerable enumerableVal) {

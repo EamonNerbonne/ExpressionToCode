@@ -39,7 +39,7 @@ namespace ExpressionToCodeLib.Internal
         StringifiedExpression SingleChildDispatch(Expression child)
             => this.ExpressionDispatch(child).MarkAsConceptualChild();
 
-        StringifiedExpression SingleChildDispatch(string prefix, Expression child)
+        StringifiedExpression SingleChildDispatch(string? prefix, Expression child)
             => StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly(prefix), this.ExpressionDispatch(child) }).MarkAsConceptualChild();
 
         [Pure]
@@ -460,7 +460,7 @@ namespace ExpressionToCodeLib.Internal
         }
 
         [Pure]
-        StringifiedExpression StringifyMethodName(MethodCallExpression mce, MethodInfo method, Expression objExpr)
+        StringifiedExpression StringifyMethodName(MethodCallExpression mce, MethodInfo method, Expression? objExpr)
         {
             var kids = KidsBuilder.Create();
 
