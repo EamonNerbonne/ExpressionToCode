@@ -1,14 +1,11 @@
-﻿#if formattable_string
-using System;
+﻿using System;
 using ExpressionToCodeLib;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    public class StringInterpolationTest
+    public sealed class StringInterpolationTest
     {
         // ReSharper disable once MemberCanBeMadeStatic.Local
         FormattableString Interpolation(FormattableString str)
@@ -163,4 +160,3 @@ namespace ExpressionToCodeTest
         }
     }
 }
-#endif
