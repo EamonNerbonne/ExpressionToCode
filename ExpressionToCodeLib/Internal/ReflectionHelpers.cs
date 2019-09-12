@@ -8,7 +8,7 @@ namespace ExpressionToCodeLib.Internal
 {
     static class ReflectionHelpers
     {
-        public static PropertyInfo GetPropertyIfGetter(MethodInfo mi)
+        public static PropertyInfo? GetPropertyIfGetter(MethodInfo mi)
         {
             var supposedGetter = mi.Name.StartsWith("get_", StringComparison.Ordinal);
 

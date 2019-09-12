@@ -20,7 +20,7 @@ namespace ExpressionToCodeLib.Internal
         {
             var retval = ObjectToCode.PlainObjectToCode(val);
             if (val is string) {
-                return ElidePossiblyMultilineString(config, retval, indent, valueSize).Trim();
+                return ElidePossiblyMultilineString(config, retval ?? throw new InvalidOperationException("retval cannot be null for strings"), indent, valueSize).Trim();
             } else if (retval != null) {
                 return ElideAfter(retval, valueSize);
             } else if (val == null) {

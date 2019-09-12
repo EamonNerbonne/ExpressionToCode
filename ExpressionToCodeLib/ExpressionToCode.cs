@@ -161,7 +161,7 @@ namespace ExpressionToCodeLib
 
     public interface IAnnotatedToCode
     {
-        string AnnotatedToCode(Expression e, string msg, bool outerValueIsAssertionFailure);
+        string AnnotatedToCode(Expression e, string? msg, bool outerValueIsAssertionFailure);
     }
 
     public static class AnnotatedToCodeExtensions

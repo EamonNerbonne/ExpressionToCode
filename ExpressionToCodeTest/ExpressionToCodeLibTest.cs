@@ -623,7 +623,7 @@ namespace ExpressionToCodeTest
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
 #pragma warning disable 628
-        protected string TheProtectedWithPrivateSetterProperty { get; private set; }
+        protected string? TheProtectedWithPrivateSetterProperty { get; private set; }
 #pragma warning restore 628
     }
 
