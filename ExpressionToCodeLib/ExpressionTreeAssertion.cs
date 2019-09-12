@@ -5,7 +5,7 @@ namespace ExpressionToCodeLib
 {
     public static class ExpressionTreeAssertion
     {
-        public static void Assert(this ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string msg = null)
+        public static void Assert(this ExpressionToCodeConfiguration config, Expression<Func<bool>> assertion, string? msg = null)
         {
             var compiled = config.Value.ExpressionCompiler.Compile(assertion);
             bool ok;

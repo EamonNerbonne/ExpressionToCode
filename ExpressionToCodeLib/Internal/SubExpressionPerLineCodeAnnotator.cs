@@ -8,7 +8,7 @@ namespace ExpressionToCodeLib.Internal
 {
     class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool outerValueIsAssertionFailure)
+        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string? msg, bool outerValueIsAssertionFailure)
             => (msg == null ? "" : msg + "\n\n") + ExpressionWithSubExpressions.Create(config, expr, outerValueIsAssertionFailure).ComposeToSingleString();
 
         struct ExpressionWithSubExpressions
