@@ -7,7 +7,7 @@ using Xunit;
 
 namespace ExpressionToCodeTest
 {
-    public class ApiStabilityTest
+    public sealed class ApiStabilityTest
     {
         [Fact]
         public void PublicApi()
