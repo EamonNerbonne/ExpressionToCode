@@ -44,7 +44,7 @@
       <LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
     </None>
     <PackageReference Include="FastExpressionCompiler" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="3.1.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
