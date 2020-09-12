@@ -6,7 +6,6 @@
   <PropertyGroup Condition="'$(TargetFramework)' == 'net461' or '$(TargetFramework)' == 'net47'or '$(TargetFramework)' == 'net472'  ">
     <DefineConstants>binary_serialization</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ExpressionToCodeLib\ExpressionToCodeLib.csproj" />
     <PackageReference Include="JetBrains.Annotations" Version="2018.3.0" />
