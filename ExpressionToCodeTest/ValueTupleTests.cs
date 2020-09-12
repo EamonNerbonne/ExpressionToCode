@@ -25,9 +25,10 @@ namespace ExpressionToCodeTest
         static MyValueTuple<T1, T2> ToMyValueTuple<T1, T2>((T1, T2) tuple)
             => new MyValueTuple<T1, T2>(tuple);
 
-        [Fact(Skip = "https://github.com/dotnet/roslyn/issues/27322")]
+        [Fact]
         public void ExpressionWithValueTupleEqualsCanCompile()
         {
+            //was a test for https://github.com/dotnet/roslyn/issues/27322
             var tupleA = (1, 3);
             var tupleB = (1, "123".Length);
 
@@ -57,18 +58,20 @@ namespace ExpressionToCodeTest
             Expression<Func<int>> err2 = () => tupleA.CompareTo(tupleB); //crash
         }
 
-        [Fact(Skip = "https://github.com/dotnet/roslyn/issues/27322")]
+        [Fact]
         public void FastExpressionCompileValueTupleEqualsWorks()
         {
+            //was a test for https://github.com/dotnet/roslyn/issues/27322
             var tuple = (1, 3);
             var tuple2 = (1, "123".Length);
             var expr = ExpressionCompiler.CompileFast(() => tuple.Equals(tuple2));
             Assert.True(expr());
         }
 
-        [Fact(Skip = "https://github.com/dotnet/roslyn/issues/27322")]
+        [Fact]
         public void AssertingOnValueTupleEqualsWorks()
         {
+            //was a test for https://github.com/dotnet/roslyn/issues/27322
             var tuple = (1, 3);
             var tuple2 = (1, "123".Length);
             Expression<Func<bool>> expr = () => tuple.Equals(tuple2);
