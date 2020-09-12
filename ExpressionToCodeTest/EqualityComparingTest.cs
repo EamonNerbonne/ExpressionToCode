@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ExpressionToCodeLib;
@@ -14,7 +13,7 @@ using Xunit;
 // ReSharper disable RedundantCast
 namespace ExpressionToCodeTest
 {
-    public class EqualityComparingTest
+    public sealed class EqualityComparingTest
     {
         static readonly string bla = "bla";
         static readonly object bla2object = "bla2object";
@@ -82,7 +81,7 @@ namespace ExpressionToCodeTest
         }
 
         static Tuple<EqualityExpressionClass, bool>[] eqclasses(params EqualityExpressionClass[] classes)
-            => classes.Select(eqClass => Tuple.Create(eqClass, false)).ToArray();
+            => classes.Select(eqClass => (eqClass, false).ToTuple()).ToArray();
 
         [Fact]
         public void StringEqDisagreement()

@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Xunit;
-using Assert = Xunit.Assert;
 // ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable ConvertToConstant.Local
@@ -19,7 +18,7 @@ using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest
 {
-    public class ExpressionToCodeLibTest
+    public sealed class ExpressionToCodeLibTest
     {
         [Fact]
         public void ComplexObjectToCodeAlsoSupportsExpressions()
@@ -57,6 +56,7 @@ namespace ExpressionToCodeTest
             => Assert.Equal(
                 @"() => new object() as string == default(string)",
                 // ReSharper disable once TryCastAndCheckForNull.0
+                // ReSharper disable once SafeCastIsUsedAsTypeCheck
                 ExpressionToCode.ToCode(() => new object() as string == null));
 
         [Fact]
@@ -145,6 +145,8 @@ namespace ExpressionToCodeTest
         [Fact]
         public void MembersDefault()
         {
+#pragma warning disable CS8602 // Dereference of a possibly null reference. - these are false positives, because the code isn't executed, it's stringified.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type. - these are false positives, because the code isn't executed, it's stringified.
             Assert.Equal(
                 @"() => default(DateTime).Ticks == 0L",
                 ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0L));
@@ -167,6 +169,8 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 @"() => default(List<int>).AsReadOnly()",
                 ExpressionToCode.ToCode(() => default(List<int>).AsReadOnly()));
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Fact]
@@ -180,7 +184,6 @@ namespace ExpressionToCodeTest
             Assert.Equal(
                 "() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any",
                 actual);
-            Console.WriteLine(actual);
         }
 
         [Fact]
@@ -195,7 +198,7 @@ namespace ExpressionToCodeTest
                 @"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)set.Add)",
                 ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
 
-            Func<Func<object, object, bool>, bool> sink = f => f(null, null);
+            Func<Func<object?, object?, bool>, bool> sink = f => f(null, null);
             Assert.Equal(
                 @"() => sink((Func<object, object, bool>)object.Equals)",
                 ExpressionToCode.ToCode(() => sink(int.Equals)));
@@ -438,7 +441,7 @@ namespace ExpressionToCodeTest
         public void StaticMethodWithRefAndOutModifiers()
         {
             var x = "a";
-            object y;
+            object? y;
             Assert.Equal(
                 @"() => ClassA.MethodWithOutAndRefParam(ref x, out y, 3)",
                 ExpressionToCode.ToCode(() => ClassA.MethodWithOutAndRefParam(ref x, out y, 3)));
@@ -527,7 +530,7 @@ namespace ExpressionToCodeTest
             Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()", code);
         }
 
-        class B { }
+        sealed class B { }
 
         [Fact]
         public void ThisPropertyAccess()
@@ -590,9 +593,10 @@ namespace ExpressionToCodeTest
             Assert.Equal(@"() => someValue + closedVariable + "" "" + argument", expr);
         }
 
+        // ReSharper disable once ClassCanBeSealed.Local
         class ClassWithClosure
         {
-            public string someValue;
+            public string? someValue;
 
             public string GetExpression(DayOfWeek argument)
             {
@@ -605,11 +609,24 @@ namespace ExpressionToCodeTest
             }
         }
 
-        public string this[int index] => "TheIndexedValue";
-        public string TheProperty => "TheValue";
-        protected string TheProtectedProperty => "TheValue";
-        static string ThePrivateStaticProperty => "TheValue";
-        protected string TheProtectedWithPrivateSetterProperty { private get; set; }
+        // ReSharper disable once UnusedParameter.Global
+        public string this[int index]
+            => "TheIndexedValue";
+
+        public string TheProperty
+            => "TheValue";
+
+        // ReSharper disable once MemberCanBeMadeStatic.Local
+        string TheProtectedProperty
+            => "TheValue";
+
+        static string ThePrivateStaticProperty
+            => "TheValue";
+
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+#pragma warning disable 628
+        protected string? TheProtectedWithPrivateSetterProperty { get; private set; }
+#pragma warning restore 628
     }
 
     public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
@@ -622,11 +639,11 @@ namespace ExpressionToCodeTest
             => alternateOut = date.AddDays(dayOffset).Ticks + tickOffset;
     }
 
-    class ClassA
+    sealed class ClassA
     {
-        public static int MethodWithOutAndRefParam<T>(ref T input, out object output, int x)
+        public static int MethodWithOutAndRefParam<T>(ref T input, out object? output, int x)
         {
-            output = x == 4 ? default(object) : input;
+            output = x == 4 ? default(object?) : input;
             return x;
         }
 
@@ -647,13 +664,13 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => !ReferenceEquals(this, new ClassA())));
             Assert.Equal(
                 @"() => MyEquals(this) && !MyEquals(default(ClassA))",
-                ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA))));
+                ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default)));
         }
 
         int C()
             => x + 5;
 
-        bool MyEquals(ClassA other)
+        bool MyEquals(ClassA? other)
             => other != null && x == other.x;
     }
 }

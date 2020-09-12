@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Collections.Concurrent;
 
 namespace ExpressionToCodeLib.Internal
 {
@@ -13,37 +13,22 @@ namespace ExpressionToCodeLib.Internal
     {
         static readonly string[] lineSeparators = { "\r\n", "\n" };
 
-        public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent)
+        public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object? val, int indent)
             => ComplexObjectToPseudoCode(config, val, indent, config.Value.MaximumValueLength ?? int.MaxValue);
 
-        static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object val, int indent, int valueSize)
+        static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object? val, int indent, int valueSize)
         {
             var retval = ObjectToCode.PlainObjectToCode(val);
             if (val is string) {
-                return ElidePossiblyMultilineString(config, retval, indent, valueSize).Trim();
+                return ElidePossiblyMultilineString(config, retval ?? throw new InvalidOperationException("retval cannot be null for strings"), indent, valueSize).Trim();
             } else if (retval != null) {
                 return ElideAfter(retval, valueSize);
+            } else if (val == null) {
+                throw new Exception("Impossible: if val is null, retval cannot be");
             } else if (val is Array arrayVal) {
                 return "new[] " + FormatEnumerable(config, arrayVal, indent, valueSize - 6);
             } else if (val is IEnumerable enumerableVal) {
-                var type = val.GetType();
-                if (type.GetConstructor(Type.EmptyTypes) is ConstructorInfo ci && ci.IsPublic) {
-                    foreach (var pi in type.GetProperties()) {
-                        if (
-                            pi.Name == "Item"
-                            && pi.CanWrite
-                            && pi.GetIndexParameters() is ParameterInfo[] indexPars
-                            && indexPars.Length == 1
-                            && typeof(IEnumerable<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(indexPars[0].ParameterType, pi.PropertyType)) is Type keyEnumerableType
-                            && keyEnumerableType.IsAssignableFrom(type)
-                            ) {
-                            var typeName = type.ToCSharpFriendlyTypeName();
-                            return "new " + typeName + " " + PrintInitializerContents(config, enumerableVal, indexPars[0].ParameterType, pi.PropertyType, indent, valueSize - typeName.Length);
-                        }
-                    }
-                }
-
-                return FormatEnumerable(config, enumerableVal, indent, valueSize);
+                return FormatTypeWithListInitializerOrNull(config, val, indent, valueSize, enumerableVal) ?? FormatEnumerable(config, enumerableVal, indent, valueSize);
             } else if (val is Expression exprVal) {
                 return ElideAfter(config.GetExpressionToCode().ToCode(exprVal), valueSize);
             } else if (val is IStructuralComparable tuple && val is IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
@@ -81,7 +66,29 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        class NastyHackyTupleCollector : IComparer
+        static string? FormatTypeWithListInitializerOrNull(ExpressionToCodeConfiguration config, object val, int indent, int valueSize, IEnumerable enumerableVal)
+        {
+            var type = val.GetType();
+            if (!(type.GetConstructor(Type.EmptyTypes) is ConstructorInfo ci) || !ci.IsPublic) {
+                return null;
+            }
+            foreach (var pi in type.GetProperties()) {
+                if (
+                    pi.Name == "Item"
+                    && pi.CanWrite
+                    && pi.GetIndexParameters() is ParameterInfo[] indexPars
+                    && indexPars.Length == 1
+                    && typeof(IEnumerable<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(indexPars[0].ParameterType, pi.PropertyType)) is Type keyEnumerableType
+                    && keyEnumerableType.IsAssignableFrom(type)
+                ) {
+                    var typeName = type.ToCSharpFriendlyTypeName();
+                    return "new " + typeName + " " + PrintInitializerContents(config, enumerableVal, indexPars[0].ParameterType, pi.PropertyType, indent, valueSize - typeName.Length);
+                }
+            }
+            return null;
+        }
+
+        sealed class NastyHackyTupleCollector : IComparer
         {
             //hack assumptions:
             // - A structural ordering comparer must in some way iterate over its contents.
@@ -188,13 +195,12 @@ namespace ExpressionToCodeLib.Internal
                     }
                 }
             }
+
             public IEnumerable<string> PrintInitializerContents(ExpressionToCodeConfiguration config, IEnumerable list)
                 => PrintInitializerContents(config, (IEnumerable<KeyValuePair<TKey, TValue>>)list);
         }
 
-
-
-        public static string ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent)
+        public static string? ExpressionValueAsCode(ExpressionToCodeConfiguration config, Expression expression, int indent)
         {
             try {
                 Delegate lambda;

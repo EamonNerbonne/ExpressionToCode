@@ -6,9 +6,9 @@ using System.Text;
 
 namespace ExpressionToCodeLib.Internal
 {
-    class ValuesOnStalksCodeAnnotator : ICodeAnnotator
+    sealed class ValuesOnStalksCodeAnnotator : ICodeAnnotator
     {
-        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string msg, bool outerValueIsAssertionFailure)
+        public string AnnotateExpressionTree(ExpressionToCodeConfiguration config, Expression expr, string? msg, bool outerValueIsAssertionFailure)
         {
             var splitLine = ExpressionToStringWithValues(config, expr, outerValueIsAssertionFailure);
 
@@ -92,7 +92,7 @@ namespace ExpressionToCodeLib.Internal
         struct SubExpressionInfo
         {
             public int Location;
-            public string Value;
+            public string? Value;
         }
     }
 }

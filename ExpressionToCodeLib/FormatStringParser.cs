@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace ExpressionToCodeLib
@@ -26,7 +25,7 @@ namespace ExpressionToCodeLib
         {
             //Format strings have exceptions for stuff like double curly braces
             //There are also corner-cases that non-compiler generated format strings might hit
-            //All in all: rather than reimplement a custom parser, this 
+            //All in all: rather than reimplement a custom parser, this
             readonly StringBuilder sb = new StringBuilder();
             readonly List<Segment> Segments = new List<Segment>();
 

@@ -14,7 +14,7 @@ namespace ExpressionToCodeLib.Internal
         public string GetTypeName(Type type)
             => AliasNameOrNull(type) ?? NullableTypeNameOrNull(type.GetTypeInfo()) ?? ArrayTypeNameOrNull(type) ?? ValueTupleTypeNameOrNull(type) ?? GetUnaliasedTypeName(type);
 
-        string ValueTupleTypeNameOrNull(Type type)
+        string? ValueTupleTypeNameOrNull(Type type)
         {
             if (!IsValueTupleType(type.GetTypeInfo())) {
                 return null;
@@ -56,7 +56,7 @@ namespace ExpressionToCodeLib.Internal
             return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
         }
 
-        static string AliasNameOrNull(Type type)
+        static string? AliasNameOrNull(Type type)
         {
             if (type == typeof(bool)) {
                 return "bool";
@@ -97,7 +97,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        string NullableTypeNameOrNull(TypeInfo typeInfo)
+        string? NullableTypeNameOrNull(TypeInfo typeInfo)
             => typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && typeInfo.GetGenericTypeDefinition() == typeof(Nullable<>) ? GetTypeName(typeInfo.GetGenericArguments().Single()) + "?" : null;
 
         string NormalName(Type type)
@@ -112,7 +112,7 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        string GenericTypeName(Type type)
+        string? GenericTypeName(Type type)
         {
             if (!type.GetTypeInfo().IsGenericType) {
                 return null;
@@ -157,13 +157,13 @@ namespace ExpressionToCodeLib.Internal
             return string.Join(".", revNestedTypeNames);
         }
 
-        string ArrayTypeNameOrNull(Type type)
+        string? ArrayTypeNameOrNull(Type type)
         {
             if (!type.IsArray) {
                 return null;
             }
 
-            string arraySuffix = null;
+            var arraySuffix = default(string?);
             do {
                 var rankCommas = new string(',', type.GetArrayRank() - 1);
                 type = type.GetElementType();
