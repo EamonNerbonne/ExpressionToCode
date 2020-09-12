@@ -3,7 +3,7 @@
     <AssemblyName>ExpressionToCode.Benchmarks</AssemblyName>
     <RootNamespace>ExpressionToCode.Benchmarks</RootNamespace>
     <Authors>Maksim Volkau, Eamon Nerbonne</Authors>
-    <TargetFrameworks>netcoreapp2.1;net462</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
     <Owners>Eamon Nerbonne</Owners>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
