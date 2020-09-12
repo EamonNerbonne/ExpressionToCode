@@ -293,10 +293,7 @@ namespace ExpressionToCodeLib.Internal
             return kids.Finish();
         }
 
-        static readonly MethodInfo createDelegate = typeof(Delegate).GetTypeInfo()
-            .GetMethod(
-                "CreateDelegate",
-                new[] { typeof(Type), typeof(object), typeof(MethodInfo) });
+        static readonly MethodInfo createDelegate = ((Func<Type,object,MethodInfo, Delegate>)Delegate.CreateDelegate).Method;
 
         [Pure]
         public StringifiedExpression DispatchCall(Expression e)
