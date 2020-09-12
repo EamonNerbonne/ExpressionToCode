@@ -185,14 +185,14 @@ namespace ExpressionToCodeLib.Internal
                 || !ReflectionHelpers.CanImplicitlyCast(operand.Type, e.Type)
                 || typeof(Delegate).IsAssignableFrom(operand.Type) && operand.NodeType == ExpressionType.Lambda
                 || typeof(Expression).IsAssignableFrom(operand.Type) && operand.NodeType == ExpressionType.Quote
-                ) {
-
+            ) {
                 if (e.Type.GetTypeInfo().IsAssignableFrom(operand.Type)) // base class, basically; don't re-print identical values.
                 {
                     kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")");
                 } else {
                     kids.Add("(" + objectStringifier.TypeNameToCode(e.Type) + ")", e);
                 }
+
                 if (operand.NodeType == ExpressionType.Convert) {
                     var nestedConvert = (UnaryExpression)operand;
                     kids.Add("(" + objectStringifier.TypeNameToCode(operand.Type) + ")");
@@ -257,7 +257,7 @@ namespace ExpressionToCodeLib.Internal
                 le.Parameters.Count == 1
                     ? NestExpression(e.NodeType, le.Parameters.Single())
                     : ArgListDispatch(le.Parameters.Select(SingleChildDispatch))
-            //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
+                //though delegate lambdas do support ref/out parameters, expression tree lambda's don't
             );
             kids.Add(" => ");
             kids.Add(NestExpression(le.NodeType, le.Body));
@@ -293,7 +293,7 @@ namespace ExpressionToCodeLib.Internal
             return kids.Finish();
         }
 
-        static readonly MethodInfo createDelegate = ((Func<Type,object,MethodInfo, Delegate>)Delegate.CreateDelegate).Method;
+        static readonly MethodInfo createDelegate = ((Func<Type, object, MethodInfo, Delegate>)Delegate.CreateDelegate).Method;
 
         [Pure]
         public StringifiedExpression DispatchCall(Expression e)
@@ -398,19 +398,20 @@ namespace ExpressionToCodeLib.Internal
         KidsBuilder AddStringInterpolation(KidsBuilder kids, string formatString, IEnumerable<Expression> arguments)
         {
             var interpolationArgumentsStringified = arguments
-                .Select(expr =>
-                    expr.NodeType == ExpressionType.Convert
+                .Select(
+                    expr =>
+                        expr.NodeType == ExpressionType.Convert
                         && expr.Type == typeof(object)
                         && expr is UnaryExpression unaryExpr
                             ? unaryExpr.Operand
                             : expr
                 )
                 .Select(
-                child =>
-                    child.NodeType == ExpressionType.Conditional
-                        ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
-                        : this.ExpressionDispatch(child)
-            ).ToArray();
+                    child =>
+                        child.NodeType == ExpressionType.Conditional
+                            ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
+                            : this.ExpressionDispatch(child)
+                ).ToArray();
             var useLiteralSyntax = ObjectStringifyImpl.PreferLiteralSyntax(formatString)
                 || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
 
@@ -518,7 +519,7 @@ namespace ExpressionToCodeLib.Internal
                     && !(typeof(Delegate).IsAssignableFrom(haystack)
                         && haystack.GetTypeInfo().GetMethod("Invoke").GetParameters().Any(pi => pi.ParameterType == needle)
                     )
-                    && haystack.GetTypeInfo().GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
+                && haystack.GetTypeInfo().GetGenericArguments().Any(argType => ContainsInferableType(argType, needle));
 
         [Pure]
         public StringifiedExpression DispatchIndex(Expression e)
@@ -570,7 +571,8 @@ namespace ExpressionToCodeLib.Internal
                     throw new ArgumentOutOfRangeException(
                         nameof(e),
                         "Can't print constant " + (const_Val?.ToString() ?? "<null>")
-                        + " in expr of type " + e.Type);
+                        + " in expr of type " + e.Type
+                    );
                 }
             } else {
                 kids.Add(codeRepresentation);
@@ -675,12 +677,14 @@ namespace ExpressionToCodeLib.Internal
                     !parms.Select(p => new { p.Name, Type = p.ParameterType })
                         .SequenceEqual(props.Select(p => new { p.Name, Type = p.PropertyType }))) {
                     throw new InvalidOperationException(
-                        "Constructor params for anonymous type don't match it's properties!");
+                        "Constructor params for anonymous type don't match it's properties!"
+                    );
                 }
 
                 if (!parms.Select(p => p.ParameterType).SequenceEqual(ne.Arguments.Select(argE => argE.Type))) {
                     throw new InvalidOperationException(
-                        "Constructor Arguments for anonymous type don't match it's type signature!");
+                        "Constructor Arguments for anonymous type don't match it's type signature!"
+                    );
                 }
 
                 kids.Add("new { ");
@@ -810,7 +814,7 @@ namespace ExpressionToCodeLib.Internal
 
         [Pure]
         public StringifiedExpression DispatchCoalesce(Expression e)
-            =>  ((BinaryExpression)e).Left is ConstantExpression ce && ((BinaryExpression)e).Right is ConstantExpression && ce.Type == e.Type &&ce.Type == typeof(string) && ce.Value!=null
+            => ((BinaryExpression)e).Left is ConstantExpression ce && ((BinaryExpression)e).Right is ConstantExpression && ce.Type == e.Type && ce.Type == typeof(string) && ce.Value != null
                 ? this.ExpressionDispatch(ce) //for some weird reason the compile sometimes generates redundant null-coalescing operators.  Get rid of em!
                 : BinaryDispatch("??", e);
 
