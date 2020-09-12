@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if expression_interpretation
+using System;
 using System.Linq.Expressions;
 using Xunit;
 
@@ -30,3 +31,4 @@ namespace ExpressionToCodeTest
         }
     }
 }
+#endif
