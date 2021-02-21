@@ -274,7 +274,8 @@ namespace ExpressionToCodeLib.Internal
                     e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
                     || e.NodeType == ExpressionType.MemberAccess
                 )
-                && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.ClosureType;
+                && e.Type.GuessTypeClass() is { } typeClass
+                && (typeClass == ReflectionHelpers.TypeClass.ClosureType || typeClass == ReflectionHelpers.TypeClass.TopLevelProgramClosureType);
 
         [Pure]
         public StringifiedExpression DispatchMemberAccess(Expression e)
