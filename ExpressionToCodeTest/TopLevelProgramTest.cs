@@ -10,7 +10,7 @@ namespace ExpressionToCodeTest
         public void CanRunTopLevelProgram()
         {
             var topLevelProgram = (Action<string[]>)Delegate.CreateDelegate(typeof(Action<string[]>), typeof(TopLevelProgramMarker).Assembly.EntryPoint);
-            topLevelProgram(new []{"test"});
+            topLevelProgram(new[] { "test" });
         }
     }
 }
