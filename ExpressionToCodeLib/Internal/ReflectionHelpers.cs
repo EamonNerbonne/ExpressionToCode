@@ -80,6 +80,7 @@ namespace ExpressionToCodeLib.Internal
             ClosureType,
             StructType,
             NormalType,
+            TopLevelProgramClosureType,
         }
 
         public static TypeClass GuessTypeClass(this Type type)
@@ -91,13 +92,13 @@ namespace ExpressionToCodeLib.Internal
 
             var compilerGenerated = typeInfo.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any();
             var name = type.Name;
+            var named_DisplayClass = name.Contains("_DisplayClass");
             var name_StartWithLessThan = name.StartsWith("<", StringComparison.Ordinal);
             var isBuiltin = typeInfo.IsPrimitive || typeInfo.IsEnum || type == typeof(decimal) || type == typeof(string)
                 || typeof(Type).GetTypeInfo().IsAssignableFrom(type);
 
             if (name_StartWithLessThan && compilerGenerated) {
                 var named_AnonymousType = name.Contains("AnonymousType");
-                var named_DisplayClass = name.Contains("DisplayClass");
                 var isGeneric = typeInfo.IsGenericType;
                 var isNested = type.IsNested;
 
@@ -114,6 +115,8 @@ namespace ExpressionToCodeLib.Internal
                 }
             } else if (!compilerGenerated && !name_StartWithLessThan) {
                 return isBuiltin ? TypeClass.BuiltinType : typeInfo.IsValueType ? TypeClass.StructType : TypeClass.NormalType;
+            } else if (!compilerGenerated && name_StartWithLessThan && named_DisplayClass && type.Namespace is null && type.IsNested && type.DeclaringType == type.Assembly.EntryPoint?.DeclaringType) {
+                return TypeClass.TopLevelProgramClosureType;
             } else {
                 throw new ArgumentException("Unusual type, heuristics uncertain:" + name);
             }
