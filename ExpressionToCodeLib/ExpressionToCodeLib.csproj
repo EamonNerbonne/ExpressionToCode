@@ -43,7 +43,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
     </None>
-    <PackageReference Include="FastExpressionCompiler" Version="3.2.1" />
+    <PackageReference Include="FastExpressionCompiler" Version="3.2.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
