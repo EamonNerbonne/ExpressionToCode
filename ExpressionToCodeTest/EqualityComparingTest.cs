@@ -86,9 +86,11 @@ namespace ExpressionToCodeTest
         [Fact]
         public void StringEqDisagreement()
         {
+            var equalities1 = EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => ReferenceEquals(1000.ToString(CultureInfo.InvariantCulture), 10 + "00"))
+                ?? throw new("Expected non-null return");
+
             Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => ReferenceEquals(1000.ToString(CultureInfo.InvariantCulture), 10 + "00"))
-                    .OrderBy(x => x),
+                equalities1.OrderBy(x => x),
                 eqclasses(
                         EqualityExpressionClass.EqualsOp,
                         EqualityExpressionClass.NotEqualsOp,
@@ -99,8 +101,11 @@ namespace ExpressionToCodeTest
                         EqualityExpressionClass.StructuralEquals
                     )
                     .OrderBy(x => x));
+
+            var equalities2 = EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => 1000.ToString(CultureInfo.InvariantCulture).Equals(10 + "00"))
+                ?? throw new("Expected non-null return");
             Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => 1000.ToString(CultureInfo.InvariantCulture).Equals(10 + "00")).ToArray(),
+                equalities2.ToArray(),
                 eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
         }
 
@@ -111,7 +116,7 @@ namespace ExpressionToCodeTest
                         ExpressionToCodeConfiguration.DefaultAssertionConfiguration,
                         // ReSharper disable ReferenceEqualsWithValueType
                         () => ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17)))
-                    .ToArray(),
+                    ?.ToArray() ?? throw new("Expected non-null return"),
                 // ReSharper restore ReferenceEqualsWithValueType
                 eqclasses(
                     EqualityExpressionClass.ObjectEquals,
@@ -122,7 +127,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void DtEqDisagreement()
             => Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17))).ToArray(),
+                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17)))?.ToArray() ?? throw new("Expected non-null return"),
                 eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
     }
 }
