@@ -336,7 +336,9 @@ namespace ExpressionToCodeTest
         public void Quoted()
             => Assert.Equal(
                 @"() => (Expression<Func<int, string, string>>)((n, s) => s + n.ToString()) != null",
-                ExpressionToCode.ToCode(() => (Expression<Func<int, string, string>>)((n, s) => s + n) != null));
+                // ReSharper disable once RedundantToStringCallForValueType
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                ExpressionToCode.ToCode(() => (Expression<Func<int, string, string>>)((n, s) => s + n.ToString()) != null));
 
         [Fact]
         public void Quoted2()
