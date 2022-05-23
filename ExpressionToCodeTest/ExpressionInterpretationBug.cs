@@ -1,4 +1,5 @@
-﻿#if expression_interpretation
+﻿//requires .net 4.7.2, but not testing older than 4.8 anymore; so this is effectively always on
+
 using System;
 using System.Linq.Expressions;
 using FastExpressionCompiler;
@@ -7,7 +8,7 @@ using Xunit;
 namespace ExpressionToCodeTest
 {
     /// <summary>
-    /// Repro for https://github.com/dotnet/runtime/issues/29673
+    ///     Repro for https://github.com/dotnet/runtime/issues/29673
     /// </summary>
     public class ExpressionInterpretationBug
     {
@@ -30,7 +31,7 @@ namespace ExpressionToCodeTest
             var expr_compiled = Expr(() => new SomethingMutable { AStructField = { AValue = 2 } }).Compile(false)();
             Assert.Equal(2, expr_compiled.AStructField.AValue);
         }
-#if !NETFRAMEWORK
+
         [Fact]
         public void MemberMemberBindingForStructsInterpretsWrong_BUGBUG()
         {
@@ -38,7 +39,6 @@ namespace ExpressionToCodeTest
             //Assert.Equal(2, expr_interpreted.AStructField.AValue);  //this should hold, but instead:
             Assert.Equal(0, expr_interpreted.AStructField.AValue); //this way I might notice when the bug gets fixed
         }
-#endif
 
         [Fact]
         public void MemberMemberBindingForStructsFastCompilesOk()
@@ -48,4 +48,3 @@ namespace ExpressionToCodeTest
         }
     }
 }
-#endif
