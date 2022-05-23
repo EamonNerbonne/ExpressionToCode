@@ -31,14 +31,15 @@ namespace ExpressionToCodeTest
             var expr_compiled = Expr(() => new SomethingMutable { AStructField = { AValue = 2 } }).Compile(false)();
             Assert.Equal(2, expr_compiled.AStructField.AValue);
         }
-
+#if!NETFRAMEWORK
         [Fact]
         public void MemberMemberBindingForStructsInterpretsWrong_BUGBUG()
         {
             var expr_interpreted = Expr(() => new SomethingMutable { AStructField = { AValue = 2 } }).Compile(true)();
             //Assert.Equal(2, expr_interpreted.AStructField.AValue);  //this should hold, but instead:
-            Assert.Equal(0, expr_interpreted.AStructField.AValue); //this way I might notice when the bug gets fixed
+            Assert.Equal(0, expr_interpreted.AStructField.AValue); //this way I might notice when the bug gets fixed (https://github.com/dotnet/runtime/issues/29673)
         }
+#endif
 
         [Fact]
         public void MemberMemberBindingForStructsFastCompilesOk()
