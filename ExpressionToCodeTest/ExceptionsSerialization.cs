@@ -17,15 +17,16 @@ namespace ExpressionToCodeTest
         public void PAssertExceptionIsSerializable()
             => AssertMethodFailsWithSerializableException(IntentionallyFailingMethod);
 
+#pragma warning disable SYSLIB0011 // BinaryFormatter is Obsolete
         static void AssertMethodFailsWithSerializableException(Action intentionallyFailingMethod)
         {
             var original = Assert.ThrowsAny<Exception>(intentionallyFailingMethod);
-
             var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
             var ms = new MemoryStream();
             formatter.Serialize(ms, original);
             var deserialized = formatter.Deserialize(new MemoryStream(ms.ToArray()));
             Assert.Equal(original.ToString(), deserialized.ToString());
         }
+#pragma warning restore SYSLIB0011
     }
 }
