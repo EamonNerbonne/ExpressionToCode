@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 using Xunit;
 // ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
@@ -330,6 +331,18 @@ namespace ExpressionToCodeTest
                 @"() => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)",
                 ExpressionToCode.ToCode(
                     () => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)));
+        }
+
+        [Fact]
+        public void StructObjectInitializers()
+        {
+            var s = new DictionaryEntry { Key = "key", Value = 13, };
+            Assert.Equal(
+                @"() => new DictionaryEntry { Key = ""key"", Value = 13, }.Equals(s)",
+                ExpressionToCode.ToCode(
+                    () => new DictionaryEntry { Key = "key", Value = 13, }.Equals(s)
+                )
+            );
         }
 
         [Fact]
