@@ -128,7 +128,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void ListInitializer_with_struct_member_init_key()
             => Assert.Equal(
-                @"() => new List<DictionaryEntry> { new() { Value = 42, }, new() }.Count == 2",
+                @"() => new List<DictionaryEntry> { new DictionaryEntry { Value = 42 }, new DictionaryEntry() }.Count == 2",
                 ExpressionToCode.ToCode(() => new List<DictionaryEntry> { new() { Value = 42, }, new() }.Count == 2));
 
         [Fact]
