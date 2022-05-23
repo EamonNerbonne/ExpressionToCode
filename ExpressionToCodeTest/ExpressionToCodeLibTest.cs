@@ -623,18 +623,12 @@ namespace ExpressionToCodeTest
         }
 
         // ReSharper disable once UnusedParameter.Global
-        public string this[int index]
-            => "TheIndexedValue";
-
-        public string TheProperty
-            => "TheValue";
+        public string this[int index] => "TheIndexedValue";
+        public string TheProperty => "TheValue";
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        string TheProtectedProperty
-            => "TheValue";
-
-        static string ThePrivateStaticProperty
-            => "TheValue";
+        string TheProtectedProperty => "TheValue";
+        static string ThePrivateStaticProperty => "TheValue";
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
 #pragma warning disable 628
