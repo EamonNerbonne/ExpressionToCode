@@ -108,6 +108,12 @@ namespace ExpressionToCodeTest
                 ExpressionToCode.ToCode(() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3));
 
         [Fact]
+        public void DictionaryInitializer_with_struct_member_init_key()
+            => Assert.Equal(
+                @"new Dictionary<DictionaryEntry, int> { { new() { Value = 42, }, 1 }, { new(), 2 } }.Count == 2",
+                ExpressionToCode.ToCode(() => new Dictionary<DictionaryEntry, int> { { new() { Value = 42, }, 1 }, { new(), 2 } }.Count == 2));
+
+        [Fact]
         public void ListInitializer_with_constructor_args()
             => Assert.Equal(
                 @"() => new List<int>(50) { 1, 2, 3 }.Count == 3",
@@ -118,6 +124,12 @@ namespace ExpressionToCodeTest
             => Assert.Equal(
                 @"() => new List<int> { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int> { 1, 2, 3 }.Count == 3));
+
+        [Fact]
+        public void ListInitializer_with_struct_member_init_key()
+            => Assert.Equal(
+                @"() => new List<DictionaryEntry> { new() { Value = 42, }, new() }.Count == 2",
+                ExpressionToCode.ToCode(() => new List<DictionaryEntry> { new() { Value = 42, }, new() }.Count == 2));
 
         [Fact]
         public void LiteralCharAndProperty()
