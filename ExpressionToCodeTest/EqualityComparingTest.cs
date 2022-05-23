@@ -80,7 +80,7 @@ namespace ExpressionToCodeTest
             Assert.Equal(EqualityExpressionClass.SequenceEqual, EqualityExpressions.CheckForEquality(() => new[] { 'b', 'l', 'a' }.SequenceEqual(bla2string)));
         }
 
-        static Tuple<EqualityExpressionClass, bool>[] eqclasses(params EqualityExpressionClass[] classes)
+        static Tuple<EqualityExpressionClass, bool>[] EqClasses(params EqualityExpressionClass[] classes)
             => classes.Select(eqClass => (eqClass, false).ToTuple()).ToArray();
 
         [Fact]
@@ -91,7 +91,7 @@ namespace ExpressionToCodeTest
 
             Assert.Equal(
                 equalities1.OrderBy(x => x),
-                eqclasses(
+                EqClasses(
                         EqualityExpressionClass.EqualsOp,
                         EqualityExpressionClass.NotEqualsOp,
                         EqualityExpressionClass.ObjectEquals,
@@ -106,7 +106,7 @@ namespace ExpressionToCodeTest
                 ?? throw new("Expected non-null return");
             Assert.Equal(
                 equalities2.ToArray(),
-                eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
+                EqClasses(EqualityExpressionClass.ObjectReferenceEquals));
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace ExpressionToCodeTest
                         ExpressionToCodeConfiguration.DefaultAssertionConfiguration,
                         () => ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17)))
                     ?.ToArray() ?? throw new("Expected non-null return"),
-                eqclasses(
+                EqClasses(
                     EqualityExpressionClass.ObjectEquals,
                     EqualityExpressionClass.ObjectEqualsStatic,
                     EqualityExpressionClass.StructuralEquals
@@ -130,6 +130,6 @@ namespace ExpressionToCodeTest
         public void DtEqDisagreement()
             => Assert.Equal(
                 EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17)))?.ToArray() ?? throw new("Expected non-null return"),
-                eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
+                EqClasses(EqualityExpressionClass.ObjectReferenceEquals));
     }
 }
