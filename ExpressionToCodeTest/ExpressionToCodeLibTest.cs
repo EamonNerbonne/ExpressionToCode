@@ -336,7 +336,7 @@ namespace ExpressionToCodeTest
         public void Quoted()
             => Assert.Equal(
                 @"() => (Expression<Func<int, string, string>>)((n, s) => s + n.ToString()) != null",
-                ExpressionToCode.ToCode(() => (Expression<Func<int, string, string>>)((n, s) => s + n.ToString()) != null));
+                ExpressionToCode.ToCode(() => (Expression<Func<int, string, string>>)((n, s) => s + n) != null));
 
         [Fact]
         public void Quoted2()
