@@ -12,7 +12,7 @@ namespace ExpressionToCodeTest
         {
             LambdaInsideLocalFunction = LambdaToMyVar = LambdaInsideNestedClassMethod = null;
 
-            var topLevelProgram = (Action<string[]>)Delegate.CreateDelegate(typeof(Action<string[]>), typeof(TopLevelProgramMarker).Assembly.EntryPoint);
+            var topLevelProgram = (Action<string[]>)Delegate.CreateDelegate(typeof(Action<string[]>), typeof(TopLevelProgramMarker).Assembly.EntryPoint ?? throw new("Expected non-null return"));
             topLevelProgram(new[] { "test" });
 
             Assert.Equal("() => myVariable", LambdaToMyVar);

@@ -80,16 +80,18 @@ namespace ExpressionToCodeTest
             Assert.Equal(EqualityExpressionClass.SequenceEqual, EqualityExpressions.CheckForEquality(() => new[] { 'b', 'l', 'a' }.SequenceEqual(bla2string)));
         }
 
-        static Tuple<EqualityExpressionClass, bool>[] eqclasses(params EqualityExpressionClass[] classes)
+        static Tuple<EqualityExpressionClass, bool>[] EqClasses(params EqualityExpressionClass[] classes)
             => classes.Select(eqClass => (eqClass, false).ToTuple()).ToArray();
 
         [Fact]
         public void StringEqDisagreement()
         {
+            var equalities1 = EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => ReferenceEquals(1000.ToString(CultureInfo.InvariantCulture), 10 + "00"))
+                ?? throw new("Expected non-null return");
+
             Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => ReferenceEquals(1000.ToString(CultureInfo.InvariantCulture), 10 + "00"))
-                    .OrderBy(x => x),
-                eqclasses(
+                equalities1.OrderBy(x => x),
+                EqClasses(
                         EqualityExpressionClass.EqualsOp,
                         EqualityExpressionClass.NotEqualsOp,
                         EqualityExpressionClass.ObjectEquals,
@@ -99,30 +101,35 @@ namespace ExpressionToCodeTest
                         EqualityExpressionClass.StructuralEquals
                     )
                     .OrderBy(x => x));
+
+            var equalities2 = EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => 1000.ToString(CultureInfo.InvariantCulture).Equals(10 + "00"))
+                ?? throw new("Expected non-null return");
             Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => 1000.ToString(CultureInfo.InvariantCulture).Equals(10 + "00")).ToArray(),
-                eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
+                equalities2.ToArray(),
+                EqClasses(EqualityExpressionClass.ObjectReferenceEquals));
         }
 
         [Fact]
         public void DtRefEqDisagreement()
+#pragma warning disable CA2013 // Do not use ReferenceEquals with value types
+            // ReSharper disable ReferenceEqualsWithValueType
             => Assert.Equal(
                 EqualityExpressions.DisagreeingEqualities(
                         ExpressionToCodeConfiguration.DefaultAssertionConfiguration,
-                        // ReSharper disable ReferenceEqualsWithValueType
                         () => ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17)))
-                    .ToArray(),
-                // ReSharper restore ReferenceEqualsWithValueType
-                eqclasses(
+                    ?.ToArray() ?? throw new("Expected non-null return"),
+                EqClasses(
                     EqualityExpressionClass.ObjectEquals,
                     EqualityExpressionClass.ObjectEqualsStatic,
                     EqualityExpressionClass.StructuralEquals
                 ));
+        // ReSharper restore ReferenceEqualsWithValueType
+#pragma warning restore CA2013 // Do not use ReferenceEquals with value types
 
         [Fact]
         public void DtEqDisagreement()
             => Assert.Equal(
-                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17))).ToArray(),
-                eqclasses(EqualityExpressionClass.ObjectReferenceEquals));
+                EqualityExpressions.DisagreeingEqualities(ExpressionToCodeConfiguration.DefaultAssertionConfiguration, () => new DateTime(2011, 05, 17).Equals(new DateTime(2011, 05, 17)))?.ToArray() ?? throw new("Expected non-null return"),
+                EqClasses(EqualityExpressionClass.ObjectReferenceEquals));
     }
 }

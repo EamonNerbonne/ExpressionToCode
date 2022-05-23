@@ -1,27 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Label="Configuration">
-    <Version>3.4.0</Version>
-    <Authors>Eamon Nerbonne</Authors>
-    <Owners>Eamon Nerbonne</Owners>
-    <Title>ExpressionToCode</Title>
-    <Description>Generates valid, readable C# from an expression tree, and can annotate that code with runtime values. Useful for e.g. code generation and unit testing assertions.</Description>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>Detect closures within C# 9 top-level-programs correctly</PackageReleaseNotes>
-    <PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <RepositoryUrl>https://github.com/EamonNerbonne/ExpressionToCode</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/EamonNerbonne/ExpressionToCode</PackageProjectUrl>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <SignAssembly>true</SignAssembly>
-    <LangVersion>8.0</LangVersion>
-    <Nullable>enable</Nullable>
-    <WarningsAsErrors>NU1605</WarningsAsErrors>
-    <NoWarn>CS1591</NoWarn>
-  </PropertyGroup>
-  
+	<PropertyGroup Label="Configuration">
+		<Version>3.4.0</Version>
+		<Authors>Eamon Nerbonne</Authors>
+		<Owners>Eamon Nerbonne</Owners>
+		<Title>ExpressionToCode</Title>
+		<Description>Generates valid, readable C# from an expression tree, and can annotate that code with runtime values. Useful for e.g. code generation and unit testing assertions.</Description>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>Detect closures within C# 9 top-level-programs correctly</PackageReleaseNotes>
+		<PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+		<RepositoryUrl>https://github.com/EamonNerbonne/ExpressionToCode</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/EamonNerbonne/ExpressionToCode</PackageProjectUrl>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<SignAssembly>true</SignAssembly>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>NU1605</WarningsAsErrors>
+		<NoWarn>CS1591</NoWarn>
+	</PropertyGroup>
+
 	<PropertyGroup>
 		<!-- Source link: -->
 		<DebugType>portable</DebugType>
@@ -31,21 +31,21 @@
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
-  
-  
-  <ItemGroup>
-    <Compile Update="Internal\ExpressionTypeDispatch.Generated.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
-    </Compile>
-    <None Include="Internal\ExpressionTypeDispatch.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
-    </None>
-    <PackageReference Include="FastExpressionCompiler" Version="3.3.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
+
+
+	<ItemGroup>
+		<Compile Update="Internal\ExpressionTypeDispatch.Generated.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ExpressionTypeDispatch.tt</DependentUpon>
+		</Compile>
+		<None Include="Internal\ExpressionTypeDispatch.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
+		</None>
+		<PackageReference Include="FastExpressionCompiler" Version="3.3.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
 </Project>
