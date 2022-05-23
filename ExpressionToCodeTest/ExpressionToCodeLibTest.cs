@@ -350,7 +350,7 @@ namespace ExpressionToCodeTest
         {
             var s = new DictionaryEntry { Key = "key", Value = 13, };
             Assert.Equal(
-                @"() => new DictionaryEntry { Key = ""key"", Value = 13, }.Equals(s)",
+                @"() => new DictionaryEntry { Key = ""key"", Value = 13 }.Equals(s)",
                 ExpressionToCode.ToCode(
                     () => new DictionaryEntry { Key = "key", Value = 13, }.Equals(s)
                 )

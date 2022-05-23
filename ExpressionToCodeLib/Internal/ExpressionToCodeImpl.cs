@@ -654,9 +654,10 @@ namespace ExpressionToCodeLib.Internal
 
             var mie = (MemberInitExpression)e;
             kids.Add("new ", mie);
-            kids.Add(objectStringifier.TypeNameToCode(mie.NewExpression.Constructor.DeclaringType));
-            if (mie.NewExpression.Arguments.Any()) {
-                kids.Add(ArgListDispatch(GetArgumentsForMethod(mie.NewExpression.Constructor, mie.NewExpression.Arguments)));
+            var newExpr = mie.NewExpression;
+            kids.Add(objectStringifier.TypeNameToCode(newExpr.Constructor?.DeclaringType ?? newExpr.Type));
+            if (newExpr.Arguments.Any()) {
+                kids.Add(ArgListDispatch(GetArgumentsForMethod(newExpr.Constructor ?? throw new("Constructor cannot be omitted when it has arguments: " + newExpr.Type), newExpr.Arguments)));
             }
 
             kids.Add(" { ");
