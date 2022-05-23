@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 using Xunit;
 // ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
@@ -101,22 +102,34 @@ namespace ExpressionToCodeTest
                     .ToCode(() => new Func<int>[] { () => 1, () => 2 }));
 
         [Fact]
-        public void ListInitializer()
+        public void DictionaryInitializer()
             => Assert.Equal(
                 @"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",
                 ExpressionToCode.ToCode(() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3));
 
         [Fact]
-        public void ListInitializer2()
+        public void DictionaryInitializer_with_struct_member_init_key()
+            => Assert.Equal(
+                @"() => new Dictionary<DictionaryEntry, int> { { new DictionaryEntry { Value = 42 }, 1 }, { new DictionaryEntry(), 2 } }.Count == 2",
+                ExpressionToCode.ToCode(() => new Dictionary<DictionaryEntry, int> { { new() { Value = 42, }, 1 }, { new(), 2 } }.Count == 2));
+
+        [Fact]
+        public void ListInitializer_with_constructor_args()
             => Assert.Equal(
                 @"() => new List<int>(50) { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int>(50) { 1, 2, 3 }.Count == 3));
 
         [Fact]
-        public void ListInitializer3()
+        public void ListInitializer()
             => Assert.Equal(
                 @"() => new List<int> { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int> { 1, 2, 3 }.Count == 3));
+
+        [Fact]
+        public void ListInitializer_with_struct_member_init_key()
+            => Assert.Equal(
+                @"() => new List<DictionaryEntry> { new DictionaryEntry { Value = 42 }, new DictionaryEntry() }.Count == 2",
+                ExpressionToCode.ToCode(() => new List<DictionaryEntry> { new() { Value = 42, }, new() }.Count == 2));
 
         [Fact]
         public void LiteralCharAndProperty()
@@ -330,6 +343,18 @@ namespace ExpressionToCodeTest
                 @"() => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)",
                 ExpressionToCode.ToCode(
                     () => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)));
+        }
+
+        [Fact]
+        public void StructObjectInitializers()
+        {
+            var s = new DictionaryEntry { Key = "key", Value = 13, };
+            Assert.Equal(
+                @"() => new DictionaryEntry { Key = ""key"", Value = 13 }.Equals(s)",
+                ExpressionToCode.ToCode(
+                    () => new DictionaryEntry { Key = "key", Value = 13, }.Equals(s)
+                )
+            );
         }
 
         [Fact]
@@ -612,18 +637,12 @@ namespace ExpressionToCodeTest
         }
 
         // ReSharper disable once UnusedParameter.Global
-        public string this[int index]
-            => "TheIndexedValue";
-
-        public string TheProperty
-            => "TheValue";
+        public string this[int index] => "TheIndexedValue";
+        public string TheProperty => "TheValue";
 
         // ReSharper disable once MemberCanBeMadeStatic.Local
-        string TheProtectedProperty
-            => "TheValue";
-
-        static string ThePrivateStaticProperty
-            => "TheValue";
+        string TheProtectedProperty => "TheValue";
+        static string ThePrivateStaticProperty => "TheValue";
 
         // ReSharper disable once UnusedAutoPropertyAccessor.Local
 #pragma warning disable 628
