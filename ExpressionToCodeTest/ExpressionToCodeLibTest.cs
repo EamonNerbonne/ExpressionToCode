@@ -110,7 +110,7 @@ namespace ExpressionToCodeTest
         [Fact]
         public void DictionaryInitializer_with_struct_member_init_key()
             => Assert.Equal(
-                @"new Dictionary<DictionaryEntry, int> { { new() { Value = 42, }, 1 }, { new(), 2 } }.Count == 2",
+                @"() => new Dictionary<DictionaryEntry, int> { { new DictionaryEntry { Value = 42 }, 1 }, { new DictionaryEntry(), 2 } }.Count == 2",
                 ExpressionToCode.ToCode(() => new Dictionary<DictionaryEntry, int> { { new() { Value = 42, }, 1 }, { new(), 2 } }.Count == 2));
 
         [Fact]
