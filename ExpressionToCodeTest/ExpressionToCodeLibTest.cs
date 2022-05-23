@@ -102,19 +102,19 @@ namespace ExpressionToCodeTest
                     .ToCode(() => new Func<int>[] { () => 1, () => 2 }));
 
         [Fact]
-        public void ListInitializer()
+        public void DictionaryInitializer()
             => Assert.Equal(
                 @"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",
                 ExpressionToCode.ToCode(() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3));
 
         [Fact]
-        public void ListInitializer2()
+        public void ListInitializer_with_constructor_args()
             => Assert.Equal(
                 @"() => new List<int>(50) { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int>(50) { 1, 2, 3 }.Count == 3));
 
         [Fact]
-        public void ListInitializer3()
+        public void ListInitializer()
             => Assert.Equal(
                 @"() => new List<int> { 1, 2, 3 }.Count == 3",
                 ExpressionToCode.ToCode(() => new List<int> { 1, 2, 3 }.Count == 3));
