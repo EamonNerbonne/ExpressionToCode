@@ -111,18 +111,20 @@ namespace ExpressionToCodeTest
 
         [Fact]
         public void DtRefEqDisagreement()
+#pragma warning disable CA2013 // Do not use ReferenceEquals with value types
+            // ReSharper disable ReferenceEqualsWithValueType
             => Assert.Equal(
                 EqualityExpressions.DisagreeingEqualities(
                         ExpressionToCodeConfiguration.DefaultAssertionConfiguration,
-                        // ReSharper disable ReferenceEqualsWithValueType
                         () => ReferenceEquals(new DateTime(2011, 05, 17), new DateTime(2011, 05, 17)))
                     ?.ToArray() ?? throw new("Expected non-null return"),
-                // ReSharper restore ReferenceEqualsWithValueType
                 eqclasses(
                     EqualityExpressionClass.ObjectEquals,
                     EqualityExpressionClass.ObjectEqualsStatic,
                     EqualityExpressionClass.StructuralEquals
                 ));
+        // ReSharper restore ReferenceEqualsWithValueType
+#pragma warning restore CA2013 // Do not use ReferenceEquals with value types
 
         [Fact]
         public void DtEqDisagreement()
