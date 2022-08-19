@@ -1069,7 +1069,15 @@ namespace ExpressionToCodeLib.Internal
 
         [Pure]
         public StringifiedExpression DispatchThrow(Expression e)
-            => throw new NotImplementedException();
+        {
+            var kids = KidsBuilder.Create();
+            var ue = (UnaryExpression)e;
+
+            kids.Add("throw ");
+            kids.Add(this.ExpressionDispatch(ue.Operand));
+
+            return kids.Finish();
+        }
 
         [Pure]
         public StringifiedExpression DispatchTry(Expression e)
