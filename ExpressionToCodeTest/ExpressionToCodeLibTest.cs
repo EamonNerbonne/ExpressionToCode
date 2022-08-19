@@ -620,6 +620,21 @@ namespace ExpressionToCodeTest
             Assert.Equal(@"() => someValue + closedVariable + "" "" + argument", expr);
         }
 
+        [Fact]
+        public void ThisThrow()
+        {
+            var expr = ExpressionToCode.ToCode(
+                Expression.Throw(
+                    Expression.New(
+                        typeof(Exception).GetConstructor(new[] { typeof(string) }) ??
+                        throw new InvalidOperationException("Unable to find exception constructor"),
+                        Expression.Constant("Stuff")
+                    )
+                )
+            );
+            Assert.Equal("throw new Exception(\"Stuff\")", expr);
+        }
+
         // ReSharper disable once ClassCanBeSealed.Local
         class ClassWithClosure
         {
