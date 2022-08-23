@@ -6,6 +6,7 @@ namespace ExpressionToCodeLib
     {
         string? PlainObjectToCode(object? val, Type? type);
         string TypeNameToCode(Type type);
+        bool PreferLiteralSyntax(string str1);
     }
 
     public static class ObjectStringifierExtensions
