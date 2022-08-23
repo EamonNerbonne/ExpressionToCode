@@ -9,12 +9,12 @@ namespace ExpressionToCodeLib.Internal
     sealed class ObjectStringifyImpl : IObjectStringifier
     {
         readonly bool fullTypeNames;
-        readonly bool allowRawStrings;
+        readonly bool allowLiteralStrings;
 
-        public ObjectStringifyImpl(bool fullTypeNames = false, bool allowRawStrings = true)
+        public ObjectStringifyImpl(bool fullTypeNames = false, bool allowLiteralStrings = true)
         {
             this.fullTypeNames = fullTypeNames;
-            this.allowRawStrings = allowRawStrings;
+            this.allowLiteralStrings = allowLiteralStrings;
         }
 
         public string TypeNameToCode(Type type)
@@ -67,7 +67,7 @@ namespace ExpressionToCodeLib.Internal
 
         public bool PreferLiteralSyntax(string str1)
         {
-            if (!allowRawStrings) {
+            if (!allowLiteralStrings) {
                 return false;
             }
 
