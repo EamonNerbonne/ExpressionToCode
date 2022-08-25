@@ -24,7 +24,7 @@ namespace ExpressionToCodeLib.Internal
             => val switch {
                 null when type == null || type == typeof(object) => "null",
                 null => "default(" + TypeNameToCode(type) + ")",
-                string str => PreferLiteralSyntax(str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"",
+                string str => UseVerbatimSyntax(str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"",
                 char charVal => "'" + EscapeCharForString(charVal) + "'",
                 decimal _ => Convert.ToString(val, CultureInfo.InvariantCulture) + "m",
                 float floatVal => FloatToCode(floatVal),
@@ -65,14 +65,14 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        public bool PreferLiteralSyntax(string str1)
+        public bool UseVerbatimSyntax(string str)
         {
             if (!allowLiteralStrings) {
                 return false;
             }
 
             var count = 0;
-            foreach (var c in str1) {
+            foreach (var c in str) {
                 if (c < 32 && c != '\r' || c == '\\') {
                     count++;
                     if (count > 3) {

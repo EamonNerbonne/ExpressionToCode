@@ -413,12 +413,12 @@ namespace ExpressionToCodeLib.Internal
                             ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
                             : this.ExpressionDispatch(child)
                 ).ToArray();
-            var useLiteralSyntax = objectStringifier.PreferLiteralSyntax(formatString)
+            var useVerbatimSyntax = objectStringifier.UseVerbatimSyntax(formatString)
                 || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
 
             var parsed = FormatStringParser.ParseFormatString(formatString, interpolationArgumentsStringified.Cast<object>().ToArray());
 
-            if (useLiteralSyntax) {
+            if (useVerbatimSyntax) {
                 kids.Add("$@\"");
                 foreach (var segment in parsed.segments) {
                     kids.Add(segment.InitialStringPart.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "{");
