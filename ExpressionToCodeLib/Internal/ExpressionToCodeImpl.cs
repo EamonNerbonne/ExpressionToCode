@@ -414,7 +414,8 @@ namespace ExpressionToCodeLib.Internal
                             : this.ExpressionDispatch(child)
                 ).ToArray();
             var useVerbatimSyntax = objectStringifier.UseVerbatimSyntax(formatString)
-                || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
+                || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n") // no longer necessary after https://devblogs.microsoft.com/dotnet/early-peek-at-csharp-11-features/#c-11-preview-allow-newlines-in-the-holes-of-interpolated-strings
+                ;
 
             var parsed = FormatStringParser.ParseFormatString(formatString, interpolationArgumentsStringified.Cast<object>().ToArray());
 
