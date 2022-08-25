@@ -9,9 +9,13 @@ namespace ExpressionToCodeLib.Internal
     sealed class ObjectStringifyImpl : IObjectStringifier
     {
         readonly bool fullTypeNames;
+        readonly bool allowLiteralStrings;
 
-        public ObjectStringifyImpl(bool fullTypeNames = false)
-            => this.fullTypeNames = fullTypeNames;
+        public ObjectStringifyImpl(bool fullTypeNames = false, bool allowLiteralStrings = true)
+        {
+            this.fullTypeNames = fullTypeNames;
+            this.allowLiteralStrings = allowLiteralStrings;
+        }
 
         public string TypeNameToCode(Type type)
             => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
@@ -61,8 +65,12 @@ namespace ExpressionToCodeLib.Internal
             }
         }
 
-        internal static bool PreferLiteralSyntax(string str1)
+        public bool PreferLiteralSyntax(string str1)
         {
+            if (!allowLiteralStrings) {
+                return false;
+            }
+
             var count = 0;
             foreach (var c in str1) {
                 if (c < 32 && c != '\r' || c == '\\') {

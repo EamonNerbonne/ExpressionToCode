@@ -26,6 +26,7 @@ interface IExpressionToCode
 interface IObjectStringifier
     string inst.PlainObjectToCode(object val, Type type)
     string inst.TypeNameToCode(Type type)
+    bool inst.PreferLiteralSyntax(string str1)
 
 class AnnotatedToCodeExtensions
     string TYPE.AnnotatedToCode(IAnnotatedToCode it, Expression e)
@@ -118,6 +119,8 @@ class ObjectStringifierExtensions
 class ObjectStringify
     static readonly IObjectStringifier Default
     static readonly IObjectStringifier WithFullTypeNames
+    static readonly IObjectStringifier WithoutLiteralStrings
+    static readonly IObjectStringifier WithFullTypeNamesWithoutLiteralStrings
 
 class ObjectToCode
     string TYPE.ComplexObjectToPseudoCode(object val)

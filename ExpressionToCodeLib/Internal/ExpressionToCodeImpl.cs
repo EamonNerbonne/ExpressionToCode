@@ -413,7 +413,7 @@ namespace ExpressionToCodeLib.Internal
                             ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
                             : this.ExpressionDispatch(child)
                 ).ToArray();
-            var useLiteralSyntax = ObjectStringifyImpl.PreferLiteralSyntax(formatString)
+            var useLiteralSyntax = objectStringifier.PreferLiteralSyntax(formatString)
                 || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains("\n");
 
             var parsed = FormatStringParser.ParseFormatString(formatString, interpolationArgumentsStringified.Cast<object>().ToArray());

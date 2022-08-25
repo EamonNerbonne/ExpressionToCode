@@ -557,6 +557,25 @@ namespace ExpressionToCodeTest
             Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()", code);
         }
 
+        [Fact]
+        public void WithLiteralStrings()
+        {
+            var code = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.Default)
+                .GetExpressionToCode()
+                .ToCode(static () => "Lots \t of \t tabs \t that \t will \t need \t escaping");
+
+            Assert.Equal("() => @\"Lots \t of \t tabs \t that \t will \t need \t escaping\"", code);
+        }
+
+        [Fact]
+        public void WithoutLiteralStrings()
+        {
+            var code = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithoutLiteralStrings)
+                .GetExpressionToCode()
+                .ToCode(static () => "Lots \t of \t tabs \t that \t will \t need \t escaping");
+            Assert.Equal("() => \"Lots \\t of \\t tabs \\t that \\t will \\t need \\t escaping\"", code);
+        }
+
         sealed class B { }
 
         [Fact]
