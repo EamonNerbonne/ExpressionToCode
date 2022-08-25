@@ -15,7 +15,7 @@ namespace ExpressionToCodeLib.Internal
 
         /// <summary>
         ///     The expression tree contains many symbols that are not themselves "real" expressions, e.g. the "." in "obj.field".
-        ///     This field is true for parts that aren't just implemenation details, but proper sub-expressions; e.g. the "x" in "x
+        ///     This field is true for parts that aren't just implementation details, but proper sub-expressions; e.g. the "x" in "x
         ///     &amp;&amp; y"
         /// </summary>
         public readonly bool IsConceptualChild;
