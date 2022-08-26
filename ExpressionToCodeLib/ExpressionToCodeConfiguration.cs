@@ -23,7 +23,7 @@ namespace ExpressionToCodeLib
     ///     methods are thread safe.
     ///     Changes to configuration return new configuration instances.
     /// </summary>
-    public class ExpressionToCodeConfiguration
+    public sealed record ExpressionToCodeConfiguration
     {
         /// <summary>
         ///     The default formatter for converting an expression to code. Defaults are:
