@@ -10,7 +10,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\ExpressionToCodeLib\ExpressionToCodeLib.csproj" />
-		<PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.13.2" />
 		<PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
 	</ItemGroup>
 </Project>
