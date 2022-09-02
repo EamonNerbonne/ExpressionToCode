@@ -329,43 +329,37 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             && mce.Method.DeclaringType?.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
             && mce.Method.Name == "Create"
             && mce.Arguments.Count == 2
-            && mce.Arguments[0] is ConstantExpression formattableStringFormat
-            && mce.Arguments[1] is NewArrayExpression formattableStringArguments
+            && mce.Arguments[0] is ConstantExpression { Value: string formattableStringFormatString }
+            && mce.Arguments[1] is NewArrayExpression { Expressions: {} formattableStringArguments }
         ) {
             //.net 4.6
             //string-interpolations are compiled into FormattableStringFactory.Create
-            var formatString = (string)formattableStringFormat.Value;
-            var arguments = formattableStringArguments.Expressions;
-            kids = AddStringInterpolation(kids, formatString, arguments);
+            kids = AddStringInterpolation(kids, formattableStringFormatString, formattableStringArguments);
         } else if (mce.Object == null
             && mce.Type == typeof(string)
             && mce.Method.DeclaringType == typeof(string)
             && mce.Method.Name == "Format"
             && mce.Arguments.Count == 2
-            && mce.Arguments[0] is ConstantExpression formatStringExpr
-            && formatStringExpr.Type == typeof(string)
+            && mce.Arguments[0].Type == typeof(string)
+            && mce.Arguments[0] is ConstantExpression { Value: string stringInterpolationFormatString }
             && mce.Arguments[1].Type == typeof(object[])
-            && mce.Arguments[1] is NewArrayExpression interpolationArguments
+            && mce.Arguments[1] is NewArrayExpression { Expressions: {}  stringInterpolationArguments }
         ) {
             //.net 4.6
             //string-interpolations are compiled into FormattableStringFactory.Create
-            var formatString = (string)formatStringExpr.Value;
-            var arguments = interpolationArguments.Expressions;
-            kids = AddStringInterpolation(kids, formatString, arguments);
+            kids = AddStringInterpolation(kids, stringInterpolationFormatString, stringInterpolationArguments);
         } else if (mce.Object == null
             && mce.Type == typeof(string)
             && mce.Method.DeclaringType == typeof(string)
             && mce.Method.Name == "Format"
             && mce.Arguments.Count >= 2
-            && mce.Arguments[0] is ConstantExpression formatString2Expr
-            && formatString2Expr.Type == typeof(string)
+            && mce.Arguments[0].Type == typeof(string)
+            && mce.Arguments[0] is ConstantExpression { Value: string stringInterpolationFormatString2 }
             && mce.Method.GetParameters().Skip(1).All(pi => pi.ParameterType == typeof(object))
         ) {
             //.net 4.6
             //string-interpolations are compiled into FormattableStringFactory.Create
-            var formatString = (string)formatString2Expr.Value;
-            var arguments = mce.Arguments.Skip(1);
-            kids = AddStringInterpolation(kids, formatString, arguments);
+            kids = AddStringInterpolation(kids, stringInterpolationFormatString2, mce.Arguments.Skip(1));
         } else if (mce.Object != null && mce.Method.Attributes.HasFlag(MethodAttributes.SpecialName) && mce.Method.Name == "get_Item") {
             //.net 4.5.1 or older object indexer.
 
