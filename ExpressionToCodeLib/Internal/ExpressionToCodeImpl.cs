@@ -441,10 +441,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add(objectStringifier.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
         }
 
-        var methodName = method.Name;
-
-        methodName += CreateGenericArgumentsIfNecessary(method);
-        kids.Add(methodName, mce);
+        kids.Add(method.Name + CreateGenericArgumentsIfNecessary(method), mce);
         return kids.Finish();
     }
 
