@@ -62,7 +62,7 @@ static class ObjectToCodeImpl
     static string? FormatTypeWithListInitializerOrNull(ExpressionToCodeConfiguration config, object val, int indent, int valueSize, IEnumerable enumerableVal)
     {
         var type = val.GetType();
-        if (!(type.GetConstructor(Type.EmptyTypes) is ConstructorInfo ci) || !ci.IsPublic) {
+        if (!(type.GetConstructor(Type.EmptyTypes) is { } ci) || !ci.IsPublic) {
             return null;
         }
 
@@ -70,9 +70,9 @@ static class ObjectToCodeImpl
             if (
                 pi.Name == "Item"
                 && pi.CanWrite
-                && pi.GetIndexParameters() is ParameterInfo[] indexPars
+                && pi.GetIndexParameters() is { } indexPars
                 && indexPars.Length == 1
-                && typeof(IEnumerable<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(indexPars[0].ParameterType, pi.PropertyType)) is Type keyEnumerableType
+                && typeof(IEnumerable<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(indexPars[0].ParameterType, pi.PropertyType)) is { } keyEnumerableType
                 && keyEnumerableType.IsAssignableFrom(type)
             ) {
                 var typeName = type.ToCSharpFriendlyTypeName();
@@ -120,7 +120,7 @@ static class ObjectToCodeImpl
             return "\n" + indentString + ElideAfter(val, len);
         }
 
-        if (config.Value.PrintedListLengthLimit is int limit && lines.Length > limit) {
+        if (config.Value.PrintedListLengthLimit is { } limit && lines.Length > limit) {
             lines = lines.Take(limit).Concat(new[] { "..." }).ToArray();
         }
 
