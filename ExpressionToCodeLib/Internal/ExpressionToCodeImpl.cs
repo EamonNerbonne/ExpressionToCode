@@ -294,16 +294,13 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add(NestExpression(mce.NodeType, mce.Object));
             //indexers don't support ref/out; so we can use unprefixed arguments
             kids.Add(ArgListDispatch(GetArgumentsForMethod(mce.Method, mce.Arguments), mce, "[", "]"));
-        } else if (mce.Method.Equals(createDelegate) && mce.Arguments.Count == 3
-            && mce.Arguments[2].NodeType == ExpressionType.Constant && mce.Arguments[2].Type == typeof(MethodInfo)) {
+        } else if (mce.Method.Equals(createDelegate)
+            && mce.Arguments.Count == 3
+            && mce.Arguments[2] is ConstantExpression { Value: MethodInfo implicitlyConstructedDelegateMethodTarget }) {
             //.net 4.0
             //implicitly constructed delegate from method group.
-            var targetMethod = (MethodInfo)((ConstantExpression)mce.Arguments[2]).Value;
-            var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
-                && ((ConstantExpression)mce.Arguments[1]).Value == null
-                    ? null
-                    : mce.Arguments[1];
-            kids.Add(StringifyMethodName(mce, targetMethod, targetExpr));
+            var targetExpr = mce.Arguments[1] is ConstantExpression { Value: null } ? null : mce.Arguments[1];
+            kids.Add(StringifyMethodName(mce, implicitlyConstructedDelegateMethodTarget, targetExpr));
         } else if (mce.Method.Name == "CreateDelegate"
             && mce.Arguments.Count == 2
             && mce.Object is ConstantExpression { NodeType : ExpressionType.Constant, Value: MethodInfo targetMethod, }
