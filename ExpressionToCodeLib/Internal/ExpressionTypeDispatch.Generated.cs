@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Diagnostics.Contracts;
-
-namespace ExpressionToCodeLib.Internal {
-  internal interface IExpressionTypeDispatch<T> {
+namespace ExpressionToCodeLib.Internal
+{
+    internal interface IExpressionTypeDispatch<T> {
 		[Pure] T DispatchAdd(Expression e);
 		[Pure] T DispatchAddChecked(Expression e);
 		[Pure] T DispatchAnd(Expression e);

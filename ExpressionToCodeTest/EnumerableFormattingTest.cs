@@ -1,8 +1,3 @@
-﻿using System.Globalization;
-using ExpressionToCodeLib;
-using System.Linq;
-using Xunit;
-
 namespace ExpressionToCodeTest;
 
 public class EnumerableFormattingTest

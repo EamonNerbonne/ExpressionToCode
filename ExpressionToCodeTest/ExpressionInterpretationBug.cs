@@ -1,9 +1,6 @@
-﻿//requires .net 4.7.2, but not testing older than 4.8 anymore; so this is effectively always on
+//requires .net 4.7.2, but not testing older than 4.8 anymore; so this is effectively always on
 
-using System;
-using System.Linq.Expressions;
 using FastExpressionCompiler;
-using Xunit;
 
 namespace ExpressionToCodeTest;
 

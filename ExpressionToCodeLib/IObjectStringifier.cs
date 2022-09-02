@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace ExpressionToCodeLib;
 
 public interface IObjectStringifier

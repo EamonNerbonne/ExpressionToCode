@@ -1,11 +1,3 @@
-﻿using System;
-using ExpressionToCodeLib;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Xunit;
-using System.Linq.Expressions;
-
 namespace ExpressionToCodeTest;
 
 public class ValueOnStalksAnnotatorTest

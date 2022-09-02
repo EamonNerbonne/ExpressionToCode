@@ -1,6 +1,4 @@
-﻿using System;
 using TopLevelProgramExample;
-using Xunit;
 using static TopLevelProgramExample.TopLevelProgramMarker;
 
 namespace ExpressionToCodeTest;

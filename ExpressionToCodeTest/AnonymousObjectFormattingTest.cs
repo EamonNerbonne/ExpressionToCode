@@ -1,9 +1,3 @@
-﻿using System;
-using ExpressionToCodeLib;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-
 namespace ExpressionToCodeTest;
 
 public class AnonymousObjectFormattingTest

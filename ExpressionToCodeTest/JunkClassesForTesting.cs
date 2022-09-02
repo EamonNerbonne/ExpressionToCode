@@ -1,6 +1,3 @@
-﻿using System;
-using JetBrains.Annotations;
-
 namespace ExpressionToCodeTest;
 
 // ReSharper disable UnusedTypeParameter

@@ -1,6 +1,3 @@
-﻿using System;
-using System.Linq.Expressions;
-
 namespace ExpressionToCodeLib.Internal;
 
 static class ExpressionPrecedence

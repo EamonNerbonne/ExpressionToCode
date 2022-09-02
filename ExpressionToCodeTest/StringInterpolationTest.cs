@@ -1,8 +1,3 @@
-﻿using System;
-using ExpressionToCodeLib;
-using System.Runtime.CompilerServices;
-using Xunit;
-
 namespace ExpressionToCodeTest;
 
 public sealed class StringInterpolationTest

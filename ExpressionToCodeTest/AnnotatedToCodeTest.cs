@@ -1,7 +1,3 @@
-﻿using System;
-using ExpressionToCodeLib;
-using Xunit;
-
 namespace ExpressionToCodeTest;
 
 public class AnnotatedToCodeTest

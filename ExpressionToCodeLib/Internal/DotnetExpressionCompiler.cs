@@ -1,6 +1,3 @@
-﻿using System;
-using System.Linq.Expressions;
-
 namespace ExpressionToCodeLib.Internal;
 
 sealed class DotnetExpressionCompiler : IExpressionCompiler

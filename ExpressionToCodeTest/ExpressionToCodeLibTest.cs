@@ -1,6 +1,3 @@
-﻿using System.Collections;
-using System.Reflection;
-using Xunit;
 // ReSharper disable RedundantEnumerableCastCall
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable ConvertToConstant.Local
@@ -10,12 +7,7 @@ using Xunit;
 // ReSharper disable EqualExpressionComparison
 // ReSharper disable RedundantToStringCall
 #pragma warning disable 1720
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Xml;
-using ExpressionToCodeLib;
 
 namespace ExpressionToCodeTest;
 
