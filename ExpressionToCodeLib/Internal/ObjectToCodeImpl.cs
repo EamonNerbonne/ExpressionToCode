@@ -24,7 +24,7 @@ static class ObjectToCodeImpl
             return FormatTypeWithListInitializerOrNull(config, val, indent, valueSize, enumerableVal) ?? FormatEnumerable(config, enumerableVal, indent, valueSize);
         } else if (val is Expression exprVal) {
             return ElideAfter(config.GetExpressionToCode().ToCode(exprVal), valueSize);
-        } else if (val is IStructuralComparable tuple && val is IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
+        } else if (val is IStructuralComparable tuple and IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
             var collector = new NastyHackyTupleCollector();
             _ = tuple.CompareTo(tuple, collector); //ignore return value; we're abusing the implementation of equality to help us enumerate its contents
             var sb = new StringBuilder();
