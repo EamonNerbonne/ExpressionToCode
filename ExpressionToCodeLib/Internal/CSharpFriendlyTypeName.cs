@@ -89,7 +89,7 @@ struct CSharpFriendlyTypeName
 
     string? GenericTypeName(Type? type)
     {
-        if (type ==null || !type.GetTypeInfo().IsGenericType) {
+        if (type == null || !type.GetTypeInfo().IsGenericType) {
             return null;
         }
 
