@@ -568,7 +568,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
         var lie = (ListInitExpression)e;
         kids.Add("new ", lie);
-        kids.Add(objectStringifier.TypeNameToCode(lie.NewExpression.Constructor.DeclaringType));
+        kids.Add(objectStringifier.TypeNameToCode(lie.NewExpression.Type));
         if (lie.NewExpression.Arguments.Any()) {
             kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments)));
         }
