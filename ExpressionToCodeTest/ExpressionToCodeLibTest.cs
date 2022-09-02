@@ -17,6 +17,7 @@
 #pragma warning disable IDE0075 // Simplify conditional expression - weird expression are by design, to increase test-coverage
 #pragma warning disable CS8602 // Dereference of a possibly null reference. - these are false positives, because the code isn't executed, it's stringified.
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type. - these are false positives, because the code isn't executed, it's stringified.
+#pragma warning disable xUnit1004 // Test methods should not be skipped
 
 using System.Xml;
 // ReSharper disable MemberCanBePrivate.Global
