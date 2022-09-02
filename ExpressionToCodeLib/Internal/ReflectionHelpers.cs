@@ -35,10 +35,10 @@ static class ReflectionHelpers
         => mi switch {
             FieldInfo fieldInfo => fieldInfo.IsStatic,
             MethodInfo methodInfo => (methodInfo.Attributes & MethodAttributes.Static) == MethodAttributes.Static,
-            PropertyInfo pi => (pi.GetGetMethod(true) ?? pi.GetSetMethod(true)).IsStatic,
-            EventInfo eventInfo => eventInfo.GetAddMethod(true).IsStatic,
+            PropertyInfo pi => (pi.GetGetMethod(true) ?? pi.GetSetMethod(true))?.IsStatic ?? throw new("a property must have either a getter or setter"),
+            EventInfo eventInfo => eventInfo.GetAddMethod(true)?.IsStatic ?? throw new("An event must have a backing add method"),
             { MemberType: MemberTypes.NestedType } => true,
-            _ => throw new ArgumentOutOfRangeException(nameof(mi), "Expression represents a member access for member" + mi.Name + " of membertype " + mi.MemberType + " that is unsupported")
+            _ => throw new ArgumentOutOfRangeException(nameof(mi), "Expression represents a member access for member" + mi.Name + " of member-type " + mi.MemberType + " that is unsupported")
         };
 
     public static bool HasBuiltinConversion(Type from, Type to)
