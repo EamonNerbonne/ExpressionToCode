@@ -314,17 +314,15 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add(StringifyMethodName(mce, targetMethod, targetExpr));
         } else if (mce.Method.Name == "CreateDelegate"
             && mce.Arguments.Count == 2
-            && mce.Object?.Type == typeof(MethodInfo)
-            && mce.Object.NodeType == ExpressionType.Constant
+            && mce.Object is ConstantExpression { NodeType : ExpressionType.Constant, Value: MethodInfo targetMethod, }
+            && mce.Object.Type == typeof(MethodInfo)
             && mce.Method.GetParameters()[1].ParameterType == typeof(object)
         ) {
             //.net 4.5
             //implicitly constructed delegate from method group.
-            var targetMethod = (MethodInfo)((ConstantExpression)mce.Object).Value;
-            var targetExpr = mce.Arguments[1].NodeType == ExpressionType.Constant
-                && ((ConstantExpression)mce.Arguments[1]).Value == null
-                    ? null
-                    : mce.Arguments[1];
+            var targetExpr = mce.Arguments[1] is ConstantExpression { NodeType: ExpressionType.Constant, Value: null, }
+                ? null
+                : mce.Arguments[1];
             kids.Add(StringifyMethodName(mce, targetMethod, targetExpr));
         } else if (mce.Object == null
             && mce.Type.FullName == "System.FormattableString"
