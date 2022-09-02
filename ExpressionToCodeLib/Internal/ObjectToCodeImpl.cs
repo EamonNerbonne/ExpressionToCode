@@ -164,7 +164,7 @@ static class ObjectToCodeImpl
     public static string PrintInitializerContents(ExpressionToCodeConfiguration config, IEnumerable list, Type keyType, Type valueType, int indent, int valueSize)
     {
         if (!initializerStringifiers.TryGetValue((keyType, valueType), out var stringify)) {
-            stringify = (IInitializerStringifier)Activator.CreateInstance(typeof(InitializerStringifier<,>).MakeGenericType(keyType, valueType));
+            stringify = (IInitializerStringifier)(Activator.CreateInstance(typeof(InitializerStringifier<,>).MakeGenericType(keyType, valueType)) ?? throw new("InitializerStringifier is constructable"));
             initializerStringifiers[(keyType, valueType)] = stringify;
         }
 
