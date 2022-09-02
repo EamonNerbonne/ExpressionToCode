@@ -3,23 +3,22 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ExpressionToCodeLib.Internal
+namespace ExpressionToCodeLib.Internal;
+
+static class NullabilityHelpers
 {
-    static class NullabilityHelpers
-    {
-        static bool IsNullableValueType(this Type type)
-            => type.GetTypeInfo().IsValueType && type.GetTypeInfo().IsGenericType
-                && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+    static bool IsNullableValueType(this Type type)
+        => type.GetTypeInfo().IsValueType && type.GetTypeInfo().IsGenericType
+            && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
-        public static Type EnusureNullability(this Type type)
-            => !type.GetTypeInfo().IsValueType || type.IsNullableValueType()
+    public static Type EnusureNullability(this Type type)
+        => !type.GetTypeInfo().IsValueType || type.IsNullableValueType()
+            ? type
+            : typeof(Nullable<>).MakeGenericType(type);
+
+    public static Type AvoidNullability(this Type type)
+        => !type.GetTypeInfo().IsValueType || !type.GetTypeInfo().IsGenericType
+            || type.GetGenericTypeDefinition() != typeof(Nullable<>)
                 ? type
-                : typeof(Nullable<>).MakeGenericType(type);
-
-        public static Type AvoidNullability(this Type type)
-            => !type.GetTypeInfo().IsValueType || !type.GetTypeInfo().IsGenericType
-                || type.GetGenericTypeDefinition() != typeof(Nullable<>)
-                    ? type
-                    : type.GetTypeInfo().GetGenericArguments()[0];
-    }
+                : type.GetTypeInfo().GetGenericArguments()[0];
 }

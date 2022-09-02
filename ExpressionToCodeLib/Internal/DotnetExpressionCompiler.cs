@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace ExpressionToCodeLib.Internal
-{
-    sealed class DotnetExpressionCompiler : IExpressionCompiler
-    {
-        public Func<T> Compile<T>(Expression<Func<T>> expression)
-            => expression.Compile(true);
+namespace ExpressionToCodeLib.Internal;
 
-        public Delegate Compile(LambdaExpression expression)
-            => expression.Compile(true);
-    }
+sealed class DotnetExpressionCompiler : IExpressionCompiler
+{
+    public Func<T> Compile<T>(Expression<Func<T>> expression)
+        => expression.Compile(true);
+
+    public Delegate Compile(LambdaExpression expression)
+        => expression.Compile(true);
 }

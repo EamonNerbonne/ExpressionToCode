@@ -5,29 +5,28 @@ using System.Runtime.CompilerServices;
 using ExpressionToCodeLib;
 using Xunit;
 
-namespace ExpressionToCodeTest
+namespace ExpressionToCodeTest;
+
+public class FailingClass
 {
-    public class FailingClass
-    {
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public static bool SomeFunction()
-            => throw new Exception();
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool SomeFunction()
+        => throw new Exception();
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public static bool SomeWrappedFunction()
-            => SomeFunction();
-    }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool SomeWrappedFunction()
+        => SomeFunction();
+}
 
-    public class SubExprExceptionTest
-    {
-        [Fact]
-        public void ExceptionDoesntCauseFailure()
-            => Assert.Equal(
-                @"() => FailingClass.SomeWrappedFunction()
+public class SubExprExceptionTest
+{
+    [Fact]
+    public void ExceptionDoesntCauseFailure()
+        => Assert.Equal(
+            @"() => FailingClass.SomeWrappedFunction()
 FailingClass.SomeWrappedFunction()
      →   throws System.Exception
 
 ".Replace("\r\n", "\n"),
-                ExpressionToCode.AnnotatedToCode(() => FailingClass.SomeWrappedFunction()));
-    }
+            ExpressionToCode.AnnotatedToCode(() => FailingClass.SomeWrappedFunction()));
 }
