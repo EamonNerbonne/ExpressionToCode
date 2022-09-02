@@ -86,3 +86,6 @@ dotnet_style_prefer_simplified_boolean_expressions = true:warning
 dotnet_style_prefer_simplified_interpolation = true:warning
 dotnet_style_readonly_field = true:warning
 dotnet_style_require_accessibility_modifiers = never:warning
+
+
+dotnet_diagnostic.CS0612.severity = none #temporarily suppress obsoletion warnings.
