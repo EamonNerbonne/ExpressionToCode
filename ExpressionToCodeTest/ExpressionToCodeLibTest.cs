@@ -6,9 +6,23 @@
 // ReSharper disable ConstantNullCoalescingCondition
 // ReSharper disable EqualExpressionComparison
 // ReSharper disable RedundantToStringCall
+// ReSharper disable MemberCanBeMadeStatic.Local
+// ReSharper disable SimplifyConditionalTernaryExpression
+// ReSharper disable ClassCanBeSealed.Local
+// ReSharper disable UnusedParameter.Global
+// ReSharper disable MemberCanBeMadeStatic.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 
-#pragma warning disable 1720
+#pragma warning disable CA1822 // Mark members as static - by design, for test-coverage
+#pragma warning disable IDE0075 // Simplify conditional expression - weird expression are by design, to increase test-coverage
+#pragma warning disable CS8602 // Dereference of a possibly null reference. - these are false positives, because the code isn't executed, it's stringified.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type. - these are false positives, because the code isn't executed, it's stringified.
+
 using System.Xml;
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBePrivate.Local
+#pragma warning disable CS0628
+#pragma warning disable CS0162
 
 namespace ExpressionToCodeTest;
 
@@ -171,8 +185,6 @@ public sealed class ExpressionToCodeLibTest
     [Fact]
     public void MembersDefault()
     {
-#pragma warning disable CS8602 // Dereference of a possibly null reference. - these are false positives, because the code isn't executed, it's stringified.
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type. - these are false positives, because the code isn't executed, it's stringified.
         Assert.Equal(
             @"() => default(DateTime).Ticks == 0L",
             ExpressionToCode.ToCode(() => default(DateTime).Ticks == 0L));
@@ -197,8 +209,6 @@ public sealed class ExpressionToCodeLibTest
         Assert.Equal(
             @"() => default(List<int>).AsReadOnly()",
             ExpressionToCode.ToCode(() => default(List<int>).AsReadOnly()));
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
     }
 
     [Fact]
@@ -274,7 +284,6 @@ public sealed class ExpressionToCodeLibTest
             ExpressionToCode.ToCode(() => new[] { 37, 42, }.Select((x, i) => x * 2))
         );
 
-    // ReSharper disable once MemberCanBeMadeStatic.Local
     bool Fizz(Func<int, bool> a)
         => a(42);
 
@@ -446,10 +455,7 @@ public sealed class ExpressionToCodeLibTest
         var x = "X";
         Assert.Equal(
             @"() => ((""a\n\\b"" ?? x) + x).Length == 2 ? false : true",
-            // ReSharper disable once SimplifyConditionalTernaryExpression
-#pragma warning disable 162
             ExpressionToCode.ToCode(() => (("a\n\\b" ?? x) + x).Length == 2 ? false : true));
-#pragma warning restore 162
     }
 
     [Fact]
@@ -461,7 +467,6 @@ public sealed class ExpressionToCodeLibTest
             ExpressionToCode.ToCode(() => MethodWithRefParam(ref x)));
     }
 
-    // ReSharper disable once MemberCanBeMadeStatic.Local
     T MethodWithRefParam<T>(ref T input)
         => input;
 
@@ -475,7 +480,6 @@ public sealed class ExpressionToCodeLibTest
             ExpressionToCode.ToCode(() => MethodWithOutParam(ref x, out y)));
     }
 
-    // ReSharper disable once MemberCanBeMadeStatic.Local
     T MethodWithOutParam<T>(ref T input, out T output)
         => output = input;
 
@@ -669,7 +673,6 @@ public sealed class ExpressionToCodeLibTest
         Assert.Equal("throw new Exception(\"Stuff\")", expr);
     }
 
-    // ReSharper disable once ClassCanBeSealed.Local
     class ClassWithClosure
     {
         public string? someValue;
@@ -685,18 +688,13 @@ public sealed class ExpressionToCodeLibTest
         }
     }
 
-    // ReSharper disable once UnusedParameter.Global
     public string this[int index] => "TheIndexedValue";
     public string TheProperty => "TheValue";
 
-    // ReSharper disable once MemberCanBeMadeStatic.Local
     string TheProtectedProperty => "TheValue";
     static string ThePrivateStaticProperty => "TheValue";
 
-    // ReSharper disable once UnusedAutoPropertyAccessor.Local
-#pragma warning disable 628
     protected string? TheProtectedWithPrivateSetterProperty { get; private set; }
-#pragma warning restore 628
 }
 
 public delegate int DelegateWithRefAndOut(ref int someVar, out int anotherVar);
