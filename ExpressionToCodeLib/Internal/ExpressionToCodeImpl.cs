@@ -462,13 +462,12 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             return "";
         }
 
-        if (!alwaysUseExplicitTypeArguments) {
+        if (!alwaysUseExplicitTypeArguments && method.DeclaringType != null) {
             var genericMethodDefinition = method.GetGenericMethodDefinition();
             var relevantBindingFlagsForOverloads =
-                    BindingFlags.Public
-                    | (!method.IsPublic ? BindingFlags.NonPublic : 0)
-                    | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)
-                ;
+                BindingFlags.Public
+                | (!method.IsPublic ? BindingFlags.NonPublic : 0)
+                | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance);
 
             var confusibleOverloads = method.DeclaringType.GetTypeInfo()
                 .GetMethods(relevantBindingFlagsForOverloads)
