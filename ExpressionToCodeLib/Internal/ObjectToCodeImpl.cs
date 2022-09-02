@@ -26,20 +26,20 @@ static class ObjectToCodeImpl
             return ElideAfter(config.GetExpressionToCode().ToCode(exprVal), valueSize);
         } else if (val is IStructuralComparable tuple && val is IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
             var collector = new NastyHackyTupleCollector();
-            tuple.CompareTo(tuple, collector);
+            _ = tuple.CompareTo(tuple, collector); //ignore return value; we're abusing the implementation of equality to help us enumerate its contents
             var sb = new StringBuilder();
-            sb.Append("(");
+            _ = sb.Append("(");
             for (var index = 0; index < collector.CollectedObjects.Count; index++) {
                 var item = collector.CollectedObjects[index];
                 var asString = ComplexObjectToPseudoCode(config, item, indent + 4, valueSize);
                 if (index > 0) {
-                    sb.Append(", ");
+                    _ = sb.Append(", ");
                 }
 
-                sb.Append(asString);
+                _ = sb.Append(asString);
             }
 
-            sb.Append(")");
+            _ = sb.Append(")");
             return ElidePossiblyMultilineString(config, sb.ToString(), indent, valueSize).Trim();
         } else if (val.GetType().GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
             var type = val.GetType();
