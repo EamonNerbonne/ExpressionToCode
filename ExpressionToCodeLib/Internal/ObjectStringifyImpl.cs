@@ -89,26 +89,19 @@ sealed class ObjectStringifyImpl : IObjectStringifier
     }
 
     static string EscapeCharForString(char c)
-    {
-        if (c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control) {
-            //this is a little too rigorous; but easier to read
-            if (c == '\r') {
-                return "\\r";
-            } else if (c == '\t') {
-                return "\\t";
-            } else if (c == '\n') {
-                return "\\n";
-            } else {
-                return "\\x" + Convert.ToString(c, 16);
+        => c < 32 || CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.Control
+            ? c switch {
+                //this is a little too rigorous; but easier to read
+                '\r' => "\\r",
+                '\t' => "\\t",
+                '\n' => "\\n",
+                _ => "\\x" + Convert.ToString(c, 16)
             }
-        } else if (c == '\\') {
-            return @"\\";
-        } else if (c == '\"') {
-            return "\\\"";
-        } else {
-            return c.ToString();
-        }
-    }
+            : c switch {
+                '\\' => @"\\",
+                '\"' => "\\\"",
+                _ => c.ToString()
+            };
 
     internal static string EscapeStringChars(string str)
     {
