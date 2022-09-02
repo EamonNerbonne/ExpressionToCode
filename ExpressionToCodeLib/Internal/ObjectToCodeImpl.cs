@@ -92,7 +92,7 @@ static class ObjectToCodeImpl
         public readonly List<object> CollectedObjects = new();
         int nesting = 1;
 
-        public int Compare(object x, object y)
+        public int Compare(object? x, object? y)
         {
             if (CollectedObjects.Count == nesting * 7 && x is IStructuralComparable tuple && tuple is IComparable && CSharpFriendlyTypeName.IsValueTupleType(tuple.GetType().GetTypeInfo())) {
                 nesting++;

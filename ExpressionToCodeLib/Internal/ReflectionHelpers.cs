@@ -14,11 +14,14 @@ static class ReflectionHelpers
         const BindingFlags bindingFlags =
             BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
         var pars = mi.GetParameters();
-        if (pars.Length == 0) {
-            return mi.DeclaringType.GetTypeInfo().GetProperty(pName, bindingFlags);
+        var declaringType = mi.DeclaringType;
+        if (declaringType is null) {
+            return null;
+        } else if (pars.Length == 0) {
+            return declaringType.GetTypeInfo().GetProperty(pName, bindingFlags);
         } else {
             // ReSharper disable once PossibleNullReferenceException
-            foreach (var prop in mi.DeclaringType.GetProperties(bindingFlags)) {
+            foreach (var prop in declaringType.GetProperties(bindingFlags)) {
                 if (prop.GetMethod == mi) {
                     return prop;
                 }

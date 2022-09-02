@@ -187,7 +187,7 @@ public static class EqualityExpressions
         string methodName)
         => GetGenericInterfaceImplementation(method.DeclaringType, genericInterfaceType)
                 .Any(constructedInterfaceType => IsImplementationOfInterfaceMethod(method, constructedInterfaceType, methodName))
-            || method.DeclaringType.GetTypeInfo().IsInterface && method.Name == methodName && method.DeclaringType.GetTypeInfo().IsGenericType
+            || method.DeclaringType?.GetTypeInfo().IsInterface == true && method.Name == methodName && method.DeclaringType.GetTypeInfo().IsGenericType
             && method.DeclaringType?.GetGenericTypeDefinition() == genericInterfaceType;
 
     static bool IsImplementationOfInterfaceMethod(MethodInfo method, Type interfaceType, string methodName)

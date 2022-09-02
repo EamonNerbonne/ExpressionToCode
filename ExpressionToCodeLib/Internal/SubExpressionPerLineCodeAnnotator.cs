@@ -19,7 +19,7 @@ class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
             public override int GetHashCode()
                 => SubExpression.GetHashCode() + 37 * ValueAsString.GetHashCode();
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
                 => obj is SubExpressionValue val && Equals(val);
 
             public bool Equals(SubExpressionValue val)
