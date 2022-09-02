@@ -9,11 +9,6 @@ public static class FormatStringParser
         public string WithFormatString;
     }
 
-#if !NET452
-    public static (Segment[] segments, string Tail) ParseFormatString(FormattableString formattableString)
-        => new FormattableStringParser(formattableString.Format, formattableString.GetArguments()).Finish();
-#endif
-
     public static (Segment[] segments, string Tail) ParseFormatString(string formatString, object[] formatArguments)
         => new FormattableStringParser(formatString, formatArguments).Finish();
 
