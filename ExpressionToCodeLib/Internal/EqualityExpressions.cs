@@ -201,8 +201,8 @@ public static class EqualityExpressions
             .Any();
     }
 
-    static IEnumerable<Type> GetGenericInterfaceImplementation(Type type, Type genericInterfaceType)
-        => from itype in type.GetTypeInfo().GetInterfaces()
-            where itype.GetTypeInfo().IsGenericType && itype.GetGenericTypeDefinition() == genericInterfaceType
-            select itype;
+    static IEnumerable<Type> GetGenericInterfaceImplementation(Type? type, Type genericInterfaceType)
+        => from interfaceType in type?.GetTypeInfo().GetInterfaces()
+            where interfaceType.GetTypeInfo().IsGenericType && interfaceType.GetGenericTypeDefinition() == genericInterfaceType
+            select interfaceType;
 }
