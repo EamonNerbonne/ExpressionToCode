@@ -61,7 +61,7 @@ public static class EqualityExpressions
     static ConstantExpression? ToConstantExpr(ExpressionToCodeConfiguration config, Expression e)
     {
         try {
-            var func = config.Value.ExpressionCompiler.Compile(Expression.Lambda(e));
+            var func = config.ExpressionCompiler.Compile(Expression.Lambda(e));
             try {
                 var val = func.DynamicInvoke();
                 return Expression.Constant(val, e.Type);
@@ -85,7 +85,7 @@ public static class EqualityExpressions
     static bool? EvalBoolLambda(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
     {
         try {
-            return EvalBoolFunc(config.Value.ExpressionCompiler.Compile(e));
+            return EvalBoolFunc(config.ExpressionCompiler.Compile(e));
         } catch (InvalidOperationException) {
             return null;
         }

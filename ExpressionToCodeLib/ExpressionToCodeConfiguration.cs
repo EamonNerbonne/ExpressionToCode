@@ -84,9 +84,6 @@ public sealed record ExpressionToCodeConfiguration
     }
 
     [Obsolete]
-    public ExpressionToCodeConfiguration Value => this;
-
-    [Obsolete]
     public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler v)
         => this with { ExpressionCompiler = v, };
 

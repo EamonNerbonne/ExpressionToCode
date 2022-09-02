@@ -7,7 +7,7 @@ static class ObjectToCodeImpl
     static readonly string[] lineSeparators = { "\r\n", "\n" };
 
     public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object? val, int indent)
-        => ComplexObjectToPseudoCode(config, val, indent, config.Value.MaximumValueLength ?? int.MaxValue);
+        => ComplexObjectToPseudoCode(config, val, indent, config.MaximumValueLength ?? int.MaxValue);
 
     static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object? val, int indent, int valueSize)
     {
@@ -120,7 +120,7 @@ static class ObjectToCodeImpl
             return "\n" + indentString + ElideAfter(val, len);
         }
 
-        if (config.Value.PrintedListLengthLimit is { } limit && lines.Length > limit) {
+        if (config.PrintedListLengthLimit is { } limit && lines.Length > limit) {
             lines = lines.Take(limit).Concat(new[] { "..." }).ToArray();
         }
 
@@ -150,7 +150,7 @@ static class ObjectToCodeImpl
         var count = 0;
         foreach (var item in list) {
             count++;
-            if (count > config.Value.PrintedListLengthLimit) {
+            if (count > config.PrintedListLengthLimit) {
                 yield return "...";
                 yield break;
             } else {
@@ -183,7 +183,7 @@ static class ObjectToCodeImpl
             var count = 0;
             foreach (var item in list) {
                 count++;
-                if (count > config.Value.PrintedListLengthLimit) {
+                if (count > config.PrintedListLengthLimit) {
                     yield return "...";
                     yield break;
                 } else {
@@ -201,7 +201,7 @@ static class ObjectToCodeImpl
         try {
             Delegate lambda;
             try {
-                lambda = config.Value.ExpressionCompiler.Compile(Expression.Lambda(expression));
+                lambda = config.ExpressionCompiler.Compile(Expression.Lambda(expression));
             } catch (InvalidOperationException) {
                 return null;
             }

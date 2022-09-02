@@ -92,7 +92,7 @@ class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
                 var ignoreInitialSpace = true;
                 var valueString = ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10);
                 AppendNodeToStringBuilder(sb, subExprNode, ref ignoreInitialSpace);
-                var maxSize = Math.Max(40, config.Value.MaximumValueLength ?? 200);
+                var maxSize = Math.Max(40, config.MaximumValueLength ?? 200);
                 var subExprString = sb.Length <= maxSize
                     ? sb.ToString()
                     : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);

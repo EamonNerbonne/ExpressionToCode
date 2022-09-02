@@ -7,8 +7,8 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         => this.config = config;
 
     readonly ExpressionToCodeConfiguration config;
-    IObjectStringifier ObjectStringifier => config.Value.ObjectStringifier;
-    bool AlwaysUseExplicitTypeArguments => config.Value.AlwaysUseExplicitTypeArguments;
+    IObjectStringifier ObjectStringifier => config.ObjectStringifier;
+    bool AlwaysUseExplicitTypeArguments => config.AlwaysUseExplicitTypeArguments;
 
     [Pure]
     IEnumerable<StringifiedExpression> NestExpression(ExpressionType? parentType, Expression child, bool parensIfEqualRank = false)
@@ -164,7 +164,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
         var ue = (UnaryExpression)e;
         var operand = ue.Operand;
-        if (!config.Value.OmitImplicitCasts
+        if (!config.OmitImplicitCasts
             || !ReflectionHelpers.CanImplicitlyCast(operand.Type, e.Type)
             || typeof(Delegate).IsAssignableFrom(operand.Type) && operand.NodeType == ExpressionType.Lambda
             || typeof(Expression).IsAssignableFrom(operand.Type) && operand.NodeType == ExpressionType.Quote
