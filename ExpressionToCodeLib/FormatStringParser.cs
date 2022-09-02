@@ -5,8 +5,8 @@ public static class FormatStringParser
     public struct Segment
     {
         public string InitialStringPart;
-        public object FollowedByValue;
-        public string WithFormatString;
+        public object? FollowedByValue;
+        public string? WithFormatString;
     }
 
     public static (Segment[] segments, string Tail) ParseFormatString(string formatString, object[] formatArguments)
@@ -23,13 +23,13 @@ public static class FormatStringParser
         public FormattableStringParser(string formatString, object[] formatArguments)
             => sb.AppendFormat(this, formatString, formatArguments);
 
-        object IFormatProvider.GetFormat(Type formatType)
+        object IFormatProvider.GetFormat(Type? formatType)
             => this;
 
         public (Segment[] segments, string Tail) Finish()
             => (Segments.ToArray(), sb.ToString());
 
-        string ICustomFormatter.Format(string format, object arg, IFormatProvider formatProvider)
+        string ICustomFormatter.Format(string? format, object? arg, IFormatProvider? formatProvider)
         {
             Segments.Add(
                 new Segment {
