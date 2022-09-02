@@ -57,11 +57,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         string close = ")",
         string joiner = ", ")
     {
-        if (value != null) {
-            yield return StringifiedExpression.TextAndExpr(open, value);
-        } else {
-            yield return StringifiedExpression.TextOnly(open);
-        }
+        yield return value != null ? StringifiedExpression.TextAndExpr(open, value) : StringifiedExpression.TextOnly(open);
 
         foreach (var o in JoinDispatch(arguments, joiner)) {
             yield return o;
@@ -141,18 +137,13 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         ) {
             expr1 = expr1uncast;
 
-            if (expr2.NodeType == ExpressionType.Constant) {
-                var value = ((ConstantExpression)expr2).Value;
-                if (value == null) {
-                    expr2 = Expression.Default(expr1uncast.Type.EnsureNullability());
-                } else if (expr1nonnullableType == typeof(char)) {
-                    expr2 = Expression.Constant((char)(int)value);
-                } else {
-                    expr2 = Expression.Constant(Enum.ToObject(expr1nonnullableType, value));
-                }
-            } else {
-                expr2 = Expression.Convert(expr2, expr1uncast.Type);
-            }
+            expr2 = expr2 is not ConstantExpression { NodeType: ExpressionType.Constant } constantExpression
+                ? Expression.Convert(expr2, expr1uncast.Type)
+                : constantExpression.Value == null
+                    ? Expression.Default(expr1uncast.Type.EnsureNullability())
+                    : expr1nonnullableType == typeof(char)
+                        ? Expression.Constant((char)(int)constantExpression.Value)
+                        : Expression.Constant(Enum.ToObject(expr1nonnullableType, constantExpression.Value));
         }
     }
 
