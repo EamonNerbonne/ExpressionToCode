@@ -16,5 +16,6 @@ public class TopLevelProgramTest
         Assert.Equal("() => myVariable", LambdaToMyVar);
         Assert.Equal("() => InnerClass.StaticInt + InstanceInt", LambdaInsideNestedClassMethod);
         Assert.Equal("() => inLocalFunction + myVariable.Length - arg - withImplicitType.A.Length * 27", LambdaInsideLocalFunction);
+        Assert.Equal("LocalFunction", LocalFunctionToString);
     }
 }

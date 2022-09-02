@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace ExpressionToCodeLib.Internal;
 
@@ -36,7 +37,14 @@ sealed class ObjectStringifyImpl : IObjectStringifier
             bool boolVal => boolVal ? "true" : "false",
             Enum enumVal => EnumValueToCode(val, enumVal),
             Type typeVal => "typeof(" + TypeNameToCode(typeVal) + ")",
-            MethodInfo methodInfoVal => TypeNameToCode(methodInfoVal.DeclaringType) + "." + methodInfoVal.Name,
+            MethodInfo methodInfoVal =>
+                methodInfoVal.DeclaringType switch {
+                    { } declaringType when declaringType.GuessTypeClass() is not (ReflectionHelpers.TypeClass.TopLevelProgramClosureType or ReflectionHelpers.TypeClass.ClosureType)
+                        => TypeNameToCode(declaringType) + "." + methodInfoVal.Name,
+                    _ when Regex.Match(methodInfoVal.Name, @"^.+>g__(\w+)\|[\d_]*$", RegexOptions.Multiline) is { Success: true } match =>
+                        match.Groups[1].Value,
+                    _ => methodInfoVal.Name,
+                },
             _ when val is ValueType && Activator.CreateInstance(val.GetType()).Equals(val) => "default(" + TypeNameToCode(val.GetType()) + ")",
             _ => null
         };
