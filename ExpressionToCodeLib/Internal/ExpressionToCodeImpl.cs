@@ -641,8 +641,8 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             var parameters = ne.Type.GetTypeInfo().GetConstructors().Single().GetParameters();
             var props = ne.Type.GetTypeInfo().GetProperties();
             if (
-                !parameters.Select(p => new { p.Name, Type = p.ParameterType })
-                    .SequenceEqual(props.Select(p => new { p.Name, Type = p.PropertyType }))) {
+                !parameters.Select(p => (p.Name ?? "", p.ParameterType))
+                    .SequenceEqual(props.Select(p => (p.Name, p.PropertyType)))) {
                 throw new InvalidOperationException(
                     "Constructor params for anonymous type don't match it's properties!"
                 );
