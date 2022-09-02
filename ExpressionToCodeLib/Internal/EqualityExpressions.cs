@@ -112,7 +112,7 @@ public static class EqualityExpressions
             return null;
         }
 
-        return DisagreeingEqualities(config, currentEquals.Value.left, currentEquals.Value.right, currentVal.Value)
+        return DisagreeingEqualities(config, currentEquals.Value.left, currentEquals.Value.right, currentVal.Value)?
                 .Select(o => o.ToTuple()) //purely to avoid breaking API changes
             ;
     }
