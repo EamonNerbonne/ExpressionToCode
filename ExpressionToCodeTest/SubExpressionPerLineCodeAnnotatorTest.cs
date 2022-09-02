@@ -10,7 +10,7 @@ public class SubExpressionPerLineCodeAnnotatorTest
     static string AnnotateAsAssertion<T>(Expression<Func<T>> expr) => annotator.AnnotatedToCode(expr.Body, "assertion failed", true);
 
     [Fact]
-    public void AplusBapproved()
+    public void A_plus_B_approved()
     {
         var a = 2;
         var b = 5;
