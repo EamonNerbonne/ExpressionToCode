@@ -415,7 +415,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add("$@\"");
             foreach (var segment in parsed.segments) {
                 kids.Add(segment.InitialStringPart.Replace("\"", "\"\"").Replace("{", "{{").Replace("}", "}}") + "{");
-                kids.Add((StringifiedExpression)segment.FollowedByValue);
+                kids.Add(segment.FollowedByValue is StringifiedExpression expr ? expr : throw new InvalidOperationException("All arguments should have been StringifiedExpressions"));
                 if (segment.WithFormatString != null) {
                     kids.Add(":" + segment.WithFormatString + "}");
                 } else {
@@ -428,7 +428,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add("$\"");
             foreach (var segment in parsed.segments) {
                 kids.Add(ObjectStringifyImpl.EscapeStringChars(segment.InitialStringPart.Replace("{", "{{").Replace("}", "}}")) + "{");
-                kids.Add((StringifiedExpression)segment.FollowedByValue);
+                kids.Add(segment.FollowedByValue is StringifiedExpression expr ? expr : throw new InvalidOperationException("All arguments should have been StringifiedExpressions"));
                 if (segment.WithFormatString != null) {
                     kids.Add(":" + segment.WithFormatString + "}");
                 } else {
