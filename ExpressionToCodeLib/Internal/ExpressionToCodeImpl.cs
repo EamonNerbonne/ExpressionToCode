@@ -70,7 +70,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         yield return StringifiedExpression.TextOnly(close);
     }
 
-    struct KidsBuilder
+    readonly struct KidsBuilder
     {
         readonly List<StringifiedExpression> kids;
 

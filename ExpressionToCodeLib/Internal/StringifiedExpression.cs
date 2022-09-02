@@ -1,6 +1,6 @@
 namespace ExpressionToCodeLib.Internal;
 
-struct StringifiedExpression
+readonly struct StringifiedExpression
 {
     //a node cannot have children and text.  If it has neither, it is considered empty.
     public readonly string? Text;

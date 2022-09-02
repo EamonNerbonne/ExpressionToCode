@@ -2,7 +2,7 @@ using FastExpressionCompiler;
 
 namespace ExpressionToCodeTest;
 
-public struct MyValueTuple<T1, T2> : IEquatable<MyValueTuple<T1, T2>>
+public readonly struct MyValueTuple<T1, T2> : IEquatable<MyValueTuple<T1, T2>>
 {
     public readonly T1 v1;
     public readonly T2 v2;
