@@ -45,7 +45,7 @@ sealed class ObjectStringifyImpl : IObjectStringifier
                         match.Groups[1].Value,
                     _ => methodInfoVal.Name,
                 },
-            _ when val is ValueType && Activator.CreateInstance(val.GetType()).Equals(val) => "default(" + TypeNameToCode(val.GetType()) + ")",
+            _ when val is ValueType && (Activator.CreateInstance(val.GetType()) ?? throw new("value types cannot be null: " + val.GetType())).Equals(val) => "default(" + TypeNameToCode(val.GetType()) + ")",
             _ => null
         };
 
