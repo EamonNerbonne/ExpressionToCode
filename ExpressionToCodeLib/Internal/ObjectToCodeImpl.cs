@@ -65,6 +65,7 @@ static class ObjectToCodeImpl
         if (!(type.GetConstructor(Type.EmptyTypes) is ConstructorInfo ci) || !ci.IsPublic) {
             return null;
         }
+
         foreach (var pi in type.GetProperties()) {
             if (
                 pi.Name == "Item"
@@ -78,6 +79,7 @@ static class ObjectToCodeImpl
                 return "new " + typeName + " " + PrintInitializerContents(config, enumerableVal, indexPars[0].ParameterType, pi.PropertyType, indent, valueSize - typeName.Length);
             }
         }
+
         return null;
     }
 
@@ -165,6 +167,7 @@ static class ObjectToCodeImpl
             stringify = (IInitializerStringifier)Activator.CreateInstance(typeof(InitializerStringifier<,>).MakeGenericType(keyType, valueType));
             initializerStringifiers[(keyType, valueType)] = stringify;
         }
+
         return FormatLiteralInitializerContents(config, stringify.PrintInitializerContents(config, list).ToArray(), indent, valueSize);
     }
 
