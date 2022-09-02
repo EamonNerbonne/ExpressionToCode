@@ -248,17 +248,12 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     }
 
     static bool IsThisRef(Expression e)
-        => e.NodeType == ExpressionType.Constant
-            && ((ConstantExpression)e).Value != null
+        => e is ConstantExpression { Value: not null }
             && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 
     static bool IsClosureRef(Expression e)
-        => (
-                e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
-                || e.NodeType == ExpressionType.MemberAccess
-            )
-            && e.Type.GuessTypeClass() is { } typeClass
-            && (typeClass == ReflectionHelpers.TypeClass.ClosureType || typeClass == ReflectionHelpers.TypeClass.TopLevelProgramClosureType);
+        => e is ConstantExpression { Value: not null } or { NodeType: ExpressionType.MemberAccess }
+            && e.Type.GuessTypeClass() is ReflectionHelpers.TypeClass.ClosureType or ReflectionHelpers.TypeClass.TopLevelProgramClosureType;
 
     [Pure]
     public StringifiedExpression DispatchMemberAccess(Expression e)
