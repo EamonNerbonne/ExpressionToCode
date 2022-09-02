@@ -8,12 +8,23 @@
 // ReSharper disable RedundantToStringCall
 
 #pragma warning disable 1720
-#if !NET48
-using System.Collections.Immutable;
-#endif
 using System.Xml;
 
 namespace ExpressionToCodeTest;
+
+struct MyList : IEnumerable
+{
+    IEnumerable<int>? contents;
+
+    readonly IEnumerable<int> List()
+        => contents ?? Array.Empty<int>();
+
+    public readonly IEnumerator GetEnumerator()
+        => List().GetEnumerator();
+
+    public void Add(int value)
+        => contents = List().Append(value);
+}
 
 public sealed class ExpressionToCodeLibTest
 {
@@ -127,27 +138,11 @@ public sealed class ExpressionToCodeLibTest
             @"() => new List<DictionaryEntry> { new DictionaryEntry { Value = 42 }, new DictionaryEntry() }.Count == 2",
             ExpressionToCode.ToCode(() => new List<DictionaryEntry> { new() { Value = 42, }, new(), }.Count == 2));
 
-#if !NET48
     [Fact]
     public void ListInitializer_custom_value_typed_list()
         => Assert.Equal(
             @"() => new MyList { 1, 2, 3, 4 }",
             ExpressionToCode.ToCode(() => new MyList { 1, 2, 3, 4, }));
-
-    struct MyList : IEnumerable
-    {
-        ImmutableList<int>? contents;
-
-        readonly ImmutableList<int> List()
-            => contents ?? ImmutableList<int>.Empty;
-
-        public readonly IEnumerator GetEnumerator()
-            => List().GetEnumerator();
-
-        public void Add(int value)
-            => contents = List().Add(value);
-    }
-#endif
 
     [Fact]
     public void LiteralCharAndProperty()
