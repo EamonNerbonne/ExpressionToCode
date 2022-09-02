@@ -493,7 +493,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var ie = (IndexExpression)e;
-        kids.Add(NestExpression(ie.NodeType, ie.Object));
+        kids.Add(NestExpression(ie.NodeType, ie.Object ?? throw new("Assumption: indexer expressions have a receiver")));
 
         var args = ie.Indexer == null
             ? ie.Arguments.Select(SingleChildDispatch)
@@ -514,7 +514,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         }
 
         kids.Add(NestExpression(ie.NodeType, ie.Expression));
-        var invokeMethod = ie.Expression.Type.GetTypeInfo().GetMethod("Invoke");
+        var invokeMethod = ie.Expression.Type.GetTypeInfo().GetMethod("Invoke") ?? throw new("Assumption: all delegates have a method Invoke");
         var args = GetArgumentsForMethod(invokeMethod, ie.Arguments);
         kids.Add(ArgListDispatch(args, ie));
         return kids.Finish();
