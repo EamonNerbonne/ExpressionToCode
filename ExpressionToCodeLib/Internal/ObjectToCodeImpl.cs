@@ -16,7 +16,7 @@ static class ObjectToCodeImpl
             return ElidePossiblyMultilineString(config, retval ?? throw new InvalidOperationException("retval cannot be null for strings"), indent, valueSize).Trim();
         } else if (retval != null) {
             return ElideAfter(retval, valueSize);
-        } else if (val == null) {
+        } else if (val is null) {
             throw new Exception("Impossible: if val is null, retval cannot be");
         } else if (val is Array arrayVal) {
             return "new[] " + FormatEnumerable(config, arrayVal, indent, valueSize - 6);
@@ -55,7 +55,7 @@ static class ObjectToCodeImpl
                 )
                 + "\n" + new string(' ', indent) + "}";
         } else {
-            return ElideAfter(val.ToString(), valueSize);
+            return ElideAfter(val.ToString() ?? "", valueSize);
         }
     }
 
