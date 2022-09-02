@@ -91,7 +91,7 @@ static class ObjectToCodeImpl
         // - if earlier members are equal in order (compare==0), then it must call later members
         // - if everything is equal, it must call compareto on everything
         // - it would be inefficient to call compareto unnecessarily, so any tuple implementation is *likely* to call compareto in tuple-member-order, so it can exit early on non-zero comparison.
-        public readonly List<object> CollectedObjects = new();
+        public readonly List<object?> CollectedObjects = new();
         int nesting = 1;
 
         public int Compare(object? x, object? y)
