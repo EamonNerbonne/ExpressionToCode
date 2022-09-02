@@ -270,7 +270,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add(NestExpression(e.NodeType, memberOfExpr));
             kids.Add(".");
         } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
-            kids.Add(objectStringifier.TypeNameToCode(me.Member.DeclaringType) + ".");
+            kids.Add(objectStringifier.TypeNameToCode(me.Member.DeclaringType ?? throw new("A static member must have a declaring type")) + ".");
         }
 
         kids.Add(me.Member.Name, e);
@@ -288,8 +288,9 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
         var optPropertyInfo = ReflectionHelpers.GetPropertyIfGetter(mce.Method);
         if (optPropertyInfo != null
+            && mce.Object != null
             && (optPropertyInfo.Name == "Item"
-                || mce.Object?.Type == typeof(string) && optPropertyInfo.Name == "Chars")) {
+                || optPropertyInfo.Name == "Chars" && mce.Object.Type == typeof(string))) {
             kids.Add(NestExpression(mce.NodeType, mce.Object));
             //indexers don't support ref/out; so we can use unprefixed arguments
             kids.Add(ArgListDispatch(GetArgumentsForMethod(mce.Method, mce.Arguments), mce, "[", "]"));
