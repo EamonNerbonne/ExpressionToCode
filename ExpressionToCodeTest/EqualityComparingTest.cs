@@ -75,8 +75,8 @@ public sealed class EqualityComparingTest
         Assert.Equal(EqualityExpressionClass.SequenceEqual, EqualityExpressions.CheckForEquality(() => new[] { 'b', 'l', 'a' }.SequenceEqual(bla2string)));
     }
 
-    static Tuple<EqualityExpressionClass, bool>[] EqClasses(params EqualityExpressionClass[] classes)
-        => classes.Select(eqClass => (eqClass, false).ToTuple()).ToArray();
+    static (EqualityExpressionClass eqClass, bool)[] EqClasses(params EqualityExpressionClass[] classes)
+        => classes.Select(eqClass => (eqClass, false)).ToArray();
 
     [Fact]
     public void StringEqDisagreement()
