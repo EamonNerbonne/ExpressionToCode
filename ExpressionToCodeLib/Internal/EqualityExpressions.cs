@@ -100,7 +100,7 @@ public static class EqualityExpressions
         }
     }
 
-    public static IEnumerable<Tuple<EqualityExpressionClass, bool>>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
+    public static IEnumerable<(EqualityExpressionClass Kind, bool IsDeterminate)>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
     {
         var currentEquals = ExtractEqualityType(e);
         if (currentEquals == null) {
@@ -112,12 +112,10 @@ public static class EqualityExpressions
             return null;
         }
 
-        return DisagreeingEqualities(config, currentEquals.Value.left, currentEquals.Value.right, currentVal.Value)?
-                .Select(o => o.ToTuple()) //purely to avoid breaking API changes
-            ;
+        return DisagreeingEqualities(config, currentEquals.Value.left, currentEquals.Value.right, currentVal.Value);
     }
 
-    static IEnumerable<(EqualityExpressionClass equalityKind, bool isDeterminate)>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression left, Expression right, bool shouldBeEqual)
+    static IEnumerable<(EqualityExpressionClass Kind, bool IsDeterminate)>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression left, Expression right, bool shouldBeEqual)
     {
         var leftC = ToConstantExpr(config, left);
         var rightC = ToConstantExpr(config, right);
