@@ -102,21 +102,14 @@ public static class EqualityExpressions
 
     public static IEnumerable<(EqualityExpressionClass Kind, bool IsDeterminate)>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
     {
-        var currentEquals = ExtractEqualityType(e);
-        if (currentEquals == null) {
+        if (ExtractEqualityType(e) is not var (_, left, right)) {
             return null;
         }
 
-        var currentVal = EvalBoolLambda(config, e);
-        if (!currentVal.HasValue) {
+        if (EvalBoolLambda(config, e) is not { } currentVal) {
             return null;
         }
 
-        return DisagreeingEqualities(config, currentEquals.Value.left, currentEquals.Value.right, currentVal.Value);
-    }
-
-    static IEnumerable<(EqualityExpressionClass Kind, bool IsDeterminate)>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression left, Expression right, bool shouldBeEqual)
-    {
         var leftC = ToConstantExpr(config, left);
         var rightC = ToConstantExpr(config, right);
 
@@ -125,9 +118,9 @@ public static class EqualityExpressions
         }
 
         (EqualityExpressionClass, bool) ReportIfError(EqualityExpressionClass eqClass, bool? itsVal)
-            => shouldBeEqual == itsVal ? default : (eqClass, !itsVal.HasValue);
+            => currentVal == itsVal ? default : (eqClass, !itsVal.HasValue);
 
-        var ienumerableTypes =
+        var iEnumerableTypes =
             GetGenericInterfaceImplementation(leftC.Type, typeof(IEnumerable<>))
                 .Intersect(GetGenericInterfaceImplementation(rightC.Type, typeof(IEnumerable<>)))
                 .Select(seqType => seqType.GetTypeInfo().GetGenericArguments().Single());
@@ -135,13 +128,13 @@ public static class EqualityExpressions
         var seqEqualsMethod =
             ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).GetMethodInfo().GetGenericMethodDefinition();
 
-        var iequatableEqualsMethods =
+        var iEquatableEqualsMethods =
             (from genEquatable in GetGenericInterfaceImplementation(leftC.Type, typeof(IEquatable<>))
                 let otherType = genEquatable.GetTypeInfo().GetGenericArguments().Single()
                 where otherType.GetTypeInfo().IsAssignableFrom(rightC.Type)
-                let ifacemap = leftC.Type.GetTypeInfo().GetRuntimeInterfaceMap(genEquatable)
+                let interfaceMapping = leftC.Type.GetTypeInfo().GetRuntimeInterfaceMap(genEquatable)
                 select
-                    ifacemap.InterfaceMethods.Zip(ifacemap.InterfaceMethods, Tuple.Create)
+                    interfaceMapping.InterfaceMethods.Zip(interfaceMapping.InterfaceMethods, Tuple.Create)
                         .Single(ifaceAndImpl => ifaceAndImpl.Item1.Name == "Equals")
                         .Item2).Distinct();
 
@@ -164,7 +157,7 @@ public static class EqualityExpressions
                     EqualityExpressionClass.StructuralEquals,
                     StructuralComparisons.StructuralEqualityComparer.Equals(leftC.Value, rightC.Value)),
             }.Concat(
-                iequatableEqualsMethods.Select(
+                iEquatableEqualsMethods.Select(
                     method =>
                         ReportIfError(
                             EqualityExpressionClass.EquatableEquals,
@@ -173,7 +166,7 @@ public static class EqualityExpressions
                                 Expression.Call(leftC, method, rightC))))
             )
             .Concat(
-                ienumerableTypes.Select(
+                iEnumerableTypes.Select(
                     elemType =>
                         ReportIfError(
                             EqualityExpressionClass.SequenceEqual,
