@@ -669,7 +669,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             if (ne.Arguments.Count == 0) {
                 kids.Add("()");
             } else {
-                kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor, ne.Arguments)));
+                kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor ?? throw new("Assumption: any new-expression with arguments must have a constructor"), ne.Arguments)));
             }
         }
 
@@ -683,7 +683,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var nae = (NewArrayExpression)e;
-        var arrayElemType = nae.Type.GetElementType();
+        var arrayElemType = nae.Type.GetElementType() ?? throw new("Assumption: all arrays have an element type");
         var isDelegate = typeof(Delegate).GetTypeInfo().IsAssignableFrom(arrayElemType);
         var implicitTypeOK = !isDelegate && nae.Expressions.Any()
             && nae.Expressions.All(expr => expr.Type == arrayElemType);
@@ -698,7 +698,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var nae = (NewArrayExpression)e;
-        var arrayElemType = nae.Type.GetElementType();
+        var arrayElemType = nae.Type.GetElementType() ?? throw new("Assumption: all arrays have an element type");
         kids.Add("new " + objectStringifier.TypeNameToCode(arrayElemType), nae);
         kids.Add(ArgListDispatch(nae.Expressions.Select(SingleChildDispatch), null, "[", "]"));
         return kids.Finish();
