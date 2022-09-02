@@ -87,7 +87,7 @@ public class CSharpFriendlyTypeNameTest
 
     [Fact]
     public void GenericArgumentTypes()
-        => Assert.Equal("Func<Z>", typeof(Outer<,>.Nested<>).GetTypeInfo().GetMethod("Method")!.GetParameters()![0].ParameterType.ToCSharpFriendlyTypeName());
+        => Assert.Equal("Func<Z>", typeof(Outer<,>.Nested<>).GetTypeInfo().GetMethod("Method")!.GetParameters()[0].ParameterType.ToCSharpFriendlyTypeName());
 
     [Fact]
     public void UnboundNested()
