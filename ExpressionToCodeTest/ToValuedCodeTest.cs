@@ -7,7 +7,7 @@ public sealed class ToValuedCodeTest
     {
         ExpressionToCodeLibTest? obj = null;
 
-        Assert.ThrowsAny<InvalidOperationException>(
+        _ = Assert.ThrowsAny<InvalidOperationException>(
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
             () => ExpressionToCode.ToValuedCode(() => obj.TheProperty)
 #pragma warning restore CS8602 // Dereference of a possibly null reference.

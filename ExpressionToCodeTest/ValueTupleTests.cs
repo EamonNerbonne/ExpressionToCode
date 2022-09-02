@@ -31,20 +31,20 @@ public class ValueTupleTests
         Expression<Func<Tuple<int, int>>> ok3 = () => tupleA.ToTuple();
         Expression<Func<bool>> ok4 = () => Equals(tupleA, tupleB);
         Expression<Func<int>> ok5 = () => Comparer<(int, int)>.Default.Compare(tupleA, tupleB);
-        ok1.Compile()();
-        ok2.Compile()();
-        ok3.Compile()();
-        ok4.Compile()();
-        ok5.Compile()();
+        _ = ok1.Compile()();
+        _ = ok2.Compile()();
+        _ = ok3.Compile()();
+        _ = ok4.Compile()();
+        _ = ok5.Compile()();
 
         var myTupleA = ToMyValueTuple(tupleA);
         var myTupleB = ToMyValueTuple(tupleB);
         Expression<Func<bool>> ok6 = () => myTupleA.Equals(myTupleB);
         Expression<Func<bool>> ok7 = () => tupleA.ToTuple().Equals(tupleB.ToTuple());
         Expression<Func<bool>> ok8 = () => ToMyValueTuple(tupleA).Equals(ToMyValueTuple(tupleB));
-        ok6.Compile()();
-        ok7.Compile()();
-        ok8.Compile()();
+        _ = ok6.Compile()();
+        _ = ok7.Compile()();
+        _ = ok8.Compile()();
 
         // ReSharper disable once UnusedVariable
         Expression<Func<bool>> err1 = () => tupleA.Equals(tupleB); //crash

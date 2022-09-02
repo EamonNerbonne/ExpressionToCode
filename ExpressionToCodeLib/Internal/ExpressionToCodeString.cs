@@ -14,7 +14,7 @@ sealed class ExpressionToCodeString
     static void AppendTo(StringBuilder sb, ref bool ignoreInitialSpace, StringifiedExpression node)
     {
         if (node.Text != null) {
-            sb.Append(ignoreInitialSpace ? node.Text.TrimStart() : node.Text);
+            _ = sb.Append(ignoreInitialSpace ? node.Text.TrimStart() : node.Text);
             ignoreInitialSpace = node.Text.Any() && ExpressionToCode.ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
         } else {
             foreach (var kid in node.Children) {

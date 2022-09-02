@@ -8,12 +8,12 @@ sealed class ValuesOnStalksCodeAnnotator : ICodeAnnotator
 
         var exprWithStalkedValues = new StringBuilder();
         if (msg == null) {
-            exprWithStalkedValues.AppendLine(splitLine.Line);
+            _ = exprWithStalkedValues.AppendLine(splitLine.Line);
         } else if (IsMultiline(msg)) {
-            exprWithStalkedValues.AppendLine(msg);
-            exprWithStalkedValues.AppendLine(splitLine.Line);
+            _ = exprWithStalkedValues.AppendLine(msg);
+            _ = exprWithStalkedValues.AppendLine(splitLine.Line);
         } else {
-            exprWithStalkedValues.AppendLine(splitLine.Line + "  :  " + msg);
+            _ = exprWithStalkedValues.AppendLine(splitLine.Line + "  :  " + msg);
         }
 
         for (var nodeI = splitLine.Nodes.Length - 1; nodeI >= 0; nodeI--) {
@@ -28,7 +28,7 @@ sealed class ValuesOnStalksCodeAnnotator : ICodeAnnotator
                 stalkLine[splitLine.Nodes[prevI].Location] = '\u2502'; //light vertical lines
             }
 
-            exprWithStalkedValues.AppendLine((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
+            _ = exprWithStalkedValues.AppendLine((new string(stalkLine) + splitLine.Nodes[nodeI].Value).TrimEnd());
         }
 
         return exprWithStalkedValues.ToString();
@@ -62,7 +62,7 @@ sealed class ValuesOnStalksCodeAnnotator : ICodeAnnotator
         if (node.Text != null) {
             var trimmedText = ignoreInitialSpace ? node.Text.TrimStart() : node.Text;
             var pos0 = sb.Length;
-            sb.Append(trimmedText);
+            _ = sb.Append(trimmedText);
             ignoreInitialSpace = node.Text.Any() && ExpressionToCode.ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
             if (showTopExpressionValue) {
                 var valueString = node.OptionalValue == null ? null : ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 0);

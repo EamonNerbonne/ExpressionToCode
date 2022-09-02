@@ -71,7 +71,7 @@ class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
         {
             if (node.Text != null) {
                 var trimmedText = ignoreInitialSpace ? node.Text.TrimStart() : node.Text;
-                sb.Append(trimmedText);
+                _ = sb.Append(trimmedText);
                 ignoreInitialSpace = node.Text != "" && ExpressionToCode.ShouldIgnoreSpaceAfter(node.Text[node.Text.Length - 1]);
             } else {
                 foreach (var kid in node.Children) {

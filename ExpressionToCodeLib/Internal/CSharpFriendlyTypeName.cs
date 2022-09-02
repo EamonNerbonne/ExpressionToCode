@@ -15,7 +15,7 @@ struct CSharpFriendlyTypeName
         }
 
         var output = new StringBuilder();
-        output.Append("(");
+        _ = output.Append("(");
         var genericArguments = type.GetTypeInfo().GetGenericArguments();
         var nextIdx = 0;
         while (nextIdx < genericArguments.Length) {
@@ -25,17 +25,17 @@ struct CSharpFriendlyTypeName
                     genericArguments = typePar.GetTypeInfo().GetGenericArguments();
                     nextIdx = 0;
                 } else {
-                    output.Append(GetTypeName(typePar));
+                    _ = output.Append(GetTypeName(typePar));
                     break;
                 }
             } else {
-                output.Append(GetTypeName(typePar));
-                output.Append(", ");
+                _ = output.Append(GetTypeName(typePar));
+                _ = output.Append(", ");
                 nextIdx++;
             }
         }
 
-        output.Append(")");
+        _ = output.Append(")");
         return output.ToString();
     }
 

@@ -104,7 +104,7 @@ sealed class ObjectStringifyImpl : IObjectStringifier
     {
         var sb = new StringBuilder(str.Length);
         foreach (var c in str) {
-            sb.Append(EscapeCharForString(c));
+            _ = sb.Append(EscapeCharForString(c));
         }
 
         return sb.ToString();
