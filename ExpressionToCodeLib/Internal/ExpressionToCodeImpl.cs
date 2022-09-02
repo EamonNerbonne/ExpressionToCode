@@ -256,12 +256,12 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         return kids.Finish();
     }
 
-    static bool isThisRef(Expression e)
+    static bool IsThisRef(Expression e)
         => e.NodeType == ExpressionType.Constant
             && ((ConstantExpression)e).Value != null
             && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 
-    static bool isClosureRef(Expression e)
+    static bool IsClosureRef(Expression e)
         => (
                 e.NodeType == ExpressionType.Constant && ((ConstantExpression)e).Value != null
                 || e.NodeType == ExpressionType.MemberAccess
@@ -275,7 +275,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
         var me = (MemberExpression)e;
         var memberOfExpr = me.Expression;
-        if (memberOfExpr != null && !isThisRef(memberOfExpr) && !isClosureRef(memberOfExpr)) {
+        if (memberOfExpr != null && !IsThisRef(memberOfExpr) && !IsClosureRef(memberOfExpr)) {
             kids.Add(NestExpression(e.NodeType, memberOfExpr));
             kids.Add(".");
         } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
@@ -330,7 +330,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             && mce.Method.Name == "Create"
             && mce.Arguments.Count == 2
             && mce.Arguments[0] is ConstantExpression { Value: string formattableStringFormatString }
-            && mce.Arguments[1] is NewArrayExpression { Expressions: {} formattableStringArguments }
+            && mce.Arguments[1] is NewArrayExpression { Expressions: { } formattableStringArguments }
         ) {
             //.net 4.6
             //string-interpolations are compiled into FormattableStringFactory.Create
@@ -343,7 +343,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             && mce.Arguments[0].Type == typeof(string)
             && mce.Arguments[0] is ConstantExpression { Value: string stringInterpolationFormatString }
             && mce.Arguments[1].Type == typeof(object[])
-            && mce.Arguments[1] is NewArrayExpression { Expressions: {}  stringInterpolationArguments }
+            && mce.Arguments[1] is NewArrayExpression { Expressions: { } stringInterpolationArguments }
         ) {
             //.net 4.6
             //string-interpolations are compiled into FormattableStringFactory.Create
@@ -449,7 +449,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         if (objExpr != null) {
-            if (!(isThisRef(objExpr) || isClosureRef(objExpr))) {
+            if (!(IsThisRef(objExpr) || IsClosureRef(objExpr))) {
                 kids.Add(NestExpression(mce.NodeType, objExpr));
                 kids.Add(".");
             }
