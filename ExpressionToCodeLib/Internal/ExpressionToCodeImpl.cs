@@ -570,7 +570,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         kids.Add("new ", lie);
         kids.Add(objectStringifier.TypeNameToCode(lie.NewExpression.Type));
         if (lie.NewExpression.Arguments.Any()) {
-            kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor, lie.NewExpression.Arguments)));
+            kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor ?? throw new("Assumption: Constructor cannot be omitted when it has arguments: " + lie.NewExpression.Type), lie.NewExpression.Arguments)));
         }
 
         kids.Add(" { ");
@@ -620,9 +620,9 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var mie = (MemberInitExpression)e;
         kids.Add("new ", mie);
         var newExpr = mie.NewExpression;
-        kids.Add(objectStringifier.TypeNameToCode(newExpr.Constructor?.DeclaringType ?? newExpr.Type));
+        kids.Add(objectStringifier.TypeNameToCode(newExpr.Type));
         if (newExpr.Arguments.Any()) {
-            kids.Add(ArgListDispatch(GetArgumentsForMethod(newExpr.Constructor ?? throw new("Constructor cannot be omitted when it has arguments: " + newExpr.Type), newExpr.Arguments)));
+            kids.Add(ArgListDispatch(GetArgumentsForMethod(newExpr.Constructor ?? throw new("Assumption: Constructor cannot be omitted when it has arguments: " + newExpr.Type), newExpr.Arguments)));
         }
 
         kids.Add(" { ");
