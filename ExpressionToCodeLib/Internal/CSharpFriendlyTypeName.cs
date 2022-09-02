@@ -106,9 +106,9 @@ struct CSharpFriendlyTypeName
         }
     }
 
-    string? GenericTypeName(Type type)
+    string? GenericTypeName(Type? type)
     {
-        if (!type.GetTypeInfo().IsGenericType) {
+        if (type ==null || !type.GetTypeInfo().IsGenericType) {
             return null;
         }
 
@@ -160,7 +160,7 @@ struct CSharpFriendlyTypeName
         var arraySuffix = default(string?);
         do {
             var rankCommas = new string(',', type.GetArrayRank() - 1);
-            type = type.GetElementType();
+            type = type.GetElementType() ?? throw new("Arrays must have an element type");
             arraySuffix = arraySuffix + "[" + rankCommas + "]";
             // ReSharper disable once PossibleNullReferenceException
         } while (type.IsArray);
