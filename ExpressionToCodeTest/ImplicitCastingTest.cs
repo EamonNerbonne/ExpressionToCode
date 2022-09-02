@@ -43,6 +43,7 @@ public class ImplicitCastingTest
         byte z = 42;
         Assert.Equal(
             @"() => ~z == 0",
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             ExpressionToCode.ToCode(() => ~z == 0));
     }
 

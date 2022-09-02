@@ -166,10 +166,12 @@ public sealed class ExpressionToCodeLibTest
             ExpressionToCode.ToCode(() => default(List<int>).Count));
         Assert.Equal(
             @"() => default(int[]).Clone() == null",
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             ExpressionToCode.ToCode(() => default(int[]).Clone() == null));
         //default(Type).IsInstanceOfType(new object()) is not compiled as extension method in .net core!
         Assert.Equal(
             @"() => default(IEnumerable<Type>).Any()",
+            // ReSharper disable once AssignNullToNotNullAttribute
             ExpressionToCode.ToCode(() => default(IEnumerable<Type>).Any()));
         Assert.Equal(
             @"() => default(List<int>).AsReadOnly()",
