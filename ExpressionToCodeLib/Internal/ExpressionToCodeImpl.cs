@@ -437,7 +437,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
                 kids.Add(NestExpression(mce.NodeType, objExpr));
                 kids.Add(".");
             }
-        } else if (method.IsStatic) {
+        } else if (method.IsStatic && method.DeclaringType is not null) {
             kids.Add(objectStringifier.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
         }
 
