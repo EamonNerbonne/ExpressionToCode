@@ -34,19 +34,19 @@ public sealed class ExpressionToCodeLibTest
     public void AnonymousClasses()
         => Assert.Equal(
             @"() => new { X = 3, A = ""a"" } == new { X = 3, A = ""a"" }",
-            ExpressionToCode.ToCode(() => new { X = 3, A = "a" } == new { X = 3, A = "a" }));
+            ExpressionToCode.ToCode(() => new { X = 3, A = "a", } == new { X = 3, A = "a", }));
 
     [Fact]
     public void ArrayIndex()
         => Assert.Equal(
             @"() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3L)] == 3",
-            ExpressionToCode.ToCode(() => new[] { 3, 4, 5 }[0 + (int)(DateTime.Now.Ticks % 3)] == 3));
+            ExpressionToCode.ToCode(() => new[] { 3, 4, 5, }[0 + (int)(DateTime.Now.Ticks % 3)] == 3));
 
     [Fact]
     public void ArrayLengthAndDoubles()
         => Assert.Equal(
             @"() => new[] { 1.0, 2.01, 3.5 }.Concat(new[] { 1.0, 2.0 }).ToArray().Length == 0",
-            ExpressionToCode.ToCode(() => new[] { 1.0, 2.01, 3.5 }.Concat(new[] { 1.0, 2.0 }).ToArray().Length == 0));
+            ExpressionToCode.ToCode(() => new[] { 1.0, 2.01, 3.5, }.Concat(new[] { 1.0, 2.0, }).ToArray().Length == 0));
 
     [Fact]
     public void AsOperator()
@@ -66,7 +66,7 @@ public sealed class ExpressionToCodeLibTest
     public void DefaultValue()
         => Assert.Equal(
             @"() => new TimeSpan(1, 2, 3) == default(TimeSpan)",
-            ExpressionToCode.ToCode(() => new TimeSpan(1, 2, 3) == default(TimeSpan)));
+            ExpressionToCode.ToCode(() => new TimeSpan(1, 2, 3) == default));
 
     [Fact]
     public void IndexerAccess()
@@ -87,7 +87,7 @@ public sealed class ExpressionToCodeLibTest
     public void ArrayOfFuncInitializer()
         => Assert.Equal(
             @"() => new Func<int>[] { () => 1, () => 2 }",
-            ExpressionToCode.ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+            ExpressionToCode.ToCode(() => new Func<int>[] { () => 1, () => 2, }));
 
     [Fact]
     public void ArrayOfFuncInitializer_FullNames()
@@ -95,44 +95,44 @@ public sealed class ExpressionToCodeLibTest
             @"() => new System.Func<int>[] { () => 1, () => 2 }",
             ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
                 .GetExpressionToCode()
-                .ToCode(() => new Func<int>[] { () => 1, () => 2 }));
+                .ToCode(() => new Func<int>[] { () => 1, () => 2, }));
 
     [Fact]
     public void DictionaryInitializer()
         => Assert.Equal(
             @"() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3",
-            ExpressionToCode.ToCode(() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 } }.Count == 3));
+            ExpressionToCode.ToCode(() => new Dictionary<int, int> { { 1, 1 }, { 2, 2 }, { 3, 4 }, }.Count == 3));
 
     [Fact]
     public void DictionaryInitializer_with_struct_member_init_key()
         => Assert.Equal(
             @"() => new Dictionary<DictionaryEntry, int> { { new DictionaryEntry { Value = 42 }, 1 }, { new DictionaryEntry(), 2 } }.Count == 2",
-            ExpressionToCode.ToCode(() => new Dictionary<DictionaryEntry, int> { { new() { Value = 42, }, 1 }, { new(), 2 } }.Count == 2));
+            ExpressionToCode.ToCode(() => new Dictionary<DictionaryEntry, int> { { new() { Value = 42, }, 1 }, { new(), 2 }, }.Count == 2));
 
     [Fact]
     public void ListInitializer_with_constructor_args()
         => Assert.Equal(
             @"() => new List<int>(50) { 1, 2, 3 }.Count == 3",
-            ExpressionToCode.ToCode(() => new List<int>(50) { 1, 2, 3 }.Count == 3));
+            ExpressionToCode.ToCode(() => new List<int>(50) { 1, 2, 3, }.Count == 3));
 
     [Fact]
     public void ListInitializer()
         => Assert.Equal(
             @"() => new List<int> { 1, 2, 3 }.Count == 3",
-            ExpressionToCode.ToCode(() => new List<int> { 1, 2, 3 }.Count == 3));
+            ExpressionToCode.ToCode(() => new List<int> { 1, 2, 3, }.Count == 3));
 
     [Fact]
     public void ListInitializer_with_struct_member_init_key()
         => Assert.Equal(
             @"() => new List<DictionaryEntry> { new DictionaryEntry { Value = 42 }, new DictionaryEntry() }.Count == 2",
-            ExpressionToCode.ToCode(() => new List<DictionaryEntry> { new() { Value = 42, }, new() }.Count == 2));
+            ExpressionToCode.ToCode(() => new List<DictionaryEntry> { new() { Value = 42, }, new(), }.Count == 2));
 
 #if !NET48
     [Fact]
     public void ListInitializer_custom_value_typed_list()
         => Assert.Equal(
             @"() => new MyList { 1, 2, 3, 4 }",
-            ExpressionToCode.ToCode(() => new MyList { 1, 2, 3, 4 }));
+            ExpressionToCode.ToCode(() => new MyList { 1, 2, 3, 4, }));
 
     struct MyList : IEnumerable
     {
@@ -213,7 +213,7 @@ public sealed class ExpressionToCodeLibTest
     [Fact]
     public void MethodGroupAsExtensionMethod()
     {
-        var actual = ExpressionToCode.ToCode(() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any);
+        var actual = ExpressionToCode.ToCode(() => (Func<bool>)new[] { 2000, 2004, 2008, 2012, }.Any);
         Assert.Equal(
             "() => (Func<bool>)new[] { 2000, 2004, 2008, 2012 }.Any",
             actual);
@@ -224,17 +224,17 @@ public sealed class ExpressionToCodeLibTest
     {
         Assert.Equal(
             @"() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, (Predicate<int>)DateTime.IsLeapYear)",
-            ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012 }, DateTime.IsLeapYear)));
+            ExpressionToCode.ToCode(() => Array.TrueForAll(new[] { 2000, 2004, 2008, 2012, }, DateTime.IsLeapYear)));
 
         var set = new HashSet<int>();
         Assert.Equal(
             @"() => new[] { 2000, 2004, 2008, 2012 }.All((Func<int, bool>)set.Add)",
-            ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012 }.All(set.Add)));
+            ExpressionToCode.ToCode(() => new[] { 2000, 2004, 2008, 2012, }.All(set.Add)));
 
         Func<Func<object?, object?, bool>, bool> sink = f => f(null, null);
         Assert.Equal(
             @"() => sink((Func<object, object, bool>)object.Equals)",
-            ExpressionToCode.ToCode(() => sink(int.Equals)));
+            ExpressionToCode.ToCode(() => sink(Equals)));
     }
 
     [Fact]
@@ -264,7 +264,7 @@ public sealed class ExpressionToCodeLibTest
     {
         Assert.Equal(
             @"() => new[] { 37, 42 }.Select(x => x * 2)",
-            ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select(x => x * 2))
+            ExpressionToCode.ToCode(() => new[] { 37, 42, }.Select(x => x * 2))
         );
         Assert.Equal(
             @"() => Buzz(x => true)",
@@ -276,7 +276,7 @@ public sealed class ExpressionToCodeLibTest
     public void NestedLambda_TwoParameters()
         => Assert.Equal(
             @"() => new[] { 37, 42 }.Select((x, i) => x * 2)",
-            ExpressionToCode.ToCode(() => new[] { 37, 42 }.Select((x, i) => x * 2))
+            ExpressionToCode.ToCode(() => new[] { 37, 42, }.Select((x, i) => x * 2))
         );
 
     // ReSharper disable once MemberCanBeMadeStatic.Local
@@ -315,7 +315,7 @@ public sealed class ExpressionToCodeLibTest
     public void NewArrayAndExtensionMethod()
         => Assert.Equal(
             @"() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })",
-            ExpressionToCode.ToCode(() => new[] { 1.0, 2.01, 3.5 }.SequenceEqual(new[] { 1.0, 2.01, 3.5 })));
+            ExpressionToCode.ToCode(() => new[] { 1.0, 2.01, 3.5, }.SequenceEqual(new[] { 1.0, 2.01, 3.5, })));
 
     [Fact]
     public void NewMultiDimArray()
@@ -357,12 +357,12 @@ public sealed class ExpressionToCodeLibTest
     {
         var s = new XmlReaderSettings {
             CloseInput = false,
-            CheckCharacters = false
+            CheckCharacters = false,
         };
         Assert.Equal(
             @"() => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)",
             ExpressionToCode.ToCode(
-                () => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters }.Equals(s)));
+                () => new XmlReaderSettings { CloseInput = s.CloseInput, CheckCharacters = s.CheckCharacters, }.Equals(s)));
     }
 
     [Fact]
@@ -395,7 +395,7 @@ public sealed class ExpressionToCodeLibTest
     public void QuotedWithAnonymous()
         => Assert.Equal(
             @"() => new[] { new { X = ""a"", Y = ""b"" } }.Select(o => o.X + o.Y).Single()",
-            ExpressionToCode.ToCode(() => new[] { new { X = "a", Y = "b" } }.Select(o => o.X + o.Y).Single()));
+            ExpressionToCode.ToCode(() => new[] { new { X = "a", Y = "b", }, }.Select(o => o.X + o.Y).Single()));
 
     [Fact]
     public void StaticCall()
@@ -420,7 +420,7 @@ public sealed class ExpressionToCodeLibTest
     public void TypedConstant()
         => Assert.Equal(
             @"() => new[] { typeof(int), typeof(string) }",
-            ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string) }));
+            ExpressionToCode.ToCode(() => new[] { typeof(int), typeof(string), }));
 
     [Fact]
     public void StaticMembers()
@@ -573,7 +573,7 @@ public sealed class ExpressionToCodeLibTest
     {
         var code = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithFullTypeNames)
             .GetExpressionToCode()
-            .ToCode(() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B());
+            .ToCode(() => new ExpressionToCodeLibTest.B());
         Assert.Equal("() => new ExpressionToCodeTest.ExpressionToCodeLibTest.B()", code);
     }
 
@@ -654,7 +654,7 @@ public sealed class ExpressionToCodeLibTest
     public void DetectsClosuresInNestedClasses()
     {
         var expr = new ClassWithClosure {
-            someValue = "test "
+            someValue = "test ",
         }.GetExpression(DayOfWeek.Friday);
         Assert.Equal(@"() => someValue + closedVariable + "" "" + argument", expr);
     }
@@ -665,7 +665,7 @@ public sealed class ExpressionToCodeLibTest
         var expr = ExpressionToCode.ToCode(
             Expression.Throw(
                 Expression.New(
-                    typeof(Exception).GetConstructor(new[] { typeof(string) }) ??
+                    typeof(Exception).GetConstructor(new[] { typeof(string), }) ??
                     throw new InvalidOperationException("Unable to find exception constructor"),
                     Expression.Constant("Stuff")
                 )
@@ -681,7 +681,7 @@ public sealed class ExpressionToCodeLibTest
 
         public string GetExpression(DayOfWeek argument)
         {
-            var arr = new[] { 37 };
+            var arr = new[] { 37, };
             foreach (var closedVariable in arr) {
                 return ExpressionToCode.ToCode(() => someValue + closedVariable + " " + argument);
             }
