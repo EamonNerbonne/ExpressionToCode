@@ -66,7 +66,7 @@ public sealed class ExpressionToCodeLibTest
     public void DefaultValue()
         => Assert.Equal(
             @"() => new TimeSpan(1, 2, 3) == default(TimeSpan)",
-            ExpressionToCode.ToCode(() => new TimeSpan(1, 2, 3) == default));
+            ExpressionToCode.ToCode(() => new TimeSpan(1, 2, 3) == default(TimeSpan)));
 
     [Fact]
     public void IndexerAccess()
@@ -739,7 +739,7 @@ sealed class ClassA
             ExpressionToCode.ToCode(() => !ReferenceEquals(this, new ClassA())));
         Assert.Equal(
             @"() => MyEquals(this) && !MyEquals(default(ClassA))",
-            ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default)));
+            ExpressionToCode.ToCode(() => MyEquals(this) && !MyEquals(default(ClassA?))));
     }
 
     int C()
