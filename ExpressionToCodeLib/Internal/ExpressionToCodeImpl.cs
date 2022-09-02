@@ -114,20 +114,20 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {
         left = be.Left;
         right = be.Right;
-        var uleft = left.NodeType == ExpressionType.Convert ? ((UnaryExpression)left).Operand : null;
-        var uright = right.NodeType == ExpressionType.Convert ? ((UnaryExpression)right).Operand : null;
-        if (uleft != null) {
-            if (uright != null) {
-                if (uright.Type.EnusureNullability() == uleft.Type.EnusureNullability()) {
-                    left = uleft;
-                    right = uright;
+        var uncastLeft = left.NodeType == ExpressionType.Convert ? ((UnaryExpression)left).Operand : null;
+        var uncastRight = right.NodeType == ExpressionType.Convert ? ((UnaryExpression)right).Operand : null;
+        if (uncastLeft != null) {
+            if (uncastRight != null) {
+                if (uncastRight.Type.EnsureNullability() == uncastLeft.Type.EnsureNullability()) {
+                    left = uncastLeft;
+                    right = uncastRight;
                 }
             } else {
-                UnwrapEnumBinOp(uleft, ref left, ref right);
+                UnwrapEnumBinOp(uncastLeft, ref left, ref right);
             }
-        } else if (uright != null) {
+        } else if (uncastRight != null) {
             //implies uleft == null
-            UnwrapEnumBinOp(uright, ref right, ref left);
+            UnwrapEnumBinOp(uncastRight, ref right, ref left);
         }
     }
 
@@ -144,7 +144,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             if (expr2.NodeType == ExpressionType.Constant) {
                 var value = ((ConstantExpression)expr2).Value;
                 if (value == null) {
-                    expr2 = Expression.Default(expr1uncast.Type.EnusureNullability());
+                    expr2 = Expression.Default(expr1uncast.Type.EnsureNullability());
                 } else if (expr1nonnullableType == typeof(char)) {
                     expr2 = Expression.Constant((char)(int)value);
                 } else {
@@ -549,8 +549,8 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var codeRepresentation = objectStringifier.PlainObjectToCode(const_Val, e.Type);
         //e.Type.IsVisible
         if (codeRepresentation == null) {
-            var typeclass = e.Type.GuessTypeClass();
-            if (typeclass == ReflectionHelpers.TypeClass.NormalType) // probably this!
+            var typeClass = e.Type.GuessTypeClass();
+            if (typeClass == ReflectionHelpers.TypeClass.NormalType) // probably this!
             {
                 kids.Add("this"); //TODO:verify that all this references refer to the same object!
             } else {
@@ -658,17 +658,17 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
         var ne = (NewExpression)e;
         if (ne.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.AnonymousType) {
-            var parms = ne.Type.GetTypeInfo().GetConstructors().Single().GetParameters();
+            var parameters = ne.Type.GetTypeInfo().GetConstructors().Single().GetParameters();
             var props = ne.Type.GetTypeInfo().GetProperties();
             if (
-                !parms.Select(p => new { p.Name, Type = p.ParameterType })
+                !parameters.Select(p => new { p.Name, Type = p.ParameterType })
                     .SequenceEqual(props.Select(p => new { p.Name, Type = p.PropertyType }))) {
                 throw new InvalidOperationException(
                     "Constructor params for anonymous type don't match it's properties!"
                 );
             }
 
-            if (!parms.Select(p => p.ParameterType).SequenceEqual(ne.Arguments.Select(argE => argE.Type))) {
+            if (!parameters.Select(p => p.ParameterType).SequenceEqual(ne.Arguments.Select(argE => argE.Type))) {
                 throw new InvalidOperationException(
                     "Constructor Arguments for anonymous type don't match it's type signature!"
                 );

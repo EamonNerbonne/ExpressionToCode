@@ -6,7 +6,7 @@ static class NullabilityHelpers
         => type.GetTypeInfo().IsValueType && type.GetTypeInfo().IsGenericType
             && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
-    public static Type EnusureNullability(this Type type)
+    public static Type EnsureNullability(this Type type)
         => !type.GetTypeInfo().IsValueType || type.IsNullableValueType()
             ? type
             : typeof(Nullable<>).MakeGenericType(type);

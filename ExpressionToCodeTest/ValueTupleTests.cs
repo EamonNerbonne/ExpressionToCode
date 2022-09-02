@@ -81,7 +81,7 @@ public class ValueTupleTests
     }
 
     [Fact]
-    public void ToCSharpFriendlyTypeNameSupportsLooongTuples()
+    public void ToCSharpFriendlyTypeNameSupportsLongTuples()
     {
         var actual = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         Assert.Equal("(int, int, int, int, int, int, int, int, int, int)", actual.GetType().ToCSharpFriendlyTypeName());

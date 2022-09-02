@@ -135,7 +135,7 @@ public static class EqualityExpressions
                 let interfaceMapping = leftC.Type.GetTypeInfo().GetRuntimeInterfaceMap(genEquatable)
                 select
                     interfaceMapping.InterfaceMethods.Zip(interfaceMapping.InterfaceMethods, Tuple.Create)
-                        .Single(ifaceAndImpl => ifaceAndImpl.Item1.Name == "Equals")
+                        .Single(interfaceAndImpl => interfaceAndImpl.Item1.Name == "Equals")
                         .Item2).Distinct();
 
         var errs = new[] {
