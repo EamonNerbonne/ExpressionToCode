@@ -1,5 +1,6 @@
 // ReSharper disable PossiblyMistakenUseOfParamsMethod
 // ReSharper disable RedundantNameQualifier
+
 namespace ExpressionToCodeLib.Internal;
 
 public enum EqualityExpressionClass
@@ -39,15 +40,15 @@ public static class EqualityExpressions
             } else if (e.NodeType == ExpressionType.Call) {
                 var mce = (MethodCallExpression)e;
                 if (mce.Method.Equals(((Func<object, bool>)new object().Equals).GetMethodInfo())) {
-                    return (EqualityExpressionClass.ObjectEquals, mce.Object, mce.Arguments.Single());
+                    return (EqualityExpressionClass.ObjectEquals, mce.Object ?? throw new("object.Equals instance method missing receiver"), mce.Arguments.Single());
                 } else if (mce.Method.Equals(objEqualStaticMethod)) {
                     return (EqualityExpressionClass.ObjectEqualsStatic, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
                 } else if (mce.Method.Equals(objEqualReferenceMethod)) {
                     return (EqualityExpressionClass.ObjectReferenceEquals, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
                 } else if (IsImplementationOfGenericInterfaceMethod(mce.Method, typeof(IEquatable<>), "Equals")) {
-                    return (EqualityExpressionClass.EquatableEquals, mce.Object, mce.Arguments.Single());
+                    return (EqualityExpressionClass.EquatableEquals, mce.Object ?? throw new("IEquatable<>.Equals method missing receiver"), mce.Arguments.Single());
                 } else if (IsImplementationOfInterfaceMethod(mce.Method, typeof(IStructuralEquatable), "Equals")) {
-                    return (EqualityExpressionClass.StructuralEquals, mce.Object, mce.Arguments.Single());
+                    return (EqualityExpressionClass.StructuralEquals, mce.Object ?? throw new("IStructuralEquatable.Equals method missing receiver"), mce.Arguments.Single());
                 } else if (HaveSameGenericDefinition(mce.Method, ((Func<IEnumerable<int>, IEnumerable<int>, bool>)Enumerable.SequenceEqual).GetMethodInfo())) {
                     return (EqualityExpressionClass.SequenceEqual, mce.Arguments.First(), mce.Arguments.Skip(1).Single());
                 }
@@ -101,18 +102,18 @@ public static class EqualityExpressions
 
     public static IEnumerable<Tuple<EqualityExpressionClass, bool>>? DisagreeingEqualities(ExpressionToCodeConfiguration config, Expression<Func<bool>> e)
     {
-        var currEquals = ExtractEqualityType(e);
-        if (currEquals == null) {
+        var currentEquals = ExtractEqualityType(e);
+        if (currentEquals == null) {
             return null;
         }
 
-        var currVal = EvalBoolLambda(config, e);
-        if (!currVal.HasValue) {
+        var currentVal = EvalBoolLambda(config, e);
+        if (!currentVal.HasValue) {
             return null;
         }
 
-        return DisagreeingEqualities(config, currEquals.Value.left, currEquals.Value.right, currVal.Value)
-                .Select(o=>o.ToTuple())//purely to avoid breaking API changes
+        return DisagreeingEqualities(config, currentEquals.Value.left, currentEquals.Value.right, currentVal.Value)
+                .Select(o => o.ToTuple()) //purely to avoid breaking API changes
             ;
     }
 
@@ -121,7 +122,7 @@ public static class EqualityExpressions
         var leftC = ToConstantExpr(config, left);
         var rightC = ToConstantExpr(config, right);
 
-        if(leftC==null || rightC==null) {
+        if (leftC == null || rightC == null) {
             return null;
         }
 
