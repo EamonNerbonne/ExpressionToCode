@@ -1,4 +1,4 @@
-﻿assertion failed
+assertion failed
 
 a + b > 3
    →   true (caused assertion failure)

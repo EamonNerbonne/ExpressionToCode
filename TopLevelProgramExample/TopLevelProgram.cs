@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using ExpressionToCodeLib;
 using TopLevelProgramExample;
@@ -9,6 +9,8 @@ var withImplicitType = new {
     A = "ImplicitTypeMember",
 };
 Console.WriteLine(TopLevelProgramMarker.LambdaToMyVar = ExpressionToCode.ToCode(() => myVariable));
+
+Console.WriteLine(TopLevelProgramMarker.LocalFunctionToString = ObjectToCode.ComplexObjectToPseudoCode(((Action<int>)LocalFunction).Method));
 
 new InnerClass().DoIt();
 LocalFunction(123);
