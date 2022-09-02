@@ -22,8 +22,8 @@ public static class FormatStringParser
         //Format strings have exceptions for stuff like double curly braces
         //There are also corner-cases that non-compiler generated format strings might hit
         //All in all: rather than reimplement a custom parser, this
-        readonly StringBuilder sb = new StringBuilder();
-        readonly List<Segment> Segments = new List<Segment>();
+        readonly StringBuilder sb = new();
+        readonly List<Segment> Segments = new();
 
         public FormattableStringParser(string formatString, object[] formatArguments)
             => sb.AppendFormat(this, formatString, formatArguments);

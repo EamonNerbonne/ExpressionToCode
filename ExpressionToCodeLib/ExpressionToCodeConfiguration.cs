@@ -28,7 +28,7 @@ public sealed record ExpressionToCodeConfiguration
     ///     <para>- Print all elements in an enumerable (this will cause crashes on infinite or very large enumerables).</para>
     /// </summary>
     public static readonly ExpressionToCodeConfiguration DefaultCodeGenConfiguration =
-        new ExpressionToCodeConfiguration(
+        new(
             new ExpressionToCodeConfigurationValue {
                 CodeAnnotator = CodeAnnotators.SubExpressionPerLineCodeAnnotator,
                 ExpressionCompiler = ExpressionTreeCompilers.DotnetExpressionCompiler,

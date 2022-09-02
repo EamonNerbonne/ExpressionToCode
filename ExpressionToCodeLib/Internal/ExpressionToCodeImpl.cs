@@ -79,7 +79,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
         [Pure]
         public static KidsBuilder Create()
-            => new KidsBuilder(new List<StringifiedExpression>());
+            => new(new List<StringifiedExpression>());
 
         public void Add(StringifiedExpression node)
             => kids.Add(node);

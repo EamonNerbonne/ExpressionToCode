@@ -29,7 +29,7 @@ readonly struct StringifiedExpression
 
     [Pure]
     public static StringifiedExpression TextOnly(string? text)
-        => new StringifiedExpression(text, null, null, false);
+        => new(text, null, null, false);
 
     [Pure]
     public static StringifiedExpression TextAndExpr(string text, Expression expr)
@@ -43,12 +43,12 @@ readonly struct StringifiedExpression
 
     [Pure]
     public static StringifiedExpression WithChildren(StringifiedExpression[] children)
-        => new StringifiedExpression(null, children, null, false);
+        => new(null, children, null, false);
 
     [Pure]
     public override string ToString()
         => Text ?? string.Join("", Children);
 
     public StringifiedExpression MarkAsConceptualChild()
-        => new StringifiedExpression(Text, children, OptionalValue, true);
+        => new(Text, children, OptionalValue, true);
 }
