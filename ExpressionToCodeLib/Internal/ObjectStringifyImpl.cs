@@ -5,8 +5,8 @@ namespace ExpressionToCodeLib.Internal;
 
 sealed class ObjectStringifyImpl : IObjectStringifier
 {
-    readonly bool fullTypeNames;
-    readonly bool allowLiteralStrings;
+    internal readonly bool fullTypeNames;
+    internal readonly bool allowVerbatimStrings;
 
     public ObjectStringifyImpl(bool fullTypeNames = false, bool allowVerbatimStrings = true)
     {
