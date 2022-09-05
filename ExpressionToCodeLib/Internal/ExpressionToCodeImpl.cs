@@ -7,7 +7,13 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         => this.config = config;
 
     readonly ExpressionToCodeConfiguration config;
-    IObjectStringifier ObjectStringifier => config.ObjectStringifier;
+
+    string? PlainObjectToCode(object? val, Type? type)
+        => ObjectStringifyImpl.PlainObjectToCode(config, val, type);
+
+    string TypeNameToCode(Type type)
+        => ObjectStringifyImpl.TypeNameToCode(config, type);
+
     bool AlwaysUseExplicitTypeArguments => config.AlwaysUseExplicitTypeArguments;
 
     [Pure]
@@ -32,7 +38,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         => this.ExpressionDispatch(child).MarkAsConceptualChild();
 
     StringifiedExpression SingleChildDispatch(string? prefix, Expression child)
-        => StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly(prefix), this.ExpressionDispatch(child) }).MarkAsConceptualChild();
+        => StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly(prefix), this.ExpressionDispatch(child), }).MarkAsConceptualChild();
 
     [Pure]
     static IEnumerable<StringifiedExpression> JoinDispatch(IEnumerable<StringifiedExpression> children, string joiner)
@@ -137,7 +143,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         ) {
             expr1 = expr1uncast;
 
-            expr2 = expr2 is not ConstantExpression { NodeType: ExpressionType.Constant } constantExpression
+            expr2 = expr2 is not ConstantExpression { NodeType: ExpressionType.Constant, } constantExpression
                 ? Expression.Convert(expr2, expr1uncast.Type)
                 : constantExpression.Value == null
                     ? Expression.Default(expr1uncast.Type.EnsureNullability())
@@ -171,14 +177,14 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         ) {
             if (e.Type.GetTypeInfo().IsAssignableFrom(operand.Type)) // base class, basically; don't re-print identical values.
             {
-                kids.Add("(" + ObjectStringifier.TypeNameToCode(e.Type) + ")");
+                kids.Add("(" + TypeNameToCode(e.Type) + ")");
             } else {
-                kids.Add("(" + ObjectStringifier.TypeNameToCode(e.Type) + ")", e);
+                kids.Add("(" + TypeNameToCode(e.Type) + ")", e);
             }
 
             if (operand.NodeType == ExpressionType.Convert) {
                 var nestedConvert = (UnaryExpression)operand;
-                kids.Add("(" + ObjectStringifier.TypeNameToCode(operand.Type) + ")");
+                kids.Add("(" + TypeNameToCode(operand.Type) + ")");
                 kids.Add(NestExpression(nestedConvert.NodeType, nestedConvert.Operand));
             } else {
                 kids.Add(NestExpression(ue.NodeType, operand));
@@ -206,7 +212,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
         kids.Add(NestExpression(e.NodeType, ((TypeBinaryExpression)e).Expression));
         kids.Add(" " + op + " ", e);
-        kids.Add(ObjectStringifier.TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
+        kids.Add(TypeNameToCode(((TypeBinaryExpression)e).TypeOperand));
         return kids.Finish();
     }
 
@@ -248,11 +254,11 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     }
 
     static bool IsThisRef(Expression e)
-        => e is ConstantExpression { Value: not null }
+        => e is ConstantExpression { Value: not null, }
             && e.Type.GuessTypeClass() == ReflectionHelpers.TypeClass.NormalType;
 
     static bool IsClosureRef(Expression e)
-        => e is ConstantExpression { Value: not null } or { NodeType: ExpressionType.MemberAccess }
+        => e is ConstantExpression { Value: not null, } or { NodeType: ExpressionType.MemberAccess, }
             && e.Type.GuessTypeClass() is ReflectionHelpers.TypeClass.ClosureType or ReflectionHelpers.TypeClass.TopLevelProgramClosureType;
 
     [Pure]
@@ -265,7 +271,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add(NestExpression(e.NodeType, memberOfExpr));
             kids.Add(".");
         } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
-            kids.Add(ObjectStringifier.TypeNameToCode(me.Member.DeclaringType ?? throw new("A static member must have a declaring type")) + ".");
+            kids.Add(TypeNameToCode(me.Member.DeclaringType ?? throw new Exception("A static member must have a declaring type")) + ".");
         }
 
         kids.Add(me.Member.Name, e);
@@ -291,10 +297,10 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add(ArgListDispatch(GetArgumentsForMethod(mce.Method, mce.Arguments), mce, "[", "]"));
         } else if (mce.Method.Equals(createDelegate)
             && mce.Arguments.Count == 3
-            && mce.Arguments[2] is ConstantExpression { Value: MethodInfo implicitlyConstructedDelegateMethodTarget }) {
+            && mce.Arguments[2] is ConstantExpression { Value: MethodInfo implicitlyConstructedDelegateMethodTarget, }) {
             //.net 4.0
             //implicitly constructed delegate from method group.
-            var targetExpr = mce.Arguments[1] is ConstantExpression { Value: null } ? null : mce.Arguments[1];
+            var targetExpr = mce.Arguments[1] is ConstantExpression { Value: null, } ? null : mce.Arguments[1];
             kids.Add(StringifyMethodName(mce, implicitlyConstructedDelegateMethodTarget, targetExpr));
         } else if (mce.Method.Name == "CreateDelegate"
             && mce.Arguments.Count == 2
@@ -313,8 +319,8 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             && mce.Method.DeclaringType?.FullName == "System.Runtime.CompilerServices.FormattableStringFactory"
             && mce.Method.Name == "Create"
             && mce.Arguments.Count == 2
-            && mce.Arguments[0] is ConstantExpression { Value: string formattableStringFormatString }
-            && mce.Arguments[1] is NewArrayExpression { Expressions: { } formattableStringArguments }
+            && mce.Arguments[0] is ConstantExpression { Value: string formattableStringFormatString, }
+            && mce.Arguments[1] is NewArrayExpression { Expressions: { } formattableStringArguments, }
         ) {
             //.net 4.6
             //string-interpolations are compiled into FormattableStringFactory.Create
@@ -325,9 +331,9 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             && mce.Method.Name == "Format"
             && mce.Arguments.Count == 2
             && mce.Arguments[0].Type == typeof(string)
-            && mce.Arguments[0] is ConstantExpression { Value: string stringInterpolationFormatString }
+            && mce.Arguments[0] is ConstantExpression { Value: string stringInterpolationFormatString, }
             && mce.Arguments[1].Type == typeof(object[])
-            && mce.Arguments[1] is NewArrayExpression { Expressions: { } stringInterpolationArguments }
+            && mce.Arguments[1] is NewArrayExpression { Expressions: { } stringInterpolationArguments, }
         ) {
             //.net 4.6
             //string-interpolations are compiled into FormattableStringFactory.Create
@@ -338,7 +344,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             && mce.Method.Name == "Format"
             && mce.Arguments.Count >= 2
             && mce.Arguments[0].Type == typeof(string)
-            && mce.Arguments[0] is ConstantExpression { Value: string stringInterpolationFormatString2 }
+            && mce.Arguments[0] is ConstantExpression { Value: string stringInterpolationFormatString2, }
             && mce.Method.GetParameters().Skip(1).All(pi => pi.ParameterType == typeof(object))
         ) {
             //.net 4.6
@@ -378,10 +384,10 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             .Select(
                 child =>
                     child.NodeType == ExpressionType.Conditional
-                        ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")") })
+                        ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")"), })
                         : this.ExpressionDispatch(child)
             ).ToArray();
-        var useVerbatimSyntax = ObjectStringifier.UseVerbatimSyntax(formatString)
+        var useVerbatimSyntax = ObjectStringifyImpl.UseVerbatimSyntax(config, formatString)
                 || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains('\n') // no longer necessary after https://devblogs.microsoft.com/dotnet/early-peek-at-csharp-11-features/#c-11-preview-allow-newlines-in-the-holes-of-interpolated-strings
             ;
 
@@ -438,7 +444,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
                 kids.Add(".");
             }
         } else if (method.IsStatic && method.DeclaringType is not null) {
-            kids.Add(ObjectStringifier.TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
+            kids.Add(TypeNameToCode(method.DeclaringType) + "."); //TODO:better reference avoiding for this?
         }
 
         kids.Add(method.Name + CreateGenericArgumentsIfNecessary(method), mce);
@@ -474,7 +480,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             }
         }
 
-        var methodTypeArgs = method.GetGenericArguments().Select(type => ObjectStringifier.TypeNameToCode(type)).ToArray();
+        var methodTypeArgs = method.GetGenericArguments().Select(type => TypeNameToCode(type)).ToArray();
         return string.Concat("<", string.Join(", ", methodTypeArgs), ">");
     }
 
@@ -493,7 +499,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var ie = (IndexExpression)e;
-        kids.Add(NestExpression(ie.NodeType, ie.Object ?? throw new("Assumption: indexer expressions have a receiver")));
+        kids.Add(NestExpression(ie.NodeType, ie.Object ?? throw new Exception("Assumption: indexer expressions have a receiver")));
 
         var args = ie.Indexer == null
             ? ie.Arguments.Select(SingleChildDispatch)
@@ -510,11 +516,11 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
         var ie = (InvocationExpression)e;
         if (ie.Expression.NodeType == ExpressionType.Lambda) {
-            kids.Add("new " + ObjectStringifier.TypeNameToCode(ie.Expression.Type));
+            kids.Add("new " + TypeNameToCode(ie.Expression.Type));
         }
 
         kids.Add(NestExpression(ie.NodeType, ie.Expression));
-        var invokeMethod = ie.Expression.Type.GetTypeInfo().GetMethod("Invoke") ?? throw new("Assumption: all delegates have a method Invoke");
+        var invokeMethod = ie.Expression.Type.GetTypeInfo().GetMethod("Invoke") ?? throw new Exception("Assumption: all delegates have a method Invoke");
         var args = GetArgumentsForMethod(invokeMethod, ie.Arguments);
         kids.Add(ArgListDispatch(args, ie));
         return kids.Finish();
@@ -526,7 +532,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var const_Val = ((ConstantExpression)e).Value;
-        var codeRepresentation = ObjectStringifier.PlainObjectToCode(const_Val, e.Type);
+        var codeRepresentation = PlainObjectToCode(const_Val, e.Type);
         //e.Type.IsVisible
         if (codeRepresentation == null) {
             var typeClass = e.Type.GuessTypeClass();
@@ -568,9 +574,9 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
         var lie = (ListInitExpression)e;
         kids.Add("new ", lie);
-        kids.Add(ObjectStringifier.TypeNameToCode(lie.NewExpression.Type));
+        kids.Add(TypeNameToCode(lie.NewExpression.Type));
         if (lie.NewExpression.Arguments.Any()) {
-            kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor ?? throw new("Assumption: Constructor cannot be omitted when it has arguments: " + lie.NewExpression.Type), lie.NewExpression.Arguments)));
+            kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor ?? throw new Exception("Assumption: Constructor cannot be omitted when it has arguments: " + lie.NewExpression.Type), lie.NewExpression.Arguments)));
         }
 
         kids.Add(" { ");
@@ -620,9 +626,9 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var mie = (MemberInitExpression)e;
         kids.Add("new ", mie);
         var newExpr = mie.NewExpression;
-        kids.Add(ObjectStringifier.TypeNameToCode(newExpr.Type));
+        kids.Add(TypeNameToCode(newExpr.Type));
         if (newExpr.Arguments.Any()) {
-            kids.Add(ArgListDispatch(GetArgumentsForMethod(newExpr.Constructor ?? throw new("Assumption: Constructor cannot be omitted when it has arguments: " + newExpr.Type), newExpr.Arguments)));
+            kids.Add(ArgListDispatch(GetArgumentsForMethod(newExpr.Constructor ?? throw new Exception("Assumption: Constructor cannot be omitted when it has arguments: " + newExpr.Type), newExpr.Arguments)));
         }
 
         kids.Add(" { ");
@@ -665,11 +671,11 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
             kids.Add(" }");
         } else {
-            kids.Add("new " + ObjectStringifier.TypeNameToCode(ne.Type), ne);
+            kids.Add("new " + TypeNameToCode(ne.Type), ne);
             if (ne.Arguments.Count == 0) {
                 kids.Add("()");
             } else {
-                kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor ?? throw new("Assumption: any new-expression with arguments must have a constructor"), ne.Arguments)));
+                kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor ?? throw new Exception("Assumption: any new-expression with arguments must have a constructor"), ne.Arguments)));
             }
         }
 
@@ -683,11 +689,11 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var nae = (NewArrayExpression)e;
-        var arrayElemType = nae.Type.GetElementType() ?? throw new("Assumption: all arrays have an element type");
+        var arrayElemType = nae.Type.GetElementType() ?? throw new Exception("Assumption: all arrays have an element type");
         var isDelegate = typeof(Delegate).GetTypeInfo().IsAssignableFrom(arrayElemType);
         var implicitTypeOK = !isDelegate && nae.Expressions.Any()
             && nae.Expressions.All(expr => expr.Type == arrayElemType);
-        kids.Add("new" + (implicitTypeOK ? "" : " " + ObjectStringifier.TypeNameToCode(arrayElemType)) + "[] ", nae);
+        kids.Add("new" + (implicitTypeOK ? "" : " " + TypeNameToCode(arrayElemType)) + "[] ", nae);
         kids.Add(ArgListDispatch(nae.Expressions.Select(SingleChildDispatch), null, "{ ", " }"));
         return kids.Finish();
     }
@@ -698,8 +704,8 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var nae = (NewArrayExpression)e;
-        var arrayElemType = nae.Type.GetElementType() ?? throw new("Assumption: all arrays have an element type");
-        kids.Add("new " + ObjectStringifier.TypeNameToCode(arrayElemType), nae);
+        var arrayElemType = nae.Type.GetElementType() ?? throw new Exception("Assumption: all arrays have an element type");
+        kids.Add("new " + TypeNameToCode(arrayElemType), nae);
         kids.Add(ArgListDispatch(nae.Expressions.Select(SingleChildDispatch), null, "[", "]"));
         return kids.Finish();
     }
@@ -716,7 +722,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         kids.Add("{ ");
 
         foreach (var v in be.Variables) {
-            kids.Add(StatementDispatch(ObjectStringifier.TypeNameToCode(v.Type), v, ExpressionType.Block));
+            kids.Add(StatementDispatch(TypeNameToCode(v.Type), v, ExpressionType.Block));
         }
 
         foreach (var child in statements) {
@@ -740,7 +746,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
         kids.Add("Math.Pow", e);
         var binaryExpression = (BinaryExpression)e;
-        kids.Add(ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right }.Select(SingleChildDispatch)));
+        kids.Add(ArgListDispatch(new[] { binaryExpression.Left, binaryExpression.Right, }.Select(SingleChildDispatch)));
         return kids.Finish();
     }
 
@@ -896,7 +902,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
     [Pure]
     public StringifiedExpression DispatchTypeAs(Expression e)
-        => UnaryPostfixDispatch(" as " + ObjectStringifier.TypeNameToCode(e.Type), e);
+        => UnaryPostfixDispatch(" as " + TypeNameToCode(e.Type), e);
 
     [Pure]
     public StringifiedExpression DispatchTypeIs(Expression e)
@@ -1005,7 +1011,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     {
         var defExpr = (DefaultExpression)e;
 
-        return StringifiedExpression.TextOnly("default(" + ObjectStringifier.TypeNameToCode(defExpr.Type) + ")");
+        return StringifiedExpression.TextOnly("default(" + TypeNameToCode(defExpr.Type) + ")");
     }
 
     [Pure]

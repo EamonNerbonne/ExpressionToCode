@@ -2,9 +2,11 @@ namespace ExpressionToCodeLib;
 
 public interface IObjectStringifier
 {
+    [Obsolete]
     string? PlainObjectToCode(object? val, Type? type);
+
+    [Obsolete]
     string TypeNameToCode(Type type);
-    bool UseVerbatimSyntax(string str);
 }
 
 public static class ObjectStringifierExtensions

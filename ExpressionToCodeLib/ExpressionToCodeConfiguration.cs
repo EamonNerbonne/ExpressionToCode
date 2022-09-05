@@ -11,8 +11,16 @@ public sealed record ExpressionToCodeConfiguration
 {
     public ICodeAnnotator CodeAnnotator { get; init; } = CodeAnnotators.SubExpressionPerLineCodeAnnotator;
     public IExpressionCompiler ExpressionCompiler { get; init; } = ExpressionTreeCompilers.DotnetExpressionCompiler;
-    public IObjectStringifier ObjectStringifier { get; init; } = ObjectStringify.Default;
+
+    [Obsolete("Replaced by UseFullyQualifiedTypeNames")]
+    public IObjectStringifier ObjectStringifier
+    {
+        init => UseFullyQualifiedTypeNames = ((ObjectStringifyImpl)value).UseFullyQualifiedTypeNames;
+    }
+
     public bool AlwaysUseExplicitTypeArguments { get; init; }
+    public bool UseFullyQualifiedTypeNames { get; init; }
+    public bool AllowVerbatimStringLiterals { get; init; } = true;
 
     /// <summary>
     ///     Omits builtin implicit casts (on by default).  This can cause the code to select another overload or simply fail to

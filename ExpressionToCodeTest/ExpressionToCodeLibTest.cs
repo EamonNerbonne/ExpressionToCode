@@ -18,8 +18,8 @@
 #pragma warning disable CS8602 // Dereference of a possibly null reference. - these are false positives, because the code isn't executed, it's stringified.
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type. - these are false positives, because the code isn't executed, it's stringified.
 #pragma warning disable xUnit1004 // Test methods should not be skipped
-
 using System.Xml;
+
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBePrivate.Local
 #pragma warning disable CS0628
@@ -590,7 +590,7 @@ public sealed class ExpressionToCodeLibTest
     [Fact]
     public void WithoutLiteralStrings()
     {
-        var code = ExpressionToCodeConfiguration.DefaultCodeGenConfiguration.WithObjectStringifier(ObjectStringify.WithoutLiteralStrings)
+        var code = (ExpressionToCodeConfiguration.DefaultCodeGenConfiguration with { AllowVerbatimStringLiterals = false, })
             .GetExpressionToCode()
             .ToCode(static () => "Lots \t of \t tabs \t that \t will \t need \t escaping");
         Assert.Equal("() => \"Lots \\t of \\t tabs \\t that \\t will \\t need \\t escaping\"", code);
@@ -691,10 +691,8 @@ public sealed class ExpressionToCodeLibTest
 
     public string this[int index] => "TheIndexedValue";
     public string TheProperty => "TheValue";
-
     string TheProtectedProperty => "TheValue";
     static string ThePrivateStaticProperty => "TheValue";
-
     protected string? TheProtectedWithPrivateSetterProperty { get; private set; }
 }
 

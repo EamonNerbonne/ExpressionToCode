@@ -5,23 +5,27 @@ namespace ExpressionToCodeLib.Internal;
 
 sealed class ObjectStringifyImpl : IObjectStringifier
 {
-    internal readonly bool fullTypeNames;
-    internal readonly bool allowVerbatimStrings;
+    internal readonly bool UseFullyQualifiedTypeNames;
 
-    public ObjectStringifyImpl(bool fullTypeNames = false, bool allowVerbatimStrings = true)
-    {
-        this.fullTypeNames = fullTypeNames;
-        this.allowVerbatimStrings = allowVerbatimStrings;
-    }
+    public ObjectStringifyImpl(bool useFullyQualifiedTypeNames = false)
+        => this.UseFullyQualifiedTypeNames = useFullyQualifiedTypeNames;
 
+    [Obsolete]
     public string TypeNameToCode(Type type)
-        => new CSharpFriendlyTypeName { UseFullName = fullTypeNames }.GetTypeName(type);
+        => TypeNameToCode(ExpressionToCodeConfiguration.GlobalCodeGenConfiguration with { UseFullyQualifiedTypeNames = UseFullyQualifiedTypeNames, }, type);
 
+    internal static string TypeNameToCode(ExpressionToCodeConfiguration config, Type type)
+        => new CSharpFriendlyTypeName { UseFullName = config.UseFullyQualifiedTypeNames, }.GetTypeName(type);
+
+    [Obsolete]
     public string? PlainObjectToCode(object? val, Type? type)
+        => PlainObjectToCode(new ExpressionToCodeConfiguration { UseFullyQualifiedTypeNames = UseFullyQualifiedTypeNames, }, val, type);
+
+    internal static string? PlainObjectToCode(ExpressionToCodeConfiguration config, object? val, Type? type)
         => val switch {
             null when type == null || type == typeof(object) => "null",
-            null => "default(" + TypeNameToCode(type) + ")",
-            string str => UseVerbatimSyntax(str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"",
+            null => "default(" + TypeNameToCode(config, type) + ")",
+            string str => UseVerbatimSyntax(config, str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"",
             char charVal => "'" + EscapeCharForString(charVal) + "'",
             decimal _ => Convert.ToString(val, CultureInfo.InvariantCulture) + "m",
             float floatVal => FloatToCode(floatVal),
@@ -35,43 +39,43 @@ sealed class ObjectStringifyImpl : IObjectStringifier
             long longVal => longVal + "L",
             ulong ulongVal => ulongVal + "UL",
             bool boolVal => boolVal ? "true" : "false",
-            Enum enumVal => EnumValueToCode(val, enumVal),
-            Type typeVal => "typeof(" + TypeNameToCode(typeVal) + ")",
+            Enum enumVal => EnumValueToCode(config, val, enumVal),
+            Type typeVal => "typeof(" + TypeNameToCode(config, typeVal) + ")",
             MethodInfo methodInfoVal =>
                 methodInfoVal.DeclaringType switch {
                     { } declaringType when declaringType.GuessTypeClass() is not (ReflectionHelpers.TypeClass.TopLevelProgramClosureType or ReflectionHelpers.TypeClass.ClosureType)
-                        => TypeNameToCode(declaringType) + "." + methodInfoVal.Name,
-                    _ when Regex.Match(methodInfoVal.Name, @"^.+>g__(\w+)\|[\d_]*$", RegexOptions.Multiline) is { Success: true } match =>
+                        => TypeNameToCode(config, declaringType) + "." + methodInfoVal.Name,
+                    _ when Regex.Match(methodInfoVal.Name, @"^.+>g__(\w+)\|[\d_]*$", RegexOptions.Multiline) is { Success: true, } match =>
                         match.Groups[1].Value,
                     _ => methodInfoVal.Name,
                 },
-            _ when val is ValueType && (Activator.CreateInstance(val.GetType()) ?? throw new("value types cannot be null: " + val.GetType())).Equals(val) => "default(" + TypeNameToCode(val.GetType()) + ")",
-            _ => null
+            _ when val is ValueType && (Activator.CreateInstance(val.GetType()) ?? throw new Exception("value types cannot be null: " + val.GetType())).Equals(val) => "default(" + TypeNameToCode(config, val.GetType()) + ")",
+            _ => null,
         };
 
-    string EnumValueToCode(object val, Enum enumVal)
+    static string EnumValueToCode(ExpressionToCodeConfiguration config, object val, Enum enumVal)
     {
         if (Enum.IsDefined(enumVal.GetType(), enumVal)) {
-            return TypeNameToCode(enumVal.GetType()) + "." + enumVal;
+            return TypeNameToCode(config, enumVal.GetType()) + "." + enumVal;
         } else {
             var enumAsLong = ((IConvertible)enumVal).ToInt64(null);
             var toString = enumVal.ToString();
             if (toString == enumAsLong.ToString()) {
-                return "((" + TypeNameToCode(enumVal.GetType()) + ")" + enumAsLong + ")";
+                return "((" + TypeNameToCode(config, enumVal.GetType()) + ")" + enumAsLong + ")";
             } else {
-                var components = toString.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries);
+                var components = toString.Split(new[] { ", ", }, StringSplitOptions.RemoveEmptyEntries);
                 return components.Length == 0
-                    ? "default(" + TypeNameToCode(enumVal.GetType()) + ")"
+                    ? "default(" + TypeNameToCode(config, enumVal.GetType()) + ")"
                     : components.Length == 1
-                        ? TypeNameToCode(enumVal.GetType()) + "." + components[0]
-                        : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(val.GetType()) + "." + s)) + ")";
+                        ? TypeNameToCode(config, enumVal.GetType()) + "." + components[0]
+                        : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(config, val.GetType()) + "." + s)) + ")";
             }
         }
     }
 
-    public bool UseVerbatimSyntax(string str)
+    internal static bool UseVerbatimSyntax(ExpressionToCodeConfiguration config, string str)
     {
-        if (!allowVerbatimStrings) {
+        if (!config.AllowVerbatimStringLiterals) {
             return false;
         }
 
