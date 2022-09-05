@@ -8,10 +8,10 @@ sealed class ObjectStringifyImpl : IObjectStringifier
     readonly bool fullTypeNames;
     readonly bool allowLiteralStrings;
 
-    public ObjectStringifyImpl(bool fullTypeNames = false, bool allowLiteralStrings = true)
+    public ObjectStringifyImpl(bool fullTypeNames = false, bool allowVerbatimStrings = true)
     {
         this.fullTypeNames = fullTypeNames;
-        this.allowLiteralStrings = allowLiteralStrings;
+        this.allowVerbatimStrings = allowVerbatimStrings;
     }
 
     public string TypeNameToCode(Type type)
@@ -71,7 +71,7 @@ sealed class ObjectStringifyImpl : IObjectStringifier
 
     public bool UseVerbatimSyntax(string str)
     {
-        if (!allowLiteralStrings) {
+        if (!allowVerbatimStrings) {
             return false;
         }
 
