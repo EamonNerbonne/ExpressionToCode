@@ -1,16 +1,6 @@
 // ReSharper disable MemberCanBePrivate.Global
-namespace ExpressionToCodeLib;
 
-struct ExpressionToCodeConfigurationValue
-{
-    public ICodeAnnotator CodeAnnotator;
-    public IExpressionCompiler ExpressionCompiler;
-    public IObjectStringifier ObjectStringifier;
-    public bool AlwaysUseExplicitTypeArguments;
-    public bool OmitImplicitCasts;
-    public int? PrintedListLengthLimit;
-    public int? MaximumValueLength;
-}
+namespace ExpressionToCodeLib;
 
 /// <summary>
 ///     Specifies details of how expressions and their values are to be formatted.  This object is immutable; all instance
@@ -19,34 +9,43 @@ struct ExpressionToCodeConfigurationValue
 /// </summary>
 public sealed record ExpressionToCodeConfiguration
 {
+    public ICodeAnnotator CodeAnnotator { get; init; } = CodeAnnotators.SubExpressionPerLineCodeAnnotator;
+    public IExpressionCompiler ExpressionCompiler { get; init; } = ExpressionTreeCompilers.DotnetExpressionCompiler;
+
+    [Obsolete("Replaced by UseFullyQualifiedTypeNames")]
+    public IObjectStringifier ObjectStringifier
+    {
+        init => UseFullyQualifiedTypeNames = ((ObjectStringifyImpl)value).UseFullyQualifiedTypeNames;
+    }
+
+    public bool AlwaysUseExplicitTypeArguments { get; init; }
+    public bool UseFullyQualifiedTypeNames { get; init; }
+    public bool AllowVerbatimStringLiterals { get; init; } = true;
+
     /// <summary>
-    ///     The default formatter for converting an expression to code. Defaults are:
-    ///     <para>- Avoid generic type parameters in output where they can be inferred.</para>
-    ///     <para>- Omit namespaces from type names (as opposed to fully qualifying type names)</para>
-    ///     <para>- Use the default .net expression compiler (as opposed to the experimental optimized compiler).</para>
-    ///     <para>- Annotate values using "stalks" hanging under expressions.</para>
-    ///     <para>- Print all elements in an enumerable (this will cause crashes on infinite or very large enumerables).</para>
+    ///     Omits builtin implicit casts (on by default).  This can cause the code to select another overload or simply fail to
+    ///     compile, and the rules used to detect valid cast elision may be wrong in corner cases.
+    ///     If you're purely interested in accuracy over readability of the code, you may wish to turn this off.
     /// </summary>
-    public static readonly ExpressionToCodeConfiguration DefaultCodeGenConfiguration =
-        new(
-            new ExpressionToCodeConfigurationValue {
-                CodeAnnotator = CodeAnnotators.SubExpressionPerLineCodeAnnotator,
-                ExpressionCompiler = ExpressionTreeCompilers.DotnetExpressionCompiler,
-                ObjectStringifier = ObjectStringify.Default,
-                AlwaysUseExplicitTypeArguments = false,
-                OmitImplicitCasts = true,
-            });
+    public bool OmitImplicitCasts { get; init; } = true;
+
+    public int? PrintedListLengthLimit { get; init; }
+    public int? MaximumValueLength { get; init; }
+
+    /// <summary>
+    ///     The default formatter for converting an expression to code.
+    /// </summary>
+    public static readonly ExpressionToCodeConfiguration DefaultCodeGenConfiguration = new();
 
     /// <summary>
     ///     The default formatter for formatting an assertion violation.
-    ///     This is identical to DefaultCodeGenConfiguration, except that enumerable contents after the first 10 elements are
-    ///     elided.
+    ///     This is identical to DefaultCodeGenConfiguration, except that long enumerables or values with long string
+    ///     representations are truncated.
     /// </summary>
-    public static readonly ExpressionToCodeConfiguration DefaultAssertionConfiguration =
-        DefaultCodeGenConfiguration
-            .WithPrintedListLengthLimit(30)
-            .WithMaximumValueLength(150)
-            .WithOmitImplicitCasts(true);
+    public static readonly ExpressionToCodeConfiguration DefaultAssertionConfiguration = new() {
+        PrintedListLengthLimit = 30,
+        MaximumValueLength = 150,
+    };
 
     /// <summary>
     ///     This configuration is used for PAssert.That(()=>...) and Expect(()=>...).  Initially
@@ -74,72 +73,50 @@ public sealed record ExpressionToCodeConfiguration
     // ReSharper disable once FieldCanBeMadeReadOnly.Global
     public static ExpressionToCodeConfiguration GlobalCodeGenConfiguration = DefaultCodeGenConfiguration;
 
-    internal readonly ExpressionToCodeConfigurationValue Value;
-
-    ExpressionToCodeConfiguration(ExpressionToCodeConfigurationValue value)
-        => Value = value;
-
-    delegate void WithDelegate(ref ExpressionToCodeConfigurationValue configToEdit);
-
-    ExpressionToCodeConfiguration With(WithDelegate edit)
-    {
-        var configCopy = Value;
-        edit(ref configCopy);
-        return new ExpressionToCodeConfiguration(configCopy);
-    }
-
-    public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler compiler)
-        => With((ref ExpressionToCodeConfigurationValue a) => a.ExpressionCompiler = compiler);
-
-    public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator annotator)
-        => With((ref ExpressionToCodeConfigurationValue a) => a.CodeAnnotator = annotator);
-
-    public ExpressionToCodeConfiguration WithPrintedListLengthLimit(int? limitListsToLength)
-        => With((ref ExpressionToCodeConfigurationValue a) => a.PrintedListLengthLimit = limitListsToLength);
-
-    public ExpressionToCodeConfiguration WithMaximumValueLength(int? limitValueStringsToLength)
-        => With((ref ExpressionToCodeConfigurationValue a) => a.MaximumValueLength = limitValueStringsToLength);
-
-    /// <summary>
-    ///     Omits builtin implicit casts.  This can cause the code to select another overload, so it's off by default for the
-    ///     code-gen config.
-    /// </summary>
-    public ExpressionToCodeConfiguration WithOmitImplicitCasts(bool omitImplicitCasts)
-        => With((ref ExpressionToCodeConfigurationValue a) => a.OmitImplicitCasts = omitImplicitCasts);
-
-    public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier objectStringifier)
-        => With((ref ExpressionToCodeConfigurationValue a) => a.ObjectStringifier = objectStringifier);
-
-    public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool alwaysUseExplicitTypeArguments)
-        => With((ref ExpressionToCodeConfigurationValue a) => a.AlwaysUseExplicitTypeArguments = alwaysUseExplicitTypeArguments);
-
     public IExpressionToCode GetExpressionToCode()
         => new ExpressionToCodeWrapper(this);
 
     public IAnnotatedToCode GetAnnotatedToCode()
         => new AnnotatedToCodeWrapper(this);
 
-    sealed class AnnotatedToCodeWrapper : IAnnotatedToCode
+    public TypeToCodeConfig GetTypeToCode(bool includeGenericTypeArgumentNames)
+        => new() { IncludeGenericTypeArgumentNames = includeGenericTypeArgumentNames, UseFullyQualifiedTypeNames = UseFullyQualifiedTypeNames, };
+
+    sealed record AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config) : IAnnotatedToCode
     {
-        readonly ExpressionToCodeConfiguration config;
-
-        public AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config)
-            => this.config = config;
-
         public string AnnotatedToCode(Expression e, string? msg, bool outerValueIsAssertionFailure)
-            => config.Value.CodeAnnotator.AnnotateExpressionTree(config, e, msg, outerValueIsAssertionFailure);
+            => config.CodeAnnotator.AnnotateExpressionTree(config, e, msg, outerValueIsAssertionFailure);
     }
 
-    sealed class ExpressionToCodeWrapper : IExpressionToCode
+    sealed record ExpressionToCodeWrapper(ExpressionToCodeConfiguration config) : IExpressionToCode
     {
-        readonly ExpressionToCodeConfiguration config;
-
-        public ExpressionToCodeWrapper(ExpressionToCodeConfiguration config)
-            => this.config = config;
-
         public string ToCode(Expression e)
             => ExpressionToCodeString.ToCodeString(config, e);
     }
+
+    [Obsolete]
+    public ExpressionToCodeConfiguration WithCompiler(IExpressionCompiler v)
+        => this with { ExpressionCompiler = v, };
+
+    [Obsolete]
+    public ExpressionToCodeConfiguration WithAnnotator(ICodeAnnotator v)
+        => this with { CodeAnnotator = v, };
+
+    [Obsolete]
+    public ExpressionToCodeConfiguration WithPrintedListLengthLimit(int? v)
+        => this with { PrintedListLengthLimit = v, };
+
+    [Obsolete]
+    public ExpressionToCodeConfiguration WithObjectStringifier(IObjectStringifier withFullTypeNames)
+        => this with { ObjectStringifier = withFullTypeNames, };
+
+    [Obsolete]
+    public ExpressionToCodeConfiguration WithAlwaysUseExplicitTypeArguments(bool b)
+        => this with { AlwaysUseExplicitTypeArguments = b, };
+
+    [Obsolete]
+    public ExpressionToCodeConfiguration WithOmitImplicitCasts(bool b)
+        => this with { OmitImplicitCasts = b, };
 }
 
 public interface ICodeAnnotator

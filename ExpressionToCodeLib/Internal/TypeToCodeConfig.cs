@@ -1,9 +1,9 @@
 namespace ExpressionToCodeLib.Internal;
 
-struct CSharpFriendlyTypeName
+public readonly record struct TypeToCodeConfig
 {
-    public bool UseFullName;
-    public bool IncludeGenericTypeArgumentNames;
+    public bool UseFullyQualifiedTypeNames { get; init; }
+    public bool IncludeGenericTypeArgumentNames { get; init; }
 
     public string GetTypeName(Type type)
         => AliasNameOrNull(type) ?? NullableTypeNameOrNull(type.GetTypeInfo()) ?? ArrayTypeNameOrNull(type) ?? ValueTupleTypeNameOrNull(type) ?? GetUnaliasedTypeName(type);
@@ -39,7 +39,7 @@ struct CSharpFriendlyTypeName
         return output.ToString();
     }
 
-    public static bool IsValueTupleType(TypeInfo typeInfo)
+    internal static bool IsValueTupleType(TypeInfo typeInfo)
         => typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && typeInfo.Namespace == "System" && typeInfo.Name.StartsWith("ValueTuple`", StringComparison.Ordinal);
 
     string GetUnaliasedTypeName(Type type)
@@ -47,7 +47,7 @@ struct CSharpFriendlyTypeName
         var typeNameWithoutNamespace =
             GenericTypeName(type)
             ?? NormalName(type);
-        return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
+        return UseFullyQualifiedTypeNames ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
     }
 
     static string? AliasNameOrNull(Type type)
@@ -68,7 +68,7 @@ struct CSharpFriendlyTypeName
             _ when type == typeof(ushort) => "ushort",
             _ when type == typeof(string) => "string",
             _ when type == typeof(void) => "void",
-            { IsGenericParameter: true } => type.Name,
+            { IsGenericParameter: true, } => type.Name,
             _ => null,
         };
 
@@ -78,10 +78,7 @@ struct CSharpFriendlyTypeName
     string NormalName(Type type)
     {
         if (type.DeclaringType != null) {
-            var settingsWithoutUseFullname = this;
-            settingsWithoutUseFullname.UseFullName = false;
-
-            return settingsWithoutUseFullname.GetTypeName(type.DeclaringType) + "." + type.Name;
+            return (this with { UseFullyQualifiedTypeNames = false, }).GetTypeName(type.DeclaringType) + "." + type.Name;
         } else {
             return type.Name;
         }

@@ -1,6 +1,6 @@
-
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
+
 namespace ExpressionToCodeLib;
 
 /// <summary>
@@ -70,7 +70,7 @@ public static class ExpressionToCode
         => c == ' ' || c == '(';
 
     public static string AnnotatedToCode(this ExpressionToCodeConfiguration config, Expression expr)
-        => config.Value.CodeAnnotator.AnnotateExpressionTree(config, expr, null, false);
+        => config.CodeAnnotator.AnnotateExpressionTree(config, expr, null, false);
 
     /// <summary>
     ///     Converts expression to variable/property/method C# like representation adding it's string value.
@@ -87,7 +87,7 @@ public static class ExpressionToCode
     {
         TResult retValue;
         try {
-            retValue = ExpressionToCodeConfiguration.GlobalAssertionConfiguration.Value.ExpressionCompiler.Compile(expression)();
+            retValue = ExpressionToCodeConfiguration.GlobalAssertionConfiguration.ExpressionCompiler.Compile(expression)();
         } catch (Exception ex) {
             throw new InvalidOperationException("Cannon get return value of expression when it throws error", ex);
         }
