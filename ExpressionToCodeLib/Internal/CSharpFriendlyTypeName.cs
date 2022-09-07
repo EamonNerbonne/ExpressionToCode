@@ -1,9 +1,9 @@
 namespace ExpressionToCodeLib.Internal;
 
-struct CSharpFriendlyTypeName
+readonly struct CSharpFriendlyTypeName
 {
-    public bool UseFullyQualifiedTypeNames;
-    public bool IncludeGenericTypeArgumentNames;
+    public bool UseFullyQualifiedTypeNames { get; init; }
+    public bool IncludeGenericTypeArgumentNames { get; init; }
 
     public string GetTypeName(Type type)
         => AliasNameOrNull(type) ?? NullableTypeNameOrNull(type.GetTypeInfo()) ?? ArrayTypeNameOrNull(type) ?? ValueTupleTypeNameOrNull(type) ?? GetUnaliasedTypeName(type);
