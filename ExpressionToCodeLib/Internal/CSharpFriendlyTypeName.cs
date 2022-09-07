@@ -78,10 +78,7 @@ struct CSharpFriendlyTypeName
     string NormalName(Type type)
     {
         if (type.DeclaringType != null) {
-            var settingsWithoutUseFullname = this;
-            settingsWithoutUseFullname.UseFullyQualifiedTypeNames = false;
-
-            return settingsWithoutUseFullname.GetTypeName(type.DeclaringType) + "." + type.Name;
+            return (this with { UseFullyQualifiedTypeNames = false }).GetTypeName(type.DeclaringType) + "." + type.Name;
         } else {
             return type.Name;
         }
