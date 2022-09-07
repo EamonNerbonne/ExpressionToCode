@@ -1,6 +1,6 @@
 namespace ExpressionToCodeLib.Internal;
 
-sealed record TypeToCodeConfig
+public readonly record struct TypeToCodeConfig
 {
     public bool UseFullyQualifiedTypeNames { get; init; }
     public bool IncludeGenericTypeArgumentNames { get; init; }
