@@ -12,7 +12,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         => ObjectToCodeImpl.PlainObjectToCode(config, val, type);
 
     string TypeNameToCode(Type type)
-        => ObjectToCodeImpl.TypeNameToCode(config, type);
+        => type.ToCSharpFriendlyTypeName(config, false);
 
     bool AlwaysUseExplicitTypeArguments => config.AlwaysUseExplicitTypeArguments;
 

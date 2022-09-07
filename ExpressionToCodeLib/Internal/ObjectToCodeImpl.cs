@@ -219,13 +219,10 @@ static class ObjectToCodeImpl
         }
     }
 
-    internal static string TypeNameToCode(ExpressionToCodeConfiguration config, Type type)
-        => type.ToCSharpFriendlyTypeName(config, false);
-
     internal static string? PlainObjectToCode(ExpressionToCodeConfiguration config, object? val, Type? type)
         => val switch {
             null when type == null || type == typeof(object) => "null",
-            null => "default(" + TypeNameToCode(config, type) + ")",
+            null => "default(" + type.ToCSharpFriendlyTypeName(config, false) + ")",
             string str => UseVerbatimSyntax(config, str) ? "@\"" + str.Replace("\"", "\"\"") + "\"" : "\"" + EscapeStringChars(str) + "\"",
             char charVal => "'" + EscapeCharForString(charVal) + "'",
             decimal _ => Convert.ToString(val, CultureInfo.InvariantCulture) + "m",
@@ -241,35 +238,35 @@ static class ObjectToCodeImpl
             ulong ulongVal => ulongVal + "UL",
             bool boolVal => boolVal ? "true" : "false",
             Enum enumVal => EnumValueToCode(config, val, enumVal),
-            Type typeVal => "typeof(" + TypeNameToCode(config, typeVal) + ")",
+            Type typeVal => "typeof(" + typeVal.ToCSharpFriendlyTypeName(config, false) + ")",
             MethodInfo methodInfoVal =>
                 methodInfoVal.DeclaringType switch {
                     { } declaringType when declaringType.GuessTypeClass() is not (ReflectionHelpers.TypeClass.TopLevelProgramClosureType or ReflectionHelpers.TypeClass.ClosureType)
-                        => TypeNameToCode(config, declaringType) + "." + methodInfoVal.Name,
+                        => declaringType.ToCSharpFriendlyTypeName(config, false) + "." + methodInfoVal.Name,
                     _ when Regex.Match(methodInfoVal.Name, @"^.+>g__(\w+)\|[\d_]*$", RegexOptions.Multiline) is { Success: true, } match =>
                         match.Groups[1].Value,
                     _ => methodInfoVal.Name,
                 },
-            _ when val is ValueType && (Activator.CreateInstance(val.GetType()) ?? throw new Exception("value types cannot be null: " + val.GetType())).Equals(val) => "default(" + TypeNameToCode(config, val.GetType()) + ")",
+            _ when val is ValueType && (Activator.CreateInstance(val.GetType()) ?? throw new Exception("value types cannot be null: " + val.GetType())).Equals(val) => "default(" + val.GetType().ToCSharpFriendlyTypeName(config, false) + ")",
             _ => null,
         };
 
     static string EnumValueToCode(ExpressionToCodeConfiguration config, object val, Enum enumVal)
     {
         if (Enum.IsDefined(enumVal.GetType(), enumVal)) {
-            return TypeNameToCode(config, enumVal.GetType()) + "." + enumVal;
+            return enumVal.GetType().ToCSharpFriendlyTypeName(config, false) + "." + enumVal;
         } else {
             var enumAsLong = ((IConvertible)enumVal).ToInt64(null);
             var toString = enumVal.ToString();
             if (toString == enumAsLong.ToString()) {
-                return "((" + TypeNameToCode(config, enumVal.GetType()) + ")" + enumAsLong + ")";
+                return "((" + enumVal.GetType().ToCSharpFriendlyTypeName(config, false) + ")" + enumAsLong + ")";
             } else {
                 var components = toString.Split(new[] { ", ", }, StringSplitOptions.RemoveEmptyEntries);
                 return components.Length == 0
-                    ? "default(" + TypeNameToCode(config, enumVal.GetType()) + ")"
+                    ? "default(" + enumVal.GetType().ToCSharpFriendlyTypeName(config, false) + ")"
                     : components.Length == 1
-                        ? TypeNameToCode(config, enumVal.GetType()) + "." + components[0]
-                        : "(" + string.Join(" | ", components.Select(s => TypeNameToCode(config, val.GetType()) + "." + s)) + ")";
+                        ? enumVal.GetType().ToCSharpFriendlyTypeName(config, false) + "." + components[0]
+                        : "(" + string.Join(" | ", components.Select(s => val.GetType().ToCSharpFriendlyTypeName(config, false) + "." + s)) + ")";
             }
         }
     }
