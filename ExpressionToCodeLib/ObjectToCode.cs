@@ -22,8 +22,8 @@ public static class ObjectToCode
         => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true, }.GetTypeName(type);
 
     public static string ToCSharpFriendlyTypeName(this Type type, ExpressionToCodeConfiguration config)
-        => type.ToCSharpFriendlyTypeName(config.UseFullyQualifiedTypeNames);
+        => type.ToCSharpFriendlyTypeName(config.UseFullyQualifiedTypeNames, true);
 
-    public static string ToCSharpFriendlyTypeName(this Type type, bool useFullyQualifiedTypeNames)
-        => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true, UseFullyQualifiedTypeNames = useFullyQualifiedTypeNames, }.GetTypeName(type);
+    public static string ToCSharpFriendlyTypeName(this Type type, bool useFullyQualifiedTypeNames, bool includeGenericTypeArgumentNames)
+        => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = includeGenericTypeArgumentNames, UseFullyQualifiedTypeNames = useFullyQualifiedTypeNames, }.GetTypeName(type);
 }
