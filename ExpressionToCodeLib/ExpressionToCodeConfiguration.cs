@@ -79,6 +79,9 @@ public sealed record ExpressionToCodeConfiguration
     public IAnnotatedToCode GetAnnotatedToCode()
         => new AnnotatedToCodeWrapper(this);
 
+    public TypeToCodeConfig GetTypeToCode(bool includeGenericTypeArgumentNames)
+        => new() { IncludeGenericTypeArgumentNames = includeGenericTypeArgumentNames, UseFullyQualifiedTypeNames = UseFullyQualifiedTypeNames, };
+
     sealed record AnnotatedToCodeWrapper(ExpressionToCodeConfiguration config) : IAnnotatedToCode
     {
         public string AnnotatedToCode(Expression e, string? msg, bool outerValueIsAssertionFailure)
