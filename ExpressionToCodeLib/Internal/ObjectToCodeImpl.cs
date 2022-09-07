@@ -220,7 +220,7 @@ static class ObjectToCodeImpl
     }
 
     internal static string TypeNameToCode(ExpressionToCodeConfiguration config, Type type)
-        =>  new TypeToCodeConfig { UseFullyQualifiedTypeNames = config.UseFullyQualifiedTypeNames, }.GetTypeName(type);
+        => type.ToCSharpFriendlyTypeName(config, false);
 
     internal static string? PlainObjectToCode(ExpressionToCodeConfiguration config, object? val, Type? type)
         => val switch {
