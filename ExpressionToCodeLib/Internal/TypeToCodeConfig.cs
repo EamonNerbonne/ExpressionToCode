@@ -1,6 +1,6 @@
 namespace ExpressionToCodeLib.Internal;
 
-readonly struct CSharpFriendlyTypeName
+sealed record TypeToCodeConfig
 {
     public bool UseFullyQualifiedTypeNames { get; init; }
     public bool IncludeGenericTypeArgumentNames { get; init; }

@@ -19,11 +19,11 @@ public static class ObjectToCode
         => ObjectToCodeImpl.PlainObjectToCode(ExpressionToCodeConfiguration.GlobalCodeGenConfiguration, val, type);
 
     public static string ToCSharpFriendlyTypeName(this Type type)
-        => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true, }.GetTypeName(type);
+        => new TypeToCodeConfig { IncludeGenericTypeArgumentNames = true, }.GetTypeName(type);
 
     public static string ToCSharpFriendlyTypeName(this Type type, ExpressionToCodeConfiguration config)
         => type.ToCSharpFriendlyTypeName(config.UseFullyQualifiedTypeNames, true);
 
     public static string ToCSharpFriendlyTypeName(this Type type, bool useFullyQualifiedTypeNames, bool includeGenericTypeArgumentNames)
-        => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = includeGenericTypeArgumentNames, UseFullyQualifiedTypeNames = useFullyQualifiedTypeNames, }.GetTypeName(type);
+        => new TypeToCodeConfig { IncludeGenericTypeArgumentNames = includeGenericTypeArgumentNames, UseFullyQualifiedTypeNames = useFullyQualifiedTypeNames, }.GetTypeName(type);
 }

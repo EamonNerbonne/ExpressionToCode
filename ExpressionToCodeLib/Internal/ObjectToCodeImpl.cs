@@ -26,7 +26,7 @@ static class ObjectToCodeImpl
             return FormatTypeWithListInitializerOrNull(config, val, indent, valueSize, enumerableVal) ?? FormatEnumerable(config, enumerableVal, indent, valueSize);
         } else if (val is Expression exprVal) {
             return ElideAfter(config.GetExpressionToCode().ToCode(exprVal), valueSize);
-        } else if (val is IStructuralComparable tuple and IComparable && CSharpFriendlyTypeName.IsValueTupleType(val.GetType().GetTypeInfo())) {
+        } else if (val is IStructuralComparable tuple and IComparable && TypeToCodeConfig.IsValueTupleType(val.GetType().GetTypeInfo())) {
             var collector = new NastyHackyTupleCollector();
             _ = tuple.CompareTo(tuple, collector); //ignore return value; we're abusing the implementation of equality to help us enumerate its contents
             var sb = new StringBuilder();
@@ -98,7 +98,7 @@ static class ObjectToCodeImpl
 
         public int Compare(object? x, object? y)
         {
-            if (CollectedObjects.Count == nesting * 7 && x is IStructuralComparable tuple && tuple is IComparable && CSharpFriendlyTypeName.IsValueTupleType(tuple.GetType().GetTypeInfo())) {
+            if (CollectedObjects.Count == nesting * 7 && x is IStructuralComparable tuple && tuple is IComparable && TypeToCodeConfig.IsValueTupleType(tuple.GetType().GetTypeInfo())) {
                 nesting++;
                 return tuple.CompareTo(tuple, this);
             }
@@ -220,7 +220,7 @@ static class ObjectToCodeImpl
     }
 
     internal static string TypeNameToCode(ExpressionToCodeConfiguration config, Type type)
-        =>  new CSharpFriendlyTypeName { UseFullyQualifiedTypeNames = config.UseFullyQualifiedTypeNames, }.GetTypeName(type);
+        =>  new TypeToCodeConfig { UseFullyQualifiedTypeNames = config.UseFullyQualifiedTypeNames, }.GetTypeName(type);
 
     internal static string? PlainObjectToCode(ExpressionToCodeConfiguration config, object? val, Type? type)
         => val switch {
