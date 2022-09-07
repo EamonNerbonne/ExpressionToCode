@@ -81,7 +81,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
 
         [Pure]
         public static KidsBuilder Create()
-            => new(new List<StringifiedExpression>());
+            => new(new());
 
         public void Add(StringifiedExpression node)
             => kids.Add(node);
@@ -271,7 +271,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             kids.Add(NestExpression(e.NodeType, memberOfExpr));
             kids.Add(".");
         } else if (ReflectionHelpers.IsMemberInfoStatic(me.Member)) {
-            kids.Add(TypeNameToCode(me.Member.DeclaringType ?? throw new Exception("A static member must have a declaring type")) + ".");
+            kids.Add(TypeNameToCode(me.Member.DeclaringType ?? throw new("A static member must have a declaring type")) + ".");
         }
 
         kids.Add(me.Member.Name, e);
@@ -499,7 +499,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var ie = (IndexExpression)e;
-        kids.Add(NestExpression(ie.NodeType, ie.Object ?? throw new Exception("Assumption: indexer expressions have a receiver")));
+        kids.Add(NestExpression(ie.NodeType, ie.Object ?? throw new("Assumption: indexer expressions have a receiver")));
 
         var args = ie.Indexer == null
             ? ie.Arguments.Select(SingleChildDispatch)
@@ -520,7 +520,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         }
 
         kids.Add(NestExpression(ie.NodeType, ie.Expression));
-        var invokeMethod = ie.Expression.Type.GetTypeInfo().GetMethod("Invoke") ?? throw new Exception("Assumption: all delegates have a method Invoke");
+        var invokeMethod = ie.Expression.Type.GetTypeInfo().GetMethod("Invoke") ?? throw new("Assumption: all delegates have a method Invoke");
         var args = GetArgumentsForMethod(invokeMethod, ie.Arguments);
         kids.Add(ArgListDispatch(args, ie));
         return kids.Finish();
@@ -576,7 +576,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         kids.Add("new ", lie);
         kids.Add(TypeNameToCode(lie.NewExpression.Type));
         if (lie.NewExpression.Arguments.Any()) {
-            kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor ?? throw new Exception("Assumption: Constructor cannot be omitted when it has arguments: " + lie.NewExpression.Type), lie.NewExpression.Arguments)));
+            kids.Add(ArgListDispatch(GetArgumentsForMethod(lie.NewExpression.Constructor ?? throw new("Assumption: Constructor cannot be omitted when it has arguments: " + lie.NewExpression.Type), lie.NewExpression.Arguments)));
         }
 
         kids.Add(" { ");
@@ -628,7 +628,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var newExpr = mie.NewExpression;
         kids.Add(TypeNameToCode(newExpr.Type));
         if (newExpr.Arguments.Any()) {
-            kids.Add(ArgListDispatch(GetArgumentsForMethod(newExpr.Constructor ?? throw new Exception("Assumption: Constructor cannot be omitted when it has arguments: " + newExpr.Type), newExpr.Arguments)));
+            kids.Add(ArgListDispatch(GetArgumentsForMethod(newExpr.Constructor ?? throw new("Assumption: Constructor cannot be omitted when it has arguments: " + newExpr.Type), newExpr.Arguments)));
         }
 
         kids.Add(" { ");
@@ -675,7 +675,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
             if (ne.Arguments.Count == 0) {
                 kids.Add("()");
             } else {
-                kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor ?? throw new Exception("Assumption: any new-expression with arguments must have a constructor"), ne.Arguments)));
+                kids.Add(ArgListDispatch(GetArgumentsForMethod(ne.Constructor ?? throw new("Assumption: any new-expression with arguments must have a constructor"), ne.Arguments)));
             }
         }
 
@@ -689,7 +689,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var nae = (NewArrayExpression)e;
-        var arrayElemType = nae.Type.GetElementType() ?? throw new Exception("Assumption: all arrays have an element type");
+        var arrayElemType = nae.Type.GetElementType() ?? throw new("Assumption: all arrays have an element type");
         var isDelegate = typeof(Delegate).GetTypeInfo().IsAssignableFrom(arrayElemType);
         var implicitTypeOK = !isDelegate && nae.Expressions.Any()
             && nae.Expressions.All(expr => expr.Type == arrayElemType);
@@ -704,7 +704,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         var kids = KidsBuilder.Create();
 
         var nae = (NewArrayExpression)e;
-        var arrayElemType = nae.Type.GetElementType() ?? throw new Exception("Assumption: all arrays have an element type");
+        var arrayElemType = nae.Type.GetElementType() ?? throw new("Assumption: all arrays have an element type");
         kids.Add("new " + TypeNameToCode(arrayElemType), nae);
         kids.Add(ArgListDispatch(nae.Expressions.Select(SingleChildDispatch), null, "[", "]"));
         return kids.Finish();

@@ -19,7 +19,7 @@ static class ObjectToCodeImpl
         } else if (retval != null) {
             return ElideAfter(retval, valueSize);
         } else if (val is null) {
-            throw new Exception("Impossible: if val is null, retval cannot be");
+            throw new("Impossible: if val is null, retval cannot be");
         } else if (val is Array arrayVal) {
             return "new[] " + FormatEnumerable(config, arrayVal, indent, valueSize - 6);
         } else if (val is IEnumerable enumerableVal) {
@@ -247,7 +247,7 @@ static class ObjectToCodeImpl
                         match.Groups[1].Value,
                     _ => methodInfoVal.Name,
                 },
-            _ when val is ValueType && (Activator.CreateInstance(val.GetType()) ?? throw new Exception("value types cannot be null: " + val.GetType())).Equals(val) => "default(" + val.GetType().ToCSharpFriendlyTypeName(config, false) + ")",
+            _ when val is ValueType && (Activator.CreateInstance(val.GetType()) ?? throw new("value types cannot be null: " + val.GetType())).Equals(val) => "default(" + val.GetType().ToCSharpFriendlyTypeName(config, false) + ")",
             _ => null,
         };
 

@@ -109,6 +109,6 @@ static class ExpressionPrecedence
             ExpressionType.AddAssignChecked => 15,
             ExpressionType.MultiplyAssignChecked => 15,
             ExpressionType.SubtractAssignChecked => 15,
-            _ => throw new ArgumentOutOfRangeException("Unsupported enum value:" + exprType)
+            _ => throw new ArgumentOutOfRangeException("Unsupported enum value:" + exprType),
         };
 }

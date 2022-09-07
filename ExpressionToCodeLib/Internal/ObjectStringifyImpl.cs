@@ -14,5 +14,5 @@ sealed class ObjectStringifyImpl : IObjectStringifier
 
     [Obsolete]
     public string? PlainObjectToCode(object? val, Type? type)
-        => ObjectToCodeImpl.PlainObjectToCode(new ExpressionToCodeConfiguration { UseFullyQualifiedTypeNames = UseFullyQualifiedTypeNames, }, val, type);
+        => ObjectToCodeImpl.PlainObjectToCode(new() { UseFullyQualifiedTypeNames = UseFullyQualifiedTypeNames, }, val, type);
 }

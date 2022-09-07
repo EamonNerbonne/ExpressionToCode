@@ -36,10 +36,10 @@ class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
             var subExpressionValues = new List<SubExpressionValue>();
             FindSubExpressionValues(config, node, node, subExpressionValues, outerValueIsAssertionFailure);
             var assertionValue = outerValueIsAssertionFailure ? OutermostValue(config, node) : null;
-            return new ExpressionWithSubExpressions {
+            return new() {
                 ExpressionString = fullExprText
                     + (assertionValue != null ? "\n" + spacedArrow + assertionValue + " (caused assertion failure)\n" : ""),
-                SubExpressions = subExpressionValues.Distinct().ToArray()
+                SubExpressions = subExpressionValues.Distinct().ToArray(),
             };
         }
 
@@ -48,6 +48,7 @@ class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
             if (node.OptionalValue != null) {
                 return ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 10);
             }
+
             foreach (var kid in node.Children) {
                 if (!kid.IsConceptualChild) {
                     var value = OutermostValue(config, kid);
@@ -56,6 +57,7 @@ class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
                     }
                 }
             }
+
             foreach (var kid in node.Children) {
                 if (kid.IsConceptualChild) {
                     var value = OutermostValue(config, kid);
@@ -64,6 +66,7 @@ class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
                     }
                 }
             }
+
             return null;
         }
 
@@ -98,7 +101,7 @@ class SubExpressionPerLineCodeAnnotator : ICodeAnnotator
                     : sb.ToString(0, maxSize / 2 - 1) + "  …  " + sb.ToString(sb.Length - (maxSize / 2 - 1), maxSize / 2 - 1);
                 // ReSharper disable once ReplaceWithStringIsNullOrEmpty - for nullability analysis
                 if (valueString != null && valueString != "") {
-                    subExpressionValues.Add(new SubExpressionValue { SubExpression = subExprString, ValueAsString = valueString });
+                    subExpressionValues.Add(new() { SubExpression = subExprString, ValueAsString = valueString, });
                 }
             }
 

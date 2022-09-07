@@ -32,7 +32,7 @@ public static class FormatStringParser
         string ICustomFormatter.Format(string? format, object? arg, IFormatProvider? formatProvider)
         {
             Segments.Add(
-                new Segment {
+                new() {
                     InitialStringPart = sb.ToString(),
                     FollowedByValue = arg,
                     WithFormatString = format,

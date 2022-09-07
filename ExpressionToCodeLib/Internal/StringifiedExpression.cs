@@ -11,8 +11,8 @@ readonly struct StringifiedExpression
 
     /// <summary>
     ///     The expression tree contains many symbols that are not themselves "real" expressions, e.g. the "." in "obj.field".
-    ///     This field is true for parts that aren't just implementation details, but proper sub-expressions; e.g. the "x" in "x
-    ///     &amp;&amp; y"
+    ///     This field is true for parts that aren't just implementation details, but proper sub-expressions; e.g. the "x" in
+    ///     "x &amp;&amp; y"
     /// </summary>
     public readonly bool IsConceptualChild;
 
@@ -38,7 +38,7 @@ readonly struct StringifiedExpression
             throw new ArgumentNullException(nameof(expr));
         }
 
-        return new StringifiedExpression(text, null, expr, false);
+        return new(text, null, expr, false);
     }
 
     [Pure]

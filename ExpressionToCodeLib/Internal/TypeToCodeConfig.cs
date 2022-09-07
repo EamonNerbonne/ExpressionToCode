@@ -68,7 +68,7 @@ public readonly record struct TypeToCodeConfig
             _ when type == typeof(ushort) => "ushort",
             _ when type == typeof(string) => "string",
             _ when type == typeof(void) => "void",
-            { IsGenericParameter: true } => type.Name,
+            { IsGenericParameter: true, } => type.Name,
             _ => null,
         };
 
@@ -78,7 +78,7 @@ public readonly record struct TypeToCodeConfig
     string NormalName(Type type)
     {
         if (type.DeclaringType != null) {
-            return (this with { UseFullyQualifiedTypeNames = false }).GetTypeName(type.DeclaringType) + "." + type.Name;
+            return (this with { UseFullyQualifiedTypeNames = false, }).GetTypeName(type.DeclaringType) + "." + type.Name;
         } else {
             return type.Name;
         }

@@ -1,6 +1,6 @@
-
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
+
 namespace ExpressionToCodeLib;
 
 /// <summary>

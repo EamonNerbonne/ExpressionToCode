@@ -47,8 +47,8 @@ sealed class ValuesOnStalksCodeAnnotator : ICodeAnnotator
         var ignoreInitialSpace = true;
         var node = new ExpressionToCodeImpl(config).ExpressionDispatch(e);
         AppendTo(config, sb, nodeInfos, node, ref ignoreInitialSpace, !outerValueIsAssertionFailure);
-        nodeInfos.Add(new SubExpressionInfo { Location = sb.Length, Value = null });
-        return new SplitExpressionLine { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray() };
+        nodeInfos.Add(new() { Location = sb.Length, Value = null, });
+        return new() { Line = sb.ToString().TrimEnd(), Nodes = nodeInfos.ToArray(), };
     }
 
     static void AppendTo(
@@ -67,7 +67,7 @@ sealed class ValuesOnStalksCodeAnnotator : ICodeAnnotator
             if (showTopExpressionValue) {
                 var valueString = node.OptionalValue == null ? null : ObjectToCodeImpl.ExpressionValueAsCode(config, node.OptionalValue, 0);
                 if (valueString != null) {
-                    nodeInfos.Add(new SubExpressionInfo { Location = pos0 + trimmedText.Length / 2, Value = valueString });
+                    nodeInfos.Add(new() { Location = pos0 + trimmedText.Length / 2, Value = valueString, });
                 }
             }
         }
