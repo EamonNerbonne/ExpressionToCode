@@ -13,10 +13,10 @@ public static class ObjectToCode
         => ObjectToCodeImpl.ComplexObjectToPseudoCode(config, val, 0);
 
     public static string? PlainObjectToCode(object? val)
-        => ObjectStringifyImpl.PlainObjectToCode(ExpressionToCodeConfiguration.GlobalCodeGenConfiguration, val, val?.GetType());
+        => ObjectToCodeImpl.PlainObjectToCode(ExpressionToCodeConfiguration.GlobalCodeGenConfiguration, val, val?.GetType());
 
     public static string? PlainObjectToCode(object? val, Type? type)
-        => ObjectStringifyImpl.PlainObjectToCode(ExpressionToCodeConfiguration.GlobalCodeGenConfiguration, val, type);
+        => ObjectToCodeImpl.PlainObjectToCode(ExpressionToCodeConfiguration.GlobalCodeGenConfiguration, val, type);
 
     public static string ToCSharpFriendlyTypeName(this Type type)
         => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true, }.GetTypeName(type);

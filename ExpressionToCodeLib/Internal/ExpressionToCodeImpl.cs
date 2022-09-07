@@ -9,10 +9,10 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
     readonly ExpressionToCodeConfiguration config;
 
     string? PlainObjectToCode(object? val, Type? type)
-        => ObjectStringifyImpl.PlainObjectToCode(config, val, type);
+        => ObjectToCodeImpl.PlainObjectToCode(config, val, type);
 
     string TypeNameToCode(Type type)
-        => ObjectStringifyImpl.TypeNameToCode(config, type);
+        => ObjectToCodeImpl.TypeNameToCode(config, type);
 
     bool AlwaysUseExplicitTypeArguments => config.AlwaysUseExplicitTypeArguments;
 
@@ -387,7 +387,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
                         ? StringifiedExpression.WithChildren(new[] { StringifiedExpression.TextOnly("("), this.ExpressionDispatch(child), StringifiedExpression.TextOnly(")"), })
                         : this.ExpressionDispatch(child)
             ).ToArray();
-        var useVerbatimSyntax = ObjectStringifyImpl.UseVerbatimSyntax(config, formatString)
+        var useVerbatimSyntax = ObjectToCodeImpl.UseVerbatimSyntax(config, formatString)
                 || StringifiedExpression.WithChildren(interpolationArgumentsStringified).ToString().Contains('\n') // no longer necessary after https://devblogs.microsoft.com/dotnet/early-peek-at-csharp-11-features/#c-11-preview-allow-newlines-in-the-holes-of-interpolated-strings
             ;
 
@@ -409,7 +409,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
         } else {
             kids.Add("$\"");
             foreach (var segment in parsed.segments) {
-                kids.Add(ObjectStringifyImpl.EscapeStringChars(segment.InitialStringPart.Replace("{", "{{").Replace("}", "}}")) + "{");
+                kids.Add(ObjectToCodeImpl.EscapeStringChars(segment.InitialStringPart.Replace("{", "{{").Replace("}", "}}")) + "{");
                 kids.Add(segment.FollowedByValue is StringifiedExpression expr ? expr : throw new InvalidOperationException("All arguments should have been StringifiedExpressions"));
                 if (segment.WithFormatString != null) {
                     kids.Add(":" + segment.WithFormatString + "}");
@@ -418,7 +418,7 @@ class ExpressionToCodeImpl : IExpressionTypeDispatch<StringifiedExpression>
                 }
             }
 
-            kids.Add(ObjectStringifyImpl.EscapeStringChars(parsed.Tail.Replace("{", "{{").Replace("}", "}}")) + "\"");
+            kids.Add(ObjectToCodeImpl.EscapeStringChars(parsed.Tail.Replace("{", "{{").Replace("}", "}}")) + "\"");
         }
 
         return kids;
