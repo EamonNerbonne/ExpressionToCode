@@ -39,7 +39,7 @@ sealed record TypeToCodeConfig
         return output.ToString();
     }
 
-    public static bool IsValueTupleType(TypeInfo typeInfo)
+    internal static bool IsValueTupleType(TypeInfo typeInfo)
         => typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition && typeInfo.Namespace == "System" && typeInfo.Name.StartsWith("ValueTuple`", StringComparison.Ordinal);
 
     string GetUnaliasedTypeName(Type type)
