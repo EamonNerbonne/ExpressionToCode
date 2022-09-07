@@ -118,7 +118,7 @@ public static class EqualityExpressions
         }
 
         (EqualityExpressionClass, bool) ReportIfError(EqualityExpressionClass eqClass, bool? itsVal)
-            => currentVal == itsVal ? default : (eqClass, !itsVal.HasValue);
+            => currentVal == itsVal ? (EqualityExpressionClass.None, false) : (eqClass, !itsVal.HasValue);
 
         var iEnumerableTypes =
             GetGenericInterfaceImplementation(leftC.Type, typeof(IEnumerable<>))
