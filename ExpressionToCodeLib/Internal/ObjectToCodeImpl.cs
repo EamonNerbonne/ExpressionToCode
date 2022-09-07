@@ -6,7 +6,7 @@ namespace ExpressionToCodeLib.Internal;
 
 static class ObjectToCodeImpl
 {
-    static readonly string[] lineSeparators = { "\r\n", "\n" };
+    static readonly string[] lineSeparators = { "\r\n", "\n", };
 
     public static string ComplexObjectToPseudoCode(ExpressionToCodeConfiguration config, object? val, int indent)
         => ComplexObjectToPseudoCode(config, val, indent, config.MaximumValueLength ?? int.MaxValue);
@@ -123,7 +123,7 @@ static class ObjectToCodeImpl
         }
 
         if (config.PrintedListLengthLimit is { } limit && lines.Length > limit) {
-            lines = lines.Take(limit).Concat(new[] { "..." }).ToArray();
+            lines = lines.Take(limit).Concat(new[] { "...", }).ToArray();
         }
 
         var stringBoundaryPrefix = lines[0].StartsWith("@\"", StringComparison.Ordinal) ? 2 : lines[0].StartsWith("\"", StringComparison.Ordinal) ? 1 : 0;
