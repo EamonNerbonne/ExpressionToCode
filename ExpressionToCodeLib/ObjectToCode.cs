@@ -20,4 +20,10 @@ public static class ObjectToCode
 
     public static string ToCSharpFriendlyTypeName(this Type type)
         => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true, }.GetTypeName(type);
+
+    public static string ToCSharpFriendlyTypeName(this Type type, ExpressionToCodeConfiguration config)
+        => type.ToCSharpFriendlyTypeName(config.UseFullyQualifiedTypeNames);
+
+    public static string ToCSharpFriendlyTypeName(this Type type, bool useFullyQualifiedTypeNames)
+        => new CSharpFriendlyTypeName { IncludeGenericTypeArgumentNames = true, UseFullyQualifiedTypeNames = useFullyQualifiedTypeNames, }.GetTypeName(type);
 }

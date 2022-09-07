@@ -563,9 +563,7 @@ public sealed class ExpressionToCodeLibTest
     public void PlainTypeName_WhenFullTypeNameRequestedForUnboundTypeArgument()
     {
         var unboundListTypeArg = typeof(List<>).GetGenericArguments()[0];
-        Assert.Equal(
-            "T",
-            ObjectStringify.WithFullTypeNames.TypeNameToCode(unboundListTypeArg));
+        Assert.Equal("T", unboundListTypeArg.ToCSharpFriendlyTypeName(true));
     }
 
     [Fact]

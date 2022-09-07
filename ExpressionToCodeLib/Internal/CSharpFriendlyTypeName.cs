@@ -2,7 +2,7 @@ namespace ExpressionToCodeLib.Internal;
 
 struct CSharpFriendlyTypeName
 {
-    public bool UseFullName;
+    public bool UseFullyQualifiedTypeNames;
     public bool IncludeGenericTypeArgumentNames;
 
     public string GetTypeName(Type type)
@@ -47,7 +47,7 @@ struct CSharpFriendlyTypeName
         var typeNameWithoutNamespace =
             GenericTypeName(type)
             ?? NormalName(type);
-        return UseFullName ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
+        return UseFullyQualifiedTypeNames ? type.Namespace + "." + typeNameWithoutNamespace : typeNameWithoutNamespace;
     }
 
     static string? AliasNameOrNull(Type type)
@@ -79,7 +79,7 @@ struct CSharpFriendlyTypeName
     {
         if (type.DeclaringType != null) {
             var settingsWithoutUseFullname = this;
-            settingsWithoutUseFullname.UseFullName = false;
+            settingsWithoutUseFullname.UseFullyQualifiedTypeNames = false;
 
             return settingsWithoutUseFullname.GetTypeName(type.DeclaringType) + "." + type.Name;
         } else {
