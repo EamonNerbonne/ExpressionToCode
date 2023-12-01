@@ -46,7 +46,7 @@
 		</None>
 		<PackageReference Include="FastExpressionCompiler" Version="3.3.4" />
 		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="7.0.0" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
         <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
 		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
 	</ItemGroup>
