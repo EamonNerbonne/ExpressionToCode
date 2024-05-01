@@ -44,7 +44,7 @@
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
 		</None>
-		<PackageReference Include="FastExpressionCompiler" Version="4.1.0" />
+		<PackageReference Include="FastExpressionCompiler" Version="4.2.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.0" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
         <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
