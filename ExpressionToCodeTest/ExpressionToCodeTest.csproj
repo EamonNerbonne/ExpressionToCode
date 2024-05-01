@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../packages/xunit.core.2.8.0/build/xunit.core.props" Condition="Exists('../packages/xunit.core.2.8.0/build/xunit.core.props')" />
   <PropertyGroup>
     <OutputType>library</OutputType>
     <TargetFrameworks>net48;netcoreapp3.1;net6.0</TargetFrameworks>
@@ -25,5 +26,17 @@
       <HintPath>..\packages\xunit.extensibility.core.2.8.0\lib\net452\xunit.core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.8.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
+      <HintPath>..\packages\xunit.extensibility.execution.2.8.0\lib\net452\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('../packages/xunit.core.2.8.0/build/xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '../packages/xunit.core.2.8.0/build/xunit.core.props'))" />
+    <Error Condition="!Exists('../packages/xunit.core.2.8.0/build/xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '../packages/xunit.core.2.8.0/build/xunit.core.targets'))" />
+  </Target>
+  <Import Project="../packages/xunit.core.2.8.0/build/xunit.core.targets" Condition="Exists('../packages/xunit.core.2.8.0/build/xunit.core.targets')" />
 </Project>
