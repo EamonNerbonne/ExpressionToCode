@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../packages/xunit.core.2.8.1/build/xunit.core.props" Condition="Exists('../packages/xunit.core.2.8.1/build/xunit.core.props')" />
   <Import Project="../packages/xunit.runner.visualstudio.2.8.0/build/net462/xunit.runner.visualstudio.props" Condition="Exists('../packages/xunit.runner.visualstudio.2.8.0/build/net462/xunit.runner.visualstudio.props')" />
   <Import Project="../packages/xunit.core.2.8.0/build/xunit.core.props" Condition="Exists('../packages/xunit.core.2.8.0/build/xunit.core.props')" />
   <PropertyGroup>
@@ -71,16 +72,16 @@
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="xunit.assert, Version=2.8.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
-      <HintPath>..\packages\xunit.assert.2.8.0\lib\netstandard1.1\xunit.assert.dll</HintPath>
+    <Reference Include="xunit.assert, Version=2.8.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
+      <HintPath>..\packages\xunit.assert.2.8.1\lib\netstandard1.1\xunit.assert.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="xunit.core, Version=2.8.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
-      <HintPath>..\packages\xunit.extensibility.core.2.8.0\lib\net452\xunit.core.dll</HintPath>
+    <Reference Include="xunit.core, Version=2.8.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
+      <HintPath>..\packages\xunit.extensibility.core.2.8.1\lib\net452\xunit.core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="xunit.execution.desktop, Version=2.8.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
-      <HintPath>..\packages\xunit.extensibility.execution.2.8.0\lib\net452\xunit.execution.desktop.dll</HintPath>
+    <Reference Include="xunit.execution.desktop, Version=2.8.1.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c">
+      <HintPath>..\packages\xunit.extensibility.execution.2.8.1\lib\net452\xunit.execution.desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -91,6 +92,9 @@
     <Error Condition="!Exists('../packages/xunit.core.2.8.0/build/xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '../packages/xunit.core.2.8.0/build/xunit.core.props'))" />
     <Error Condition="!Exists('../packages/xunit.core.2.8.0/build/xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '../packages/xunit.core.2.8.0/build/xunit.core.targets'))" />
     <Error Condition="!Exists('../packages/xunit.runner.visualstudio.2.8.0/build/net462/xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '../packages/xunit.runner.visualstudio.2.8.0/build/net462/xunit.runner.visualstudio.props'))" />
+    <Error Condition="!Exists('../packages/xunit.core.2.8.1/build/xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '../packages/xunit.core.2.8.1/build/xunit.core.props'))" />
+    <Error Condition="!Exists('../packages/xunit.core.2.8.1/build/xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '../packages/xunit.core.2.8.1/build/xunit.core.targets'))" />
   </Target>
   <Import Project="../packages/xunit.core.2.8.0/build/xunit.core.targets" Condition="Exists('../packages/xunit.core.2.8.0/build/xunit.core.targets')" />
+  <Import Project="../packages/xunit.core.2.8.1/build/xunit.core.targets" Condition="Exists('../packages/xunit.core.2.8.1/build/xunit.core.targets')" />
 </Project>
