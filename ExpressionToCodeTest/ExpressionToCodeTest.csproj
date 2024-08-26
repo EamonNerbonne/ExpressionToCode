@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../packages/xunit.runner.visualstudio.2.8.2/build/net462/xunit.runner.visualstudio.props" Condition="Exists('../packages/xunit.runner.visualstudio.2.8.2/build/net462/xunit.runner.visualstudio.props')" />
   <Import Project="../packages/ApprovalTests.6.0.0/build/ApprovalTests.props" Condition="Exists('../packages/ApprovalTests.6.0.0/build/ApprovalTests.props')" />
   <Import Project="../packages/xunit.core.2.9.0/build/xunit.core.props" Condition="Exists('../packages/xunit.core.2.9.0/build/xunit.core.props')" />
   <Import Project="../packages/xunit.runner.visualstudio.2.8.0/build/net462/xunit.runner.visualstudio.props" Condition="Exists('../packages/xunit.runner.visualstudio.2.8.0/build/net462/xunit.runner.visualstudio.props')" />
@@ -16,7 +17,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit" Version="2.6.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
@@ -142,6 +143,7 @@
     <Error Condition="!Exists('../packages/EmptyFiles.8.3.0/build/EmptyFiles.targets')" Text="$([System.String]::Format('$(ErrorText)', '../packages/EmptyFiles.8.3.0/build/EmptyFiles.targets'))" />
     <Error Condition="!Exists('../packages/ApprovalTests.6.0.0/build/ApprovalTests.props')" Text="$([System.String]::Format('$(ErrorText)', '../packages/ApprovalTests.6.0.0/build/ApprovalTests.props'))" />
     <Error Condition="!Exists('../packages/ApprovalTests.6.0.0/build/ApprovalTests.targets')" Text="$([System.String]::Format('$(ErrorText)', '../packages/ApprovalTests.6.0.0/build/ApprovalTests.targets'))" />
+    <Error Condition="!Exists('../packages/xunit.runner.visualstudio.2.8.2/build/net462/xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '../packages/xunit.runner.visualstudio.2.8.2/build/net462/xunit.runner.visualstudio.props'))" />
   </Target>
   <Import Project="../packages/xunit.core.2.8.0/build/xunit.core.targets" Condition="Exists('../packages/xunit.core.2.8.0/build/xunit.core.targets')" />
   <Import Project="../packages/xunit.core.2.9.0/build/xunit.core.targets" Condition="Exists('../packages/xunit.core.2.9.0/build/xunit.core.targets')" />
