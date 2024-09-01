@@ -10,7 +10,7 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageTags>code-generation NUnit xUnit.NET mstest expression-tree unit-test PowerAssert ExpressionToCode</PackageTags>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-		<TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
 		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 		<RepositoryUrl>https://github.com/EamonNerbonne/ExpressionToCode</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/EamonNerbonne/ExpressionToCode</PackageProjectUrl>
@@ -45,7 +45,7 @@
 			<LastGenOutput>ExpressionTypeDispatch.Generated.cs</LastGenOutput>
 		</None>
 		<PackageReference Include="FastExpressionCompiler" Version="4.2.1" />
-		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.1" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
         <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
 		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />

@@ -1,16 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup Label="Configuration">
-		<AssemblyName>ExpressionToCode.Benchmarks</AssemblyName>
-		<RootNamespace>ExpressionToCode.Benchmarks</RootNamespace>
 		<Authors>Maksim Volkau, Eamon Nerbonne</Authors>
-		<TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 		<Owners>Eamon Nerbonne</Owners>
 		<OutputType>Exe</OutputType>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\ExpressionToCodeLib\ExpressionToCodeLib.csproj" />
-		<PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
 		<PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
 	</ItemGroup>
 </Project>
