@@ -24,10 +24,10 @@ The assertion fails with the following message:
 ```
 assertion failed
 
-Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture) == 3.5.ToString(CultureInfo.InvariantCulture)
+Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString() == 3.5.ToString()
    →   false (caused assertion failure)
 
-Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString(CultureInfo.InvariantCulture)
+Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"].ToString()
      →   "3"
 
 Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)["n3"]
@@ -71,7 +71,7 @@ Enumerable.Range(0, 1000).ToDictionary(i => "n" + i)
 Enumerable.Range(0, 1000)
      →   { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, ... }
 
-3.5.ToString(CultureInfo.InvariantCulture)
+3.5.ToString()
      →   "3.5"
 
 ```
